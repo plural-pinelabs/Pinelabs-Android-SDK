@@ -9,5 +9,6 @@ enum class ErrorCode(val code: String) {
     ORDER_PROCESSED("2001"), //  success code for order processing
     PAYMENT_FAILED("2002"), //  failure code for payment failure
     TRANSACTION_CANCELLED("2003"), //  code for transaction cancellation
-    UNKNOWN_PAYMENT_ERROR("2004") //  code for an unhandled payment error
+    UNKNOWN_PAYMENT_ERROR("2004"), //  code for an unhandled payment error
+    EXCEPTION_THROWN("2005"), //  code for an unhandled exception
 }

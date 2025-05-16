@@ -1,6 +1,7 @@
 package com.plural_pinelabs.expresscheckoutsdk.presentation
 
 import android.os.Bundle
+import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -17,5 +18,16 @@ class LandingActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+    }
+
+
+    private fun showHideHeaderLayout(isShow: Boolean) {
+        val headerLayout = findViewById<View>(R.id.header_layout)
+        headerLayout.visibility = if (!isShow) {
+            View.GONE
+        } else {
+            View.VISIBLE
+        }
+
     }
 }

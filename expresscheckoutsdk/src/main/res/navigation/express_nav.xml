@@ -13,11 +13,21 @@
         tools:layout="@layout/fragment_splash" >
         <action
             android:id="@+id/action_splashFragment_to_landingFragment"
-            app:destination="@id/landingFragment" />
+            app:destination="@id/landingFragment"
+            app:popUpTo="@id/splashFragment"
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_splashFragment_to_phoneNumberFragment"
+            app:destination="@id/phoneNumberFragment" />
     </fragment>
     <fragment
         android:id="@+id/landingFragment"
         android:name="com.plural_pinelabs.expresscheckoutsdk.presentation.landing.LandingFragment"
         android:label="fragment_landing"
         tools:layout="@layout/fragment_landing" />
+    <fragment
+        android:id="@+id/phoneNumberFragment"
+        android:name="com.plural_pinelabs.expresscheckoutsdk.presentation.PhoneNumberFragment"
+        android:label="fragment_phone_number"
+        tools:layout="@layout/fragment_phone_number" />
 </navigation>

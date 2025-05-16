@@ -20,8 +20,8 @@ class MainActivity : AppCompatActivity() {
             insets
         }
         ExpressSDKInitializer().initializeSDK(
-            this,
-            "your_token_here",
+            this@MainActivity,
+            "",
             object : ExpressSDKCallback {
                 override fun onError(
                     errorCode: String?,

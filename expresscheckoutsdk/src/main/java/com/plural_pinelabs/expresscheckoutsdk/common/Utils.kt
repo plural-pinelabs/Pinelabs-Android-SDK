@@ -13,6 +13,7 @@ import com.clevertap.android.sdk.CleverTapAPI
 import com.plural_pinelabs.expresscheckoutsdk.R
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.EMAIL_REGEX
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.MOBILE_REGEX
+import com.plural_pinelabs.expresscheckoutsdk.data.model.Palette
 import java.net.Inet4Address
 import java.net.NetworkInterface
 import java.net.SocketException
@@ -31,54 +32,7 @@ object Utils {
             }
         }
 
-    fun hasInternetConnection(context: Context?): Boolean {
-        try {
-            if (context == null)
-                return false
-            val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE)
-                    as ConnectivityManager
-            val activeNetwork = connectivityManager.activeNetwork ?: return false
-            val networkCapabilities =
-                connectivityManager.getNetworkCapabilities(activeNetwork) ?: return false
-            return when {
-                networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true
-                networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> true
-                networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) -> true
-                else -> false
-            }
-        } catch (e: Exception) {
-            return false
-        }
-    }
 
-    fun getLocalIpAddress(): String? {
-        try {
-            val en = NetworkInterface.getNetworkInterfaces()
-            while (en.hasMoreElements()) {
-                val nextEle = en.nextElement()
-                val enumIpAddress = nextEle.inetAddresses
-                while (enumIpAddress.hasMoreElements()) {
-                    val inetAddress = enumIpAddress.nextElement()
-                    if (!inetAddress.isLoopbackAddress && inetAddress is Inet4Address) {
-                        return inetAddress.getHostAddress()
-                    }
-                }
-            }
-        } catch (ex: SocketException) {
-            ex.printStackTrace()
-        }
-        return null
-    }
-
-    fun getTimeOffset(): Int {
-        // Get the default time zone of the device
-        val timeZone: TimeZone = TimeZone.getDefault()
-        // Get the offset from UTC in milliseconds
-        val offsetMillis: Int = timeZone.getOffset(System.currentTimeMillis())
-        // Convert milliseconds to minutes
-        val offsetMinutes = offsetMillis / (1000 * 60)
-        return offsetMinutes
-    }
 
     // Method to map the pixel format to color depth in bits
     fun getColorDepth(pixelFormat: Int): Int {

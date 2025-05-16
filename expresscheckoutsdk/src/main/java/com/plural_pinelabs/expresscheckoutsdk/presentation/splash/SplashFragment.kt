@@ -1,24 +1,41 @@
 package com.plural_pinelabs.expresscheckoutsdk.presentation.splash
 
+import android.animation.Animator
 import android.os.Bundle
-import androidx.fragment.app.Fragment
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.findNavController
+import com.airbnb.lottie.LottieAnimationView
+import com.plural_pinelabs.expresscheckoutsdk.ExpressSDKObject
 import com.plural_pinelabs.expresscheckoutsdk.R
+import com.plural_pinelabs.expresscheckoutsdk.common.BaseResult
+import com.plural_pinelabs.expresscheckoutsdk.common.NetworkHelper
+import com.plural_pinelabs.expresscheckoutsdk.common.SplashViewModelFactory
+import com.plural_pinelabs.expresscheckoutsdk.data.model.FetchResponseDTO
+import kotlinx.coroutines.launch
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [SplashFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class SplashFragment : Fragment() {
+    private var isDataFetched = false
 
+    private var isRevealShown = false
+    private lateinit var logoAnimation: LottieAnimationView
+
+    private lateinit var viewModel: SplashViewModel
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        viewModel = ViewModelProvider(
+            this,
+            SplashViewModelFactory(NetworkHelper(requireContext()))
+        )[SplashViewModel::class.java]
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -26,6 +43,92 @@ class SplashFragment : Fragment() {
     ): View? {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_splash, container, false)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        setLottieAnimation(view)
+        observeViewModel()
+
+        //  viewModel.fetchData(ExpressSDKObject.getToken() ?: "")
+       // findNavController().navigate(R.id.action_splashFragment_to_phoneNumberFragment)
+    }
+
+    private fun setLottieAnimation(view: View) {
+        logoAnimation = view.findViewById(R.id.img_logo)
+        logoAnimation.setAnimation(R.raw.reveal)
+        logoAnimation.playAnimation()
+
+
+        logoAnimation.addAnimatorListener(object : Animator.AnimatorListener {
+            override fun onAnimationStart(animation: Animator) {
+
+            }
+
+            override fun onAnimationEnd(animation: Animator) {
+                if (isDataFetched) {
+                    logoAnimation.pauseAnimation()
+                }
+            }
+
+            override fun onAnimationCancel(animation: Animator) {
+
+            }
+
+            override fun onAnimationRepeat(animation: Animator) {
+                if (isDataFetched) {
+                    logoAnimation.pauseAnimation()
+                }
+                if (!isRevealShown) {
+                    isRevealShown = true
+                    logoAnimation.setAnimation(R.raw.logo)
+                    logoAnimation.playAnimation()
+                }
+
+            }
+
+        })
+
+    }
+
+    private fun observeViewModel() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.fetchDataResult.collect { result ->
+                    when (result) {
+                        is BaseResult.Error -> {
+                            isDataFetched = true
+                            // Han
+                            // dle error
+                            result.errorCode.let { exception ->
+                                // Log the error or show a message to the user
+                                Log.e("Error", exception)
+                                // For example, navigate to an error screen or show a dialog
+                            }
+
+                        }
+
+                        is BaseResult.Success<FetchResponseDTO> -> {
+                            isDataFetched = true
+                            // Handle success
+                            result.data.let { it ->
+                                // Process the data
+                                ExpressSDKObject.setFetchData(it)
+                                Log.d("Success", "Data fetched successfully")
+                                // Navigate using NavController
+                                findNavController().navigate(R.id.action_splashFragment_to_landingFragment)
+                            }
+                        }
+
+                        is BaseResult.Loading -> {
+                            // handle loading
+                            Log.d("Loading", "Loading data...")
+                            result.isLoading
+                        }
+                    }
+                }
+            }
+        }
     }
 
 }

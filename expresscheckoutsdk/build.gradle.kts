@@ -9,11 +9,26 @@ android {
     namespace = "com.plural_pinelabs.expresscheckoutsdk"
     compileSdk = 35
 
+    buildFeatures {
+        buildConfig = true
+    }
     defaultConfig {
         minSdk = 26
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
+
+        buildConfigField(
+            "String",
+            "SHA256_UAT",
+            "\"c2hhMjU2LzRnZU5TQkpuem9BYVc2K3puR2x3YmhYZWdSS1Q0c0s2bEdUZ0w2YmVZQmM9\""
+        )
+        buildConfigField("String", "SHA256_QA", "\"c2hhMjU2LzVwNjZBekxRU0kzdjdUd2RBeGVuQUswY0dU\"")
+        buildConfigField(
+            "String",
+            "SHA256_PROD",
+            "\"c2hhMjU2L2dmVUJRQzB1WWNmQ2k3d21CdWllcnZjNWlNWGZnSXE3U2JQcVNyeU1LZDA9\""
+        )
     }
 
     buildTypes {
@@ -53,6 +68,7 @@ dependencies {
     implementation(libs.lifecycle.runtime)
     implementation(libs.lifecycle.extension)
     implementation(libs.lifecycle.viewmodel)
+    implementation(libs.retrofit.logging.interceptor)
 
     implementation(libs.activity.ktx)
     implementation(libs.fragment.ktx)

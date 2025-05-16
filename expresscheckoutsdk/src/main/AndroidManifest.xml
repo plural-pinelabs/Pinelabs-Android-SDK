@@ -1,9 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
 
-    <application>
+    <application
+        android:name="com.clevertap.android.sdk.Application"
+        android:allowBackup="false"
+        tools:replace="android:allowBackup">
+
+        <meta-data
+            android:name="CLEVERTAP_IDENTIFIER"
+            android:value="Identity,Phone" />
+
+        <meta-data
+            android:name="CLEVERTAP_ACCOUNT_ID"
+            android:value="TEST-Z69-W6Z-9Z6Z" />
+        <meta-data
+            android:name="CLEVERTAP_TOKEN"
+            android:value="TEST-160-c61" />
+        <meta-data
+            android:name="CLEVERTAP_USE_GOOGLE_AD_ID"
+            android:value="1" />
+
         <activity
             android:name=".presentation.LandingActivity"
             android:exported="false" />

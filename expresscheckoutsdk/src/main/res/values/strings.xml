@@ -5,4 +5,7 @@
     <string name="invalid_token">Invalid Token\n</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="cancel">Cancel</string>
+    <string name="contact_detail_divider">|</string>
+    <string name="order_summary">Order Summary</string>
 </resources>

@@ -1,6 +1,7 @@
 package com.plural_pinelabs.expresscheckoutsdk
 
 import android.content.Context
+import com.plural_pinelabs.expresscheckoutsdk.data.model.FetchResponseDTO
 import java.util.concurrent.atomic.AtomicReference
 
 internal data class SDKObject(
@@ -22,6 +23,10 @@ internal object ExpressSDKObject {
 
     fun getSDKObject(): SDKObject? {
         return sdkObjectRef.get()
+    }
+
+    fun setFetchData(it: FetchResponseDTO) {
+
     }
 }
 
