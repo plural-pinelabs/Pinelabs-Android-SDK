@@ -5,8 +5,6 @@ import android.graphics.PixelFormat
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.GradientDrawable
 import android.graphics.drawable.StateListDrawable
-import android.net.ConnectivityManager
-import android.net.NetworkCapabilities
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.graphics.toColorInt
 import com.clevertap.android.sdk.CleverTapAPI
@@ -14,10 +12,8 @@ import com.plural_pinelabs.expresscheckoutsdk.R
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.EMAIL_REGEX
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.MOBILE_REGEX
 import com.plural_pinelabs.expresscheckoutsdk.data.model.Palette
-import java.net.Inet4Address
-import java.net.NetworkInterface
-import java.net.SocketException
-import java.util.TimeZone
+import com.plural_pinelabs.expresscheckoutsdk.data.model.PaymentMode
+import com.plural_pinelabs.expresscheckoutsdk.data.model.RecyclerViewPaymentOptionData
 import java.util.regex.Pattern
 
 object Utils {
@@ -31,7 +27,6 @@ object Utils {
                 "ExpressSDK"
             }
         }
-
 
 
     // Method to map the pixel format to color depth in bits
@@ -95,6 +90,41 @@ object Utils {
 
     fun cleverTapLog() {
         CleverTapAPI.setDebugLevel(CleverTapAPI.LogLevel.OFF)
+    }
+
+    fun mapPaymentModes(paymentMode: PaymentMode): RecyclerViewPaymentOptionData {
+
+        var paymentModeData = RecyclerViewPaymentOptionData()
+        when (paymentMode.paymentModeId) {
+            PaymentModes.CREDIT_DEBIT.toString() -> paymentModeData =
+                RecyclerViewPaymentOptionData(
+                    PaymentModes.CREDIT_DEBIT.paymentModeImage,
+                    PaymentModes.CREDIT_DEBIT.paymentModeName,
+                    PaymentModes.CREDIT_DEBIT.paymentModeDescription
+
+                )
+
+            PaymentModes.NET_BANKING.toString() -> paymentModeData =
+                RecyclerViewPaymentOptionData(
+                    PaymentModes.NET_BANKING.paymentModeImage,
+                    PaymentModes.NET_BANKING.paymentModeName,
+                    PaymentModes.NET_BANKING.paymentModeDescription
+                )
+
+            PaymentModes.UPI.toString() -> paymentModeData = RecyclerViewPaymentOptionData(
+                PaymentModes.UPI.paymentModeImage,
+                PaymentModes.UPI.paymentModeName,
+                PaymentModes.UPI.paymentModeDescription
+            )
+
+            PaymentModes.WALLET.toString() -> paymentModeData = RecyclerViewPaymentOptionData(
+                PaymentModes.WALLET.paymentModeImage,
+                PaymentModes.WALLET.paymentModeName,
+                PaymentModes.WALLET.paymentModeDescription
+            )
+        }
+
+        return paymentModeData
     }
 
 

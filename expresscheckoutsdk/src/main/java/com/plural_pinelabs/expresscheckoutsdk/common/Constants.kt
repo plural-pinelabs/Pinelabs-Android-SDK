@@ -13,4 +13,10 @@ internal object Constants {
     const val BASE_CHECKOUTBFF = "/api/v3/checkout-bff/"
 
     const val TIMEOUT: Long = 60
+
+    const val CREDIT_DEBIT_ID = "CREDIT_DEBIT"
+    const val PAY_BY_POINTS_ID = "PAYBYPOINTS"
+    const val NET_BANKING_ID = "NET_BANKING"
+    const val UPI_ID = "UPI"
+    const val WALLET_ID = "WALLET"
 }

@@ -8,6 +8,7 @@ internal data class SDKObject(
     val context: Context,
     val callback: ExpressSDKCallback,
     val token: String,
+    var fetchResponseDTO: FetchResponseDTO? = null,
 )
 
 internal object ExpressSDKObject {
@@ -26,7 +27,10 @@ internal object ExpressSDKObject {
     }
 
     fun setFetchData(it: FetchResponseDTO) {
-
+        getSDKObject()?.fetchResponseDTO = it
+    }
+    fun getFetchData(): FetchResponseDTO? {
+        return getSDKObject()?.fetchResponseDTO
     }
 }
 

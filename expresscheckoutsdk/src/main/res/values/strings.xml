@@ -8,4 +8,31 @@
     <string name="cancel">Cancel</string>
     <string name="contact_detail_divider">|</string>
     <string name="order_summary">Order Summary</string>
+    <string name="enter_your_mobile_number">Enter your mobile number</string>
+    <string name="mobile_number">Mobile Number</string>
+    <string name="_91">(+91)</string>
+    <string name="continue_text">Continue</string>
+    <string name="verify_mobile_number">Verify mobile number</string>
+    <string name="enter_the_otp_sent_to">Enter the OTP sent to</string>
+    <string name="resend_otp_in">Resend OTP in</string>
+    <string name="to_proceed_please_verify_your_mobile_number">To proceed, please verify your mobile number</string>
+    <string name="verify">Verify</string>
+    <string name="add_delivery_address">Add delivery address</string>
+    <string name="contact_and_delivery_details">Contact and delivery details</string>
+    <string name="save_up_to">Save Up to</string>
+    <string name="select_a_payment_option">Select a payment option</string>
+    <string name="credit_debit_label">Cards</string>
+    <string name="net_banking_label">Netbanking</string>
+    <string name="upi_label">UPI</string>
+    <string name="wallet_label">Wallet</string>
+    <string name="all_payment_methods_label">All Payment Methods</string>
+    <string name="credit_debit_label_description">Visa, MasterCard, RuPay &amp; more</string>
+    <string name="net_banking_label_description">Pay by scanning a QR code with any banking app</string>
+    <string name="upi_label_description">PhonePe, GooglePay, PayTM, CRED &amp; more</string>
+    <string name="wallet_label_description">Jio, Airtel, PayTM, Mobikwik &amp; more</string>
+    <string name="all_payment_methods_label_description">All Payment Methods</string>
+    <string name="enmi_label_description">Credit, Debit &amp; Cardless EMIs from ₹ 1,999 per month</string>
+    <string name="bnpl_label_descrption">Lazypay, Simpl and HDFC</string>
+
+
 </resources>

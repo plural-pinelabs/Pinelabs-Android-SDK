@@ -8,22 +8,17 @@ import android.view.ViewGroup
 import androidx.navigation.fragment.findNavController
 import com.plural_pinelabs.expresscheckoutsdk.R
 
-class PhoneNumberFragment : Fragment() {
-
+class NewAddressFormFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_phone_number, container, false)
+        return inflater.inflate(R.layout.fragment_new_address_form, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        view.findViewById<View>(R.id.continue_btn).setOnClickListener {
-            // Handle button click
-            findNavController().navigate(R.id.action_phoneNumberFragment_to_verifyOTPFragment)
-        }
+        findNavController().navigate(R.id.action_newAddressFormFragment_to_paymentModeFragment)
     }
-
 }

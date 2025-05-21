@@ -12,13 +12,11 @@
         android:label="fragment_splash"
         tools:layout="@layout/fragment_splash" >
         <action
-            android:id="@+id/action_splashFragment_to_landingFragment"
-            app:destination="@id/landingFragment"
-            app:popUpTo="@id/splashFragment"
-            app:popUpToInclusive="true" />
-        <action
             android:id="@+id/action_splashFragment_to_phoneNumberFragment"
             app:destination="@id/phoneNumberFragment" />
+        <action
+            android:id="@+id/action_splashFragment_to_paymentModeFragment"
+            app:destination="@id/paymentModeFragment" />
     </fragment>
     <fragment
         android:id="@+id/landingFragment"
@@ -29,5 +27,30 @@
         android:id="@+id/phoneNumberFragment"
         android:name="com.plural_pinelabs.expresscheckoutsdk.presentation.PhoneNumberFragment"
         android:label="fragment_phone_number"
-        tools:layout="@layout/fragment_phone_number" />
+        tools:layout="@layout/fragment_phone_number" >
+        <action
+            android:id="@+id/action_phoneNumberFragment_to_verifyOTPFragment"
+            app:destination="@id/verifyOTPFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/verifyOTPFragment"
+        android:name="com.plural_pinelabs.expresscheckoutsdk.VerifyOTPFragment"
+        android:label="VerifyOTPFragment" >
+        <action
+            android:id="@+id/action_verifyOTPFragment_to_newAddressFormFragment"
+            app:destination="@id/newAddressFormFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/newAddressFormFragment"
+        android:name="com.plural_pinelabs.expresscheckoutsdk.presentation.NewAddressFormFragment"
+        android:label="NewAddressFormFragment" >
+        <action
+            android:id="@+id/action_newAddressFormFragment_to_paymentModeFragment"
+            app:destination="@id/paymentModeFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/paymentModeFragment"
+        android:name="com.plural_pinelabs.expresscheckoutsdk.presentation.PaymentModeFragment"
+        android:label="fragment_payment_mode"
+        tools:layout="@layout/fragment_payment_mode" />
 </navigation>

@@ -1,0 +1,44 @@
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Outer top border -->
+    <item
+        android:bottom="7dp"
+        android:left="1dp"
+        android:right="1dp"
+        android:top="0dp">
+        <shape>
+            <corners android:radius="6dp" />
+            <solid android:color="@android:color/transparent" />
+            <stroke
+                android:width="6dp"
+                android:color="#006400" />
+        </shape>
+    </item>
+
+
+    <!-- Inner top border (slightly below outer) -->
+    <item
+        android:bottom="0dp"
+        android:left="0dp"
+        android:right="0dp"
+        android:top="8dp">
+        <shape>
+            <solid android:color="@android:color/transparent" />
+            <stroke
+                android:width="4dp"
+                android:color="@color/border_light_green_24" />
+            <corners android:radius="12dp" />
+        </shape>
+    </item>
+
+
+    <!-- Background fill -->
+    <item android:top="6dp"
+        android:bottom="1dp"
+        android:left="1dp"
+        android:right="1dp">
+        <shape>
+            <solid android:color="#E6FFE6" />
+            <corners android:radius="12dp" />
+        </shape>
+    </item>
+</layer-list>

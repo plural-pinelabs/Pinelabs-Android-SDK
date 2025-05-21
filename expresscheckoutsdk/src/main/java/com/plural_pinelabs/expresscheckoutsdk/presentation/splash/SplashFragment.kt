@@ -50,8 +50,8 @@ class SplashFragment : Fragment() {
         setLottieAnimation(view)
         observeViewModel()
 
-        //  viewModel.fetchData(ExpressSDKObject.getToken() ?: "")
-       // findNavController().navigate(R.id.action_splashFragment_to_phoneNumberFragment)
+        viewModel.fetchData(ExpressSDKObject.getToken() ?: "")
+        // findNavController().navigate(R.id.action_splashFragment_to_phoneNumberFragment)
     }
 
     private fun setLottieAnimation(view: View) {
@@ -115,8 +115,14 @@ class SplashFragment : Fragment() {
                                 // Process the data
                                 ExpressSDKObject.setFetchData(it)
                                 Log.d("Success", "Data fetched successfully")
-                                // Navigate using NavController
-                                findNavController().navigate(R.id.action_splashFragment_to_landingFragment)
+                                // TODO Finalize the condition
+                                if (it.customerInfo?.customerId.isNullOrEmpty()) {
+                                    // no customer id new user
+                                    findNavController().navigate(R.id.action_splashFragment_to_phoneNumberFragment)
+                                } else
+                                   // TODO UNCOMMENT NAVIGATION TO LANDING AND REMOVE THIS
+                                    findNavController().navigate(R.id.action_splashFragment_to_phoneNumberFragment)
+                                //  findNavController().navigate(R.id.action_splashFragment_to_landingFragment)
                             }
                         }
 

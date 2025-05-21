@@ -111,8 +111,9 @@ data class BrandTheme(val color: String)
 
 
 data class RecyclerViewPaymentOptionData(
-    val payment_image: Int = -1,
-    val payment_option: String = ""
+    val paymentImage: Int = -1,
+    val paymentOption: Int = -1,
+    val description: Int = -1,
 )
 
 @Parcelize
@@ -464,3 +465,5 @@ data class Palette(
     @SerializedName("600") val C600: String, @SerializedName("700") val C700: String,
     @SerializedName("800") val C800: String, @SerializedName("900") var C900: String
 ) : Parcelable
+
+
