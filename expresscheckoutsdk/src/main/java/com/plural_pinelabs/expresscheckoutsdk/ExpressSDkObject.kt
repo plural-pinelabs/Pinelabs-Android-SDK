@@ -29,8 +29,16 @@ internal object ExpressSDKObject {
     fun setFetchData(it: FetchResponseDTO) {
         getSDKObject()?.fetchResponseDTO = it
     }
+
     fun getFetchData(): FetchResponseDTO? {
         return getSDKObject()?.fetchResponseDTO
+    }
+
+    fun getAmount(): Int {
+        val fetchResponse = getFetchData()
+        return fetchResponse?.paymentData?.originalTxnAmount?.amount ?: run {
+            -1
+        }
     }
 }
 

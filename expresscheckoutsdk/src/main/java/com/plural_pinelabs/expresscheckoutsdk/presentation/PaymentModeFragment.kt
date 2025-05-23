@@ -1,16 +1,20 @@
 package com.plural_pinelabs.expresscheckoutsdk.presentation
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.plural_pinelabs.expresscheckoutsdk.ExpressSDKObject
 import com.plural_pinelabs.expresscheckoutsdk.R
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PAY_BY_POINTS_ID
+import com.plural_pinelabs.expresscheckoutsdk.common.ItemClickListener
+import com.plural_pinelabs.expresscheckoutsdk.common.PaymentModes
 import com.plural_pinelabs.expresscheckoutsdk.data.model.PaymentMode
 import com.plural_pinelabs.expresscheckoutsdk.presentation.utils.DividerItemDecoration
 
@@ -37,7 +41,12 @@ class PaymentModeFragment : Fragment() {
         val paymentModes = getPaymentModes()
         paymentModes?.let {
             val adapter =
-                PaymentModeRecyclerViewAdapter(requireContext(), it, isPBPEnabled(paymentModes))
+                PaymentModeRecyclerViewAdapter(
+                    requireContext(),
+                    it,
+                    isPBPEnabled(paymentModes),
+                    getPaymentModeSelectionCallback(requireContext())
+                )
             recyclerView.adapter = adapter
         }
 
@@ -50,6 +59,36 @@ class PaymentModeFragment : Fragment() {
 
     private fun isPBPEnabled(paymentModes: List<PaymentMode>): Boolean {
         return paymentModes.any { it.paymentModeId == PAY_BY_POINTS_ID }
+    }
+
+    private fun getPaymentModeSelectionCallback(context: Context): ItemClickListener<PaymentMode>? {
+        return object : ItemClickListener<PaymentMode> {
+            override fun onItemClick(position: Int, item: PaymentMode) {
+                //TODO navigate to different fragments based on the payment mode selected
+                when (item.paymentModeId) {
+                    PaymentModes.CREDIT_DEBIT.paymentModeID -> {
+                        findNavController().navigate(R.id.action_paymentModeFragment_to_cardFragment)
+                    }
+
+                    PaymentModes.UPI.paymentModeID -> {
+                        // Handle UPI selection
+                    }
+
+                    PaymentModes.NET_BANKING.paymentModeID -> {
+                        // Handle Netbanking selection
+                    }
+
+                    PaymentModes.WALLET.paymentModeID -> {
+                        // Handle Wallet selection
+                    }
+
+                    else -> {
+                        // Handle other selections
+                    }
+                }
+
+            }
+        }
     }
 
 }

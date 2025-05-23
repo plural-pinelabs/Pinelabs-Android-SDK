@@ -9,7 +9,7 @@
         android:id="@+id/img_safe_secure"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/safe_and_secure_trust_marker"
+        android:src="@drawable/ic_safe_and_secure_marker"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent" />
 
@@ -20,7 +20,7 @@
         android:layout_marginLeft="10dp"
         android:layout_marginTop="5dp"
         android:layout_marginBottom="5dp"
-        android:background="@color/shimmer_grey"
+        android:background="@color/black_text_20"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toRightOf="@+id/img_safe_secure"
         app:layout_constraintTop_toTopOf="@+id/img_safe_secure" />
@@ -30,7 +30,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="10dp"
-        android:src="@drawable/pci_dss"
+        android:src="@drawable/ic_pci_dss"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toRightOf="@+id/txt_slash" />
 
@@ -38,7 +38,7 @@
         android:id="@+id/img_plural_pinelabs"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/plural_by_pinelabs"
+        android:src="@drawable/ic_pineabs_logo_grey"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintRight_toRightOf="parent" />
 

@@ -145,15 +145,15 @@ data class CustomerInfoResponse(
 
 @Parcelize
 data class ProcessPaymentRequest(
-    val card_token_data: CardTokenData?,
-    val customer_data: CustomerData?,
-    val card_data: CardData?,
-    val upi_data: UpiData?,
-    val wallet_data: WalletData?,
-    val netbanking_data: NetBankingData?,
-    val extras: Extra?,
-    val txn_data: UpiTransactionData?,
-    val convenience_fee_data: ConvenienceFeesData?,
+    val card_token_data: CardTokenData? = null,
+    val customer_data: CustomerData? = null,
+    val card_data: CardData? = null,
+    val upi_data: UpiData? = null,
+    val wallet_data: WalletData? = null,
+    val netbanking_data: NetBankingData? = null,
+    val extras: Extra? = null,
+    val txn_data: UpiTransactionData? = null,
+    val convenience_fee_data: ConvenienceFeesData? = null,
 ) : Parcelable
 
 @Parcelize

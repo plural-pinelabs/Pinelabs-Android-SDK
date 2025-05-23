@@ -10,6 +10,7 @@ import com.plural_pinelabs.expresscheckoutsdk.common.Constants.BASE_URL_UAT
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.HTTPS
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.TIMEOUT
 import com.plural_pinelabs.expresscheckoutsdk.common.PaymentModeDeserialiser
+import com.plural_pinelabs.expresscheckoutsdk.data.fetch.CardApiService
 import com.plural_pinelabs.expresscheckoutsdk.data.fetch.FetchApiService
 import okhttp3.CertificatePinner
 import okhttp3.OkHttpClient
@@ -38,6 +39,7 @@ object RetrofitBuilder {
     }
 
     val fetchApiService: FetchApiService = getRetrofit().create(FetchApiService::class.java)
+    val cardApiService: CardApiService = getRetrofit().create(CardApiService::class.java)
 
     private fun createBuilder(): OkHttpClient.Builder {
 

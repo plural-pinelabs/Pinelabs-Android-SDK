@@ -33,6 +33,20 @@
     <string name="all_payment_methods_label_description">All Payment Methods</string>
     <string name="enmi_label_description">Credit, Debit &amp; Cardless EMIs from ₹ 1,999 per month</string>
     <string name="bnpl_label_descrption">Lazypay, Simpl and HDFC</string>
+    <string name="add_a_new_card_credit_debit"><font color="CC1C1C1C">Add a New Card </font><font color="#801C1C1C">(Credit/Debit)</font></string>
+    <string name="card_details">Card details</string>
+    <string name="securely_save_your_card_for_future_payments">Securely save your card for future payments</string>
+    <string name="pay_faster_on_croma_for_your_next_purchase">Pay faster on Croma for your next purchase</string>
+    <string name="full_name_on_card">Full name on card</string>
+    <string name="please_enter_a_valid_card_number">Please enter a valid card number</string>
+    <string name="please_enter_a_valid_expiry">Please enter a valid expiry date</string>
+    <string name="please_enter_a_valid_cvv">Please enter a valid CVV</string>
+    <string name="please_enter_a_valid_card_holder_name">Please enter a valid card holder name.</string>
+    <string name="pay_amount_text">"Pay %1$s %2$.2f"</string>
+    <string name="rupee_symbol">\u20B9</string>
+    <string name="card_number_hint">1234 1234 1234 1234</string>
+    <string name="processing_payment">Processing your payment</string>
+    <string name="payment_verification">We’re verifying your payment status.\n Please do not go back or refresh.</string>
 
 
 </resources>

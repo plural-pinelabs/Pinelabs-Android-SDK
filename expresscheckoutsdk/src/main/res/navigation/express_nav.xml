@@ -52,5 +52,14 @@
         android:id="@+id/paymentModeFragment"
         android:name="com.plural_pinelabs.expresscheckoutsdk.presentation.PaymentModeFragment"
         android:label="fragment_payment_mode"
-        tools:layout="@layout/fragment_payment_mode" />
+        tools:layout="@layout/fragment_payment_mode" >
+        <action
+            android:id="@+id/action_paymentModeFragment_to_cardFragment"
+            app:destination="@id/cardFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/cardFragment"
+        android:name="com.plural_pinelabs.expresscheckoutsdk.presentation.card.CardFragment"
+        android:label="fragment_card"
+        tools:layout="@layout/fragment_card" />
 </navigation>

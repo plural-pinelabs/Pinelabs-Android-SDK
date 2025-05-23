@@ -26,7 +26,7 @@ inline fun <reified T> toResultFlow(
                     } else {
                         val type = object : TypeToken<FetchError>() {}.type
                         val errorResponse: FetchError? =
-                            Gson().fromJson(response.errorBody()!!.charStream(), type)
+                            Gson().fromJson(response.errorBody()?.charStream(), type)
                         emit(
                             BaseResult.Error(
                                 errorResponse?.error_code ?: ErrorCode.INTERNAL_SERVER_ERROR.code,
