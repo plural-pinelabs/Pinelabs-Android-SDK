@@ -1,6 +1,5 @@
 package com.plural_pinelabs.expresscheckoutsdk.data.repository
 
-import android.content.Context
 import com.plural_pinelabs.expresscheckoutsdk.common.BaseResult
 import com.plural_pinelabs.expresscheckoutsdk.common.NetworkHelper
 import com.plural_pinelabs.expresscheckoutsdk.common.toResultFlow
@@ -9,6 +8,8 @@ import com.plural_pinelabs.expresscheckoutsdk.data.fetch.FetchApiService
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CardBinMetaDataRequestList
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CardBinMetaDataResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.FetchResponseDTO
+import com.plural_pinelabs.expresscheckoutsdk.data.model.OTPRequest
+import com.plural_pinelabs.expresscheckoutsdk.data.model.OTPResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ProcessPaymentRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ProcessPaymentResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.retrofit.ApiService
@@ -41,6 +42,33 @@ class ExpressRepositoryImpl(
     ): Flow<BaseResult<ProcessPaymentResponse>> {
         return toResultFlow(networkHelper = networkHelper) {
             (apiService as CardApiService).processPayment(token, paymentData)
+        }
+    }
+
+    override suspend fun submitOTP(
+        token: String?,
+        otpRequest: OTPRequest
+    ): Flow<BaseResult<OTPResponse>> {
+        return toResultFlow(networkHelper = networkHelper) {
+            (apiService as CardApiService).submitOTP(token, otpRequest)
+        }
+    }
+
+    override suspend fun requestOTP(
+        token: String?,
+        otpRequest: OTPRequest
+    ): Flow<BaseResult<OTPResponse>> {
+        return toResultFlow(networkHelper = networkHelper) {
+            (apiService as CardApiService).initiateOTP(token, otpRequest)
+        }
+    }
+
+    override suspend fun resendOTP(
+        token: String?,
+        otpRequest: OTPRequest
+    ): Flow<BaseResult<OTPResponse>> {
+        return toResultFlow(networkHelper = networkHelper) {
+            (apiService as CardApiService).initiateOTP(token, otpRequest)
         }
     }
 }

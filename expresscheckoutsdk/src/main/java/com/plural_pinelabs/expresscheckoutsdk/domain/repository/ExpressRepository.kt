@@ -4,6 +4,8 @@ import com.plural_pinelabs.expresscheckoutsdk.common.BaseResult
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CardBinMetaDataRequestList
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CardBinMetaDataResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.FetchResponseDTO
+import com.plural_pinelabs.expresscheckoutsdk.data.model.OTPRequest
+import com.plural_pinelabs.expresscheckoutsdk.data.model.OTPResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ProcessPaymentRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ProcessPaymentResponse
 import kotlinx.coroutines.flow.Flow
@@ -21,4 +23,11 @@ interface ExpressRepository {
         paymentData: ProcessPaymentRequest?
     ): Flow<BaseResult<ProcessPaymentResponse>>
 
+    suspend fun submitOTP(
+        token: String?,
+        otpRequest: OTPRequest
+    ): Flow<BaseResult<OTPResponse>>
+
+    suspend fun requestOTP(token: String?, otpRequest: OTPRequest): Flow<BaseResult<OTPResponse>>
+    suspend fun resendOTP(token: String?, otpRequest: OTPRequest): Flow<BaseResult<OTPResponse>>
 }
