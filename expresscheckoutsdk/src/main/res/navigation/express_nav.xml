@@ -25,7 +25,7 @@
         tools:layout="@layout/fragment_landing" />
     <fragment
         android:id="@+id/phoneNumberFragment"
-        android:name="com.plural_pinelabs.expresscheckoutsdk.presentation.PhoneNumberFragment"
+        android:name="com.plural_pinelabs.expresscheckoutsdk.presentation.d2c.PhoneNumberFragment"
         android:label="fragment_phone_number"
         tools:layout="@layout/fragment_phone_number" >
         <action
@@ -34,7 +34,7 @@
     </fragment>
     <fragment
         android:id="@+id/verifyOTPFragment"
-        android:name="com.plural_pinelabs.expresscheckoutsdk.VerifyOTPFragment"
+        android:name="com.plural_pinelabs.expresscheckoutsdk.presentation.d2c.VerifyOTPFragment"
         android:label="VerifyOTPFragment" >
         <action
             android:id="@+id/action_verifyOTPFragment_to_newAddressFormFragment"
@@ -42,7 +42,7 @@
     </fragment>
     <fragment
         android:id="@+id/newAddressFormFragment"
-        android:name="com.plural_pinelabs.expresscheckoutsdk.presentation.NewAddressFormFragment"
+        android:name="com.plural_pinelabs.expresscheckoutsdk.presentation.d2c.NewAddressFormFragment"
         android:label="NewAddressFormFragment" >
         <action
             android:id="@+id/action_newAddressFormFragment_to_paymentModeFragment"
@@ -50,7 +50,7 @@
     </fragment>
     <fragment
         android:id="@+id/paymentModeFragment"
-        android:name="com.plural_pinelabs.expresscheckoutsdk.presentation.PaymentModeFragment"
+        android:name="com.plural_pinelabs.expresscheckoutsdk.presentation.landing.PaymentModeFragment"
         android:label="fragment_payment_mode"
         tools:layout="@layout/fragment_payment_mode" >
         <action
@@ -61,5 +61,21 @@
         android:id="@+id/cardFragment"
         android:name="com.plural_pinelabs.expresscheckoutsdk.presentation.card.CardFragment"
         android:label="fragment_card"
-        tools:layout="@layout/fragment_card" />
+        tools:layout="@layout/fragment_card" >
+        <action
+            android:id="@+id/action_cardFragment_to_ACSFragment"
+            app:destination="@id/ACSFragment" />
+        <action
+            android:id="@+id/action_cardFragment_to_nativeOTPFragment"
+            app:destination="@id/nativeOTPFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/ACSFragment"
+        android:name="com.plural_pinelabs.expresscheckoutsdk.presentation.acs.ACSFragment"
+        android:label="ACSFragment" />
+    <fragment
+        android:id="@+id/nativeOTPFragment"
+        android:name="com.plural_pinelabs.expresscheckoutsdk.presentation.NativeOTPFragment"
+        android:label="fragment_native_otp"
+        tools:layout="@layout/fragment_native_otp" />
 </navigation>

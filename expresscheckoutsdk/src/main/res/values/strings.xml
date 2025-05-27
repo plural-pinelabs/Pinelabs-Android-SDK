@@ -47,6 +47,15 @@
     <string name="card_number_hint">1234 1234 1234 1234</string>
     <string name="processing_payment">Processing your payment</string>
     <string name="payment_verification">We’re verifying your payment status.\n Please do not go back or refresh.</string>
+    <string name="go_back">Go back</string>
+    <string name="enter_otp_to_complete_payment">Enter OTP to complete payment</string>
+    <string name="otp_sent_to_the_mobile_linked_to_your_bank">OTP sent to the mobile linked to your bank</string>
+    <string name="enter_otp">Enter OTP</string>
+    <string name="waiting_to_auto_read_otp">Waiting to auto-read OTP</string>
+    <string name="wrong_otp_please_re_enter">Wrong OTP, please re-enter</string>
+    <string name="verify_pay">Verify &amp; Pay</string>
+    <string name="or_complete_payment_on_your"><font color ='background: #1C1C1C80;
+'> Or, complete payment on your </font><font color='#CC1C1C1C'><u>bank’s website</u></font></string>
 
 
 </resources>

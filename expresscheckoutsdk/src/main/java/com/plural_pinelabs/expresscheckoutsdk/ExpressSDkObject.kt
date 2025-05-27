@@ -2,6 +2,7 @@ package com.plural_pinelabs.expresscheckoutsdk
 
 import android.content.Context
 import com.plural_pinelabs.expresscheckoutsdk.data.model.FetchResponseDTO
+import com.plural_pinelabs.expresscheckoutsdk.data.model.ProcessPaymentResponse
 import java.util.concurrent.atomic.AtomicReference
 
 internal data class SDKObject(
@@ -9,6 +10,7 @@ internal data class SDKObject(
     val callback: ExpressSDKCallback,
     val token: String,
     var fetchResponseDTO: FetchResponseDTO? = null,
+    var processPaymentResponse: ProcessPaymentResponse? = null,
 )
 
 internal object ExpressSDKObject {
@@ -36,9 +38,17 @@ internal object ExpressSDKObject {
 
     fun getAmount(): Int {
         val fetchResponse = getFetchData()
-        return fetchResponse?.paymentData?.originalTxnAmount?.amount ?: run {
+        return (fetchResponse?.paymentData?.originalTxnAmount?.amount ?: run {
             -1
-        }
+        })
+    }
+
+    fun setProcessPaymentResponse(it: ProcessPaymentResponse) {
+        getSDKObject()?.processPaymentResponse = it
+    }
+
+    fun getProcessPaymentResponse(): ProcessPaymentResponse? {
+        return getSDKObject()?.processPaymentResponse
     }
 }
 

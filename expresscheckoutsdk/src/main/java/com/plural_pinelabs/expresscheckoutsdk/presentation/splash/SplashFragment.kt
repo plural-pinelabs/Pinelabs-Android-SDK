@@ -19,6 +19,7 @@ import com.plural_pinelabs.expresscheckoutsdk.common.BaseResult
 import com.plural_pinelabs.expresscheckoutsdk.common.NetworkHelper
 import com.plural_pinelabs.expresscheckoutsdk.common.SplashViewModelFactory
 import com.plural_pinelabs.expresscheckoutsdk.data.model.FetchResponseDTO
+import com.plural_pinelabs.expresscheckoutsdk.presentation.LandingActivity
 import kotlinx.coroutines.launch
 
 class SplashFragment : Fragment() {
@@ -116,11 +117,12 @@ class SplashFragment : Fragment() {
                                 ExpressSDKObject.setFetchData(it)
                                 Log.d("Success", "Data fetched successfully")
                                 // TODO Finalize the condition
+                                (activity as? LandingActivity)?.updateValueForHeaderLayout(it)
                                 if (it.customerInfo?.customerId.isNullOrEmpty()) {
                                     // no customer id new user
                                     findNavController().navigate(R.id.action_splashFragment_to_phoneNumberFragment)
                                 } else
-                                   // TODO UNCOMMENT NAVIGATION TO LANDING AND REMOVE THIS
+                                // TODO UNCOMMENT NAVIGATION TO LANDING AND REMOVE THIS
                                     findNavController().navigate(R.id.action_splashFragment_to_phoneNumberFragment)
                                 //  findNavController().navigate(R.id.action_splashFragment_to_landingFragment)
                             }

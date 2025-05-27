@@ -1,4 +1,4 @@
-package com.plural_pinelabs.expresscheckoutsdk.presentation
+package com.plural_pinelabs.expresscheckoutsdk.presentation.landing
 
 import android.content.Context
 import android.view.LayoutInflater

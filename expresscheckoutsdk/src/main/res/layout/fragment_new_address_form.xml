@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".presentation.PhoneNumberFragment">
+    tools:context=".presentation.d2c.PhoneNumberFragment">
 
     <LinearLayout
         android:layout_width="match_parent"

@@ -54,8 +54,8 @@ class CardFragmentViewModel(private val expressRepositoryImpl: ExpressRepository
         }
     }
 
-    fun processPayment(token: String, paymentData: ProcessPaymentRequest?) =
-        viewModelScope.launch {
+    fun processPayment(token: String?, paymentData: ProcessPaymentRequest?) =
+        viewModelScope.launch(Dispatchers.IO) {
             expressRepositoryImpl.processPayment(token, paymentData).collect {
                 _processPaymentResult.value = it
             }

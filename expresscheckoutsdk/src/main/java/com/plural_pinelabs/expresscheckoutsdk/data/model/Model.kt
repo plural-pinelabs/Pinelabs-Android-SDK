@@ -120,6 +120,7 @@ data class RecyclerViewPaymentOptionData(
 // New data class to hold customer information
 data class CustomerInfo(
     val customerId: String?,
+    var customer_id: String?,
     val firstName: String?,
     val lastName: String,
     val isEditCustomerDetailsAllowed: Boolean?,

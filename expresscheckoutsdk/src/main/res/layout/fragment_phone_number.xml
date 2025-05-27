@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:layout_marginHorizontal="16dp"
     android:orientation="vertical"
-    tools:context=".presentation.PhoneNumberFragment">
+    tools:context=".presentation.d2c.PhoneNumberFragment">
 
     <TextView
         android:layout_width="match_parent"

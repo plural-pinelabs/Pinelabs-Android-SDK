@@ -1,6 +1,8 @@
 package com.plural_pinelabs.expresscheckoutsdk.common
 
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.PixelFormat
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.GradientDrawable
@@ -8,6 +10,7 @@ import android.graphics.drawable.StateListDrawable
 import android.os.Build
 import android.provider.Settings
 import android.text.TextUtils
+import android.util.Base64
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.graphics.toColorInt
 import com.clevertap.android.sdk.CleverTapAPI
@@ -294,6 +297,13 @@ internal object Utils {
 
         return phrase.toString()
     }
+
+
+     fun decodeBase64ToBitmap(base64String: String?): Bitmap? {
+        val decodedBytes = Base64.decode(base64String, Base64.DEFAULT)
+        return BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.size)
+    }
+
 
 
 }

@@ -9,6 +9,7 @@
     <color name="black_text">#1C1C1C</color>
     <color name="black_border_stroke">#1F1C1C1C</color>
     <color name="black_text_50">#801C1C1C</color>
+    <color name="black_text_60">#991C1C1C</color>
     <color name="black_text_80">#CC1C1C1C</color>
     <color name="black_text_20">#331C1C1C</color>
     <color name="black_text_12">#1F1C1C1C</color>
@@ -22,4 +23,5 @@
     <color name="yellow_D6A24380">#80D6A243</color>
     <color name="green_3D50D387">#CC50D387</color>
     <color name="error_DD4D42">#DD4D42</color>
+    <color name="grey_99FFFFFF">#99FFFFFF</color>
 </resources>

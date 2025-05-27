@@ -1,4 +1,4 @@
-package com.plural_pinelabs.expresscheckoutsdk.presentation
+package com.plural_pinelabs.expresscheckoutsdk.presentation.d2c
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment

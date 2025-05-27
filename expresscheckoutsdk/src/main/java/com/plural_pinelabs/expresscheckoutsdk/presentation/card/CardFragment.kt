@@ -17,6 +17,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.findNavController
 import com.plural_pinelabs.expresscheckoutsdk.ExpressSDKObject
 import com.plural_pinelabs.expresscheckoutsdk.R
 import com.plural_pinelabs.expresscheckoutsdk.common.BaseResult
@@ -33,7 +34,6 @@ import com.plural_pinelabs.expresscheckoutsdk.data.model.CardBinMetaDataResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CardData
 import com.plural_pinelabs.expresscheckoutsdk.data.model.DeviceInfo
 import com.plural_pinelabs.expresscheckoutsdk.data.model.Extra
-import com.plural_pinelabs.expresscheckoutsdk.data.model.OTPRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ProcessPaymentRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ProcessPaymentResponse
 import kotlinx.coroutines.launch
@@ -93,7 +93,8 @@ class CardFragment : Fragment() {
         expiryEditText = view.findViewById(R.id.expiry_date_et)
         cvvEditText = view.findViewById(R.id.cvv_et)
         payBtn = view.findViewById(R.id.continue_btn)
-        cardHolderText = view.findViewById(R.id.error_message_card_holder_name)
+        cardHolderText = view.findViewById(R.id.full_name_et)
+        cardHolderErrorText = view.findViewById(R.id.error_message_card_holder_name)
         cardErrorText = view.findViewById(R.id.error_message_card_details)
         setUpAmount()
     }
@@ -101,7 +102,8 @@ class CardFragment : Fragment() {
     private fun setUpAmount() {
         payBtn.text = getString(
             R.string.pay_amount_text,
-            getString(R.string.rupee_symbol), ExpressSDKObject.getAmount()
+            getString(R.string.rupee_symbol),
+            Utils.convertInRupees(ExpressSDKObject.getAmount())
         )
         payBtn.setOnClickListener {
             validateAllFields()
@@ -144,7 +146,8 @@ class CardFragment : Fragment() {
                     }
                 }
             }
-
+        }
+        lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED)
             {
                 viewModel.processPaymentResult.collect {
@@ -158,19 +161,11 @@ class CardFragment : Fragment() {
                         }
 
                         is BaseResult.Success<ProcessPaymentResponse> -> {
-                            val data = it.data
-                            val paymentId = data.payment_id
-                            val redirectUrl = data.redirect_url
-                            if (isNativeOTP == true) {
-                                generateOtp(
-                                    data?.payment_id
-                                )
+                            ExpressSDKObject.setProcessPaymentResponse(it.data)
+                            if (isNativeOTP) {
+                                navigateToNativeOTP()
                             } else {
-                                redirectToACS(
-                                    data?.redirect_url,
-                                    data?.order_id,
-                                    data?.payment_id
-                                )
+                                redirectToACS()
                             }
                         }
                     }
@@ -202,20 +197,16 @@ class CardFragment : Fragment() {
         }
     }
 
-    private fun generateOtp(
-        paymentId: String?
-    ) {
-        val otpRequest = OTPRequest(payment_id = paymentId)
-        //  mainViewModel.generatOtp(token, otpRequest)
+    private fun navigateToNativeOTP() {
+
+        // TODO  move to native OTP screen
     }
 
-    fun redirectToACS(
-        redirectUrl: String?,
-        orderId: String?,
-        paymentId: String?
+    private fun redirectToACS(
     ) {
         //todo get time from server
         TimerManager.startTimer(5000)
+        findNavController().navigate(R.id.action_cardFragment_to_ACSFragment)
 
     }
 
@@ -462,8 +453,12 @@ class CardFragment : Fragment() {
     private fun validateAllFields() {
         if (isCardValid && isExpiryValid && isCVVValid && isCardHolderNameValid) {
             val createProcessPaymentRequest = createProcessPaymentRequest()
-
             //create process payment request
+            viewModel.processPayment(
+                token = ExpressSDKObject.getToken(),
+                paymentData = createProcessPaymentRequest
+            )
+
         }
 
     }
