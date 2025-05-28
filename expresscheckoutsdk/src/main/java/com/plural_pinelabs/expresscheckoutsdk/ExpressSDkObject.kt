@@ -43,6 +43,13 @@ internal object ExpressSDKObject {
         })
     }
 
+    fun getCurrency(): String {
+        val fetchResponse = getFetchData()
+        return (fetchResponse?.paymentData?.originalTxnAmount?.currency ?: run {
+            ""
+        })
+    }
+
     fun setProcessPaymentResponse(it: ProcessPaymentResponse) {
         getSDKObject()?.processPaymentResponse = it
     }

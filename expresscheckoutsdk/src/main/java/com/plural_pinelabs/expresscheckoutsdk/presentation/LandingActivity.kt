@@ -11,6 +11,7 @@ import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.plural_pinelabs.expresscheckoutsdk.ExpressSDKObject
@@ -32,6 +33,7 @@ class LandingActivity : AppCompatActivity() {
     private lateinit var customerEmail: TextView
     private lateinit var separator: TextView
     private lateinit var customerInfoData: CustomerInfo
+    private lateinit var headerParentLayout: ConstraintLayout
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -41,6 +43,8 @@ class LandingActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+        //Required to change the background color of the screen
+        window.decorView.setBackgroundColor(getResources().getColor(R.color.screen_background));
         setView()
     }
 
@@ -66,7 +70,10 @@ class LandingActivity : AppCompatActivity() {
         customerId = findViewById(R.id.txt_customer_id)
         customerEmail = findViewById(R.id.txt_customer_email)
         separator = findViewById(R.id.seperator)
+        headerParentLayout = findViewById(R.id.header_layout_parent)
+        showHideHeaderLayout(false)
     }
+
 
     fun updateValueForHeaderLayout(fetchResponse: FetchResponseDTO?) {
         fetchResponse?.let { fetchData ->
@@ -107,11 +114,11 @@ class LandingActivity : AppCompatActivity() {
                             e.printStackTrace()
                         }
                     } else {
-                        merchantLogoCard.visibility= View.INVISIBLE
+                        merchantLogoCard.visibility = View.INVISIBLE
                         merchantLogo.visibility = View.INVISIBLE
                     }
                 } ?: run {
-                    merchantLogoCard.visibility= View.INVISIBLE
+                    merchantLogoCard.visibility = View.INVISIBLE
                     merchantLogo.visibility = View.INVISIBLE
                 }
 

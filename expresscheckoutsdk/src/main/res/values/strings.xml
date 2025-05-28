@@ -54,8 +54,29 @@
     <string name="waiting_to_auto_read_otp">Waiting to auto-read OTP</string>
     <string name="wrong_otp_please_re_enter">Wrong OTP, please re-enter</string>
     <string name="verify_pay">Verify &amp; Pay</string>
-    <string name="or_complete_payment_on_your"><font color ='background: #1C1C1C80;
+    <string name="or_complete_payment_on_your"><font color='background: #1C1C1C80;
 '> Or, complete payment on your </font><font color='#CC1C1C1C'><u>bank’s website</u></font></string>
+    <string name="pay_using_upi">Pay using UPI</string>
+    <string name="pay_by_any_upi_app">Pay by any UPI app</string>
+    <string name="upi_app_google_pay">Google Pay</string>
+    <string name="upi_app_phonepe">PhonePe</string>
+    <string name="upi_app_paytm">Paytm</string>
+    <string name="upi_app_bhim_upi">BHIM </string>
+    <string name="upi_app_cred">CRED</string>
+    <string name="or_get_payment_request_on_upi_id">Or get payment request on UPI ID</string>
+    <string name="upi_open_with">Open with</string>
+    <string name="full_name">Full name</string>
+    <string name="enter_full_name">Enter Full Name</string>
+    <string name="location_details">Location details</string>
+    <string name="enter_pincode">Enter Pincode</string>
+    <string name="city">City</string>
+    <string name="state">State</string>
+    <string name="address_details">Address details</string>
+    <string name="save_this_address_for_quicker_checkout">Save this address for quicker checkout</string>
+    <string name="securely_save_as_per_plural_s_terms_and_privacy_policy">Securely save as per Plural\'s Terms and Privacy Policy</string>
+    <string name="terms">Terms</string>
+    <string name="privacy_policy">Privacy Policy</string>
+    <string name="enter_pin_code_to_view_available_delivery_methods">Enter PIN code to view available delivery methods</string>
 
 
 </resources>

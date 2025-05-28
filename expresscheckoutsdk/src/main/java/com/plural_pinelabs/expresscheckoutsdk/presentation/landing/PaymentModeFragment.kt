@@ -72,6 +72,7 @@ class PaymentModeFragment : Fragment() {
 
                     PaymentModes.UPI.paymentModeID -> {
                         // Handle UPI selection
+                        findNavController().navigate(R.id.action_paymentModeFragment_to_UPIFragment)
                     }
 
                     PaymentModes.NET_BANKING.paymentModeID -> {

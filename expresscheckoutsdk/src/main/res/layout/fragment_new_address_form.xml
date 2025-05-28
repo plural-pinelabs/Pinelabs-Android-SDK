@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -20,6 +21,113 @@
             android:textColor="@color/black_text"
             android:textSize="16sp" />
 
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:fontFamily="sans-serif"
+            android:text="@string/full_name"
+            android:textColor="@color/black_text_80"
+            android:textFontWeight="500"
+            android:textSize="12sp" />
+
+        <EditText
+            android:id="@+id/full_name_edit_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:autofillHints="name"
+            android:background="@drawable/input_field_border"
+            android:fontFamily="sans-serif"
+            android:hint="@string/enter_full_name"
+            android:padding="15dp"
+            android:textColorHint="@color/black_text_30"
+            android:textSize="14sp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:fontFamily="sans-serif"
+            android:text="@string/location_details"
+            android:textColor="@color/black_text_80"
+            android:textFontWeight="500"
+            android:textSize="12sp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:minHeight="50dp"
+            android:orientation="vertical">
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:autofillHints="postalCode"
+                android:background="@drawable/input_field_top_border"
+                android:fontFamily="sans-serif-medium"
+                android:hint="@string/enter_pincode"
+                android:padding="15dp"
+                android:textColorHint="@color/black_text_30"
+                android:textSize="14sp" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/black_text_12"
+                android:visibility="gone" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <EditText
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@drawable/input_field_bottom_left_border"
+                    android:fontFamily="sans-serif-medium"
+                    android:hint="@string/city"
+                    android:padding="15dp"
+                    android:textColorHint="@color/black_text_30"
+                    android:textSize="14sp" />
+
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginHorizontal="4dp"
+                    android:background="@color/black_text_12"
+                    android:visibility="gone" />
+
+                <EditText
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@drawable/input_field_bottom_right_border"
+                    android:fontFamily="sans-serif-medium"
+                    android:hint="@string/state"
+                    android:padding="15dp"
+                    android:textColorHint="@color/black_text_30"
+                    android:textSize="14sp" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:fontFamily="sans-serif"
+            android:text="@string/address_details"
+            android:textColor="@color/black_text_80"
+            android:textFontWeight="500"
+            android:textSize="12sp" />
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -34,7 +142,7 @@
                 android:layout_margin="15dp"
                 android:background="@android:color/transparent"
                 android:fontFamily="sans-serif-medium"
-                android:hint="Enter Pincode "
+                android:hint="@string/enter_pincode"
                 android:textColorHint="@color/black_text_30"
                 android:textSize="14sp" />
 
@@ -43,42 +151,86 @@
                 android:layout_height="1dp"
                 android:background="@color/black_text_12" />
 
-            <LinearLayout
+            <EditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:layout_margin="15dp"
+                android:background="@android:color/transparent"
+                android:fontFamily="sans-serif-medium"
+                android:hint="@string/enter_pincode"
+                android:textColorHint="@color/black_text_30"
+                android:textSize="14sp" />
 
-                <EditText
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="15dp"
-                    android:layout_weight="1"
-                    android:background="@android:color/transparent"
-                    android:fontFamily="sans-serif-medium"
-                    android:hint="City"
-                    android:textColorHint="@color/black_text_30"
-                    android:textSize="14sp" />
-
-                <View
-                    android:layout_width="1dp"
-                    android:layout_height="match_parent"
-                    android:layout_marginHorizontal="4dp"
-                    android:background="@color/black_text_12" />
-
-                <EditText
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="15dp"
-                    android:layout_weight="1"
-                    android:background="@android:color/transparent"
-                    android:fontFamily="sans-serif-medium"
-                    android:hint="State"
-                    android:textColorHint="@color/black_text_30"
-                    android:textSize="14sp" />
-
-            </LinearLayout>
 
         </LinearLayout>
+
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:background="@drawable/input_field_border"
+            android:padding="16dp">
+
+            <CheckBox
+                android:id="@+id/save_address_checkbox"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_margin="8dp"
+                android:background="@null"
+                android:button="@drawable/checkbox_state"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/save_address_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:text="@string/save_this_address_for_quicker_checkout"
+                android:textColor="@color/black_text_80"
+                android:textSize="12sp"
+                app:layout_constraintStart_toEndOf="@id/save_address_checkbox"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/save_address_description"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="4dp"
+                android:autoLink="web"
+                android:linksClickable="true"
+                android:text="@string/securely_save_as_per_plural_s_terms_and_privacy_policy"
+                android:textColor="@color/black_text_80"
+                android:textSize="12sp"
+                app:layout_constraintStart_toEndOf="@id/save_address_checkbox"
+                app:layout_constraintTop_toBottomOf="@id/save_address_text" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:fontFamily="sans-serif"
+            android:text="@string/address_details"
+            android:textColor="@color/black_text_80"
+            android:textFontWeight="500"
+            android:textSize="12sp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/input_field_border"
+            android:drawableStart="@drawable/ic_info_icon"
+            android:drawablePadding="8dp"
+            android:padding="15dp"
+            android:text="@string/enter_pin_code_to_view_available_delivery_methods"
+            android:textColor="@color/black_text_50"
+            android:textSize="12sp" />
 
     </LinearLayout>
 

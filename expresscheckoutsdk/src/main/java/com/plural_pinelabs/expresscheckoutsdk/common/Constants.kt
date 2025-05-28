@@ -39,6 +39,15 @@ internal object Constants {
     const val BFF_RESPONSE_HANDLER_ENDPOINT = "checkout-bff/responseHandler"
     const val ACS_JAVA_SCRIPT_INTERFACE = "AndroidInterface"
 
+    //UPI
+    const val UPI_INTENT_PREFIX = "upi://pay"
+    const val GPAY = "com.google.android.apps.nbu.paisa.user"
+    const val PHONEPE = "com.phonepe.app"
+    const val PAYTM = "net.one97.paytm"
+    const val BHIM_UPI = "in.org.npci.upiapp"
+    const val CRED_UPI = "com.dreamplug.androidapp"
+    const val UPI_INTENT = "INTENT"
+
 
 
 }
