@@ -35,6 +35,10 @@
         <action
             android:id="@+id/action_verifyOTPFragment_to_newAddressFormFragment"
             app:destination="@id/newAddressFormFragment" />
+        <argument
+            android:name="isSavedCardVerification"
+            app:argType="boolean"
+            android:defaultValue="false" />
     </fragment>
     <fragment
         tools:layout="@layout/fragment_new_address_form"
@@ -68,20 +72,54 @@
         <action
             android:id="@+id/action_cardFragment_to_nativeOTPFragment"
             app:destination="@id/nativeOTPFragment" />
+        <action
+            android:id="@+id/action_cardFragment_to_failureFragment"
+            app:destination="@id/failureFragment" />
     </fragment>
     <fragment
         tools:layout="@layout/fragment_a_c_s"
         android:id="@+id/ACSFragment"
         android:name="com.plural_pinelabs.expresscheckoutsdk.presentation.acs.ACSFragment"
-        android:label="ACSFragment" />
+        android:label="ACSFragment" >
+        <action
+            android:id="@+id/action_ACSFragment_to_failureFragment"
+            app:destination="@id/failureFragment" />
+        <action
+            android:id="@+id/action_ACSFragment_to_successFragment"
+            app:destination="@id/successFragment" />
+    </fragment>
     <fragment
         android:id="@+id/nativeOTPFragment"
         android:name="com.plural_pinelabs.expresscheckoutsdk.presentation.NativeOTPFragment"
         android:label="fragment_native_otp"
-        tools:layout="@layout/fragment_native_otp" />
+        tools:layout="@layout/fragment_native_otp" >
+        <action
+            android:id="@+id/action_nativeOTPFragment_to_successFragment"
+            app:destination="@id/successFragment" />
+        <action
+            android:id="@+id/action_nativeOTPFragment_to_failureFragment"
+            app:destination="@id/failureFragment" />
+    </fragment>
     <fragment
         android:id="@+id/UPIFragment"
         tools:layout="@layout/fragment_u_p_i"
         android:name="com.plural_pinelabs.expresscheckoutsdk.presentation.upi.UPIFragment"
-        android:label="UPIFragment" />
+        android:label="UPIFragment" >
+        <action
+            android:id="@+id/action_UPIFragment_to_failureFragment"
+            app:destination="@id/failureFragment" />
+        <action
+            android:id="@+id/action_UPIFragment_to_successFragment"
+            app:destination="@id/successFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/failureFragment"
+        android:name="com.plural_pinelabs.expresscheckoutsdk.presentation.terminal.FailureFragment"
+        android:label="fragment_failure"
+        tools:layout="@layout/fragment_failure" />
+    <fragment
+        android:id="@+id/successFragment"
+        android:name="com.plural_pinelabs.expresscheckoutsdk.presentation.terminal.SuccessFragment"
+        android:label="fragment_success"
+        tools:layout="@layout/fragment_success" />
 </navigation>

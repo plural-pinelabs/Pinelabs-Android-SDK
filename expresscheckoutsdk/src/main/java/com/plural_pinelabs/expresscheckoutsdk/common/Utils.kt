@@ -11,13 +11,17 @@ import android.os.Build
 import android.provider.Settings
 import android.text.TextUtils
 import android.util.Base64
+import android.view.LayoutInflater
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.graphics.toColorInt
+import com.airbnb.lottie.LottieAnimationView
 import com.clevertap.android.sdk.CleverTapAPI
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.plural_pinelabs.expresscheckoutsdk.BuildConfig
 import com.plural_pinelabs.expresscheckoutsdk.R
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.APP_VERSION
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.EMAIL_REGEX
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.IMAGE_LOGO
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.MOBILE_REGEX
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.OS
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PLATFORM_TYPE
@@ -299,11 +303,32 @@ internal object Utils {
     }
 
 
-     fun decodeBase64ToBitmap(base64String: String?): Bitmap? {
+    fun decodeBase64ToBitmap(base64String: String?): Bitmap? {
         val decodedBytes = Base64.decode(base64String, Base64.DEFAULT)
         return BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.size)
     }
 
+    fun showProcessPaymentDialog(context: Context): BottomSheetDialog {
+        val bottomSheetDialog = BottomSheetDialog(context)
+        val view = LayoutInflater.from(context)
+            .inflate(R.layout.processing_full_screen_dialog, null)
 
+        val logoAnimation: LottieAnimationView = view.findViewById(R.id.img_process_logo)
+        logoAnimation.setAnimationFromUrl(IMAGE_LOGO)
+
+        bottomSheetDialog.setCancelable(false)
+        bottomSheetDialog.setCanceledOnTouchOutside(false)
+        bottomSheetDialog.setContentView(view)
+        bottomSheetDialog.show()
+
+        return bottomSheetDialog
+    }
+
+    fun formatTimeInMinutes(context: Context, millis: Long): String {
+        val seconds = millis / 1000
+        val minutes = seconds / 60
+        val remainingSeconds = seconds % 60
+        return String.format(context.getString(R.string.timer_format), minutes, remainingSeconds)
+    }
 
 }

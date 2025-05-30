@@ -21,7 +21,7 @@ class MainActivity : AppCompatActivity() {
         }
         ExpressSDKInitializer().initializeSDK(
             this@MainActivity,
-            "V3_zi2%2BOy3tgn3r1vrd6O%2BaVfECdmCw1Bl3Mu9UHdd%2FpsC6HGX39EXH7cL4i48qGpsT\n",
+            "V3_JcAXbYSSgyxm7yVTCZ42Fk0Aol5ZiIyWMLZqWqlPKBWOSRim9Gzyaduzz3hy0BNg\n",
             object : ExpressSDKCallback {
                 override fun onError(
                     errorCode: String?,

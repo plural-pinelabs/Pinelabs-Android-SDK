@@ -1,5 +1,6 @@
 package com.plural_pinelabs.expresscheckoutsdk.data.repository
 
+import android.content.Context
 import com.plural_pinelabs.expresscheckoutsdk.common.BaseResult
 import com.plural_pinelabs.expresscheckoutsdk.common.NetworkHelper
 import com.plural_pinelabs.expresscheckoutsdk.common.toResultFlow
@@ -12,6 +13,8 @@ import com.plural_pinelabs.expresscheckoutsdk.data.model.OTPRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.model.OTPResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ProcessPaymentRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ProcessPaymentResponse
+import com.plural_pinelabs.expresscheckoutsdk.data.model.SavedCardResponse
+import com.plural_pinelabs.expresscheckoutsdk.data.model.TransactionStatusResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.retrofit.ApiService
 import com.plural_pinelabs.expresscheckoutsdk.domain.repository.ExpressRepository
 import kotlinx.coroutines.flow.Flow
@@ -69,6 +72,32 @@ class ExpressRepositoryImpl(
     ): Flow<BaseResult<OTPResponse>> {
         return toResultFlow(networkHelper = networkHelper) {
             (apiService as CardApiService).initiateOTP(token, otpRequest)
+        }
+    }
+
+    override suspend fun sendOTPCustomer(
+        token: String?,
+        otpRequest: OTPRequest?
+    ): Flow<BaseResult<SavedCardResponse>> {
+        return toResultFlow(networkHelper = networkHelper) {
+            (apiService as CardApiService).sendOTPCustomer(token, otpRequest)
+        }
+    }
+
+    override suspend fun validateOTPCustomer(
+        token: String?,
+        otpRequest: OTPRequest?
+    ): Flow<BaseResult<SavedCardResponse>> {
+        return toResultFlow(networkHelper = networkHelper) {
+            (apiService as CardApiService).validateOTPCustomer(token, otpRequest)
+        }
+    }
+
+    override suspend fun transactionStatus(
+        token: String?
+    ): Flow<BaseResult<TransactionStatusResponse>> {
+        return toResultFlow(networkHelper = networkHelper) {
+            (apiService as CardApiService).statusOfTransaction(token)
         }
     }
 }

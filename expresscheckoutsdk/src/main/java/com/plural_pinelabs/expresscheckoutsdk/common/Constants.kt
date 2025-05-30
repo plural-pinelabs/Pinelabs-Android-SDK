@@ -49,5 +49,11 @@ internal object Constants {
     const val UPI_INTENT = "INTENT"
 
 
+    const val PROCESSED_STATUS = "PROCESSED"
+    const val PROCESSED_FAILED = "FAILED"
+    const val PROCESSED_ATTEMPTED = "ATTEMPTED"
+
+    const val REQ_USER_CONSENT = 200
+
 
 }

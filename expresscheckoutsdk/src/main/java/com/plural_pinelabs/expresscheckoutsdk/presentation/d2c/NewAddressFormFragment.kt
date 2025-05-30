@@ -1,7 +1,6 @@
 package com.plural_pinelabs.expresscheckoutsdk.presentation.d2c
 
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.text.SpannableString
 import android.text.Spanned
@@ -11,10 +10,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.plural_pinelabs.expresscheckoutsdk.R
-import androidx.core.net.toUri
 
 class NewAddressFormFragment : Fragment() {
     private lateinit var addressSaveDescriptionHyperLink: TextView
@@ -29,8 +28,8 @@ class NewAddressFormFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         addressSaveDescriptionHyperLink = view.findViewById(R.id.save_address_description)
-        setSaveAddressHyperLinkForTerms()
-       // findNavController().navigate(R.id.action_newAddressFormFragment_to_paymentModeFragment)
+        //  setSaveAddressHyperLinkForTerms()
+        findNavController().navigate(R.id.action_newAddressFormFragment_to_paymentModeFragment)
     }
 
 

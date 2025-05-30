@@ -2,14 +2,18 @@ package com.plural_pinelabs.expresscheckoutsdk.data.fetch
 
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CardBinMetaDataRequestList
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CardBinMetaDataResponse
+import com.plural_pinelabs.expresscheckoutsdk.data.model.CustomerInfo
+import com.plural_pinelabs.expresscheckoutsdk.data.model.CustomerInfoResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.OTPRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.model.OTPResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ProcessPaymentRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ProcessPaymentResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.SavedCardResponse
+import com.plural_pinelabs.expresscheckoutsdk.data.model.TransactionStatusResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.retrofit.ApiService
 import retrofit2.Response
 import retrofit2.http.Body
+import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Query
 
@@ -70,6 +74,30 @@ interface CardApiService : ApiService {
         ) token: String?, @Body request: OTPRequest?
     ): Response<SavedCardResponse>
 
+
+    @POST("customer/otp/validate-and-update-order")
+    suspend fun validateUpdateOrder(
+        @Query(
+            "token",
+            encoded = true
+        ) token: String?, @Body request: OTPRequest?
+    ): Response<CustomerInfoResponse>
+
+    @POST("customer/create-inactive")
+    suspend fun createInactive(
+        @Query(
+            "token",
+            encoded = true
+        ) token: String?, @Body request: CustomerInfo?
+    ): Response<CustomerInfo>
+
+    @GET("inquiry")
+    suspend fun statusOfTransaction(
+        @Query(
+            "token",
+            encoded = true
+        ) token: String?
+    ): Response<TransactionStatusResponse>
 
 }
 

@@ -6,6 +6,7 @@ import com.plural_pinelabs.expresscheckoutsdk.data.repository.ExpressRepositoryI
 import com.plural_pinelabs.expresscheckoutsdk.data.retrofit.RetrofitBuilder
 import com.plural_pinelabs.expresscheckoutsdk.presentation.NativeOTPViewModel
 import com.plural_pinelabs.expresscheckoutsdk.presentation.card.CardFragmentViewModel
+import com.plural_pinelabs.expresscheckoutsdk.presentation.d2c.VerifyOTPFragmentViewModel
 import com.plural_pinelabs.expresscheckoutsdk.presentation.splash.SplashViewModel
 
 class SplashViewModelFactory(private val networkHelper: NetworkHelper) : ViewModelProvider.Factory {
@@ -35,6 +36,19 @@ class NativeOTPFragmentViewModelFactory(private val networkHelper: NetworkHelper
     ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return NativeOTPViewModel(
+            ExpressRepositoryImpl(
+                RetrofitBuilder.cardApiService,
+                networkHelper = networkHelper
+            )
+        ) as T
+    }
+}
+
+
+class VerifyOTPFragmentViewModelFactory(private val networkHelper: NetworkHelper) :
+    ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        return VerifyOTPFragmentViewModel(
             ExpressRepositoryImpl(
                 RetrofitBuilder.cardApiService,
                 networkHelper = networkHelper

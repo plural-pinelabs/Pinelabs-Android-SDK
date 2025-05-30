@@ -13,8 +13,8 @@
     <string name="_91">(+91)</string>
     <string name="continue_text">Continue</string>
     <string name="verify_mobile_number">Verify mobile number</string>
-    <string name="enter_the_otp_sent_to">Enter the OTP sent to</string>
-    <string name="resend_otp_in">Resend OTP in</string>
+    <string name="enter_the_otp_sent_to">Enter the OTP sent to <font color="#1C1C1C">%s</font></string>
+    <string name="resend_otp_in">Resend OTP in <font color="1C1C1C"> %s</font></string>
     <string name="to_proceed_please_verify_your_mobile_number">To proceed, please verify your mobile number</string>
     <string name="verify">Verify</string>
     <string name="add_delivery_address">Add delivery address</string>
@@ -77,6 +77,13 @@
     <string name="terms">Terms</string>
     <string name="privacy_policy">Privacy Policy</string>
     <string name="enter_pin_code_to_view_available_delivery_methods">Enter PIN code to view available delivery methods</string>
+    <string name="processing_payment_description">We’ll confirm everything in just a few seconds.</string>
+    <string name="email">Email</string>
+    <string name="timer_format">%02d:%02d</string>
+    <string name="resend_otp">Resend OTP</string>
+    <string name="saved_card_otp_information">Verifying your mobile number is a one-time activity</string>
+    <string name="mm_yy">MM / YY</string>
+    <string name="cvv">CVV</string>
 
 
 </resources>

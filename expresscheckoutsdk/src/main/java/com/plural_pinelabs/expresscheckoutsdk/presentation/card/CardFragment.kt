@@ -9,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.TextView
 import androidx.core.content.ContextCompat
@@ -18,6 +19,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.plural_pinelabs.expresscheckoutsdk.ExpressSDKObject
 import com.plural_pinelabs.expresscheckoutsdk.R
 import com.plural_pinelabs.expresscheckoutsdk.common.BaseResult
@@ -26,10 +28,10 @@ import com.plural_pinelabs.expresscheckoutsdk.common.Constants
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.BROWSER_ACCEPT_ALL
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.BROWSER_USER_AGENT_ANDROID
 import com.plural_pinelabs.expresscheckoutsdk.common.NetworkHelper
-import com.plural_pinelabs.expresscheckoutsdk.common.TimerManager
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils.cardIcons
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils.cardTypes
+import com.plural_pinelabs.expresscheckoutsdk.common.Utils.showProcessPaymentDialog
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CardBinMetaDataResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CardData
 import com.plural_pinelabs.expresscheckoutsdk.data.model.DeviceInfo
@@ -51,6 +53,7 @@ class CardFragment : Fragment() {
     private lateinit var payBtn: Button
     private lateinit var cardErrorText: TextView
     private lateinit var cardHolderErrorText: TextView
+    private lateinit var saveCardCheckbox: CheckBox
 
     private var cardNumber: String = ""
     private var formattedCardNumber: String? = null
@@ -61,6 +64,7 @@ class CardFragment : Fragment() {
     private var isExpiryValid = false
     private var isCVVValid = false
     private var isCardHolderNameValid: Boolean = false
+    private var bottomSheetDialog: BottomSheetDialog? = null
 
 
     private lateinit var viewModel: CardFragmentViewModel
@@ -72,7 +76,6 @@ class CardFragment : Fragment() {
             this,
             CardFragmentViewModelFactory(NetworkHelper(requireContext()))
         )[CardFragmentViewModel::class.java]
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_card, container, false)
     }
 
@@ -96,6 +99,7 @@ class CardFragment : Fragment() {
         cardHolderText = view.findViewById(R.id.full_name_et)
         cardHolderErrorText = view.findViewById(R.id.error_message_card_holder_name)
         cardErrorText = view.findViewById(R.id.error_message_card_details)
+        saveCardCheckbox = view.findViewById(R.id.save_card_checkbox)
         setUpAmount()
     }
 
@@ -118,6 +122,7 @@ class CardFragment : Fragment() {
                     when (result) {
                         is BaseResult.Error -> {
                             result.errorCode.let { exception ->
+                                findNavController().navigate(R.id.action_cardFragment_to_failureFragment)
                                 Log.e("Error", exception)
                             }
 
@@ -130,18 +135,15 @@ class CardFragment : Fragment() {
                                     it.card_payment_details[0].card_network
                                 )
 
-                                isNativeOTP =
-                                    it.card_payment_details[0].is_native_otp_supported
-                                // TODO Process the data
+                                isNativeOTP = it.card_payment_details[0].is_native_otp_supported
+                                // TODO Procss the data for DCC
                                 Log.d("Success", " Meta Data fetched successfully")
 
                             }
                         }
 
                         is BaseResult.Loading -> {
-                            // handle loading
-                            Log.d("Loading", "Loading data...")
-                            result.isLoading
+
                         }
                     }
                 }
@@ -154,13 +156,20 @@ class CardFragment : Fragment() {
                     when (it) {
                         is BaseResult.Error -> {
                             //Throw error and exit SDK
+                            //TODO Pass error message and description
+                            bottomSheetDialog?.dismiss()
+                            findNavController().navigate(R.id.action_cardFragment_to_failureFragment)
                         }
 
                         is BaseResult.Loading -> {
                             //show the process dialog payment
+                            if (it.isLoading)
+                            //show the process dialog payment
+                                bottomSheetDialog = showProcessPaymentDialog(requireContext())
                         }
 
                         is BaseResult.Success<ProcessPaymentResponse> -> {
+                            bottomSheetDialog?.dismiss()
                             ExpressSDKObject.setProcessPaymentResponse(it.data)
                             if (isNativeOTP) {
                                 navigateToNativeOTP()
@@ -178,7 +187,12 @@ class CardFragment : Fragment() {
         cardEditText.setOnFocusChangeListener { _, hasFocus ->
             if (!hasFocus) {
                 val cardNumber = cardEditText.text.toString().replace(" ", "")
-                if (cardNumber.length < 12) {
+                if (cardNumber.length >= 19) {
+                    showCardDetailsError("CardNumber")
+                } else if (cardNumber.length < 4) {
+                    showCardDetailsError("CardNumber")
+                    cardEditText.setCompoundDrawablesWithIntrinsicBounds(null, null, null, null)
+                } else if (cardNumber.length < 12) {
                     showCardDetailsError("CardNumber")
                 } else {
                     val cardType = validateCardType(cardNumber)
@@ -198,20 +212,18 @@ class CardFragment : Fragment() {
     }
 
     private fun navigateToNativeOTP() {
-
-        // TODO  move to native OTP screen
+        findNavController().navigate(R.id.action_cardFragment_to_nativeOTPFragment)
     }
 
     private fun redirectToACS(
     ) {
-        //todo get time from server
-        TimerManager.startTimer(5000)
         findNavController().navigate(R.id.action_cardFragment_to_ACSFragment)
 
     }
 
     private fun setUpCardNumberValidation() {
         cardEditText.addTextChangedListener(object : TextWatcher {
+            private var isFormatting = false
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
                 if (!isFormatting) {
                     cursorPosition = cardEditText.selectionStart
@@ -236,7 +248,7 @@ class CardFragment : Fragment() {
                     else
                         formatted.length
                 )
-                isFormatting = false
+
                 formattedCardNumber?.let { cardEditText.setSelection(it.length) }
                 if (cardNumber.length >= 12) {
                     //call metadata api for all input after 12
@@ -245,12 +257,7 @@ class CardFragment : Fragment() {
                         cardNumber = cardNumber
                     )
                 }
-                if (cardNumber.length >= 19) {
-                    showCardDetailsError("CardNumber")
-                } else if (cardNumber.length < 4) {
-                    showCardDetailsError("CardNumber")
-                    cardEditText.setCompoundDrawablesWithIntrinsicBounds(null, null, null, null)
-                }
+                isFormatting = false
 
             }
 
@@ -361,15 +368,6 @@ class CardFragment : Fragment() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
 
             override fun afterTextChanged(s: Editable?) {
-                if (isEditing) return
-                isEditing = true
-                if (s.toString().length < 3) {
-                    showCardDetailsError("CVV")
-                } else {
-                    isCVVValid = true
-                    hideCardDetailsError()
-                }
-                isEditing = false
             }
         })
 
@@ -454,6 +452,9 @@ class CardFragment : Fragment() {
         if (isCardValid && isExpiryValid && isCVVValid && isCardHolderNameValid) {
             val createProcessPaymentRequest = createProcessPaymentRequest()
             //create process payment request
+            if (saveCardCheckbox.isChecked){
+                //TODO verify the saved card
+            }
             viewModel.processPayment(
                 token = ExpressSDKObject.getToken(),
                 paymentData = createProcessPaymentRequest

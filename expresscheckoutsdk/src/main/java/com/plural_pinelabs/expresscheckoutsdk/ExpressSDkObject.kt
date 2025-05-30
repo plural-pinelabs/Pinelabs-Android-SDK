@@ -11,6 +11,7 @@ internal data class SDKObject(
     val token: String,
     var fetchResponseDTO: FetchResponseDTO? = null,
     var processPaymentResponse: ProcessPaymentResponse? = null,
+    var phoneNumber: String? = null,
 )
 
 internal object ExpressSDKObject {
@@ -56,6 +57,14 @@ internal object ExpressSDKObject {
 
     fun getProcessPaymentResponse(): ProcessPaymentResponse? {
         return getSDKObject()?.processPaymentResponse
+    }
+
+    fun setPhoneNumber(phoneNumber: String) {
+        getSDKObject()?.phoneNumber = phoneNumber
+    }
+
+    fun getPhoneNumber(): String? {
+        return getSDKObject()?.phoneNumber
     }
 }
 

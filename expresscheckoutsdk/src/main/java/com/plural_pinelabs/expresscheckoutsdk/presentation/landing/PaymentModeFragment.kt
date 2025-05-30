@@ -64,14 +64,12 @@ class PaymentModeFragment : Fragment() {
     private fun getPaymentModeSelectionCallback(context: Context): ItemClickListener<PaymentMode>? {
         return object : ItemClickListener<PaymentMode> {
             override fun onItemClick(position: Int, item: PaymentMode) {
-                //TODO navigate to different fragments based on the payment mode selected
                 when (item.paymentModeId) {
                     PaymentModes.CREDIT_DEBIT.paymentModeID -> {
                         findNavController().navigate(R.id.action_paymentModeFragment_to_cardFragment)
                     }
 
                     PaymentModes.UPI.paymentModeID -> {
-                        // Handle UPI selection
                         findNavController().navigate(R.id.action_paymentModeFragment_to_UPIFragment)
                     }
 
