@@ -10,8 +10,12 @@ import com.plural_pinelabs.expresscheckoutsdk.common.Constants.CRED_UPI
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.GPAY
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PAYTM
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PHONEPE
+import com.plural_pinelabs.expresscheckoutsdk.common.ItemClickListener
 
-class UpiAppsAdapter(private val upiApps: List<String>) :
+class UpiAppsAdapter(
+    private val upiApps: List<String>,
+    private val itemClickListener: ItemClickListener<String>
+) :
     RecyclerView.Adapter<UpiAppsAdapter.UpiAppViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UpiAppViewHolder {
@@ -21,7 +25,7 @@ class UpiAppsAdapter(private val upiApps: List<String>) :
 
     override fun onBindViewHolder(holder: UpiAppViewHolder, position: Int) {
         val upiApp = upiApps[position]
-        holder.bind(upiApp)
+        holder.bind(upiApp, itemClickListener, position)
     }
 
     override fun getItemCount(): Int = upiApps.size
@@ -29,10 +33,15 @@ class UpiAppsAdapter(private val upiApps: List<String>) :
     class UpiAppViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val appImage: ImageView = itemView.findViewById(R.id.upi_app_image)
         private val appName: TextView = itemView.findViewById(R.id.upi_app_name)
+        private val parentLayout: View = itemView.findViewById(R.id.upi_item_parent)
 
-        fun bind(upiApp: String) {
+        fun bind(upiApp: String, itemClickListener: ItemClickListener<String>, position: Int) {
             appImage.setImageResource(getImageResIdFromPackage(upiApp))
             appName.text = itemView.context.getString(getUpiNameFromPackage(upiApp))
+            parentLayout.setOnClickListener {
+                // Handle click event if needed
+                itemClickListener.onItemClick(position, upiApp)
+            }
         }
 
         private fun getImageResIdFromPackage(upiApp: String): Int {

@@ -2,6 +2,8 @@ package com.plural_pinelabs.native_express_sdk
 
 import android.os.Bundle
 import android.util.Log
+import android.widget.Button
+import android.widget.EditText
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -19,40 +21,50 @@ class MainActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-        ExpressSDKInitializer().initializeSDK(
-            this@MainActivity,
-            "V3_JcAXbYSSgyxm7yVTCZ42Fk0Aol5ZiIyWMLZqWqlPKBWOSRim9Gzyaduzz3hy0BNg\n",
-            object : ExpressSDKCallback {
-                override fun onError(
-                    errorCode: String?,
-                    errorMessage: String?,
-                    errorDescription: String?
-                ) {
-                    Log.e("ExpressSDK", "Error: $errorCode, $errorMessage, $errorDescription")
-                }
 
-                override fun onSuccess(
-                    responseCode: String?,
-                    responseMessage: String?,
-                    responseDescription: String?
-                ) {
-                    Log.i(
-                        "ExpressSDK",
-                        "Success: $responseCode, $responseMessage, $responseDescription"
-                    )
-                }
+        setViews()
 
-                override fun onCancel(
-                    responseCode: String?,
-                    responseMessage: String?,
-                    responseDescription: String?
-                ) {
-                    Log.d(
-                        "ExpressSDK",
-                        "Cancelled: $responseCode, $responseMessage, $responseDescription"
-                    )
+    }
+
+    private fun setViews() {
+        val tokenEt = findViewById<EditText>(R.id.edt_redirect_url)
+        val startSDKBtn = findViewById<Button>(R.id.btn_start_sdk)
+        startSDKBtn.setOnClickListener {
+            ExpressSDKInitializer().initializeSDK(
+                this@MainActivity,
+                "${tokenEt.text}",
+                object : ExpressSDKCallback {
+                    override fun onError(
+                        errorCode: String?,
+                        errorMessage: String?,
+                        errorDescription: String?
+                    ) {
+                        Log.e("ExpressSDK", "Error: $errorCode, $errorMessage, $errorDescription")
+                    }
+
+                    override fun onSuccess(
+                        responseCode: String?,
+                        responseMessage: String?,
+                        responseDescription: String?
+                    ) {
+                        Log.i(
+                            "ExpressSDK",
+                            "Success: $responseCode, $responseMessage, $responseDescription"
+                        )
+                    }
+
+                    override fun onCancel(
+                        responseCode: String?,
+                        responseMessage: String?,
+                        responseDescription: String?
+                    ) {
+                        Log.d(
+                            "ExpressSDK",
+                            "Cancelled: $responseCode, $responseMessage, $responseDescription"
+                        )
+                    }
                 }
-            }
-        )
+            )
+        }
     }
 }

@@ -84,6 +84,8 @@
     <string name="saved_card_otp_information">Verifying your mobile number is a one-time activity</string>
     <string name="mm_yy">MM / YY</string>
     <string name="cvv">CVV</string>
+    <string name="save_card_verify_msg">Enter the OTP sent to <strong> %s </strong> to securely store your card ending with ****%d</string>
+    <string name="skip_saving_card"><u>Skip Saving Card</u></string>
 
 
 </resources>

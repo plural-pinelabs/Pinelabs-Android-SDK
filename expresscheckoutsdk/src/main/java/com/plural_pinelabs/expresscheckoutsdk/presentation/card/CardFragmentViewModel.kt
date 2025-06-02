@@ -20,11 +20,11 @@ class CardFragmentViewModel(private val expressRepositoryImpl: ExpressRepository
     ViewModel() {
 
     private val _metaDataResult =
-        MutableStateFlow<BaseResult<CardBinMetaDataResponse>>(BaseResult.Loading(true))
+        MutableStateFlow<BaseResult<CardBinMetaDataResponse>>(BaseResult.Loading(false))
     val metaDataResult: StateFlow<BaseResult<CardBinMetaDataResponse>> = _metaDataResult
 
     private val _processPaymentResult =
-        MutableStateFlow<BaseResult<ProcessPaymentResponse>>(BaseResult.Loading(true))
+        MutableStateFlow<BaseResult<ProcessPaymentResponse>>(BaseResult.Loading(false))
     val processPaymentResult: StateFlow<BaseResult<ProcessPaymentResponse>> = _processPaymentResult
 
 

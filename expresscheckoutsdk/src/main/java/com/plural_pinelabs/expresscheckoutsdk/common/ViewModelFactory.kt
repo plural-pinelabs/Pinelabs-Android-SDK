@@ -6,8 +6,10 @@ import com.plural_pinelabs.expresscheckoutsdk.data.repository.ExpressRepositoryI
 import com.plural_pinelabs.expresscheckoutsdk.data.retrofit.RetrofitBuilder
 import com.plural_pinelabs.expresscheckoutsdk.presentation.NativeOTPViewModel
 import com.plural_pinelabs.expresscheckoutsdk.presentation.card.CardFragmentViewModel
+import com.plural_pinelabs.expresscheckoutsdk.presentation.card.SavedCardOTPViewModel
 import com.plural_pinelabs.expresscheckoutsdk.presentation.d2c.VerifyOTPFragmentViewModel
 import com.plural_pinelabs.expresscheckoutsdk.presentation.splash.SplashViewModel
+import com.plural_pinelabs.expresscheckoutsdk.presentation.upi.UPIViewModel
 
 class SplashViewModelFactory(private val networkHelper: NetworkHelper) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -49,6 +51,31 @@ class VerifyOTPFragmentViewModelFactory(private val networkHelper: NetworkHelper
     ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return VerifyOTPFragmentViewModel(
+            ExpressRepositoryImpl(
+                RetrofitBuilder.cardApiService,
+                networkHelper = networkHelper
+            )
+        ) as T
+    }
+}
+
+class SaveCardOTPFragmentViewModelFactory(private val networkHelper: NetworkHelper) :
+    ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        return SavedCardOTPViewModel(
+            ExpressRepositoryImpl(
+                RetrofitBuilder.cardApiService,
+                networkHelper = networkHelper
+            )
+        ) as T
+    }
+}
+
+
+class UPIViewModelFactory(private val networkHelper: NetworkHelper) :
+    ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        return UPIViewModel(
             ExpressRepositoryImpl(
                 RetrofitBuilder.cardApiService,
                 networkHelper = networkHelper

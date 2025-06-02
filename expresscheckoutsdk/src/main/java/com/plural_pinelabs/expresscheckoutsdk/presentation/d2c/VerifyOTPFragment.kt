@@ -38,14 +38,12 @@ class VerifyOTPFragment : Fragment() {
     private lateinit var viewModel: VerifyOTPFragmentViewModel
     private var bottomSheetDialog: BottomSheetDialog? = null
     private var otpId: String? = null
-    private var isSavedCardVerification = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        isSavedCardVerification = arguments?.getBoolean("isSavedCardVerification", false) ?: false
         viewModel = ViewModelProvider(
             this,
             VerifyOTPFragmentViewModelFactory(NetworkHelper(requireContext()))
@@ -72,9 +70,6 @@ class VerifyOTPFragment : Fragment() {
         setPhoneNumber()
         startResendOtpTimer()
         handleClickListener()
-        if (isSavedCardVerification){
-            view.findViewById<TextView>(R.id.information_otp).text = getString(R.string.saved_card_otp_information)
-        }
     }
 
     private fun handleClickListener() {
@@ -155,10 +150,7 @@ class VerifyOTPFragment : Fragment() {
         val customerId = ExpressSDKObject.getFetchData()?.customerInfo?.customerId
             ?: ExpressSDKObject.getFetchData()?.customerInfo?.customer_id
         val otpRequest = OTPRequest(null, null, customerId, null, null)
-        if (isSavedCardVerification) {
-            //call savedcardOTP
-        } else
-            viewModel.requestOTP(otpRequest)
+        viewModel.requestOTP(otpRequest)
     }
 
     private fun observeViewModel() {

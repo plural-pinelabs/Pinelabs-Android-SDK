@@ -47,9 +47,12 @@ internal object Constants {
     const val BHIM_UPI = "in.org.npci.upiapp"
     const val CRED_UPI = "com.dreamplug.androidapp"
     const val UPI_INTENT = "INTENT"
+    const val UPI_COLLECT = "COLELCT"
+    const val UPI_TRANSACTION_STATUS_INTERVAL = 5000L
 
 
     const val PROCESSED_STATUS = "PROCESSED"
+    const val PROCESSED_PENDING = "PENDING"
     const val PROCESSED_FAILED = "FAILED"
     const val PROCESSED_ATTEMPTED = "ATTEMPTED"
 

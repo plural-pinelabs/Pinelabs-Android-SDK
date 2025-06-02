@@ -450,16 +450,33 @@ class CardFragment : Fragment() {
 
     private fun validateAllFields() {
         if (isCardValid && isExpiryValid && isCVVValid && isCardHolderNameValid) {
-            val createProcessPaymentRequest = createProcessPaymentRequest()
-            //create process payment request
-            if (saveCardCheckbox.isChecked){
-                //TODO verify the saved card
-            }
-            viewModel.processPayment(
-                token = ExpressSDKObject.getToken(),
-                paymentData = createProcessPaymentRequest
-            )
 
+            //create process payment request
+            if (saveCardCheckbox.isChecked) {
+                //TODO verify the saved card
+                findNavController().navigate(R.id.action_cardFragment_to_saveCardOTPFragment)
+            } else {
+                initProcessPayment()
+            }
+        }
+    }
+
+    private fun initProcessPayment() {
+        val createProcessPaymentRequest = createProcessPaymentRequest()
+        viewModel.processPayment(
+            token = ExpressSDKObject.getToken(),
+            paymentData = createProcessPaymentRequest
+        )
+    }
+
+    private fun observeSaveCardCallbackResponse() {
+
+        val navController = findNavController()
+        val savedStateHandle = navController.currentBackStackEntry?.savedStateHandle
+
+        savedStateHandle?.getLiveData<Boolean>("success")?.observe(viewLifecycleOwner) { result ->
+            savedStateHandle.remove<Boolean>("success")
+            initProcessPayment()
         }
 
     }
