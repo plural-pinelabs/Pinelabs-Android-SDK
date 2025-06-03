@@ -61,7 +61,7 @@ class SaveCardOTPFragment : Fragment() {
     }
 
     private fun setViews(view: View) {
-        verifyBtn = view.findViewById(R.id.verify_otp_btn)
+        verifyBtn = view.findViewById(R.id.continue_btn)
         otpInputView = view.findViewById(R.id.otp_input_view)
         resendTimerView = view.findViewById(R.id.resend_otp_tv)
         resendAction = view.findViewById(R.id.resend_otp_action)
@@ -106,6 +106,7 @@ class SaveCardOTPFragment : Fragment() {
             sendOTP()
         }
         skipSaveCardActionView.setOnClickListener {
+            passResultBackForSuccessFailure(false)
             //TODO navigate back to card fragment and  proceed with payment
         }
     }
@@ -125,11 +126,13 @@ class SaveCardOTPFragment : Fragment() {
 
                     is BaseResult.Success -> {
                         bottomSheetDialog?.dismiss()
+                        passResultBackForSuccessFailure(true)
                         // Handle success
                     }
 
                     is BaseResult.Error -> {
                         bottomSheetDialog?.dismiss()
+                        passResultBackForSuccessFailure(false)
                         //TODO ask if this need to be cancelled
                         // Handle error
                     }

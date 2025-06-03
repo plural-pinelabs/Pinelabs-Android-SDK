@@ -11,6 +11,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.CheckBox
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -36,6 +37,7 @@ import com.plural_pinelabs.expresscheckoutsdk.data.model.CardBinMetaDataResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CardData
 import com.plural_pinelabs.expresscheckoutsdk.data.model.DeviceInfo
 import com.plural_pinelabs.expresscheckoutsdk.data.model.Extra
+import com.plural_pinelabs.expresscheckoutsdk.data.model.FetchResponseDTO
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ProcessPaymentRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ProcessPaymentResponse
 import kotlinx.coroutines.launch
@@ -45,6 +47,10 @@ import java.util.Locale
 class CardFragment : Fragment() {
     private var isNativeOTP = false
     private var isPBPEnabled = false // TODO to configure this from the server
+    private var isDCCEnabled = false // TODO to configure this from the server
+    private var isSavedCardEnabled = false // TODO to configure this from the server
+
+    private var binData: CardBinMetaDataResponse? = null
 
     private lateinit var cardEditText: EditText
     private lateinit var expiryEditText: EditText
@@ -54,6 +60,7 @@ class CardFragment : Fragment() {
     private lateinit var cardErrorText: TextView
     private lateinit var cardHolderErrorText: TextView
     private lateinit var saveCardCheckbox: CheckBox
+    private lateinit var backBtn : ImageView
 
     private var cardNumber: String = ""
     private var formattedCardNumber: String? = null
@@ -82,6 +89,7 @@ class CardFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        setFlags(ExpressSDKObject.getFetchData())
         setupViews(view)
         observeViewModel()
         setCardFocusListener()
@@ -89,6 +97,14 @@ class CardFragment : Fragment() {
         setupCardHolderNameValidation(cardHolderText)
         setupCVVValidation(cvvEditText)
         setupExpiryValidation(expiryEditText)
+    }
+
+    private fun setFlags(fetchData: FetchResponseDTO?) {
+        fetchData?.merchantInfo?.featureFlags?.let {
+            isNativeOTP = it.isNativeOTPEnabled ?: false
+            isDCCEnabled = it.isDCCEnabled ?: false
+            isSavedCardEnabled = it.isSavedCardEnabled ?: false
+        }
     }
 
     private fun setupViews(view: View) {
@@ -100,6 +116,10 @@ class CardFragment : Fragment() {
         cardHolderErrorText = view.findViewById(R.id.error_message_card_holder_name)
         cardErrorText = view.findViewById(R.id.error_message_card_details)
         saveCardCheckbox = view.findViewById(R.id.save_card_checkbox)
+        backBtn = view.findViewById(R.id.back_button)
+        backBtn.setOnClickListener {
+            findNavController().popBackStack()
+        }
         setUpAmount()
     }
 
@@ -130,11 +150,11 @@ class CardFragment : Fragment() {
 
                         is BaseResult.Success<CardBinMetaDataResponse> -> {
                             result.data.let { it ->
+                                binData = it
                                 setCardBrandIcon(
                                     cardEditText,
                                     it.card_payment_details[0].card_network
                                 )
-
                                 isNativeOTP = it.card_payment_details[0].is_native_otp_supported
                                 // TODO Procss the data for DCC
                                 Log.d("Success", " Meta Data fetched successfully")
@@ -353,7 +373,6 @@ class CardFragment : Fragment() {
                     }
                 } else {
                     showCardDetailsError("Expiry")
-
                 }
             }
         }
@@ -454,6 +473,7 @@ class CardFragment : Fragment() {
             //create process payment request
             if (saveCardCheckbox.isChecked) {
                 //TODO verify the saved card
+                observeSaveCardCallbackResponse()
                 findNavController().navigate(R.id.action_cardFragment_to_saveCardOTPFragment)
             } else {
                 initProcessPayment()
@@ -461,8 +481,8 @@ class CardFragment : Fragment() {
         }
     }
 
-    private fun initProcessPayment() {
-        val createProcessPaymentRequest = createProcessPaymentRequest()
+    private fun initProcessPayment(shouldSaveCard: Boolean = false) {
+        val createProcessPaymentRequest = createProcessPaymentRequest(shouldSaveCard)
         viewModel.processPayment(
             token = ExpressSDKObject.getToken(),
             paymentData = createProcessPaymentRequest
@@ -476,13 +496,13 @@ class CardFragment : Fragment() {
 
         savedStateHandle?.getLiveData<Boolean>("success")?.observe(viewLifecycleOwner) { result ->
             savedStateHandle.remove<Boolean>("success")
-            initProcessPayment()
+            initProcessPayment(result)
         }
 
     }
 
 
-    private fun createProcessPaymentRequest(): ProcessPaymentRequest {
+    private fun createProcessPaymentRequest(shouldSaveCard: Boolean): ProcessPaymentRequest {
 
         val cardNumber = cardEditText.text.toString().filter { !it.isWhitespace() }
         val cvv = cvvEditText.text.toString()
@@ -554,8 +574,7 @@ class CardFragment : Fragment() {
                 cardExpiryYear,
                 cardExpiryMonth,
                 isNativeOTP,
-                //  if (skipSavedCard) false else isSaveCard
-                false
+                shouldSaveCard
             )
         val processPaymentRequest =
             ProcessPaymentRequest(

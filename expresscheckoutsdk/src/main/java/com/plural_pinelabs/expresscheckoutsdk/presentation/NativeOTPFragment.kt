@@ -113,6 +113,7 @@ class NativeOTPFragment : Fragment() {
 
                         is BaseResult.Error -> {
                             // TODO Handle error
+                            findNavController().navigate(R.id.action_nativeOTPFragment_to_ACSFragment)
                         }
                     }
                 }
@@ -166,6 +167,8 @@ class NativeOTPFragment : Fragment() {
 
                         is BaseResult.Error -> {
                             // TODO Handle error
+                            findNavController().navigate(R.id.action_nativeOTPFragment_to_ACSFragment)
+
                         }
                     }
                 }

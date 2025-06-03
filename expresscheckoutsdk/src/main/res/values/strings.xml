@@ -86,6 +86,16 @@
     <string name="cvv">CVV</string>
     <string name="save_card_verify_msg">Enter the OTP sent to <strong> %s </strong> to securely store your card ending with ****%d</string>
     <string name="skip_saving_card"><u>Skip Saving Card</u></string>
+    <string name="delivery_method">Delivery method</string>
+    <string name="house_apartment_no_building_name">House/Apartment No., Building Name</string>
+    <string name="street_name_locality">Street Name, Locality</string>
+    <string name="home">Home</string>
+    <string name="work">Work</string>
+    <string name="other">Other</string>
+    <string name="free_delivery">Free delivery</string>
+    <string name="_4_7_business_days">4-7 business days</string>
+    <string name="express_delivery">Express delivery</string>
+    <string name="_2_4_business_days">2-4 business days</string>
 
 
 </resources>

@@ -98,6 +98,9 @@
         <action
             android:id="@+id/action_nativeOTPFragment_to_failureFragment"
             app:destination="@id/failureFragment" />
+        <action
+            android:id="@+id/action_nativeOTPFragment_to_ACSFragment"
+            app:destination="@id/ACSFragment" />
     </fragment>
     <fragment
         android:id="@+id/UPIFragment"
