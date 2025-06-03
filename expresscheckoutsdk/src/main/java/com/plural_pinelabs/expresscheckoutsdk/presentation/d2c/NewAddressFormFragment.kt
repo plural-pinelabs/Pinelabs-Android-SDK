@@ -9,11 +9,15 @@ import android.text.style.ClickableSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.EditText
+import android.widget.RadioButton
+import android.widget.RadioGroup
 import android.widget.TextView
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import com.plural_pinelabs.expresscheckoutsdk.R
 import com.plural_pinelabs.expresscheckoutsdk.common.NetworkHelper
 import com.plural_pinelabs.expresscheckoutsdk.common.NewAddressFragmentViewModelFactory
@@ -26,6 +30,9 @@ class NewAddressFormFragment : Fragment() {
     private lateinit var addressLine1Et: EditText
     private lateinit var addressLine2Et: EditText
     private lateinit var addressSaveDescriptionHyperLink: TextView
+    private lateinit var addressType: RadioGroup
+    private lateinit var saveBtn: Button
+    private var selectedAddressType: String = "Home" // Default value
 
     private lateinit var viewModel: NewAddressFragmentViewModel
     override fun onCreateView(
@@ -42,8 +49,9 @@ class NewAddressFormFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setViews(view)
-        // findNavController().navigate(R.id.action_newAddressFormFragment_to_paymentModeFragment)
+      //  setViews(view)
+
+         findNavController().navigate(R.id.action_newAddressFormFragment_to_paymentModeFragment)
     }
 
 
@@ -104,43 +112,91 @@ class NewAddressFormFragment : Fragment() {
         stateEt = view.findViewById(R.id.state_edit_text)
         addressLine1Et = view.findViewById(R.id.address_line_1_edit_text)
         addressLine2Et = view.findViewById(R.id.address_line_2_edit_text)
+        addressType = view.findViewById(R.id.address_type_radio_group)
+        saveBtn = view.findViewById(R.id.continue_btn)
+        view.findViewById<RadioButton>(R.id.home_radio_button).isChecked = true // Default selection
+        addressType.setOnCheckedChangeListener { _, checkedId ->
+            when (checkedId) {
+                R.id.home_radio_button -> selectedAddressType = "Home"
+                R.id.work_radio_button -> selectedAddressType = "Work"
+                R.id.other_radio_button -> selectedAddressType = "Other"
+            }
+        }
         setSaveAddressHyperLinkForTerms()
+        setFocusChangeListeners()
+        saveBtn.setOnClickListener {
+            // Validate fields and save address
+            if (isAllFieldValid()) {
+            //    val request = getSaveAddressRequest()
+
+                // Proceed with saving the address
+                // You can call a method in your ViewModel to handle the save operation
+                // viewModel.saveAddress(...)
+            } else {
+                // Show error message
+            }
+        }
     }
+
+//    private fun getSaveAddressRequest(): Any {
+//
+//
+//    }
 
     private fun setFocusChangeListeners() {
         fullNameEt.setOnFocusChangeListener { _, hasFocus ->
             if (hasFocus) {
                 fullNameEt.error = null
-            } else {
-                if (fullNameEt.text.isEmpty()) {
-                    //show error
-                }
+            } else if (fullNameEt.text.isEmpty()) {
+                //show error
             }
         }
         pinCodeEt.setOnFocusChangeListener { _, hasFocus ->
             if (hasFocus) {
                 pinCodeEt.error = null
+            } else if (pinCodeEt.text.isEmpty()) {
+                //show error
             }
         }
         cityEt.setOnFocusChangeListener { _, hasFocus ->
             if (hasFocus) {
                 cityEt.error = null
+            } else if (cityEt.text.isEmpty()) {
+                //show error
             }
         }
         stateEt.setOnFocusChangeListener { _, hasFocus ->
             if (hasFocus) {
                 stateEt.error = null
+            } else if (stateEt.text.isEmpty()) {
+                //show error
             }
         }
         addressLine1Et.setOnFocusChangeListener { _, hasFocus ->
             if (hasFocus) {
                 addressLine1Et.error = null
+            } else if (addressLine1Et.text.isEmpty()) {
+                //show error
             }
         }
         addressLine2Et.setOnFocusChangeListener { _, hasFocus ->
             if (hasFocus) {
                 addressLine2Et.error = null
+            } else if (addressLine2Et.text.isEmpty()) {
+                //show error
             }
         }
     }
+
+    private fun isAllFieldValid(): Boolean {
+        return fullNameEt.text.isNotEmpty() &&
+                pinCodeEt.text.isNotEmpty() &&
+                cityEt.text.isNotEmpty() &&
+                stateEt.text.isNotEmpty() &&
+                addressLine1Et.text.isNotEmpty() &&
+                addressLine2Et.text.isNotEmpty()
+
+    }
+
+
 }

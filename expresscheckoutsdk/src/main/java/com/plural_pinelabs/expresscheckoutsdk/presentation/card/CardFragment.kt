@@ -513,6 +513,7 @@ class CardFragment : Fragment() {
         val paymentData = ExpressSDKObject.getFetchData()?.paymentData
         if (paymentData == null) {
             //TODO notify of payment failure
+            findNavController().navigate(R.id.action_cardFragment_to_failureFragment)
         }
         val amount = paymentData?.originalTxnAmount?.amount
         val currency = paymentData?.originalTxnAmount?.currency

@@ -7,6 +7,7 @@ import com.plural_pinelabs.expresscheckoutsdk.data.retrofit.RetrofitBuilder
 import com.plural_pinelabs.expresscheckoutsdk.presentation.NativeOTPViewModel
 import com.plural_pinelabs.expresscheckoutsdk.presentation.card.CardFragmentViewModel
 import com.plural_pinelabs.expresscheckoutsdk.presentation.card.SavedCardOTPViewModel
+import com.plural_pinelabs.expresscheckoutsdk.presentation.d2c.NewAddressFragmentViewModel
 import com.plural_pinelabs.expresscheckoutsdk.presentation.d2c.VerifyOTPFragmentViewModel
 import com.plural_pinelabs.expresscheckoutsdk.presentation.splash.SplashViewModel
 import com.plural_pinelabs.expresscheckoutsdk.presentation.upi.UPIViewModel
@@ -76,6 +77,18 @@ class UPIViewModelFactory(private val networkHelper: NetworkHelper) :
     ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return UPIViewModel(
+            ExpressRepositoryImpl(
+                RetrofitBuilder.cardApiService,
+                networkHelper = networkHelper
+            )
+        ) as T
+    }
+}
+
+class NewAddressFragmentViewModelFactory(private val networkHelper: NetworkHelper) :
+    ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        return NewAddressFragmentViewModel(
             ExpressRepositoryImpl(
                 RetrofitBuilder.cardApiService,
                 networkHelper = networkHelper
