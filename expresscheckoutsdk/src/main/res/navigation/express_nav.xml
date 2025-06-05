@@ -126,6 +126,7 @@
         tools:layout="@layout/fragment_success" />
     <fragment
         android:id="@+id/saveCardOTPFragment"
+        tools:layout="@layout/fragment_save_card_o_t_p"
         android:name="com.plural_pinelabs.expresscheckoutsdk.presentation.card.SaveCardOTPFragment"
         android:label="SaveCardOTPFragment" />
 </navigation>

@@ -25,6 +25,6 @@
     <color name="green_3D50D387">#CC50D387</color>
     <color name="error_DD4D42">#DD4D42</color>
     <color name="grey_99FFFFFF">#99FFFFFF</color>
-    <color name="blur">#00FFFFFF</color>
+    <color name="blur">#1FFFFFFF</color>
 
 </resources>

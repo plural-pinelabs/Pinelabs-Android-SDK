@@ -5,20 +5,29 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.airbnb.lottie.LottieAnimationView
 import com.plural_pinelabs.expresscheckoutsdk.ExpressSDKObject
 import com.plural_pinelabs.expresscheckoutsdk.R
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PAY_BY_POINTS_ID
 import com.plural_pinelabs.expresscheckoutsdk.common.ItemClickListener
 import com.plural_pinelabs.expresscheckoutsdk.common.PaymentModes
+import com.plural_pinelabs.expresscheckoutsdk.common.Utils
 import com.plural_pinelabs.expresscheckoutsdk.data.model.PaymentMode
+import com.plural_pinelabs.expresscheckoutsdk.data.model.SavedCardTokens
 import com.plural_pinelabs.expresscheckoutsdk.presentation.utils.DividerItemDecoration
 
 class PaymentModeFragment : Fragment() {
+    private lateinit var savedCardRecyclerView: RecyclerView
+    private lateinit var savedCardsHeading: TextView
+    private lateinit var paymentModeRecyclerView: RecyclerView
+    private lateinit var logoAnimation: LottieAnimationView
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -30,10 +39,48 @@ class PaymentModeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        paymentModeRecyclerView = view.findViewById(R.id.payment_option_list)
+        savedCardRecyclerView = view.findViewById(R.id.saved_cards_list)
+        savedCardsHeading = view.findViewById(R.id.saved_cards_title)
+        logoAnimation = view.findViewById(R.id.offers_gif)
+        initOffersAnimation()
+        setPaymentMode()
+        setSavedCardsView()
+        Utils.showProcessPaymentDialog(requireContext())
+    }
 
-        val recyclerView: RecyclerView = view.findViewById(R.id.payment_option_list)
-        recyclerView.layoutManager = LinearLayoutManager(requireContext())
-        recyclerView.addItemDecoration(
+    private fun setSavedCardsView() {
+        savedCardRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+        savedCardRecyclerView.addItemDecoration(
+            DividerItemDecoration(
+                ContextCompat.getDrawable(requireContext(), R.drawable.recycler_view_divider)
+            )
+        )
+        val savedCards = ExpressSDKObject.getFetchData()?.customerInfo?.tokens
+        if (savedCards.isNullOrEmpty()) {
+            savedCardsHeading.visibility = View.GONE
+            savedCardRecyclerView.visibility = View.GONE
+        } else {
+            savedCardsHeading.visibility = View.VISIBLE
+            savedCardRecyclerView.visibility = View.VISIBLE
+            val adapter =
+                SavedCardRecyclerViewAdapter(requireContext(), savedCards, getSavedCardCallback())
+            savedCardRecyclerView.adapter = adapter
+        }
+    }
+
+    private fun getSavedCardCallback(): ItemClickListener<SavedCardTokens> {
+        return object : ItemClickListener<SavedCardTokens> {
+            override fun onItemClick(position: Int, item: SavedCardTokens) {
+                // Handle saved card selection
+                findNavController().navigate(R.id.action_paymentModeFragment_to_cardFragment)
+            }
+        }
+    }
+
+    private fun setPaymentMode() {
+        paymentModeRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+        paymentModeRecyclerView.addItemDecoration(
             DividerItemDecoration(
                 ContextCompat.getDrawable(requireContext(), R.drawable.recycler_view_divider)
             )
@@ -47,14 +94,19 @@ class PaymentModeFragment : Fragment() {
                     isPBPEnabled(paymentModes),
                     getPaymentModeSelectionCallback(requireContext())
                 )
-            recyclerView.adapter = adapter
+            paymentModeRecyclerView.adapter = adapter
         }
-
-
     }
 
     private fun getPaymentModes(): List<PaymentMode>? {
-        return ExpressSDKObject.getFetchData()?.paymentModes
+        val availablePaymentModes: ArrayList<String> = arrayListOf()
+        PaymentModes.entries.forEach {
+            availablePaymentModes.add(it.paymentModeID.lowercase())
+        }
+        val filteredPaymentModes = ExpressSDKObject.getFetchData()?.paymentModes?.filter {
+            availablePaymentModes.contains(it.paymentModeId.lowercase())
+        }
+        return filteredPaymentModes
     }
 
     private fun isPBPEnabled(paymentModes: List<PaymentMode>): Boolean {
@@ -88,6 +140,11 @@ class PaymentModeFragment : Fragment() {
 
             }
         }
+    }
+
+    private fun initOffersAnimation() {
+        logoAnimation.setAnimation(R.raw.offers)
+        logoAnimation.playAnimation()
     }
 
 }

@@ -199,11 +199,13 @@
                 android:background="@drawable/input_field_border"
                 android:padding="18dp">
 
-                <CheckBox
+                <androidx.appcompat.widget.AppCompatCheckBox
                     android:id="@+id/save_card_checkbox"
-                    android:layout_width="18dp"
-                    android:layout_height="18dp"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
                     android:background="@null"
+                    android:buttonTint="@null"
+                    app:buttonTint= "@null"
                     android:button="@drawable/checkbox_state"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"

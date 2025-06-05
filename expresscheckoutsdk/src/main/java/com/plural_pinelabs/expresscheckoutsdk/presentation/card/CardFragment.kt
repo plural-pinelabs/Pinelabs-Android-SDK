@@ -60,7 +60,7 @@ class CardFragment : Fragment() {
     private lateinit var cardErrorText: TextView
     private lateinit var cardHolderErrorText: TextView
     private lateinit var saveCardCheckbox: CheckBox
-    private lateinit var backBtn : ImageView
+    private lateinit var backBtn: ImageView
 
     private var cardNumber: String = ""
     private var formattedCardNumber: String? = null
@@ -474,7 +474,7 @@ class CardFragment : Fragment() {
             if (saveCardCheckbox.isChecked) {
                 //TODO verify the saved card
                 observeSaveCardCallbackResponse()
-                findNavController().navigate(R.id.action_cardFragment_to_saveCardOTPFragment)
+                // findNavController().navigate(R.id.action_cardFragment_to_saveCardOTPFragment)
             } else {
                 initProcessPayment()
             }

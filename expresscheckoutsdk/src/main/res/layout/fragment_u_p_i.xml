@@ -18,7 +18,8 @@
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:importantForAccessibility="no"
-            android:padding="4dp"
+            android:padding="6dp"
+            android:id="@+id/btnBack"
             android:src="@drawable/ic_back_arrow"
             app:tint="@color/black_text_80" />
 

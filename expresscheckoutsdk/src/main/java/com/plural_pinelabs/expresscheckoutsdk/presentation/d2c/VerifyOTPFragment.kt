@@ -56,7 +56,7 @@ class VerifyOTPFragment : Fragment() {
         setView(view)
         observeViewModel()
         // showProcessPaymentDialog()
-        sendOTP()
+      //  sendOTP()
         view.findViewById<Button>(R.id.verify_otp_btn).setOnClickListener {
             findNavController().navigate(R.id.action_verifyOTPFragment_to_newAddressFormFragment)
         }

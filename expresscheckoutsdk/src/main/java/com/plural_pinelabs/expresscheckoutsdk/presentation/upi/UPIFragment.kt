@@ -11,6 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.net.toUri
@@ -107,6 +108,9 @@ class UPIFragment : Fragment() {
         verifyContinueButton.setOnClickListener {
             payAction(upiIdEt.text.toString(), UPI_COLLECT)
             // TODO Handle the click event for the "Verify and Continue" button
+        }
+        view.findViewById<ImageView>(R.id.btnBack).setOnClickListener {
+            findNavController().popBackStack()
         }
 
     }

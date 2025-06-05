@@ -1,8 +1,10 @@
 package com.plural_pinelabs.expresscheckoutsdk.common
 
 import android.content.Context
+import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Color
 import android.graphics.PixelFormat
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.GradientDrawable
@@ -12,10 +14,13 @@ import android.provider.Settings
 import android.text.TextUtils
 import android.util.Base64
 import android.view.LayoutInflater
+import android.widget.FrameLayout
 import androidx.appcompat.content.res.AppCompatResources
+import androidx.core.graphics.drawable.toDrawable
 import androidx.core.graphics.toColorInt
 import com.airbnb.lottie.LottieAnimationView
 import com.clevertap.android.sdk.CleverTapAPI
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.plural_pinelabs.expresscheckoutsdk.BuildConfig
 import com.plural_pinelabs.expresscheckoutsdk.R
@@ -308,19 +313,80 @@ internal object Utils {
         return BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.size)
     }
 
+//    fun showProcessPaymentDialog(context: Context): BottomSheetDialog {
+//        val bottomSheetDialog = BottomSheetDialog(context)
+//        val view = LayoutInflater.from(context)
+//            .inflate(R.layout.processing_full_screen_dialog, null)
+//
+//        view.findViewById<ConstraintLayout>(R.id.parent_layout).let {
+//            val behavior = BottomSheetBehavior.from(it)
+//            val layoutParams = it.layoutParams
+//
+//            // Set height to MATCH_PARENT
+//            layoutParams.height = WindowManager.LayoutParams.MATCH_PARENT
+//            it.layoutParams = layoutParams
+//
+//            // Set the peek height to the screen height to ensure it goes full screen
+//            // This is crucial for making it truly full screen from the start
+//            behavior.peekHeight = Resources.getSystem().displayMetrics.heightPixels
+//
+//            // Ensure it expands to the full state immediately
+//            behavior.state = BottomSheetBehavior.STATE_EXPANDED
+//
+//            // Optional: If you want to disable the partially expanded state (e.g., if you only want expanded or hidden)
+//            behavior.isFitToContents = false
+//            behavior.skipCollapsed = true
+//        }
+//
+//        val logoAnimation: LottieAnimationView = view.findViewById(R.id.img_process_logo)
+//        logoAnimation.setAnimationFromUrl(IMAGE_LOGO)
+//
+//        bottomSheetDialog.setCancelable(false)
+//        bottomSheetDialog.setCanceledOnTouchOutside(false)
+//        bottomSheetDialog.setContentView(view)
+//        bottomSheetDialog.show()
+//
+//        return bottomSheetDialog
+//    }
+
+
     fun showProcessPaymentDialog(context: Context): BottomSheetDialog {
         val bottomSheetDialog = BottomSheetDialog(context)
         val view = LayoutInflater.from(context)
-            .inflate(R.layout.processing_full_screen_dialog, null)
+            .inflate(
+                R.layout.processing_full_screen_dialog,
+                null
+            ) // Use `null` for parent in inflate
 
+        // Set the content view *before* trying to get the BottomSheetBehavior
+        bottomSheetDialog.setContentView(view)
+
+        // IMPORTANT: Get the internal FrameLayout that holds the bottom sheet content
+        val bottomSheet =
+            bottomSheetDialog.findViewById<FrameLayout>(com.google.android.material.R.id.design_bottom_sheet)
+        // Ensure the bottomSheet is not null
+        bottomSheet?.let {
+
+            val behavior = BottomSheetBehavior.from(it) // Apply behavior to the correct FrameLayout
+            // Set height to MATCH_PARENT
+            val layoutParams = it.layoutParams
+            // Get the screen height programmatically
+            val displayMetrics = Resources.getSystem().displayMetrics
+            val screenHeight = displayMetrics.heightPixels
+            layoutParams.height = screenHeight // Use screen height
+            it.layoutParams = layoutParams
+            behavior.peekHeight = screenHeight
+            behavior.state = BottomSheetBehavior.STATE_EXPANDED
+            behavior.isFitToContents = false
+            behavior.skipCollapsed = true
+            it.setBackgroundColor(Color.TRANSPARENT) // Or use a translucent color
+        }
         val logoAnimation: LottieAnimationView = view.findViewById(R.id.img_process_logo)
         logoAnimation.setAnimationFromUrl(IMAGE_LOGO)
-
         bottomSheetDialog.setCancelable(false)
         bottomSheetDialog.setCanceledOnTouchOutside(false)
-        bottomSheetDialog.setContentView(view)
+        bottomSheetDialog.window?.setBackgroundDrawable(Color.TRANSPARENT.toDrawable())
         bottomSheetDialog.show()
-
         return bottomSheetDialog
     }
 

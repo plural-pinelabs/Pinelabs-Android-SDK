@@ -79,5 +79,7 @@ dependencies {
     implementation(libs.kotlinx.coroutines.android) // Replace with the latest version
     implementation (libs.androidx.navigation.fragment.ktx)
     implementation (libs.androidx.navigation.ui.ktx)
+    implementation ("jp.wasabeef:blurry:4.0.1") // Check for the latest version on the Blurry GitHub page
+
 
 }

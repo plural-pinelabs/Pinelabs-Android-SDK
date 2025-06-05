@@ -1,11 +1,11 @@
 package com.plural_pinelabs.expresscheckoutsdk.presentation
 
+import android.graphics.Color
 import android.os.Bundle
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
 import android.view.View
-import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -17,9 +17,11 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.plural_pinelabs.expresscheckoutsdk.ExpressSDKObject
 import com.plural_pinelabs.expresscheckoutsdk.R
+import com.plural_pinelabs.expresscheckoutsdk.common.BlurringView
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CustomerInfo
 import com.plural_pinelabs.expresscheckoutsdk.data.model.FetchResponseDTO
+import jp.wasabeef.blurry.Blurry
 
 class LandingActivity : AppCompatActivity() {
     private lateinit var merchantLogoCard: CardView
@@ -35,6 +37,10 @@ class LandingActivity : AppCompatActivity() {
     private lateinit var separator: TextView
     private lateinit var customerInfoData: CustomerInfo
     private lateinit var headerParentLayout: ConstraintLayout
+
+
+    private lateinit var mainContentLayout: ConstraintLayout
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -73,6 +79,7 @@ class LandingActivity : AppCompatActivity() {
         separator = findViewById(R.id.seperator)
         headerParentLayout = findViewById(R.id.header_layout_parent)
         showHideHeaderLayout(false)
+        mainContentLayout = findViewById(R.id.main)
     }
 
 
@@ -81,6 +88,7 @@ class LandingActivity : AppCompatActivity() {
 
             showHideHeaderLayout(true)
             fetchData.customerInfo?.let { customerInfo ->
+                strikeAmount.visibility = View.GONE
                 if (!customerInfo.mobileNo.isNullOrEmpty() || !customerInfo.emailId.isNullOrEmpty()) {
                     contactDetailsLayout.visibility = View.VISIBLE
                     customerId.text = customerInfo.mobileNo ?: ""
@@ -116,11 +124,11 @@ class LandingActivity : AppCompatActivity() {
                         }
                     } else {
                         merchantLogoCard.visibility = View.INVISIBLE
-                        merchantLogo.visibility = View.INVISIBLE
+                        merchantLogo.visibility = View.GONE
                     }
                 } ?: run {
                     merchantLogoCard.visibility = View.INVISIBLE
-                    merchantLogo.visibility = View.INVISIBLE
+                    merchantLogo.visibility = View.GONE
                 }
 
                 merchantName.text = fetchData.merchantInfo?.merchantDisplayName
@@ -142,6 +150,4 @@ class LandingActivity : AppCompatActivity() {
             }
         }
     }
-
-
 }

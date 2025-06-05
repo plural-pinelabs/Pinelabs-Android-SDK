@@ -96,6 +96,17 @@
     <string name="_4_7_business_days">4-7 business days</string>
     <string name="express_delivery">Express delivery</string>
     <string name="_2_4_business_days">2-4 business days</string>
+    <string name="saved_cards">Saved cards</string>
+    <string name="order_confirmed">Order Confirmed</string>
+    <string name="you_ll_receive_order_details_on_your_phone_number">You’ll receive order details on your phone number</string>
+    <string name="transaction_id">Transaction ID</string>
+    <string name="order_number">Order Number</string>
+    <string name="paid_using">Paid Using</string>
+    <string name="original_price">Original Price</string>
+    <string name="amount_paid">Amount Paid</string>
+    <string name="payment_details">Payment Details</string>
+    <string name="continue_to_merchant"><u>Continue to merchant</u></string>
+    <string name="you_re_saving_500_on_this_order">You’re saving ₹ 500 on this order!</string>
 
 
 </resources>
