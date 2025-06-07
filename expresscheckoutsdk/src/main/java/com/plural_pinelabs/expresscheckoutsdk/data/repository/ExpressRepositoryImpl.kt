@@ -1,13 +1,15 @@
 package com.plural_pinelabs.expresscheckoutsdk.data.repository
 
-import android.content.Context
 import com.plural_pinelabs.expresscheckoutsdk.common.BaseResult
 import com.plural_pinelabs.expresscheckoutsdk.common.NetworkHelper
 import com.plural_pinelabs.expresscheckoutsdk.common.toResultFlow
 import com.plural_pinelabs.expresscheckoutsdk.data.fetch.CardApiService
+import com.plural_pinelabs.expresscheckoutsdk.data.fetch.ExpressApiService
 import com.plural_pinelabs.expresscheckoutsdk.data.fetch.FetchApiService
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CardBinMetaDataRequestList
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CardBinMetaDataResponse
+import com.plural_pinelabs.expresscheckoutsdk.data.model.ExpressAddress
+import com.plural_pinelabs.expresscheckoutsdk.data.model.ExpressAddressResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.FetchResponseDTO
 import com.plural_pinelabs.expresscheckoutsdk.data.model.OTPRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.model.OTPResponse
@@ -98,6 +100,15 @@ class ExpressRepositoryImpl(
     ): Flow<BaseResult<TransactionStatusResponse>> {
         return toResultFlow(networkHelper = networkHelper) {
             (apiService as CardApiService).statusOfTransaction(token)
+        }
+    }
+
+    override suspend fun fetchAddress(
+        token: String?,
+        request: ExpressAddress
+    ): Flow<BaseResult<ExpressAddressResponse>> {
+        return toResultFlow(networkHelper = networkHelper) {
+            (apiService as ExpressApiService).fetchAddress("Bearer ${token?.trim()}", request)
         }
     }
 }

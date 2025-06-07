@@ -46,7 +46,6 @@ class PaymentModeFragment : Fragment() {
         initOffersAnimation()
         setPaymentMode()
         setSavedCardsView()
-        Utils.showProcessPaymentDialog(requireContext())
     }
 
     private fun setSavedCardsView() {

@@ -14,6 +14,7 @@ import android.provider.Settings
 import android.text.TextUtils
 import android.util.Base64
 import android.view.LayoutInflater
+import android.widget.Button
 import android.widget.FrameLayout
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.graphics.drawable.toDrawable
@@ -385,6 +386,40 @@ internal object Utils {
         logoAnimation.setAnimationFromUrl(IMAGE_LOGO)
         bottomSheetDialog.setCancelable(false)
         bottomSheetDialog.setCanceledOnTouchOutside(false)
+        bottomSheetDialog.window?.setBackgroundDrawable(Color.TRANSPARENT.toDrawable())
+        bottomSheetDialog.show()
+        return bottomSheetDialog
+    }
+
+
+    fun showCancelPaymentDialog(context: Context): BottomSheetDialog {
+        val bottomSheetDialog = BottomSheetDialog(context)
+        val view = LayoutInflater.from(context)
+            .inflate(
+                R.layout.cancel_bottom_sheet_layout,
+                null
+            )
+        bottomSheetDialog.setContentView(view)
+        val cancelYesButton: Button = view.findViewById(R.id.cancel_yes_btn)
+        val cancelNoButton: Button = view.findViewById(R.id.cancel_no_btn)
+        val cancelButton: Button = view.findViewById(R.id.cancel_btn)
+        cancelNoButton.setOnClickListener {
+            bottomSheetDialog.dismiss()
+        }
+        cancelYesButton.setOnClickListener {
+            // Handle the cancel action here
+            //TODO cancel the payment
+            bottomSheetDialog.dismiss()
+        }
+
+        cancelButton.setOnClickListener {
+            // Handle the cancel action here
+            //TODO cancel the payment pass an interface to here and listen to the click use the existing item click listener with boolean
+            bottomSheetDialog.dismiss()
+        }
+
+        bottomSheetDialog.setCancelable(true)
+        bottomSheetDialog.setCanceledOnTouchOutside(true)
         bottomSheetDialog.window?.setBackgroundDrawable(Color.TRANSPARENT.toDrawable())
         bottomSheetDialog.show()
         return bottomSheetDialog

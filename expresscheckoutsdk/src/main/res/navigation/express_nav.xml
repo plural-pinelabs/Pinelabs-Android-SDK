@@ -35,6 +35,9 @@
         <action
             android:id="@+id/action_verifyOTPFragment_to_newAddressFormFragment"
             app:destination="@id/newAddressFormFragment" />
+        <action
+            android:id="@+id/action_verifyOTPFragment_to_savedAddressFragment"
+            app:destination="@id/savedAddressFragment" />
     </fragment>
     <fragment
         android:id="@+id/newAddressFormFragment"
@@ -129,4 +132,9 @@
         tools:layout="@layout/fragment_save_card_o_t_p"
         android:name="com.plural_pinelabs.expresscheckoutsdk.presentation.card.SaveCardOTPFragment"
         android:label="SaveCardOTPFragment" />
+    <fragment
+        android:id="@+id/savedAddressFragment"
+        android:name="com.plural_pinelabs.expresscheckoutsdk.presentation.d2c.SavedAddressFragment"
+        android:label="fragment_saved_address"
+        tools:layout="@layout/fragment_saved_address" />
 </navigation>

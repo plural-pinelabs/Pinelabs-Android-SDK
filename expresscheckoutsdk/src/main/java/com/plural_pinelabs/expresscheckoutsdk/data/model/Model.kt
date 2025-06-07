@@ -473,3 +473,32 @@ data class Palette(
 ) : Parcelable
 
 
+@Parcelize
+data class ExpressAddress(
+    val query: String,
+    val variables: Variables,
+) : Parcelable
+
+@Parcelize
+data class Variables(
+    val customerId: String
+) : Parcelable
+
+
+@Parcelize
+data class ExpressAddressResponse(
+    val data: Data
+) : Parcelable
+
+
+@Parcelize
+data class Data(
+    val getCustomerAddresses: CustomerAddresses
+) : Parcelable
+
+@Parcelize
+data class CustomerAddresses(
+    val success: Boolean,
+    val message: String
+
+) : Parcelable

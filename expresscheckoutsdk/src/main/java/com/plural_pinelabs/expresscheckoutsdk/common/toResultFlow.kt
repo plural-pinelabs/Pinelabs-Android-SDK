@@ -1,7 +1,9 @@
 package com.plural_pinelabs.expresscheckoutsdk.common
 
+import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import com.plural_pinelabs.expresscheckoutsdk.common.Utils.MTAG
 import com.plural_pinelabs.expresscheckoutsdk.data.model.FetchError
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -19,11 +21,16 @@ inline fun <reified T> toResultFlow(
             val c = call()
             c?.let { response ->
                 try {
+                    Log.d("Toresultflow", "Response: ${response.raw().body}")
+                    Log.d("Toresultflow", "Response: ${response.raw().isSuccessful}")
+                    Log.d("Toresultflow", "Response: ${response.raw().toString()}")
+
                     if (c.isSuccessful && c.body() != null) {
                         c.body()?.let {
                             emit(BaseResult.Success(it))
                         }
                     } else {
+                        Log.d("Toresultflow", "Response: emit error  ${response.raw().body}")
                         val type = object : TypeToken<FetchError>() {}.type
                         val errorResponse: FetchError? =
                             Gson().fromJson(response.errorBody()?.charStream(), type)
@@ -35,6 +42,7 @@ inline fun <reified T> toResultFlow(
                         )
                     }
                 } catch (e: Exception) {
+                    Log.d("Toresultflow", "exception error: ${e.message}")
 
                     emit(
                         BaseResult.Error(

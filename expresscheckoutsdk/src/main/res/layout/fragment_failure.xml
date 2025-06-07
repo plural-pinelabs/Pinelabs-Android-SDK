@@ -1,14 +1,159 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".presentation.terminal.FailureFragment">
+    android:background="@color/white">
 
-    <!-- TODO: Update blank fragment layout -->
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
+        android:src="@drawable/ic_failure_cancel"
+        app:layout_constraintBottom_toTopOf="@id/txt_error"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
     <TextView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="Fragment failure" />
+        android:id="@+id/txt_error"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="sans-serif-medium"
+        android:text="@string/payment_not_completed"
+        android:textColor="@color/black_text"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-</FrameLayout>
+    <TextView
+        android:id="@+id/txt_retry"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="50dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="50dp"
+        android:alpha=".8"
+        android:fontFamily="sans-serif-medium"
+        android:gravity="center"
+        android:text="@string/your_payment_has_been_failed_try_again_or_complete_the_payment_later"
+        android:textColor="@color/black_text_60"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/txt_error" />
+
+    <TextView
+        android:id="@+id/txt_autoclose"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="50dp"
+        android:alpha=".6"
+        android:fontFamily="sans-serif-medium"
+        android:text=""
+        android:textColor="@color/black_text_80"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    <!--TODO commented for now to discuss with Garima if new flow or Old flow  is required  -->
+    <!--<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"-->
+    <!--    xmlns:tools="http://schemas.android.com/tools"-->
+    <!--    android:layout_width="match_parent"-->
+    <!--    android:layout_height="wrap_content"-->
+    <!--    android:layout_marginHorizontal="16dp"-->
+    <!--    android:orientation="vertical">-->
+
+    <!--    <androidx.appcompat.widget.AppCompatTextView-->
+    <!--        android:layout_width="wrap_content"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:layout_marginTop="16dp"-->
+    <!--        android:drawableStart="@drawable/ic_back_arrow"-->
+    <!--        android:drawablePadding="4dp"-->
+    <!--        android:drawableTint="@color/black_text_80"-->
+    <!--        android:fontFamily="sans-serif"-->
+    <!--        android:text="@string/go_back"-->
+    <!--        android:textColor="@color/black_text_80"-->
+    <!--        android:textFontWeight="600"-->
+    <!--        android:textSize="14sp" />-->
+
+    <!--    <ScrollView-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:layout_marginTop="4dp"-->
+    <!--        tools:context=".presentation.terminal.SuccessFragment">-->
+
+    <!--        <LinearLayout-->
+    <!--            android:layout_width="match_parent"-->
+    <!--            android:layout_height="wrap_content"-->
+    <!--            android:layout_marginHorizontal="16dp"-->
+    <!--            android:orientation="vertical">-->
+
+    <!--            <ImageView-->
+    <!--                android:layout_width="64dp"-->
+    <!--                android:layout_height="64dp"-->
+    <!--                android:layout_gravity="center_horizontal"-->
+    <!--                android:layout_marginTop="32dp"-->
+    <!--                android:importantForAccessibility="no"-->
+    <!--                android:src="@drawable/ic_failure_cancel" />-->
+
+    <!--            <androidx.appcompat.widget.AppCompatTextView-->
+    <!--                android:layout_width="wrap_content"-->
+    <!--                android:layout_height="wrap_content"-->
+    <!--                android:layout_gravity="center_horizontal"-->
+    <!--                android:layout_marginTop="24dp"-->
+    <!--                android:fontFamily="sans-serif"-->
+    <!--                android:text="@string/payment_not_completed"-->
+    <!--                android:textColor="@color/black_text"-->
+    <!--                android:textFontWeight="500"-->
+    <!--                android:textSize="24sp" />-->
+
+    <!--            <androidx.appcompat.widget.AppCompatTextView-->
+    <!--                android:layout_width="wrap_content"-->
+    <!--                android:layout_height="wrap_content"-->
+    <!--                android:layout_gravity="center_horizontal"-->
+    <!--                android:layout_marginTop="12dp"-->
+    <!--                android:fontFamily="sans-serif"-->
+    <!--                android:gravity="center"-->
+    <!--                android:text="@string/your_payment_has_been_failed_try_again_or_complete_the_payment_later"-->
+    <!--                android:textAlignment="center"-->
+    <!--                android:textColor="@color/black_text_60"-->
+    <!--                android:textFontWeight="500"-->
+    <!--                android:textSize="14sp" />-->
+
+
+    <!--            <TextView-->
+    <!--                android:layout_width="wrap_content"-->
+    <!--                android:layout_height="wrap_content"-->
+    <!--                android:layout_gravity="center_horizontal"-->
+    <!--                android:layout_marginStart="24dp"-->
+    <!--                android:layout_marginTop="32dp"-->
+    <!--                android:fontFamily="sans-serif"-->
+    <!--                android:letterSpacing="0.12"-->
+    <!--                android:text="Retry payment of "-->
+    <!--                android:textAllCaps="true"-->
+    <!--                android:textColor="@color/black_text_60"-->
+    <!--                android:textFontWeight="700"-->
+    <!--                android:textSize="12sp" />-->
+
+
+    <!--            <androidx.fragment.app.FragmentContainerView-->
+    <!--                android:name="com.plural_pinelabs.expresscheckoutsdk.presentation.landing.PaymentModeFragment"-->
+    <!--                android:layout_width="match_parent"-->
+    <!--                android:layout_height="wrap_content"-->
+    <!--                android:layout_marginTop="24dp"-->
+    <!--                tools:layout="@layout/fragment_payment_mode" />-->
+
+
+    <!--        </LinearLayout>-->
+
+    <!--    </ScrollView>-->
+
+    <!--</LinearLayout>-->

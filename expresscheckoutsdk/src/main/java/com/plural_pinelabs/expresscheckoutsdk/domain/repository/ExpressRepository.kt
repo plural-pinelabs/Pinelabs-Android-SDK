@@ -1,9 +1,10 @@
 package com.plural_pinelabs.expresscheckoutsdk.domain.repository
 
-import android.content.Context
 import com.plural_pinelabs.expresscheckoutsdk.common.BaseResult
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CardBinMetaDataRequestList
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CardBinMetaDataResponse
+import com.plural_pinelabs.expresscheckoutsdk.data.model.ExpressAddress
+import com.plural_pinelabs.expresscheckoutsdk.data.model.ExpressAddressResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.FetchResponseDTO
 import com.plural_pinelabs.expresscheckoutsdk.data.model.OTPRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.model.OTPResponse
@@ -48,4 +49,5 @@ interface ExpressRepository {
         token: String?
     ): Flow<BaseResult<TransactionStatusResponse>>
 
+    suspend fun fetchAddress(token: String?, request: ExpressAddress): Flow<BaseResult<ExpressAddressResponse>>
 }

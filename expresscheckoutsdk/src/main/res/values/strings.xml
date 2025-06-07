@@ -107,6 +107,12 @@
     <string name="payment_details">Payment Details</string>
     <string name="continue_to_merchant"><u>Continue to merchant</u></string>
     <string name="you_re_saving_500_on_this_order">You’re saving ₹ 500 on this order!</string>
+    <string name="cancel_payment">Cancel Payment?</string>
+    <string name="are_you_sure_you_want_to_cancel_the_payment">Are you sure you want to cancel the payment?</string>
+    <string name="no">No</string>
+    <string name="yes_cancel">Yes, Cancel</string>
+    <string name="payment_not_completed">Payment not completed!</string>
+    <string name="your_payment_has_been_failed_try_again_or_complete_the_payment_later">Your payment has been failed. Try again or complete the payment later.</string>
 
 
 </resources>

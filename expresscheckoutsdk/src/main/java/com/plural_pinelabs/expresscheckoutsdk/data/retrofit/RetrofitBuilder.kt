@@ -4,6 +4,7 @@ import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.plural_pinelabs.expresscheckoutsdk.BuildConfig
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.BASE_CHECKOUTBFF
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.BASE_URL_EXPRESS_DEV
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.BASE_URL_PROD
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.BASE_URL_QA
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.BASE_URL_UAT
@@ -11,6 +12,7 @@ import com.plural_pinelabs.expresscheckoutsdk.common.Constants.HTTPS
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.TIMEOUT
 import com.plural_pinelabs.expresscheckoutsdk.common.PaymentModeDeserialiser
 import com.plural_pinelabs.expresscheckoutsdk.data.fetch.CardApiService
+import com.plural_pinelabs.expresscheckoutsdk.data.fetch.ExpressApiService
 import com.plural_pinelabs.expresscheckoutsdk.data.fetch.FetchApiService
 import okhttp3.CertificatePinner
 import okhttp3.OkHttpClient
@@ -38,8 +40,19 @@ object RetrofitBuilder {
             .build()
     }
 
+
+    private fun getRetrofitForExpressCheckout(): Retrofit {
+        return Retrofit.Builder()
+            .baseUrl(HTTPS + BASE_URL_EXPRESS_DEV )
+            .addConverterFactory(GsonConverterFactory.create())
+            .addConverterFactory(GsonConverterFactory.create(gson))
+            .client(clientBuilder.build())
+            .build()
+    }
+
     val fetchApiService: FetchApiService = getRetrofit().create(FetchApiService::class.java)
     val cardApiService: CardApiService = getRetrofit().create(CardApiService::class.java)
+    val expressApiService: ExpressApiService = getRetrofitForExpressCheckout().create(ExpressApiService::class.java)
 
     private fun createBuilder(): OkHttpClient.Builder {
 
