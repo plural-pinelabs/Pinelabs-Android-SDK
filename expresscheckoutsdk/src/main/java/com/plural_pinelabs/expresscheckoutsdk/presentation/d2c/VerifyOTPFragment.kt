@@ -54,12 +54,9 @@ class VerifyOTPFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setView(view)
-      //  observeViewModel()
+        //  observeViewModel()
         // showProcessPaymentDialog()
-      //  sendOTP()
-        view.findViewById<Button>(R.id.verify_otp_btn).setOnClickListener {
-            findNavController().navigate(R.id.action_verifyOTPFragment_to_savedAddressFragment)
-        }
+        //   sendOTP()
     }
 
     private fun setView(view: View) {

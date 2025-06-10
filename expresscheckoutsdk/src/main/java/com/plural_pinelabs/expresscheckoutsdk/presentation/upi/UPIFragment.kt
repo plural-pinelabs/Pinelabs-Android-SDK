@@ -47,6 +47,7 @@ import com.plural_pinelabs.expresscheckoutsdk.common.ItemClickListener
 import com.plural_pinelabs.expresscheckoutsdk.common.NetworkHelper
 import com.plural_pinelabs.expresscheckoutsdk.common.UPIViewModelFactory
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils
+import com.plural_pinelabs.expresscheckoutsdk.common.Utils.showProcessPaymentBottomSheetDialog
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils.showProcessPaymentDialog
 import com.plural_pinelabs.expresscheckoutsdk.data.model.Extra
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ProcessPaymentRequest
@@ -67,6 +68,7 @@ class UPIFragment : Fragment() {
     private lateinit var upiAppsRv: RecyclerView
     private lateinit var upiIdEt: EditText
     private lateinit var verifyContinueButton: Button
+    private lateinit var errorinfoTextView: TextView
     private val UPI_REGEX = Regex("^[\\w.]{1,}-?[\\w.]{0,}-?[\\w.]{1,}@[a-zA-Z]{2,}$")
     private lateinit var viewModel: UPIViewModel
     private var mTransactionMode: String? = null
@@ -100,10 +102,10 @@ class UPIFragment : Fragment() {
         upiAppsRv = view.findViewById(R.id.upi_app_rv)
         verifyContinueButton = view.findViewById(R.id.verify_and_continueButton)
         upiIdEt = view.findViewById(R.id.upi_id_edittext)
+        errorinfoTextView = view.findViewById(R.id.error_upi_id)
 
         payByAnyUPIButton.setOnClickListener {
             payAction(null, UPI_INTENT)
-            // Handle the click event for the "Pay by Any UPI" button
         }
         verifyContinueButton.setOnClickListener {
             payAction(upiIdEt.text.toString(), UPI_COLLECT)
@@ -176,6 +178,11 @@ class UPIFragment : Fragment() {
     }
 
     private fun setupUPIIdValidation() {
+        upiIdEt.setOnFocusChangeListener { v, hasFocus ->
+            if (hasFocus) {
+                errorinfoTextView.visibility = View.GONE
+            }
+        }
         upiIdEt.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
@@ -183,10 +190,9 @@ class UPIFragment : Fragment() {
 
             override fun afterTextChanged(s: Editable?) {
                 val isValidUPI = UPI_REGEX.matches(s.toString())
-
                 verifyContinueButton.isEnabled = isValidUPI
                 if (!verifyContinueButton.isEnabled) {
-                    //TODO show error message
+                    errorinfoTextView.visibility = View.VISIBLE
                 }
             }
         })
@@ -349,7 +355,7 @@ class UPIFragment : Fragment() {
 
 
     private fun getTransactionStatus(token: String?) {
-        bottomSheetDialog = Utils.showProcessPaymentDialog(requireContext())
+        bottomSheetDialog = showProcessPaymentBottomSheetDialog(requireContext())
         bottomSheetDialog?.show()
         transactionStatusJob = lifecycleScope.launch(Dispatchers.IO) {
             while (isActive) {

@@ -113,6 +113,19 @@
     <string name="yes_cancel">Yes, Cancel</string>
     <string name="payment_not_completed">Payment not completed!</string>
     <string name="your_payment_has_been_failed_try_again_or_complete_the_payment_later">Your payment has been failed. Try again or complete the payment later.</string>
+    <string name="redeem_reward_points_on_this_transaction">Redeem reward points on this transaction</string>
+    <string name="eligible_cards_list_text">Eligible cards: SBI, AXIS, ICICI, HDFC, and  <font color="#1C1C1C"><u><b>12 more</b></u></font></string>
+    <string name="your_card_may_have_points">Your card may have points</string>
+    <string name="check_for_points"><b><u>Check for Points</u> </b></string>
+    <string name="checking_points_balance">Checking points balance</string>
+    <string name="redeem_x_card_points">Redeem 10,000 card points</string>
+    <string name="get_x_instant_discount">Get <font color="#00722F"><b> %s </b></font> instant discount</string>
+    <string name="your_card_has_0_points">Your card has 0 points.</string>
+    <string name="try_another_card_or_proceed_to_pay">Try another card or proceed to pay.</string>
+    <string name="check_for_points_pbp">Check for Points!</string>
+    <string name="your_card_may_have_points_that_you_can_redeem">Your card may have points that you can redeem.</string>
+    <string name="registered_mobile_number_with_bank">Registered mobile number with bank</string>
+    <string name="check_points">Check Points</string>
 
 
 </resources>

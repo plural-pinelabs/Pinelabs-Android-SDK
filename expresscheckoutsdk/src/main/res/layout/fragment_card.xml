@@ -192,7 +192,208 @@
                 android:textFontWeight="500"
                 android:visibility="gone" />
 
+            <LinearLayout
+                android:id="@+id/redeem_points_parent_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/rounded_address_background"
+                android:gravity="start"
+                android:orientation="vertical"
+                android:padding="18dp">
+
+
+                <androidx.appcompat.widget.LinearLayoutCompat
+                    android:id="@+id/redeem_points_info_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="gone">
+
+                    <TextView
+                        android:id="@+id/redeem_points_text"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="sans-serif"
+                        android:text="@string/redeem_reward_points_on_this_transaction"
+                        android:textColor="@color/black_text_80"
+                        android:textFontWeight="500"
+                        android:textSize="12sp"
+                        app:layout_constraintStart_toEndOf="@id/save_card_checkbox"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:fontFamily="sans-serif"
+                        android:text="@string/eligible_cards_list_text"
+                        android:textColor="@color/black_text_50"
+                        android:textFontWeight="500"
+                        android:textSize="12sp"
+                        app:layout_constraintStart_toEndOf="@id/save_card_checkbox"
+                        app:layout_constraintTop_toBottomOf="@id/save_card_text" />
+                </androidx.appcompat.widget.LinearLayoutCompat>
+
+                <LinearLayout
+                    android:id="@+id/redeem_points_check_point_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:visibility="gone">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:fontFamily="sans-serif"
+                        android:text="@string/your_card_may_have_points"
+                        android:textColor="@color/black_text_80"
+                        android:textFontWeight="500"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:id="@+id/check_for_points_text"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="2dp"
+                        android:layout_weight="1"
+                        android:fontFamily="sans-serif"
+                        android:gravity="end"
+                        android:text="@string/check_for_points"
+                        android:textColor="@color/black_text_80"
+                        android:textFontWeight="500"
+                        android:textSize="14sp" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/checking_points_progress_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_horizontal"
+                    android:orientation="horizontal">
+
+                    <ProgressBar
+                        android:id="@+id/checking_points_progress_bar"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:padding="2dp"
+                        android:progressTint="@color/black_text_80"
+                        android:visibility="visible" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginStart="8dp"
+                        android:fontFamily="sans-serif"
+                        android:text="@string/checking_points_balance"
+                        android:textColor="@color/black_text_50"
+                        android:textFontWeight="500"
+                        android:textSize="12sp" />
+
+                </LinearLayout>
+
+
+            </LinearLayout>
+
             <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/redeem_points_redeem_button_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/redeem_points_twin_bg_white_solid"
+                android:padding="18dp">
+
+                <ImageView
+                    android:id="@+id/redeem_points_icon"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_marginEnd="12dp"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/ic_redeem_point_default"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <androidx.appcompat.widget.AppCompatCheckBox
+                    android:id="@+id/redeem_points_checkbox"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:background="@null"
+                    android:button="@drawable/circle_checkbox_state"
+                    android:buttonTint="@null"
+                    app:buttonTint="@null"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/redeem_card_points_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="36dp"
+                    android:fontFamily="sans-serif"
+                    android:text="@string/redeem_x_card_points"
+                    android:textColor="@color/black_text_80"
+                    android:textFontWeight="500"
+                    android:textSize="12sp"
+                    app:layout_constraintStart_toEndOf="@id/redeem_points_icon"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="36dp"
+                    android:fontFamily="sans-serif"
+                    android:text="@string/get_x_instant_discount"
+                    android:textColor="@color/black_text_50"
+                    android:textFontWeight="500"
+                    android:textSize="12sp"
+                    app:layout_constraintEnd_toStartOf="@id/redeem_points_checkbox"
+                    app:layout_constraintStart_toEndOf="@id/redeem_points_icon"
+                    app:layout_constraintTop_toBottomOf="@id/redeem_card_points_text" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/redeem_points_redeem_error_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/redeem_points_error_twin_bg_white"
+                android:padding="18dp">
+
+
+                <TextView
+                    android:id="@+id/redeem_error_title_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif"
+                    android:text="@string/your_card_has_0_points"
+                    android:textColor="@color/black_text_80"
+                    android:textFontWeight="400"
+                    android:textSize="14sp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/redeem_error_description_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif"
+                    android:text="@string/try_another_card_or_proceed_to_pay"
+                    android:textColor="@color/black_text_80"
+                    android:textFontWeight="400"
+                    android:textSize="14sp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/redeem_error_title_text" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/saved_card_parent_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
@@ -204,9 +405,9 @@
                     android:layout_width="20dp"
                     android:layout_height="20dp"
                     android:background="@null"
-                    android:buttonTint="@null"
-                    app:buttonTint= "@null"
                     android:button="@drawable/checkbox_state"
+                    android:buttonTint="@null"
+                    app:buttonTint="@null"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -248,8 +449,6 @@
                 android:minHeight="48dp"
                 android:text="@string/continue_text"
                 android:textColor="@color/white" />
-
-
         </LinearLayout>
     </ScrollView>
 </LinearLayout>

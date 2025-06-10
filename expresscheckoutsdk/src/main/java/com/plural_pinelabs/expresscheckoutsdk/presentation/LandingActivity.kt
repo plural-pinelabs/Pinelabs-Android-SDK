@@ -1,6 +1,5 @@
 package com.plural_pinelabs.expresscheckoutsdk.presentation
 
-import android.graphics.Color
 import android.os.Bundle
 import android.text.Spannable
 import android.text.SpannableString
@@ -17,11 +16,9 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.plural_pinelabs.expresscheckoutsdk.ExpressSDKObject
 import com.plural_pinelabs.expresscheckoutsdk.R
-import com.plural_pinelabs.expresscheckoutsdk.common.BlurringView
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CustomerInfo
 import com.plural_pinelabs.expresscheckoutsdk.data.model.FetchResponseDTO
-import jp.wasabeef.blurry.Blurry
 
 class LandingActivity : AppCompatActivity() {
     private lateinit var merchantLogoCard: CardView

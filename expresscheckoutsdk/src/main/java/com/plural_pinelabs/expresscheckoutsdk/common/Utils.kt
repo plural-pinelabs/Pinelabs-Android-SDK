@@ -314,42 +314,6 @@ internal object Utils {
         return BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.size)
     }
 
-//    fun showProcessPaymentDialog(context: Context): BottomSheetDialog {
-//        val bottomSheetDialog = BottomSheetDialog(context)
-//        val view = LayoutInflater.from(context)
-//            .inflate(R.layout.processing_full_screen_dialog, null)
-//
-//        view.findViewById<ConstraintLayout>(R.id.parent_layout).let {
-//            val behavior = BottomSheetBehavior.from(it)
-//            val layoutParams = it.layoutParams
-//
-//            // Set height to MATCH_PARENT
-//            layoutParams.height = WindowManager.LayoutParams.MATCH_PARENT
-//            it.layoutParams = layoutParams
-//
-//            // Set the peek height to the screen height to ensure it goes full screen
-//            // This is crucial for making it truly full screen from the start
-//            behavior.peekHeight = Resources.getSystem().displayMetrics.heightPixels
-//
-//            // Ensure it expands to the full state immediately
-//            behavior.state = BottomSheetBehavior.STATE_EXPANDED
-//
-//            // Optional: If you want to disable the partially expanded state (e.g., if you only want expanded or hidden)
-//            behavior.isFitToContents = false
-//            behavior.skipCollapsed = true
-//        }
-//
-//        val logoAnimation: LottieAnimationView = view.findViewById(R.id.img_process_logo)
-//        logoAnimation.setAnimationFromUrl(IMAGE_LOGO)
-//
-//        bottomSheetDialog.setCancelable(false)
-//        bottomSheetDialog.setCanceledOnTouchOutside(false)
-//        bottomSheetDialog.setContentView(view)
-//        bottomSheetDialog.show()
-//
-//        return bottomSheetDialog
-//    }
-
 
     fun showProcessPaymentDialog(context: Context): BottomSheetDialog {
         val bottomSheetDialog = BottomSheetDialog(context)
@@ -388,6 +352,37 @@ internal object Utils {
         bottomSheetDialog.setCanceledOnTouchOutside(false)
         bottomSheetDialog.window?.setBackgroundDrawable(Color.TRANSPARENT.toDrawable())
         bottomSheetDialog.show()
+        return bottomSheetDialog
+    }
+
+
+     fun showProcessPaymentBottomSheetDialog(
+        context: Context,
+        cancelPaymentText: String? = null,
+        itemClickListener: ItemClickListener<Boolean>? = null
+    ): BottomSheetDialog {
+        val bottomSheetDialog = BottomSheetDialog(context)
+        val view = LayoutInflater.from(context).inflate(R.layout.process_payment_bottom_sheet, null)
+        val processImageLogo: LottieAnimationView = view.findViewById(R.id.img_process_logo)
+        val processCancelButton: Button = view.findViewById(R.id.cancel_payment_text)
+        cancelPaymentText?.let {
+            if (it.isNotEmpty()) {
+                processCancelButton.text = it
+            }
+        }
+        processCancelButton.setOnClickListener {
+            itemClickListener?.onItemClick(0, true)
+            bottomSheetDialog.dismiss()
+            showCancelPaymentDialog(context)
+        }
+        processImageLogo.setAnimationFromUrl(IMAGE_LOGO)
+        processImageLogo.repeatCount = 350
+
+        bottomSheetDialog.setCancelable(false)
+        bottomSheetDialog.setCanceledOnTouchOutside(false)
+        bottomSheetDialog.setContentView(view)
+
+        bottomSheetDialog.show() // Show the dialog first
         return bottomSheetDialog
     }
 
