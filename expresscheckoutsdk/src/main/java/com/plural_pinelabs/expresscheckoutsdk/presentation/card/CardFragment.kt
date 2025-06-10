@@ -12,7 +12,10 @@ import android.widget.Button
 import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
@@ -62,6 +65,22 @@ class CardFragment : Fragment() {
     private lateinit var saveCardCheckbox: CheckBox
     private lateinit var backBtn: ImageView
 
+    //PBP view
+    private lateinit var pbpRedeemDefaultParentLayout: LinearLayout
+    private lateinit var pbpRedeemInfoParentLayout: LinearLayout
+    private lateinit var pbpCheckPointLayout: LinearLayout
+    private lateinit var pbpCheckPointsButton: TextView
+    private lateinit var pbpCheckPointsProgressLayout: LinearLayout
+    private lateinit var pbpCheckPointProgressBar: ProgressBar
+    private lateinit var pbpRedeemPointsParentLayout: ConstraintLayout
+    private lateinit var pbpRedeemPointsBankIcon: ImageView
+    private lateinit var pbpRedeemPointsTitlePointText: TextView
+    private lateinit var pbpRedeemPointsTitleAmountText: TextView
+    private lateinit var pbpRedeemPointsCheckBox: CheckBox
+    private lateinit var pbpRedeemPointsErrorParentLayout: ConstraintLayout
+    private lateinit var pbpRedeemPointsErrorTitleText: TextView
+    private lateinit var pbpRedeemPointsErrorDescriptionText: TextView
+
     private var cardNumber: String = ""
     private var formattedCardNumber: String? = null
 
@@ -72,6 +91,10 @@ class CardFragment : Fragment() {
     private var isCVVValid = false
     private var isCardHolderNameValid: Boolean = false
     private var bottomSheetDialog: BottomSheetDialog? = null
+    private var mPBPBottomSheetDialog: BottomSheetDialog? = null
+    private var isPBPNumberValid = false
+    private var redeemableAmount: Int = 0 // TODO to configure this from the server
+    private var isPBPChecked = false // TODO to configure this from the server
 
 
     private lateinit var viewModel: CardFragmentViewModel
@@ -88,7 +111,7 @@ class CardFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        isPBPEnabled = checkIfPBPIsEnabled()
         setFlags(ExpressSDKObject.getFetchData())
         setupViews(view)
         observeViewModel()
@@ -97,6 +120,18 @@ class CardFragment : Fragment() {
         setupCardHolderNameValidation(cardHolderText)
         setupCVVValidation(cvvEditText)
         setupExpiryValidation(expiryEditText)
+        showPBPView(1)
+    }
+
+    private fun showPBPView(viewType: Int) {
+        when (viewType) {
+            1 -> {
+
+
+            }
+
+        }
+
     }
 
     private fun setFlags(fetchData: FetchResponseDTO?) {
@@ -117,6 +152,40 @@ class CardFragment : Fragment() {
         cardErrorText = view.findViewById(R.id.error_message_card_details)
         saveCardCheckbox = view.findViewById(R.id.save_card_checkbox)
         backBtn = view.findViewById(R.id.back_button)
+
+        //PBP Views
+        pbpRedeemDefaultParentLayout = view.findViewById(R.id.redeem_points_parent_layout)
+        pbpRedeemInfoParentLayout = view.findViewById(R.id.redeem_points_info_layout)
+        pbpCheckPointLayout = view.findViewById(R.id.redeem_points_check_point_layout)
+        pbpCheckPointsButton = view.findViewById(R.id.check_for_points_text)
+        pbpCheckPointsProgressLayout = view.findViewById(R.id.checking_points_progress_layout)
+        pbpCheckPointProgressBar = view.findViewById(R.id.checking_points_progress_bar)
+        pbpRedeemPointsParentLayout = view.findViewById(R.id.redeem_points_redeem_button_layout)
+        pbpRedeemPointsBankIcon = view.findViewById(R.id.redeem_points_icon)
+        pbpRedeemPointsTitlePointText = view.findViewById(R.id.redeem_card_points_text)
+        pbpRedeemPointsTitleAmountText = view.findViewById(R.id.redeem_points_instant_discount)
+        pbpRedeemPointsCheckBox = view.findViewById(R.id.redeem_points_checkbox)
+        pbpRedeemPointsErrorParentLayout =
+            view.findViewById(R.id.redeem_points_redeem_error_layout)
+        pbpRedeemPointsErrorTitleText =
+            view.findViewById(R.id.redeem_error_title_text)
+        pbpRedeemPointsErrorDescriptionText =
+            view.findViewById(R.id.redeem_error_description_text)
+        pbpRedeemPointsCheckBox.setOnCheckedChangeListener { buttonView, isChecked ->
+            isPBPChecked = isChecked
+            if (isChecked) {
+                // TODO Show the redeemable amount
+                //add the amount to the total amount
+            } else {
+                // replace with the original amount
+            }
+        }
+
+        pbpRedeemDefaultParentLayout.visibility=View.GONE
+        pbpRedeemPointsParentLayout.visibility=View.GONE
+        pbpRedeemPointsErrorParentLayout.visibility=View.GONE
+
+
         backBtn.setOnClickListener {
             findNavController().popBackStack()
         }
@@ -142,7 +211,6 @@ class CardFragment : Fragment() {
                     when (result) {
                         is BaseResult.Error -> {
                             result.errorCode.let { exception ->
-                                findNavController().navigate(R.id.action_cardFragment_to_failureFragment)
                                 Log.e("Error", exception)
                             }
 
@@ -515,16 +583,16 @@ class CardFragment : Fragment() {
             //TODO notify of payment failure
             findNavController().navigate(R.id.action_cardFragment_to_failureFragment)
         }
-        val amount = paymentData?.originalTxnAmount?.amount
+        var amount = paymentData?.originalTxnAmount?.amount
         val currency = paymentData?.originalTxnAmount?.currency
 
 
         val paymentMode = arrayListOf<String>()
         paymentMode.add(Constants.CREDIT_DEBIT_ID)
-//        if (isPBPChecked) {
-//            paymentMode.add(PAYBYPOINTS_ID)
-//            amount = amount!! - redeemableAmount!!
-//        }
+        if (isPBPChecked) {
+            paymentMode.add(Constants.PAY_BY_POINTS_ID)
+            amount = amount!! - redeemableAmount
+        }
         val last4 = cardNumber.substring(cardNumber.length - 4, cardNumber.length)
 
         val displayMetrics = DisplayMetrics()
@@ -591,4 +659,42 @@ class CardFragment : Fragment() {
             )
         return processPaymentRequest
     }
+
+    private fun showCheckPointsBottomSheetDialog() {
+        mPBPBottomSheetDialog = BottomSheetDialog(requireContext())
+        val view = LayoutInflater.from(context).inflate(R.layout.pbp_bottom_sheetl_layout, null)
+        val phoneNumberEt = view.findViewById<EditText>(R.id.phone_number_et)
+        val checkPointsBtn = view.findViewById<Button>(R.id.check_points_btn)
+
+        phoneNumberEt.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+            }
+
+            override fun afterTextChanged(s: Editable?) {
+                isPBPNumberValid = s?.let {
+                    it.length == 10 && Utils.isValidPhoneNumber(it.toString())
+                } ?: false
+            }
+        })
+        checkPointsBtn.setOnClickListener {
+            if (isPBPNumberValid) {
+                //TODO handle the number pass it back and init the API call for the check pbp points
+            }
+        }
+        mPBPBottomSheetDialog?.setCancelable(false)
+        mPBPBottomSheetDialog?.setCanceledOnTouchOutside(false)
+        mPBPBottomSheetDialog?.setContentView(view)
+        mPBPBottomSheetDialog?.show() // Show the dialog first
+    }
+
+    private fun checkIfPBPIsEnabled(): Boolean {
+        val paymentModes = ExpressSDKObject.getFetchData()?.paymentModes?.filter {
+            it.paymentModeId == Constants.PAY_BY_POINTS_ID
+        }
+        return !paymentModes.isNullOrEmpty()
+    }
+
 }
