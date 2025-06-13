@@ -10,12 +10,14 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.cardview.widget.CardView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.plural_pinelabs.expresscheckoutsdk.ExpressSDKObject
 import com.plural_pinelabs.expresscheckoutsdk.R
+import com.plural_pinelabs.expresscheckoutsdk.common.CustomExceptionHandler
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CustomerInfo
 import com.plural_pinelabs.expresscheckoutsdk.data.model.FetchResponseDTO
@@ -39,6 +41,7 @@ class LandingActivity : AppCompatActivity() {
     private lateinit var mainContentLayout: ConstraintLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_landing)
@@ -50,6 +53,16 @@ class LandingActivity : AppCompatActivity() {
         //Required to change the background color of the screen
         window.decorView.setBackgroundColor(getResources().getColor(R.color.screen_background));
         setView()
+        initExceptionHandler()
+    }
+
+    private fun initExceptionHandler() {
+        val currentHandler = Thread.getDefaultUncaughtExceptionHandler()
+        if (currentHandler !is CustomExceptionHandler) {
+            Thread.setDefaultUncaughtExceptionHandler(
+                CustomExceptionHandler(currentHandler)
+            )
+        }
     }
 
 
@@ -77,6 +90,9 @@ class LandingActivity : AppCompatActivity() {
         headerParentLayout = findViewById(R.id.header_layout_parent)
         showHideHeaderLayout(false)
         mainContentLayout = findViewById(R.id.main)
+        cancelBtn.setOnClickListener {
+            Utils.showCancelPaymentDialog(this)
+        }
     }
 
 

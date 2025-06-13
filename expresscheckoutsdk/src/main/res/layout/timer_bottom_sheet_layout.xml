@@ -1,0 +1,101 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="16dp"
+    android:background="@color/white">
+
+    <!-- Wrapping ProgressBar and Timer TextView with min label in FrameLayout -->
+    <FrameLayout
+        android:layout_width="150dp"
+        android:layout_marginTop="40dp"
+        android:layout_height="150dp">
+
+        <ProgressBar
+            android:id="@+id/circularProgressBar"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:indeterminate="false"
+            android:max="100"
+            android:progress="50"
+            android:progressDrawable="@drawable/circulaar_progress_bar"
+            android:rotation="-90" />
+
+        <!-- Centering Timer and Min label together in a vertical LinearLayout -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_gravity="center">
+
+            <!-- Timer text -->
+            <TextView
+                android:id="@+id/timerTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/timer_format"
+                android:textFontWeight="600"
+                android:textSize="16sp"
+                android:fontFamily="sans-serif"
+                android:textColor="@color/black_text" />
+
+            <!-- "min" label text, centered with timer -->
+            <TextView
+                android:id="@+id/minTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/mins"
+                android:textSize="12sp"
+                android:textColor="#333333" />
+        </LinearLayout>
+    </FrameLayout>
+
+    <!-- Additional TextViews for descriptions below the timer -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/processing_your_payment"
+        android:textSize="18sp"
+        android:textColor="#333333"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:textStyle="bold"
+        android:layout_marginTop="24dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/just_a_moment_we_re_confirming_your_payment"
+        android:textSize="12sp"
+        android:textColor="@color/black_text_50"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:fontFamily="sans-serif"
+        android:layout_marginTop="8dp" />
+
+    <!-- Divider line -->
+    <View
+        android:layout_width="wrap_content"
+        android:layout_marginTop="24dp"
+        android:layout_height="1dp"
+        android:background="#C7CBD5" />
+
+    <!-- Cancel Payment TextView -->
+    <TextView
+        android:id="@+id/cancelPaymentTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/try_another_upi_app"
+        android:textSize="12sp"
+        android:textColor="@color/colorSecondary"
+        android:fontFamily="sans-serif-medium"
+        android:layout_marginTop="24dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:layout_marginBottom="40dp" />
+
+</LinearLayout>

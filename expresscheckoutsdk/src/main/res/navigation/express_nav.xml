@@ -17,6 +17,9 @@
         <action
             android:id="@+id/action_splashFragment_to_paymentModeFragment"
             app:destination="@id/paymentModeFragment" />
+        <action
+            android:id="@+id/action_splashFragment_to_failureFragment"
+            app:destination="@id/failureFragment" />
     </fragment>
     <fragment
         android:id="@+id/phoneNumberFragment"
@@ -92,7 +95,7 @@
     </fragment>
     <fragment
         android:id="@+id/nativeOTPFragment"
-        android:name="com.plural_pinelabs.expresscheckoutsdk.presentation.NativeOTPFragment"
+        android:name="com.plural_pinelabs.expresscheckoutsdk.presentation.nativeotp.NativeOTPFragment"
         android:label="fragment_native_otp"
         tools:layout="@layout/fragment_native_otp">
         <action
@@ -136,5 +139,16 @@
         android:id="@+id/savedAddressFragment"
         android:name="com.plural_pinelabs.expresscheckoutsdk.presentation.d2c.SavedAddressFragment"
         android:label="fragment_saved_address"
-        tools:layout="@layout/fragment_saved_address" />
+        tools:layout="@layout/fragment_saved_address" >
+        <action
+            android:id="@+id/action_savedAddressFragment_to_newAddressFormFragment"
+            app:destination="@id/newAddressFormFragment" />
+        <action
+            android:id="@+id/action_savedAddressFragment_to_paymentModeFragment"
+            app:destination="@id/paymentModeFragment" />
+    </fragment>
+    <dialog
+        android:id="@+id/bottomSheetRetryFragment"
+        android:name="com.plural_pinelabs.expresscheckoutsdk.common.BottomSheetRetryFragment"
+        android:label="BottomSheetRetryFragment" />
 </navigation>

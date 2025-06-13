@@ -102,6 +102,7 @@ class SplashFragment : Fragment() {
                             // Han
                             // dle error
                             result.errorCode.let { exception ->
+                                findNavController().navigate(R.id.action_splashFragment_to_failureFragment)
                                 // Log the error or show a message to the user
                                 Log.e("Error", exception)
                                 // For example, navigate to an error screen or show a dialog
@@ -116,7 +117,7 @@ class SplashFragment : Fragment() {
                                 // Process the data
                                 ExpressSDKObject.setFetchData(it)
                                 Log.d("Success", "Data fetched successfully")
-                                // TODO Finalize the condition
+                                // TODO Finalize the condition for the d2c flow
                                 (activity as? LandingActivity)?.updateValueForHeaderLayout(it)
                                 if (it.customerInfo?.customerId.isNullOrEmpty()) {
                                     // no customer id new user

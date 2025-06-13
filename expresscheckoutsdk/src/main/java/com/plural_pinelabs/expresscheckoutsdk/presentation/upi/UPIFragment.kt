@@ -4,6 +4,7 @@ import UpiAppsAdapter
 import android.content.Intent
 import android.content.pm.ResolveInfo
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
@@ -12,6 +13,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.net.toUri
@@ -23,6 +25,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.plural_pinelabs.expresscheckoutsdk.ExpressSDKObject
 import com.plural_pinelabs.expresscheckoutsdk.ExpressSDKObject.getAmount
@@ -47,7 +50,6 @@ import com.plural_pinelabs.expresscheckoutsdk.common.ItemClickListener
 import com.plural_pinelabs.expresscheckoutsdk.common.NetworkHelper
 import com.plural_pinelabs.expresscheckoutsdk.common.UPIViewModelFactory
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils
-import com.plural_pinelabs.expresscheckoutsdk.common.Utils.showProcessPaymentBottomSheetDialog
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils.showProcessPaymentDialog
 import com.plural_pinelabs.expresscheckoutsdk.data.model.Extra
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ProcessPaymentRequest
@@ -193,6 +195,8 @@ class UPIFragment : Fragment() {
                 verifyContinueButton.isEnabled = isValidUPI
                 if (!verifyContinueButton.isEnabled) {
                     errorinfoTextView.visibility = View.VISIBLE
+                } else {
+                    errorinfoTextView.visibility = View.GONE
                 }
             }
         })
@@ -204,8 +208,9 @@ class UPIFragment : Fragment() {
         if (upiAppPackageName != null) {
             upiPayIntent.`package` = upiAppPackageName
         }
-        if (null != upiPayIntent.resolveActivity(requireActivity().packageManager)) {
-            val chooser = Intent.createChooser(upiPayIntent, getString(R.string.upi_open_with))
+        val chooser = Intent.createChooser(upiPayIntent, getString(R.string.upi_open_with))
+        if (chooser.resolveActivity(requireActivity().packageManager) != null) {
+            // val chooser = Intent.createChooser(upiPayIntent, getString(R.string.upi_open_with))
             startActivity(chooser)
         } else {
             cancelTransactionProcess()
@@ -355,8 +360,11 @@ class UPIFragment : Fragment() {
 
 
     private fun getTransactionStatus(token: String?) {
-        bottomSheetDialog = showProcessPaymentBottomSheetDialog(requireContext())
-        bottomSheetDialog?.show()
+        if (mTransactionMode == UPI_INTENT) {
+            showProcessPaymentDialog()
+        } else {
+            showProcessPaymentVPADialog()
+        }
         transactionStatusJob = lifecycleScope.launch(Dispatchers.IO) {
             while (isActive) {
                 // Your task logic here
@@ -366,4 +374,89 @@ class UPIFragment : Fragment() {
         }
     }
 
+    private fun showProcessPaymentDialog() {
+        val view =
+            LayoutInflater.from(requireActivity()).inflate(R.layout.timer_bottom_sheet_layout, null)
+        val cancelPaymentTextView: TextView = view.findViewById(R.id.cancelPaymentTextView)
+
+        cancelPaymentTextView.setOnClickListener {
+            bottomSheetDialog?.dismiss()
+            cancelTransactionProcess()
+            //TODO cancel payment retry mechnaism
+        }
+
+        val circularProgressBar: ProgressBar = view.findViewById(R.id.circularProgressBar)
+        //TODO set the color of the progress bar and text view based on the palette
+        // if (palette != null) {
+//            circularProgressBar.progressTintList =
+//                ColorStateList.valueOf(Color.parseColor(palette?.C900))
+//            cancelPaymentTextView.setTextColor(Color.parseColor(palette?.C900))
+        //  }
+        val timerTextView: TextView = view.findViewById(R.id.timerTextView)
+
+        circularProgressBar.progress = 0
+        val totalTime = 600000L
+        val interval = 1000L
+
+        val countDownTimer = object : CountDownTimer(totalTime, interval) {
+            override fun onTick(millisUntilFinished: Long) {
+                val secondsRemaining = millisUntilFinished / 1000
+                timerTextView.text = String.format(
+                    getString(R.string.timer_format),
+                    secondsRemaining / 60,
+                    secondsRemaining % 60
+                )
+                val progressPercentage = (millisUntilFinished * 100 / totalTime).toInt()
+                circularProgressBar.progress = progressPercentage
+            }
+
+            override fun onFinish() {
+                timerTextView.text = getString(R.string.timer_format)
+                circularProgressBar.progress = 0
+                bottomSheetDialog?.dismiss()
+                cancelTransactionProcess()
+                //TODO throw error
+            }
+        }.start()
+        bottomSheetDialog?.setCancelable(false)
+        bottomSheetDialog?.setCanceledOnTouchOutside(false)
+        bottomSheetDialog?.setContentView(view)
+        bottomSheetDialog?.show() // Show the dialog first
+    }
+
+    private fun showProcessPaymentVPADialog() {
+        val view =
+            LayoutInflater.from(requireActivity())
+                .inflate(R.layout.upi_vpa_process_payment_bottom_sheet, null)
+        val cancelPaymentTextView: TextView = view.findViewById(R.id.cancelPaymentTextView)
+        val circularProgressBar: ProgressBar = view.findViewById(R.id.progressBar)
+        val vpaId: TextView = view.findViewById(R.id.vpaId)
+        vpaId.text = upiIdEt.text.toString()
+
+
+        bottomSheetDialog?.setOnShowListener { dialogInterface ->
+            val bottomSheet = (dialogInterface as BottomSheetDialog)
+                .findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)
+
+            bottomSheet?.let {
+                val behavior = BottomSheetBehavior.from(it)
+
+                // Set desired height here
+                val layoutParams = it.layoutParams
+                layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT // or a specific height
+                it.layoutParams = layoutParams
+
+                behavior.state = BottomSheetBehavior.STATE_EXPANDED
+            }
+        }
+        cancelPaymentTextView.setOnClickListener {
+            bottomSheetDialog?.dismiss()
+            cancelTransactionProcess()
+            //TODO cancel payment retry mechnaism
+        }
+        bottomSheetDialog?.setCancelable(false)
+        bottomSheetDialog?.setCanceledOnTouchOutside(false)
+        bottomSheetDialog?.setContentView(view)
+        bottomSheetDialog?.show() // Show the dialog first
+    }
 }

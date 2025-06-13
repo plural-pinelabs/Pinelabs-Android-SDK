@@ -13,9 +13,11 @@ import android.os.Build
 import android.provider.Settings
 import android.text.TextUtils
 import android.util.Base64
+import android.util.Log
 import android.view.LayoutInflater
 import android.widget.Button
 import android.widget.FrameLayout
+import android.widget.TextView
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.graphics.drawable.toDrawable
 import androidx.core.graphics.toColorInt
@@ -356,7 +358,7 @@ internal object Utils {
     }
 
 
-     fun showProcessPaymentBottomSheetDialog(
+    fun showProcessPaymentBottomSheetDialog(
         context: Context,
         cancelPaymentText: String? = null,
         itemClickListener: ItemClickListener<Boolean>? = null
@@ -364,7 +366,7 @@ internal object Utils {
         val bottomSheetDialog = BottomSheetDialog(context)
         val view = LayoutInflater.from(context).inflate(R.layout.process_payment_bottom_sheet, null)
         val processImageLogo: LottieAnimationView = view.findViewById(R.id.img_process_logo)
-        val processCancelButton: Button = view.findViewById(R.id.cancel_payment_text)
+        val processCancelButton: TextView = view.findViewById(R.id.cancel_payment_text)
         cancelPaymentText?.let {
             if (it.isNotEmpty()) {
                 processCancelButton.text = it
@@ -424,6 +426,7 @@ internal object Utils {
         val seconds = millis / 1000
         val minutes = seconds / 60
         val remainingSeconds = seconds % 60
+        Log.d("timer", "Minutes: $minutes, Remaining Seconds: $remainingSeconds")
         return String.format(context.getString(R.string.timer_format), minutes, remainingSeconds)
     }
 

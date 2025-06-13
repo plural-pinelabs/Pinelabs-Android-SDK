@@ -203,7 +203,7 @@
                 android:padding="18dp">
 
 
-                <androidx.appcompat.widget.LinearLayoutCompat
+                <LinearLayout
                     android:id="@+id/redeem_points_info_layout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -233,7 +233,7 @@
                         android:textSize="12sp"
                         app:layout_constraintStart_toEndOf="@id/save_card_checkbox"
                         app:layout_constraintTop_toBottomOf="@id/save_card_text" />
-                </androidx.appcompat.widget.LinearLayoutCompat>
+                </LinearLayout>
 
                 <LinearLayout
                     android:id="@+id/redeem_points_check_point_layout"
@@ -342,6 +342,7 @@
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
+                    android:id="@+id/redeem_points_instant_discount"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="36dp"
@@ -398,7 +399,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:background="@drawable/input_field_border"
-                android:padding="18dp">
+                android:padding="18dp"
+                android:visibility="gone">
 
                 <androidx.appcompat.widget.AppCompatCheckBox
                     android:id="@+id/save_card_checkbox"

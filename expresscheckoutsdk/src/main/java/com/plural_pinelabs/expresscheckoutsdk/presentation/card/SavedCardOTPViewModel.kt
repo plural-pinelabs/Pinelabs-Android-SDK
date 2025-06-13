@@ -33,8 +33,8 @@ class SavedCardOTPViewModel(private val expressRepositoryImpl: ExpressRepository
 
     fun generateOTP(token: String?, otpRequest: OTPRequest) =
         viewModelScope.launch(Dispatchers.IO) {
-            expressRepositoryImpl.validateOTPCustomer(token, otpRequest).collect { values ->
-                _verifyOTPResult.value = values
+            expressRepositoryImpl.sendOTPCustomer(token, otpRequest).collect { values ->
+                _sendOTPResult.value = values
             }
         }
 

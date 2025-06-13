@@ -1,4 +1,4 @@
-package com.plural_pinelabs.expresscheckoutsdk.presentation
+package com.plural_pinelabs.expresscheckoutsdk.presentation.nativeotp
 
 import android.content.Context
 import android.content.Intent
@@ -35,7 +35,6 @@ import com.plural_pinelabs.expresscheckoutsdk.common.TimerManager
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils
 import com.plural_pinelabs.expresscheckoutsdk.data.model.OTPRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.model.Palette
-import com.plural_pinelabs.expresscheckoutsdk.data.model.ProcessPaymentRequest
 import kotlinx.coroutines.launch
 import java.util.regex.Matcher
 import java.util.regex.Pattern
@@ -49,16 +48,14 @@ class NativeOTPFragment : Fragment() {
     private lateinit var continueButton: AppCompatButton
     private lateinit var bankWebsiteText: TextView
     private lateinit var smsBroadcastReceiver: SmsBroadcastReceiver
-    private var token: String? = null
     private lateinit var paymentId: String
-    private lateinit var orderId: String
     private var resendEnable: Boolean? = false
     private var resendTimer: String? = "180"
-    private var paymentRequest: ProcessPaymentRequest? = null
     private var palette: Palette? = null
     private lateinit var viewModel: NativeOTPViewModel
     private var timer = TimerManager
     private var bottomSheetDialog: BottomSheetDialog? = null
+    private var otpId: String? = null
 
 
     override fun onCreateView(
@@ -75,51 +72,35 @@ class NativeOTPFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        resendTimer = arguments?.getString("resend_after")
+        otpId = arguments?.getString("otp_id")
+        paymentId = ExpressSDKObject.getProcessPaymentResponse()?.payment_id ?: ""
         setUpViews(view)
         handleAutoReadOtp()
         handleBackButtonClick()
         observeViewModel()
-        callRequestOTP()
         handleContinueButtonClick()
+        initTimer(resendTimer?.toLong())// TODO pass the timer value from the server if available to get it passed from the card fragment along with the  otp id
+
+    }
+
+    private fun initTimer(timeInMillis: Long?) {
+        timer.startTimer(timeInMillis?.times(1000) ?: 18000)
+        timer.timeLeft.observe(viewLifecycleOwner) { timeLeft ->
+            if (timeLeft > 0) {
+                resendOtpText.text = getString(
+                    R.string.resend_otp_in,
+                    Utils.formatTimeInMinutes(requireContext(), timeLeft)
+                )
+                resendOtpText.isEnabled = false
+            } else {
+                resendOtpText.text = getString(R.string.resend_otp)
+                resendOtpText.isEnabled = true
+            }
+        }
     }
 
     private fun observeViewModel() {
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.otpRequestResult.collect { result ->
-                    when (result) {
-                        is BaseResult.Loading -> {
-                            // Show loading state
-                            //TODO show process dialog or loading indicator
-                        }
-
-                        is BaseResult.Success -> {
-                            // Handle success TODO start the timer for resend OTP and initialize the UI accordingly dismiss the Dialog
-                            timer.startTimer(result.data.meta_data?.resend_after?.toLong() ?: 180)
-                            timer.timeLeft.observe(viewLifecycleOwner) { timeLeft ->
-                                if (timeLeft > 0) {
-                                    resendOtpText.text = getString(
-                                        R.string.resend_otp_in,
-                                        Utils.formatTimeInMinutes(requireContext(), timeLeft)
-                                    )
-                                    resendOtpText.isEnabled = false
-                                } else {
-                                    resendOtpText.text = getString(R.string.resend_otp)
-                                    resendOtpText.isEnabled = true
-                                }
-                            }
-
-                        }
-
-                        is BaseResult.Error -> {
-                            // TODO Handle error
-                            findNavController().navigate(R.id.action_nativeOTPFragment_to_ACSFragment)
-                        }
-                    }
-                }
-            }
-        }
-
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.otpSubmitResult.collect { result ->
@@ -177,11 +158,6 @@ class NativeOTPFragment : Fragment() {
 
     }
 
-    private fun callRequestOTP() {
-        paymentId = ExpressSDKObject.getProcessPaymentResponse()?.payment_id ?: ""
-        val otpRequest = OTPRequest(payment_id = paymentId)
-        viewModel.generateOTP(token, otpRequest)
-    }
 
     private fun submitOTP(otp: String) {
         val otpRequest = OTPRequest(paymentId, otp, null, null, null)
@@ -207,8 +183,6 @@ class NativeOTPFragment : Fragment() {
 
     private fun handleBackButtonClick() {
         backButton.setOnClickListener {
-            // Handle back button click
-            //TODO cancel transaction?
             findNavController().popBackStack()
         }
     }
@@ -287,15 +261,6 @@ class NativeOTPFragment : Fragment() {
     override fun onStop() {
         super.onStop()
         requireActivity().unregisterReceiver(smsBroadcastReceiver)
-    }
-
-    private fun showBottomSheetDialog() {
-        val view = LayoutInflater.from(requireContext())
-            .inflate(R.layout.processing_full_screen_dialog, null)
-        bottomSheetDialog?.setCancelable(false)
-        bottomSheetDialog?.setCanceledOnTouchOutside(false)
-        bottomSheetDialog?.setContentView(view)
-        bottomSheetDialog?.show()
     }
 
 }

@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -17,6 +18,7 @@ import com.plural_pinelabs.expresscheckoutsdk.common.BaseResult
 import com.plural_pinelabs.expresscheckoutsdk.common.NetworkHelper
 import com.plural_pinelabs.expresscheckoutsdk.common.OtpInputView
 import com.plural_pinelabs.expresscheckoutsdk.common.SaveCardOTPFragmentViewModelFactory
+import com.plural_pinelabs.expresscheckoutsdk.common.TimerManager
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils
 import com.plural_pinelabs.expresscheckoutsdk.data.model.OTPRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.model.UpdateOrderDetails
@@ -28,7 +30,9 @@ class SaveCardOTPFragment : Fragment() {
     private lateinit var resendTimerView: TextView
     private lateinit var resendAction: TextView
     private lateinit var skipSaveCardActionView: TextView
+    private lateinit var customerSendOtpDescription: TextView
     private var otpId: String? = null
+    private var last4DigitsCard: String? = null
 
     private lateinit var viewModel: SavedCardOTPViewModel
     private var bottomSheetDialog: BottomSheetDialog? = null
@@ -47,6 +51,7 @@ class SaveCardOTPFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        last4DigitsCard = arguments?.getString("last4Digits", "")
         setViews(view)
         observeViewModel()
         sendOTP()
@@ -54,7 +59,7 @@ class SaveCardOTPFragment : Fragment() {
 
     private fun sendOTP() {
         val otpRequest = OTPRequest(
-            ExpressSDKObject.getFetchData()?.customerInfo?.customer_id
+            customerId = ExpressSDKObject.getFetchData()?.customerInfo?.customerId
         )
 
         viewModel.generateOTP(ExpressSDKObject.getToken(), otpRequest)
@@ -66,6 +71,15 @@ class SaveCardOTPFragment : Fragment() {
         resendTimerView = view.findViewById(R.id.resend_otp_tv)
         resendAction = view.findViewById(R.id.resend_otp_action)
         skipSaveCardActionView = view.findViewById(R.id.skip_card_saved_otp)
+        customerSendOtpDescription = view.findViewById(R.id.customer_send_otp_description)
+        view.findViewById<ImageView>(R.id.back_button).setOnClickListener {
+            findNavController().popBackStack()
+        }
+        customerSendOtpDescription.text = String.format(
+            getString(R.string.save_card_verify_msg),
+            ExpressSDKObject.getFetchData()?.customerInfo?.mobileNo ?: "your number",
+            last4DigitsCard?.toInt() ?: 0
+        )
 
         verifyBtn.setOnClickListener {
             val otp = otpInputView.getOtp()
@@ -84,7 +98,7 @@ class SaveCardOTPFragment : Fragment() {
                     val otpRequest = OTPRequest(
                         null,
                         otp,
-                        customerInfo.customer_id ?: customerInfo.customerId,
+                        customerInfo.customerId,
                         otpId,
                         updateOrderDetails
                     )
@@ -107,7 +121,6 @@ class SaveCardOTPFragment : Fragment() {
         }
         skipSaveCardActionView.setOnClickListener {
             passResultBackForSuccessFailure(false)
-            //TODO navigate back to card fragment and  proceed with payment
         }
     }
 
@@ -120,21 +133,22 @@ class SaveCardOTPFragment : Fragment() {
                         if (result.isLoading) {
                             bottomSheetDialog = Utils.showProcessPaymentDialog(requireContext())
                         }
-
-                        // Show loading state
                     }
 
                     is BaseResult.Success -> {
+                        otpId = result.data.otpId
+                        if (result.data.otpAttemptLeft == 0) {
+                            resendAction.visibility = View.GONE
+                            resendTimerView.visibility - View.VISIBLE
+                        } else {
+                            showResendTimer()
+                        }
                         bottomSheetDialog?.dismiss()
-                        passResultBackForSuccessFailure(true)
-                        // Handle success
                     }
 
                     is BaseResult.Error -> {
                         bottomSheetDialog?.dismiss()
                         passResultBackForSuccessFailure(false)
-                        //TODO ask if this need to be cancelled
-                        // Handle error
                     }
                 }
             }
@@ -152,13 +166,14 @@ class SaveCardOTPFragment : Fragment() {
 
                     is BaseResult.Success -> {
                         bottomSheetDialog?.dismiss()
+                        passResultBackForSuccessFailure(true)
                         // Handle success
                     }
 
                     is BaseResult.Error -> {
                         // Handle error
+                        passResultBackForSuccessFailure(false)
                         bottomSheetDialog?.dismiss()
-                        //TODO cancel the payment and exit
                     }
                 }
             }
@@ -168,5 +183,21 @@ class SaveCardOTPFragment : Fragment() {
     private fun passResultBackForSuccessFailure(isSuccess: Boolean) {
         findNavController().previousBackStackEntry?.savedStateHandle?.set("success", isSuccess)
         findNavController().popBackStack()
+    }
+
+    private fun showResendTimer() {
+        val timer = TimerManager
+        timer.startTimer(120000)
+        timer.timeLeft.observe(viewLifecycleOwner) {
+            val timeLeft = Utils.formatTimeInMinutes(requireContext(), it)
+            if (it <= 0) {
+                resendAction.visibility = View.VISIBLE
+                resendTimerView.visibility = View.GONE
+            } else {
+                resendAction.visibility = View.GONE
+                resendTimerView.visibility = View.VISIBLE
+                resendTimerView.text = String.format(getString(R.string.resend_otp_in), timeLeft)
+            }
+        }
     }
 }

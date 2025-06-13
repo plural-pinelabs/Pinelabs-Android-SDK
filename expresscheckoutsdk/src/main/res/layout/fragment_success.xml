@@ -49,17 +49,17 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:drawablePadding="4dp"
             android:layout_marginTop="12dp"
-            android:fontFamily="sans-serif"
             android:drawableStart="@drawable/ic_success_offer_saving"
-            app:fontFamily="sans-serif"
+            android:drawablePadding="4dp"
+            android:fontFamily="sans-serif"
+            android:letterSpacing="0.02"
             android:text="@string/you_re_saving_500_on_this_order"
             android:textAlignment="center"
-            android:letterSpacing="0.02"
             android:textColor="@color/green_00722F"
             android:textFontWeight="600"
-            android:textSize="14sp" />
+            android:textSize="14sp"
+            app:fontFamily="sans-serif" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -323,7 +323,8 @@
             android:textAllCaps="false"
             android:textColor="@color/black_text"
             android:textFontWeight="600"
-            android:textSize="14sp" />
+            android:textSize="14sp"
+            android:visibility="gone" />
 
         <TextView
             android:layout_width="wrap_content"

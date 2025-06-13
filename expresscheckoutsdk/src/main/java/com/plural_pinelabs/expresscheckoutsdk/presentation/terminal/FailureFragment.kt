@@ -1,14 +1,19 @@
 package com.plural_pinelabs.expresscheckoutsdk.presentation.terminal
 
 import android.os.Bundle
+import android.text.Html
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.plural_pinelabs.expresscheckoutsdk.R
+import com.plural_pinelabs.expresscheckoutsdk.common.TimerManager
+import com.plural_pinelabs.expresscheckoutsdk.common.Utils
 
 
 class FailureFragment : Fragment() {
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -17,4 +22,26 @@ class FailureFragment : Fragment() {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_failure, container, false)
     }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        val timer = TimerManager
+        timer.startTimer(5000)
+        timer.timeLeft.observe(viewLifecycleOwner, { timeLeft ->
+            if (timeLeft == 0L) {
+                requireActivity().finish() // Close the activity or navigate to another screen
+                // Handle timer finish, e.g., navigate to another fragment or activity
+                // For example: findNavController().navigate(R.id.action_failureFragment_to_nextFragment)
+            } else {
+                val autoCloseTv = view.findViewById<TextView>(R.id.txt_autoclose)
+                val autoCloseString = getString(
+                    R.string.auto_close,
+                    Utils.formatTimeInMinutes(requireContext(), timeLeft)
+                )
+                autoCloseTv.text = Html.fromHtml(autoCloseString)
+            }
+        })
+
+    }
+
 }

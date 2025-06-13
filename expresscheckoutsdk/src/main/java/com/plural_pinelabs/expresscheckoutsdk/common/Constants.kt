@@ -59,5 +59,8 @@ internal object Constants {
 
     const val REQ_USER_CONSENT = 200
 
+    const val ERROR_KEY="Error"
+    const val ERROR_MESSAGE_KEY="ErrorMessage"
+
 
 }

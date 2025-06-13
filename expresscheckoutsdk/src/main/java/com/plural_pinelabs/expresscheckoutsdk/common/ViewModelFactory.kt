@@ -4,7 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.plural_pinelabs.expresscheckoutsdk.data.repository.ExpressRepositoryImpl
 import com.plural_pinelabs.expresscheckoutsdk.data.retrofit.RetrofitBuilder
-import com.plural_pinelabs.expresscheckoutsdk.presentation.NativeOTPViewModel
+import com.plural_pinelabs.expresscheckoutsdk.presentation.acs.ACSFragmentViewModel
+import com.plural_pinelabs.expresscheckoutsdk.presentation.nativeotp.NativeOTPViewModel
 import com.plural_pinelabs.expresscheckoutsdk.presentation.card.CardFragmentViewModel
 import com.plural_pinelabs.expresscheckoutsdk.presentation.card.SavedCardOTPViewModel
 import com.plural_pinelabs.expresscheckoutsdk.presentation.d2c.AddressViewModel
@@ -105,6 +106,19 @@ class AddressViewModelFactory(private val networkHelper: NetworkHelper) :
         return AddressViewModel(
             ExpressRepositoryImpl(
                 RetrofitBuilder.expressApiService,
+                networkHelper = networkHelper
+            )
+        ) as T
+    }
+}
+
+
+class ACSViewModelFactory(private val networkHelper: NetworkHelper) :
+    ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        return ACSFragmentViewModel(
+            ExpressRepositoryImpl(
+                RetrofitBuilder.cardApiService,
                 networkHelper = networkHelper
             )
         ) as T

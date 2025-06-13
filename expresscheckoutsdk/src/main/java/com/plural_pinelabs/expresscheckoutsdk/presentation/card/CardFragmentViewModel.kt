@@ -8,6 +8,8 @@ import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PAYMENT_REFERENCE
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CardBinMetaDataRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CardBinMetaDataRequestList
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CardBinMetaDataResponse
+import com.plural_pinelabs.expresscheckoutsdk.data.model.OTPRequest
+import com.plural_pinelabs.expresscheckoutsdk.data.model.OTPResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ProcessPaymentRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ProcessPaymentResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.repository.ExpressRepositoryImpl
@@ -27,6 +29,9 @@ class CardFragmentViewModel(private val expressRepositoryImpl: ExpressRepository
         MutableStateFlow<BaseResult<ProcessPaymentResponse>>(BaseResult.Loading(false))
     val processPaymentResult: StateFlow<BaseResult<ProcessPaymentResponse>> = _processPaymentResult
 
+    private val _otpRequestResult =
+        MutableStateFlow<BaseResult<OTPResponse>>(BaseResult.Loading(true))
+    val otpRequestResult: StateFlow<BaseResult<OTPResponse>> = _otpRequestResult
 
     fun getCardBinMetaData(cardNumber: String, token: String) {
         val binRequest = CardBinMetaDataRequest(cardNumber, PAYMENT_REFERENCE_TYPE_CARD)
@@ -58,6 +63,13 @@ class CardFragmentViewModel(private val expressRepositoryImpl: ExpressRepository
         viewModelScope.launch(Dispatchers.IO) {
             expressRepositoryImpl.processPayment(token, paymentData).collect {
                 _processPaymentResult.value = it
+            }
+        }
+
+    fun generateOTP(token: String?, otpRequest: OTPRequest) =
+        viewModelScope.launch(Dispatchers.IO) {
+            expressRepositoryImpl.requestOTP(token, otpRequest).collect { values ->
+                _otpRequestResult.value = values
             }
         }
 }

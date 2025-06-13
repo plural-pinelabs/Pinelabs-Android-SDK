@@ -14,7 +14,7 @@
     <string name="continue_text">Continue</string>
     <string name="verify_mobile_number">Verify mobile number</string>
     <string name="enter_the_otp_sent_to">Enter the OTP sent to <font color="#1C1C1C">%s</font></string>
-    <string name="resend_otp_in">Resend OTP in <font color="1C1C1C"> %s</font></string>
+    <string name="resend_otp_in">Resend OTP in <font color="1C1C1C"><b> %s </b></font></string>
     <string name="to_proceed_please_verify_your_mobile_number">To proceed, please verify your mobile number</string>
     <string name="verify">Verify</string>
     <string name="add_delivery_address">Add delivery address</string>
@@ -126,6 +126,11 @@
     <string name="your_card_may_have_points_that_you_can_redeem">Your card may have points that you can redeem.</string>
     <string name="registered_mobile_number_with_bank">Registered mobile number with bank</string>
     <string name="check_points">Check Points</string>
+    <string name="auto_close">Auto-closing in <b>%s</b></string>
+    <string name="mins">mins</string>
+    <string name="processing_your_payment">Processing your payment</string>
+    <string name="just_a_moment_we_re_confirming_your_payment">Just a moment! We\'re confirming your payment.</string>
+    <string name="try_another_upi_app">Try another UPI App? <u><font color="#DD4D42">Cancel payment</font> </u> </string>
 
 
 </resources>

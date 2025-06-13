@@ -31,6 +31,8 @@ import com.plural_pinelabs.expresscheckoutsdk.common.CardFragmentViewModelFactor
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.BROWSER_ACCEPT_ALL
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.BROWSER_USER_AGENT_ANDROID
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.ERROR_KEY
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.ERROR_MESSAGE_KEY
 import com.plural_pinelabs.expresscheckoutsdk.common.NetworkHelper
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils.cardIcons
@@ -41,6 +43,7 @@ import com.plural_pinelabs.expresscheckoutsdk.data.model.CardData
 import com.plural_pinelabs.expresscheckoutsdk.data.model.DeviceInfo
 import com.plural_pinelabs.expresscheckoutsdk.data.model.Extra
 import com.plural_pinelabs.expresscheckoutsdk.data.model.FetchResponseDTO
+import com.plural_pinelabs.expresscheckoutsdk.data.model.OTPRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ProcessPaymentRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ProcessPaymentResponse
 import kotlinx.coroutines.launch
@@ -64,6 +67,7 @@ class CardFragment : Fragment() {
     private lateinit var cardHolderErrorText: TextView
     private lateinit var saveCardCheckbox: CheckBox
     private lateinit var backBtn: ImageView
+    private lateinit var savedCardParentLayout: ConstraintLayout
 
     //PBP view
     private lateinit var pbpRedeemDefaultParentLayout: LinearLayout
@@ -152,6 +156,10 @@ class CardFragment : Fragment() {
         cardErrorText = view.findViewById(R.id.error_message_card_details)
         saveCardCheckbox = view.findViewById(R.id.save_card_checkbox)
         backBtn = view.findViewById(R.id.back_button)
+        savedCardParentLayout = view.findViewById(R.id.saved_card_parent_layout)
+        if (isSavedCardEnabled) {
+            savedCardParentLayout.visibility = View.VISIBLE
+        }
 
         //PBP Views
         pbpRedeemDefaultParentLayout = view.findViewById(R.id.redeem_points_parent_layout)
@@ -181,9 +189,9 @@ class CardFragment : Fragment() {
             }
         }
 
-        pbpRedeemDefaultParentLayout.visibility=View.GONE
-        pbpRedeemPointsParentLayout.visibility=View.GONE
-        pbpRedeemPointsErrorParentLayout.visibility=View.GONE
+        pbpRedeemDefaultParentLayout.visibility = View.GONE
+        pbpRedeemPointsParentLayout.visibility = View.GONE
+        pbpRedeemPointsErrorParentLayout.visibility = View.GONE
 
 
         backBtn.setOnClickListener {
@@ -204,6 +212,31 @@ class CardFragment : Fragment() {
     }
 
     private fun observeViewModel() {
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.otpRequestResult.collect { result ->
+                    when (result) {
+                        is BaseResult.Loading -> {
+                        }
+
+                        is BaseResult.Success -> {
+                            bottomSheetDialog?.dismiss()
+                            navigateToNativeOTP(
+                                result.data.meta_data?.resend_after,
+                                result.data.next?.getOrNull(0)
+                            )
+                        }
+
+                        is BaseResult.Error -> {
+                            bottomSheetDialog?.dismiss()
+                            redirectToACS()
+                        }
+                    }
+                }
+            }
+        }
+
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED)
             {
@@ -243,24 +276,25 @@ class CardFragment : Fragment() {
                 viewModel.processPaymentResult.collect {
                     when (it) {
                         is BaseResult.Error -> {
-                            //Throw error and exit SDK
-                            //TODO Pass error message and description
+                            val bundle = Bundle()
+                            bundle.putString(ERROR_KEY, it.errorCode)
+                            bundle.putString(ERROR_MESSAGE_KEY, it.errorMessage)
                             bottomSheetDialog?.dismiss()
-                            findNavController().navigate(R.id.action_cardFragment_to_failureFragment)
+                            findNavController().navigate(
+                                R.id.action_cardFragment_to_failureFragment,
+                                bundle
+                            )
                         }
 
                         is BaseResult.Loading -> {
-                            //show the process dialog payment
                             if (it.isLoading)
-                            //show the process dialog payment
                                 bottomSheetDialog = showProcessPaymentDialog(requireContext())
                         }
 
                         is BaseResult.Success<ProcessPaymentResponse> -> {
-                            bottomSheetDialog?.dismiss()
                             ExpressSDKObject.setProcessPaymentResponse(it.data)
                             if (isNativeOTP) {
-                                navigateToNativeOTP()
+                                callNativeRequestOTP()
                             } else {
                                 redirectToACS()
                             }
@@ -299,12 +333,18 @@ class CardFragment : Fragment() {
         }
     }
 
-    private fun navigateToNativeOTP() {
-        findNavController().navigate(R.id.action_cardFragment_to_nativeOTPFragment)
+    private fun navigateToNativeOTP(resendAfter: String?, otpId: String?) {
+        val bundle = Bundle().apply {
+            putString("resend_after", resendAfter)
+            putString("otp_id", otpId)
+        }
+        bottomSheetDialog?.dismiss()
+        findNavController().navigate(R.id.action_cardFragment_to_nativeOTPFragment, bundle)
     }
 
     private fun redirectToACS(
     ) {
+        bottomSheetDialog?.dismiss()
         findNavController().navigate(R.id.action_cardFragment_to_ACSFragment)
 
     }
@@ -538,13 +578,24 @@ class CardFragment : Fragment() {
     private fun validateAllFields() {
         if (isCardValid && isExpiryValid && isCVVValid && isCardHolderNameValid) {
 
-            //create process payment request
             if (saveCardCheckbox.isChecked) {
-                //TODO verify the saved card
-                observeSaveCardCallbackResponse()
-                // findNavController().navigate(R.id.action_cardFragment_to_saveCardOTPFragment)
+                navigateToSaveCardOTPFragment()
             } else {
                 initProcessPayment()
+            }
+        }
+        else{
+            if (!isCardValid) {
+                showCardDetailsError("CardNumber")
+            }
+            if (!isExpiryValid) {
+                showCardDetailsError("Expiry")
+            }
+            if (!isCVVValid) {
+                showCardDetailsError("CVV")
+            }
+            if (!isCardHolderNameValid) {
+                showCardDetailsError("CardHolderName")
             }
         }
     }
@@ -695,6 +746,28 @@ class CardFragment : Fragment() {
             it.paymentModeId == Constants.PAY_BY_POINTS_ID
         }
         return !paymentModes.isNullOrEmpty()
+    }
+
+
+    private fun callNativeRequestOTP() {
+        val paymentId = ExpressSDKObject.getProcessPaymentResponse()?.payment_id ?: ""
+        val otpRequest = OTPRequest(payment_id = paymentId)
+        viewModel.generateOTP(ExpressSDKObject.getToken(), otpRequest)
+    }
+
+    private fun navigateToSaveCardOTPFragment() {
+        observeSaveCardCallbackResponse()
+        val last4Digits = cardNumber.substring(
+            formattedCardNumber?.length?.minus(
+                4
+            ) ?: 0
+        )
+        val bundle = Bundle()
+        bundle.putString("last4Digits", last4Digits)
+        findNavController().navigate(
+            R.id.action_cardFragment_to_saveCardOTPFragment,
+            bundle
+        )
     }
 
 }

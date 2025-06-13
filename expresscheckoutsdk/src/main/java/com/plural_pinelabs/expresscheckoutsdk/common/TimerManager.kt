@@ -14,7 +14,7 @@ internal object TimerManager {
         timer?.cancel() // Cancel any existing timer
         timer = object : CountDownTimer(durationInMillis, 1000) {
             override fun onTick(millisUntilFinished: Long) {
-                _timeLeft.postValue(millisUntilFinished / 1000) // Update time left in seconds
+                _timeLeft.postValue(millisUntilFinished) // Update time left in seconds
             }
 
             override fun onFinish() {
