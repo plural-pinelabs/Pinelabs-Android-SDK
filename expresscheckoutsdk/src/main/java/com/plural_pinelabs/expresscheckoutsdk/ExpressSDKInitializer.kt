@@ -6,15 +6,19 @@ import android.util.Log
 import com.plural_pinelabs.expresscheckoutsdk.common.ErrorCode
 import com.plural_pinelabs.expresscheckoutsdk.common.NetworkHelper
 import com.plural_pinelabs.expresscheckoutsdk.common.RootUtil
-import com.plural_pinelabs.expresscheckoutsdk.common.Utils
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils.MTAG
 import com.plural_pinelabs.expresscheckoutsdk.presentation.LandingActivity
 
 class ExpressSDKInitializer {
 
-    fun initializeSDK(context: Context, token: String, sdkCallback: ExpressSDKCallback) {
+    fun initializeSDK(
+        context: Context,
+        token: String,
+        sdkCallback: ExpressSDKCallback,
+        runInSandBoxMode: Boolean = false
+    ) {
         //TODO remove after testing
-        navigateToLandingActivity( context,sdkCallback,token)
+        navigateToLandingActivity(context, sdkCallback, token, runInSandBoxMode)
         return
         if (!NetworkHelper(context).hasInternetConnection()) {
             sdkCallback.onError(
@@ -32,13 +36,18 @@ class ExpressSDKInitializer {
                 context.getString(R.string.invalid_token)
             )
         } else {
-            navigateToLandingActivity(context, sdkCallback, token)
+            navigateToLandingActivity(context, sdkCallback, token, runInSandBoxMode)
         }
     }
 
 
-    private fun navigateToLandingActivity(context: Context, sdkCallback: ExpressSDKCallback,token: String) {
-        ExpressSDKObject.initialize(context, sdkCallback, token)
+    private fun navigateToLandingActivity(
+        context: Context,
+        sdkCallback: ExpressSDKCallback,
+        token: String,
+        runInSandBoxMode: Boolean
+    ) {
+        ExpressSDKObject.initialize(context, sdkCallback, token, runInSandBoxMode)
         Log.i(MTAG, "SDK Initialized successfully")
         val intent = Intent(context, LandingActivity::class.java)
         context.startActivity(intent)

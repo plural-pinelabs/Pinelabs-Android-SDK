@@ -62,6 +62,9 @@
         <action
             android:id="@+id/action_paymentModeFragment_to_UPIFragment"
             app:destination="@id/UPIFragment" />
+        <action
+            android:id="@+id/action_paymentModeFragment_to_walletFragment"
+            app:destination="@id/walletFragment" />
     </fragment>
     <fragment
         android:id="@+id/cardFragment"
@@ -151,4 +154,13 @@
         android:id="@+id/bottomSheetRetryFragment"
         android:name="com.plural_pinelabs.expresscheckoutsdk.common.BottomSheetRetryFragment"
         android:label="BottomSheetRetryFragment" />
+    <fragment
+        android:id="@+id/walletFragment"
+        tools:layout="@layout/fragment_wallet"
+        android:name="com.plural_pinelabs.expresscheckoutsdk.presentation.wallets.WalletFragment"
+        android:label="WalletFragment" >
+        <action
+            android:id="@+id/action_walletFragment_to_ACSFragment"
+            app:destination="@id/ACSFragment" />
+    </fragment>
 </navigation>

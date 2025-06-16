@@ -17,7 +17,7 @@ import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Query
 
-interface CardApiService : ApiService {
+interface CommonApiService : ApiService {
 
     @POST("getMetaData")
     suspend fun getMetaData(

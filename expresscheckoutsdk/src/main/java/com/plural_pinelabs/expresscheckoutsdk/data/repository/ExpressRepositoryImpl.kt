@@ -3,7 +3,7 @@ package com.plural_pinelabs.expresscheckoutsdk.data.repository
 import com.plural_pinelabs.expresscheckoutsdk.common.BaseResult
 import com.plural_pinelabs.expresscheckoutsdk.common.NetworkHelper
 import com.plural_pinelabs.expresscheckoutsdk.common.toResultFlow
-import com.plural_pinelabs.expresscheckoutsdk.data.fetch.CardApiService
+import com.plural_pinelabs.expresscheckoutsdk.data.fetch.CommonApiService
 import com.plural_pinelabs.expresscheckoutsdk.data.fetch.ExpressApiService
 import com.plural_pinelabs.expresscheckoutsdk.data.fetch.FetchApiService
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CardBinMetaDataRequestList
@@ -37,7 +37,7 @@ class ExpressRepositoryImpl(
         request: CardBinMetaDataRequestList
     ): Flow<BaseResult<CardBinMetaDataResponse>> {
         return toResultFlow(networkHelper = networkHelper) {
-            (apiService as CardApiService).getMetaData(token, request)
+            (apiService as CommonApiService).getMetaData(token, request)
         }
     }
 
@@ -46,7 +46,7 @@ class ExpressRepositoryImpl(
         paymentData: ProcessPaymentRequest?
     ): Flow<BaseResult<ProcessPaymentResponse>> {
         return toResultFlow(networkHelper = networkHelper) {
-            (apiService as CardApiService).processPayment(token, paymentData)
+            (apiService as CommonApiService).processPayment(token, paymentData)
         }
     }
 
@@ -55,7 +55,7 @@ class ExpressRepositoryImpl(
         otpRequest: OTPRequest
     ): Flow<BaseResult<OTPResponse>> {
         return toResultFlow(networkHelper = networkHelper) {
-            (apiService as CardApiService).submitOTP(token, otpRequest)
+            (apiService as CommonApiService).submitOTP(token, otpRequest)
         }
     }
 
@@ -64,7 +64,7 @@ class ExpressRepositoryImpl(
         otpRequest: OTPRequest
     ): Flow<BaseResult<OTPResponse>> {
         return toResultFlow(networkHelper = networkHelper) {
-            (apiService as CardApiService).initiateOTP(token, otpRequest)
+            (apiService as CommonApiService).initiateOTP(token, otpRequest)
         }
     }
 
@@ -73,7 +73,7 @@ class ExpressRepositoryImpl(
         otpRequest: OTPRequest
     ): Flow<BaseResult<OTPResponse>> {
         return toResultFlow(networkHelper = networkHelper) {
-            (apiService as CardApiService).initiateOTP(token, otpRequest)
+            (apiService as CommonApiService).initiateOTP(token, otpRequest)
         }
     }
 
@@ -82,7 +82,7 @@ class ExpressRepositoryImpl(
         otpRequest: OTPRequest?
     ): Flow<BaseResult<SavedCardResponse>> {
         return toResultFlow(networkHelper = networkHelper) {
-            (apiService as CardApiService).sendOTPCustomer(token, otpRequest)
+            (apiService as CommonApiService).sendOTPCustomer(token, otpRequest)
         }
     }
 
@@ -91,7 +91,7 @@ class ExpressRepositoryImpl(
         otpRequest: OTPRequest?
     ): Flow<BaseResult<SavedCardResponse>> {
         return toResultFlow(networkHelper = networkHelper) {
-            (apiService as CardApiService).validateOTPCustomer(token, otpRequest)
+            (apiService as CommonApiService).validateOTPCustomer(token, otpRequest)
         }
     }
 
@@ -99,7 +99,7 @@ class ExpressRepositoryImpl(
         token: String?
     ): Flow<BaseResult<TransactionStatusResponse>> {
         return toResultFlow(networkHelper = networkHelper) {
-            (apiService as CardApiService).statusOfTransaction(token)
+            (apiService as CommonApiService).statusOfTransaction(token)
         }
     }
 

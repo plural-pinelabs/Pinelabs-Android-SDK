@@ -3,6 +3,7 @@ package com.plural_pinelabs.expresscheckoutsdk.data.retrofit
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.plural_pinelabs.expresscheckoutsdk.BuildConfig
+import com.plural_pinelabs.expresscheckoutsdk.ExpressSDKObject
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.BASE_CHECKOUTBFF
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.BASE_URL_EXPRESS_DEV
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.BASE_URL_PROD
@@ -11,7 +12,7 @@ import com.plural_pinelabs.expresscheckoutsdk.common.Constants.BASE_URL_UAT
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.HTTPS
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.TIMEOUT
 import com.plural_pinelabs.expresscheckoutsdk.common.PaymentModeDeserialiser
-import com.plural_pinelabs.expresscheckoutsdk.data.fetch.CardApiService
+import com.plural_pinelabs.expresscheckoutsdk.data.fetch.CommonApiService
 import com.plural_pinelabs.expresscheckoutsdk.data.fetch.ExpressApiService
 import com.plural_pinelabs.expresscheckoutsdk.data.fetch.FetchApiService
 import okhttp3.CertificatePinner
@@ -32,8 +33,9 @@ object RetrofitBuilder {
         .create()
 
     private fun getRetrofit(): Retrofit {
+        val baseUrl = if (ExpressSDKObject.isSandBoxMode()) BASE_URL_UAT else BASE_URL_PROD
         return Retrofit.Builder()
-            .baseUrl(HTTPS + BASE_URL_UAT + BASE_CHECKOUTBFF)
+            .baseUrl(HTTPS + baseUrl + BASE_CHECKOUTBFF)
             .addConverterFactory(GsonConverterFactory.create())
             .addConverterFactory(GsonConverterFactory.create(gson))
             .client(clientBuilder.build())
@@ -42,8 +44,11 @@ object RetrofitBuilder {
 
 
     private fun getRetrofitForExpressCheckout(): Retrofit {
+        //TODO update the prod url of the express checout and dev to UAT
+        val baseUrl =
+            if (ExpressSDKObject.isSandBoxMode()) BASE_URL_EXPRESS_DEV else BASE_URL_EXPRESS_DEV
         return Retrofit.Builder()
-            .baseUrl(HTTPS + BASE_URL_EXPRESS_DEV )
+            .baseUrl(HTTPS + baseUrl)
             .addConverterFactory(GsonConverterFactory.create())
             .addConverterFactory(GsonConverterFactory.create(gson))
             .client(clientBuilder.build())
@@ -51,8 +56,9 @@ object RetrofitBuilder {
     }
 
     val fetchApiService: FetchApiService = getRetrofit().create(FetchApiService::class.java)
-    val cardApiService: CardApiService = getRetrofit().create(CardApiService::class.java)
-    val expressApiService: ExpressApiService = getRetrofitForExpressCheckout().create(ExpressApiService::class.java)
+    val commonApiService: CommonApiService = getRetrofit().create(CommonApiService::class.java)
+    val expressApiService: ExpressApiService =
+        getRetrofitForExpressCheckout().create(ExpressApiService::class.java)
 
     private fun createBuilder(): OkHttpClient.Builder {
 

@@ -130,6 +130,7 @@ class PaymentModeFragment : Fragment() {
 
                     PaymentModes.WALLET.paymentModeID -> {
                         // Handle Wallet selection
+                        findNavController().navigate(R.id.action_paymentModeFragment_to_walletFragment)
                     }
 
                     else -> {

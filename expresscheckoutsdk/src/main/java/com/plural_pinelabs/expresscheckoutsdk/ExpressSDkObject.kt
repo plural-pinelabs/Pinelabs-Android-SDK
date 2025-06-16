@@ -9,6 +9,7 @@ internal data class SDKObject(
     val context: Context,
     val callback: ExpressSDKCallback,
     val token: String,
+    val sandBoxMode: Boolean = false,
     var fetchResponseDTO: FetchResponseDTO? = null,
     var processPaymentResponse: ProcessPaymentResponse? = null,
     var phoneNumber: String? = null,
@@ -17,16 +18,25 @@ internal data class SDKObject(
 internal object ExpressSDKObject {
     private val sdkObjectRef = AtomicReference<SDKObject?>()
 
-    fun initialize(context: Context, callback: ExpressSDKCallback, token: String) {
-        sdkObjectRef.set(SDKObject(context, callback, token))
+    fun initialize(
+        context: Context,
+        callback: ExpressSDKCallback,
+        token: String,
+        runInSandboxedSdk: Boolean = false
+    ) {
+        sdkObjectRef.set(SDKObject(context, callback, token, runInSandboxedSdk))
     }
 
     fun getToken(): String? {
         return sdkObjectRef.get()?.token
     }
 
-    fun getSDKObject(): SDKObject? {
+    private fun getSDKObject(): SDKObject? {
         return sdkObjectRef.get()
+    }
+
+    fun isSandBoxMode(): Boolean {
+        return getSDKObject()?.sandBoxMode ?: false
     }
 
     fun setFetchData(it: FetchResponseDTO) {

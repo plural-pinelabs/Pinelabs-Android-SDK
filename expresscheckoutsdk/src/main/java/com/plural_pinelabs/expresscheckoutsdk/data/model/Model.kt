@@ -463,6 +463,7 @@ data class DCCDetails(
     var conversionRate: Double?
 ) : Parcelable
 
+
 @Parcelize
 data class Palette(
     @SerializedName("50") val C50: String, @SerializedName("100") val C100: String,

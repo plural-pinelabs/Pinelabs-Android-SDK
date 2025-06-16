@@ -583,8 +583,7 @@ class CardFragment : Fragment() {
             } else {
                 initProcessPayment()
             }
-        }
-        else{
+        } else {
             if (!isCardValid) {
                 showCardDetailsError("CardNumber")
             }
