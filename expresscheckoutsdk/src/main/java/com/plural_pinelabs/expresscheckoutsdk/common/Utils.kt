@@ -219,7 +219,7 @@ internal object Utils {
         if (ratio > 1) {
             val multiply = "10".toDouble().pow(ratio.toDouble())
             val value = amount?.times(multiply)
-            return roundToDecimal(value!!)
+            return roundToDecimal(value ?: 0.0)
         } else {
             return amount.toString()
         }

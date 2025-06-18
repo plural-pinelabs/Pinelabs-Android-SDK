@@ -132,6 +132,16 @@
     <string name="just_a_moment_we_re_confirming_your_payment">Just a moment! We\'re confirming your payment.</string>
     <string name="try_another_upi_app">Try another UPI App? <u><font color="#DD4D42">Cancel payment</font> </u> </string>
     <string name="select_a_wallet">Select a Wallet</string>
+    <string name="netbanking">Netbanking</string>
+    <string name="pay_via_bank_app">Pay via bank app</string>
+    <string name="select_bank_app">Select bank app</string>
+    <string name="pay_via_netbanking_qr">Pay via netbanking QR</string>
+    <string name="pay_by_qr_description">Scan the QR using any of the following banking apps</string>
+    <string name="generate_qr_code">Generate QR code</string>
+    <string name="select_bank">Select bank</string>
+    <string name="or_pay_using_bank_website">OR Pay using Bank website</string>
+    <string name="pay_by_bank_website_descrption">You will be redirected to the selected bank’s website</string>
+    <string name="search">Search</string>
 
 
 </resources>

@@ -17,7 +17,6 @@ import com.plural_pinelabs.expresscheckoutsdk.R
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PAY_BY_POINTS_ID
 import com.plural_pinelabs.expresscheckoutsdk.common.ItemClickListener
 import com.plural_pinelabs.expresscheckoutsdk.common.PaymentModes
-import com.plural_pinelabs.expresscheckoutsdk.common.Utils
 import com.plural_pinelabs.expresscheckoutsdk.data.model.PaymentMode
 import com.plural_pinelabs.expresscheckoutsdk.data.model.SavedCardTokens
 import com.plural_pinelabs.expresscheckoutsdk.presentation.utils.DividerItemDecoration
@@ -126,6 +125,7 @@ class PaymentModeFragment : Fragment() {
 
                     PaymentModes.NET_BANKING.paymentModeID -> {
                         // Handle Netbanking selection
+                        findNavController().navigate(R.id.action_paymentModeFragment_to_netBankingFragment)
                     }
 
                     PaymentModes.WALLET.paymentModeID -> {

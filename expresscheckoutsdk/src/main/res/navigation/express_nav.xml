@@ -65,6 +65,9 @@
         <action
             android:id="@+id/action_paymentModeFragment_to_walletFragment"
             app:destination="@id/walletFragment" />
+        <action
+            android:id="@+id/action_paymentModeFragment_to_netBankingFragment"
+            app:destination="@id/netBankingFragment" />
     </fragment>
     <fragment
         android:id="@+id/cardFragment"
@@ -135,14 +138,14 @@
         tools:layout="@layout/fragment_success" />
     <fragment
         android:id="@+id/saveCardOTPFragment"
-        tools:layout="@layout/fragment_save_card_o_t_p"
         android:name="com.plural_pinelabs.expresscheckoutsdk.presentation.card.SaveCardOTPFragment"
-        android:label="SaveCardOTPFragment" />
+        android:label="SaveCardOTPFragment"
+        tools:layout="@layout/fragment_save_card_o_t_p" />
     <fragment
         android:id="@+id/savedAddressFragment"
         android:name="com.plural_pinelabs.expresscheckoutsdk.presentation.d2c.SavedAddressFragment"
         android:label="fragment_saved_address"
-        tools:layout="@layout/fragment_saved_address" >
+        tools:layout="@layout/fragment_saved_address">
         <action
             android:id="@+id/action_savedAddressFragment_to_newAddressFormFragment"
             app:destination="@id/newAddressFormFragment" />
@@ -156,11 +159,26 @@
         android:label="BottomSheetRetryFragment" />
     <fragment
         android:id="@+id/walletFragment"
-        tools:layout="@layout/fragment_wallet"
         android:name="com.plural_pinelabs.expresscheckoutsdk.presentation.wallets.WalletFragment"
-        android:label="WalletFragment" >
+        android:label="WalletFragment"
+        tools:layout="@layout/fragment_wallet">
         <action
             android:id="@+id/action_walletFragment_to_ACSFragment"
             app:destination="@id/ACSFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/netBankingFragment"
+        android:name="com.plural_pinelabs.expresscheckoutsdk.presentation.netbanking.NetBankingFragment"
+        android:label="NetBankingFragment"
+        tools:layout="@layout/fragment_net_banking" >
+        <action
+            android:id="@+id/action_netBankingFragment_to_ACSFragment"
+            app:destination="@id/ACSFragment" />
+        <action
+            android:id="@+id/action_netBankingFragment_to_failureFragment"
+            app:destination="@id/failureFragment" />
+        <action
+            android:id="@+id/action_netBankingFragment_to_successFragment"
+            app:destination="@id/successFragment" />
     </fragment>
 </navigation>

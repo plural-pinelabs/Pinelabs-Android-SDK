@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:backgroundTint="@color/white"
+    android:paddingHorizontal="16dp"
+    android:paddingVertical="16dp">
+
+    <TextView
+        android:id="@+id/txt_all_banks"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:fontFamily="sans-serif-medium"
+        android:text="Select bank"
+        android:textColor="@color/black_text"
+        android:textFontWeight="600"
+        android:textSize="16sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/cancel_btn"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/circle_background"
+        android:backgroundTint="@color/black_text_30"
+        android:contentDescription="@string/cancel"
+        android:foregroundTint="@color/black_text"
+        android:padding="4dp"
+        android:src="@drawable/ic_cancel_close"
+        android:tint="@color/black_text"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <EditText
+        android:id="@+id/edt_search_banks"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:layout_marginTop="25dp"
+        android:background="@drawable/input_field_border"
+        android:drawableStart="@drawable/ic_search_icon"
+        android:drawablePadding="13dp"
+        android:ems="10"
+        android:fontFamily="sans-serif-medium"
+        android:hint="@string/search"
+        android:inputType="text"
+        android:paddingStart="10dp"
+        android:textColor="@color/black_text"
+        android:textColorHint="@color/black_text_50"
+        android:textSize="16sp"
+        app:layout_constraintTop_toBottomOf="@id/txt_all_banks" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_net_all_banks"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/edt_search_banks" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+
+

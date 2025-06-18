@@ -70,6 +70,7 @@
                 android:textSize="12sp" />
 
 
+
             <androidx.cardview.widget.CardView
                 android:id="@+id/wallet_list_cardview"
                 android:layout_width="match_parent"

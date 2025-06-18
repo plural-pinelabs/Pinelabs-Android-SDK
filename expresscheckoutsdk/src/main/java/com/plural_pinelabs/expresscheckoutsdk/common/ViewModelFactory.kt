@@ -11,6 +11,7 @@ import com.plural_pinelabs.expresscheckoutsdk.presentation.d2c.AddressViewModel
 import com.plural_pinelabs.expresscheckoutsdk.presentation.d2c.NewAddressFragmentViewModel
 import com.plural_pinelabs.expresscheckoutsdk.presentation.d2c.VerifyOTPFragmentViewModel
 import com.plural_pinelabs.expresscheckoutsdk.presentation.nativeotp.NativeOTPViewModel
+import com.plural_pinelabs.expresscheckoutsdk.presentation.netbanking.NetBankingViewModel
 import com.plural_pinelabs.expresscheckoutsdk.presentation.splash.SplashViewModel
 import com.plural_pinelabs.expresscheckoutsdk.presentation.upi.UPIViewModel
 import com.plural_pinelabs.expresscheckoutsdk.presentation.wallets.WalletViewModel
@@ -130,6 +131,19 @@ class WalletViewModelFactory(private val networkHelper: NetworkHelper) :
     ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return WalletViewModel(
+            ExpressRepositoryImpl(
+                RetrofitBuilder.commonApiService,
+                networkHelper = networkHelper
+            )
+        ) as T
+    }
+}
+
+
+class NetBankingViewModelFactory(private val networkHelper: NetworkHelper) :
+    ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        return NetBankingViewModel(
             ExpressRepositoryImpl(
                 RetrofitBuilder.commonApiService,
                 networkHelper = networkHelper

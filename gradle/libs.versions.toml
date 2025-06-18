@@ -18,7 +18,7 @@ lifecycle-version = "2.6.2"
 lifecycle-extension = "2.2.0"
 actvitiy-ktx = "1.8.1"
 fragment-ktx = "1.1.0"
-coil = "1.4.0"
+coil = "2.4.0"
 nav_version = "2.7.7"
 retrofit-logging-interceptor = "4.10.0"
 playServicesAuthApiPhone = "18.2.0"
@@ -56,6 +56,8 @@ clevertap = { group = "com.clevertap.android", name = "clevertap-android-sdk", v
 retrofit-logging-interceptor = { group = "com.squareup.okhttp3", name = "logging-interceptor", version.ref = "retrofit-logging-interceptor" }
 play-services-auth-api-phone = { group = "com.google.android.gms", name = "play-services-auth-api-phone", version.ref = "playServicesAuthApiPhone" }
 
+coil = { group = "io.coil-kt", name = "coil", version.ref = "coil" }
+coil-svg = { group = "io.coil-kt", name = "coil-svg", version.ref = "coil" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

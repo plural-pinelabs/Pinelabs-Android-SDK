@@ -641,7 +641,7 @@ class CardFragment : Fragment() {
         paymentMode.add(Constants.CREDIT_DEBIT_ID)
         if (isPBPChecked) {
             paymentMode.add(Constants.PAY_BY_POINTS_ID)
-            amount = amount!! - redeemableAmount
+            amount = amount?.minus(redeemableAmount)
         }
         val last4 = cardNumber.substring(cardNumber.length - 4, cardNumber.length)
 
@@ -677,8 +677,7 @@ class CardFragment : Fragment() {
                 currency,
                 last4,
                 null, //TODO redeemableAmount pass this from reward points api
-                null
-                /*mobileNumber!!.filter { !mobileNumber!!.isEmpty() }*/,
+                null,
                 null,
                 deviceInfo,
                 null,

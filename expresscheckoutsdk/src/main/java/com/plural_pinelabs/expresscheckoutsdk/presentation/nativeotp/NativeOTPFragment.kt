@@ -233,11 +233,13 @@ class NativeOTPFragment : Fragment() {
 
     private fun registerBroadcastReceiver() {
         smsBroadcastReceiver = SmsBroadcastReceiver()
-        smsBroadcastReceiver!!.smsBroadcastReceiverListener =
+        smsBroadcastReceiver.smsBroadcastReceiverListener =
             object : SmsBroadcastReceiver.SmsBroadcastReceiverListener {
                 override fun onSuccess(intent: Intent?) {
                     print("SMS Success ")
-                    startActivityForResult(intent!!, REQ_USER_CONSENT)
+                    if (intent != null) {
+                        startActivityForResult(intent, REQ_USER_CONSENT)
+                    }
                 }
 
                 override fun onFailure() {
