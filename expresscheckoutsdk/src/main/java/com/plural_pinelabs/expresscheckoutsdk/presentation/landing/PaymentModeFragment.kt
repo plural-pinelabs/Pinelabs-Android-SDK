@@ -132,6 +132,10 @@ class PaymentModeFragment : Fragment() {
                         // Handle Wallet selection
                         findNavController().navigate(R.id.action_paymentModeFragment_to_walletFragment)
                     }
+                    PaymentModes.EMI.paymentModeID -> {
+                        // Handle EMI selection
+                        findNavController().navigate(R.id.action_paymentModeFragment_to_EMIFragment)
+                    }
 
                     else -> {
                         // Handle other selections

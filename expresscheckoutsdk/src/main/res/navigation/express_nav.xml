@@ -68,6 +68,9 @@
         <action
             android:id="@+id/action_paymentModeFragment_to_netBankingFragment"
             app:destination="@id/netBankingFragment" />
+        <action
+            android:id="@+id/action_paymentModeFragment_to_EMIFragment"
+            app:destination="@id/EMIFragment" />
     </fragment>
     <fragment
         android:id="@+id/cardFragment"
@@ -153,10 +156,7 @@
             android:id="@+id/action_savedAddressFragment_to_paymentModeFragment"
             app:destination="@id/paymentModeFragment" />
     </fragment>
-    <dialog
-        android:id="@+id/bottomSheetRetryFragment"
-        android:name="com.plural_pinelabs.expresscheckoutsdk.common.BottomSheetRetryFragment"
-        android:label="BottomSheetRetryFragment" />
+
     <fragment
         android:id="@+id/walletFragment"
         android:name="com.plural_pinelabs.expresscheckoutsdk.presentation.wallets.WalletFragment"
@@ -170,7 +170,7 @@
         android:id="@+id/netBankingFragment"
         android:name="com.plural_pinelabs.expresscheckoutsdk.presentation.netbanking.NetBankingFragment"
         android:label="NetBankingFragment"
-        tools:layout="@layout/fragment_net_banking" >
+        tools:layout="@layout/fragment_net_banking">
         <action
             android:id="@+id/action_netBankingFragment_to_ACSFragment"
             app:destination="@id/ACSFragment" />
@@ -181,4 +181,21 @@
             android:id="@+id/action_netBankingFragment_to_successFragment"
             app:destination="@id/successFragment" />
     </fragment>
+    <fragment
+        android:id="@+id/EMIFragment"
+        android:name="com.plural_pinelabs.expresscheckoutsdk.presentation.emi.EMIFragment"
+        android:label="EMIFragment"
+        tools:layout="@layout/fragment_e_m_i">
+        <action
+            android:id="@+id/action_EMIFragment_to_tenureSelectionFragment"
+            app:destination="@id/tenureSelectionFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/tenureSelectionFragment"
+        android:name="com.plural_pinelabs.expresscheckoutsdk.presentation.emi.TenureSelectionFragment"
+        android:label="fragment_tenure_selection"
+        tools:layout="@layout/fragment_tenure_selection">
+
+    </fragment>
+
 </navigation>

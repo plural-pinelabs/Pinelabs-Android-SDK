@@ -503,3 +503,130 @@ data class CustomerAddresses(
     val message: String
 
 ) : Parcelable
+
+//EMI data classes
+
+@Parcelize
+data class EMIPaymentModeData(
+    val issuers: List<Issuer>,
+    val offerDetails: List<OfferDetail>? = null
+) : Parcelable
+
+@Parcelize
+data class Issuer(
+    val id: String,
+    val name: String,
+    val display_name: String,
+    val issuer_type: String,
+    val priority: Int,
+    val tenures: List<Tenure>,
+    val issuer_data: IssuerData? = null
+) : Parcelable
+
+@Parcelize
+data class Tenure(
+    val tenure_id: String,
+    val name: String,
+    val tenure_type: String,
+    val tenure_value: Int,
+    val issuer_offer_parameters: List<IssuerOfferParameter>? = null,
+    val details: List<ProductDetail>? = null,
+    val discount: Discount? = null,
+    val loan_amount: Amount? = null,
+    val total_discount_amount: Amount? = null,
+    val net_payment_amount: Amount? = null,
+    val monthly_emi_amount: Amount? = null,
+    val total_emi_amount: Amount? = null,
+    val interest_amount: Amount? = null,
+    val interest_rate_percentage: Double? = null,
+    val processing_fee_details: ProcessingFeeDetails? = null,
+    val emi_type: String
+) : Parcelable
+
+@Parcelize
+data class IssuerOfferParameter(
+    val program_type: String,
+    val offer_id: String,
+    val offer_parameter_id: String
+) : Parcelable
+
+@Parcelize
+data class ProductDetail(
+    val product_code: String,
+    val product_display_name: String,
+    val brand_id: String,
+    val brand_name: String,
+    val product_amount: Amount? = null,
+    val interest_amount: Amount? = null,
+    val interest_rate: Double? = null,
+    val discount: Discount? = null
+) : Parcelable
+
+@Parcelize
+data class Discount(
+    val discount_type: String,
+    val percentage: Int,
+    val amount: Amount? = null,
+    val max_amount: Amount? = null
+) : Parcelable
+
+@Parcelize
+data class Amount(
+    val currency: String,
+    val value: Int
+) : Parcelable
+
+@Parcelize
+data class ProcessingFeeDetails(
+    val percentage: Int? = null,
+    val amount: Amount? = null
+) : Parcelable
+
+@Parcelize
+data class IssuerData(
+    val otp_length: Int,
+    val otp_time_in_sec: Int,
+    val otp_retry_count: Int,
+    val is_consent_page_required: Boolean,
+    val consent_data: String,
+    val terms_and_conditions: String,
+    val show_key_fact_statement: Boolean,
+    val auth_type: String,
+    val is_tokenized_transaction_supported: Boolean,
+    val pan_number_last_digit_count: Int? = null,
+    val penny_transaction_amount: Amount? = null
+) : Parcelable
+
+@Parcelize
+data class OfferDetail(
+    val issuerId: String,
+    val name: String,
+    val type: String,
+    val tenureOffers: List<TenureOffer>,
+    val maxSaving: Int,
+    val issuer: Issuer
+) : Parcelable
+
+@Parcelize
+data class TenureOffer(
+    val tenureId: String,
+    val tenure: String,
+    val offers: List<Offer>,
+    val emiType: String,
+    val discountAmount: Int,
+    val cashbackAmount: Int,
+    val offerLabel: String,
+    val FullTenure: Tenure
+) : Parcelable
+
+@Parcelize
+data class Offer(
+    val programType: String,
+    val discount: DiscountValue
+) : Parcelable
+
+@Parcelize
+data class DiscountValue(
+    val type: String,
+    val value: Int
+) : Parcelable

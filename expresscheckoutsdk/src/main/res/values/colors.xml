@@ -27,5 +27,7 @@
     <color name="grey_99FFFFFF">#99FFFFFF</color>
     <color name="blur">#1FFFFFFF</color>
     <color name="yellow_C96B00">#C96B00</color>
+    <color name="AEB4BA_grey">#AEB4BA</color>
+    <color name="grey_979797_text">#979797</color>
 
 </resources>

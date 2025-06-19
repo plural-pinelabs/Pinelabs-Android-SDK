@@ -154,6 +154,12 @@ internal object Utils {
                 PaymentModes.WALLET.paymentModeName,
                 PaymentModes.WALLET.paymentModeDescription
             )
+
+            PaymentModes.EMI.toString() -> paymentModeData = RecyclerViewPaymentOptionData(
+                PaymentModes.EMI.paymentModeImage,
+                PaymentModes.EMI.paymentModeName,
+                PaymentModes.EMI.paymentModeDescription
+            )
         }
 
         return paymentModeData
@@ -187,7 +193,10 @@ internal object Utils {
         "Diners Club" to R.drawable.diners
     )
 
-    fun convertToRupees(context: Context, amountInPaisa: Int): String {
+    fun convertToRupees(context: Context, amountInPaisa: Int?): String {
+        if (amountInPaisa == null) {
+            return "Some error occurred"
+        }
         return context.getString(R.string.rupee_symbol) + " " + roundToDecimal(amountInPaisa.toDouble() / 100)
     }
 

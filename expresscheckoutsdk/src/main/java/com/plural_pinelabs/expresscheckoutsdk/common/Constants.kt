@@ -20,6 +20,7 @@ internal object Constants {
     const val NET_BANKING_ID = "NET_BANKING"
     const val UPI_ID = "UPI"
     const val WALLET_ID = "WALLET"
+    const val EMI_ID = "EMI"
 
 
     const val CARD_NUMBER_CHUNK = 4
@@ -229,6 +230,10 @@ internal object Constants {
     const val BANDHAN_CORPORATE = "bandhan_bank.svg"
     const val KARNATAKA_GRAMIN = "karnataka_gramin.png"
 
-    const val NET_BANKING="NETBANKING"
+    const val NET_BANKING = "NETBANKING"
+
+    //EMi
+    const val EMI_CC_TYPE = "CC_BANK"
+    const val EMI_DC_TYPE = "DC_BANK"
 
 }
