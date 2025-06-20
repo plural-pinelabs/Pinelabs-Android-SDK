@@ -1,6 +1,7 @@
 package com.plural_pinelabs.expresscheckoutsdk
 
 import android.content.Context
+import com.plural_pinelabs.expresscheckoutsdk.data.model.EMIPaymentModeData
 import com.plural_pinelabs.expresscheckoutsdk.data.model.FetchResponseDTO
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ProcessPaymentResponse
 import java.util.concurrent.atomic.AtomicReference
@@ -13,6 +14,7 @@ internal data class SDKObject(
     var fetchResponseDTO: FetchResponseDTO? = null,
     var processPaymentResponse: ProcessPaymentResponse? = null,
     var phoneNumber: String? = null,
+    var emiPaymentModeData: EMIPaymentModeData? = null
 )
 
 internal object ExpressSDKObject {
@@ -75,6 +77,13 @@ internal object ExpressSDKObject {
 
     fun getPhoneNumber(): String? {
         return getSDKObject()?.phoneNumber
+    }
+
+    fun setEMIPaymentModeData(emiPaymentModeData: EMIPaymentModeData) {
+        getSDKObject()?.emiPaymentModeData = emiPaymentModeData
+    }
+    fun getEMIPaymentModeData(): EMIPaymentModeData? {
+        return getSDKObject()?.emiPaymentModeData
     }
 }
 

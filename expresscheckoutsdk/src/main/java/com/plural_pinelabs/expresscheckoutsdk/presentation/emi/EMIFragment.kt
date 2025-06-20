@@ -14,6 +14,7 @@ import com.google.gson.internal.LinkedTreeMap
 import com.plural_pinelabs.expresscheckoutsdk.ExpressSDKObject
 import com.plural_pinelabs.expresscheckoutsdk.R
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.TENURE_ID
 import com.plural_pinelabs.expresscheckoutsdk.common.ItemClickListener
 import com.plural_pinelabs.expresscheckoutsdk.common.PaymentModes
 import com.plural_pinelabs.expresscheckoutsdk.data.model.EMIPaymentModeData
@@ -87,9 +88,12 @@ class EMIFragment : Fragment() {
             override fun onItemClick(position: Int, item: Issuer) {
                 // Handle item click
                 val bundle = Bundle().apply {
-                    putString("selected_issuer_id", item.id)
+                    putString(TENURE_ID, item.id)
                 }
-                findNavController().navigate(R.id.action_EMIFragment_to_tenureSelectionFragment,bundle)
+                findNavController().navigate(
+                    R.id.action_EMIFragment_to_tenureSelectionFragment,
+                    bundle
+                )
             }
         }
     }
@@ -110,6 +114,10 @@ class EMIFragment : Fragment() {
     private fun convertMapToJsonObject(yourMap: Map<*, *>): EMIPaymentModeData {
         val gson = Gson().toJsonTree(yourMap).asJsonObject
         return Gson().fromJson(gson.toString(), EMIPaymentModeData::class.java)
+
+    }
+
+    private fun mapBanKLogo(){
 
     }
 

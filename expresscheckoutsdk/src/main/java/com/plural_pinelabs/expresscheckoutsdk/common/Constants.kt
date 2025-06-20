@@ -236,4 +236,8 @@ internal object Constants {
     const val EMI_CC_TYPE = "CC_BANK"
     const val EMI_DC_TYPE = "DC_BANK"
 
+    //Bundle key
+    const val ISSUE_ID = "issueId"
+    const val TENURE_ID = "tenureId"
+
 }

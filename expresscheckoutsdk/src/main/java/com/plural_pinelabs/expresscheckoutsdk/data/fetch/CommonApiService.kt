@@ -6,6 +6,7 @@ import com.plural_pinelabs.expresscheckoutsdk.data.model.CustomerInfo
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CustomerInfoResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.OTPRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.model.OTPResponse
+import com.plural_pinelabs.expresscheckoutsdk.data.model.OfferEligibilityResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ProcessPaymentRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ProcessPaymentResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.SavedCardResponse
@@ -98,6 +99,12 @@ interface CommonApiService : ApiService {
             encoded = true
         ) token: String?
     ): Response<TransactionStatusResponse>
+
+    @POST("offer/validate")
+    suspend fun validateOffer(
+        @Query("token", encoded = true) token: String?,
+        @Body request: ProcessPaymentRequest?
+    ): Response<OfferEligibilityResponse>
 
 }
 

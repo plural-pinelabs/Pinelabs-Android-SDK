@@ -15,7 +15,7 @@ import com.plural_pinelabs.expresscheckoutsdk.data.model.Tenure
 class EMITenureListAdapter(
     private val context: Context,
     private val tenures: List<Tenure>,
-    private val emiBankSelectionCallback: ItemClickListener<Tenure>?
+    private val emiBankSelectionCallback: ItemClickListener<Tenure?>?
 ) :
     RecyclerView.Adapter<EMITenureListAdapter.ItemViewHolder>() {
 

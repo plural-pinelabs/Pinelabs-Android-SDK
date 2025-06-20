@@ -160,7 +160,14 @@ data class ProcessPaymentRequest(
     val extras: Extra? = null,
     val txn_data: UpiTransactionData? = null,
     val convenience_fee_data: ConvenienceFeesData? = null,
+    val emi_data: EmiData? = null,
 ) : Parcelable
+
+@Parcelize
+data class EmiData(
+    val offer_details: OfferDetails? = null,
+) : Parcelable
+
 
 @Parcelize
 data class ConvenienceFeesData(
@@ -262,8 +269,9 @@ data class Extra(
     val device_info: DeviceInfo?,
     var risk_validation_details: RiskValidationDetails?,
     var dcc_status: String? = null,
-    val sdk_data: SDKData? = null
-) : Parcelable
+    val sdk_data: SDKData? = null,
+    val order_amount: Int? = null,
+    ) : Parcelable
 
 data class PBPBank(
     val bankName: String,
@@ -540,7 +548,9 @@ data class Tenure(
     val interest_amount: Amount? = null,
     val interest_rate_percentage: Double? = null,
     val processing_fee_details: ProcessingFeeDetails? = null,
-    val emi_type: String
+    val emi_type: String,
+    val additionalCashback: String? = null,
+    val label: String? = null
 ) : Parcelable
 
 @Parcelize
@@ -595,6 +605,7 @@ data class IssuerData(
     val is_tokenized_transaction_supported: Boolean,
     val pan_number_last_digit_count: Int? = null,
     val penny_transaction_amount: Amount? = null
+
 ) : Parcelable
 
 @Parcelize
@@ -606,6 +617,24 @@ data class OfferDetail(
     val maxSaving: Int,
     val issuer: Issuer
 ) : Parcelable
+
+
+@Parcelize
+data class OfferDetails(
+    val id: String?,
+    val name: String?,
+    val display_name: String?,
+    val issuer_type: String?,
+    val priority: Int?,
+    val issuer_data: IssuerData?,
+    val label: String?,
+    val subventionType: String?,
+    val isMultiCartEmi: Boolean?,
+    val issuerName: String?,
+    val isSplitEmi: Boolean?,
+    val tenure: Tenure?,
+) : Parcelable
+
 
 @Parcelize
 data class TenureOffer(
@@ -630,3 +659,12 @@ data class DiscountValue(
     val type: String,
     val value: Int
 ) : Parcelable
+
+
+@Parcelize
+data class OfferEligibilityResponse(
+    val code: String,
+    val message: String
+) : Parcelable
+
+

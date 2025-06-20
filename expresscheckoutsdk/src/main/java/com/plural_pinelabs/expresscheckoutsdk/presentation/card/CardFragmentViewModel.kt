@@ -10,6 +10,7 @@ import com.plural_pinelabs.expresscheckoutsdk.data.model.CardBinMetaDataRequestL
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CardBinMetaDataResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.OTPRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.model.OTPResponse
+import com.plural_pinelabs.expresscheckoutsdk.data.model.OfferEligibilityResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ProcessPaymentRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ProcessPaymentResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.repository.ExpressRepositoryImpl
@@ -28,6 +29,10 @@ class CardFragmentViewModel(private val expressRepositoryImpl: ExpressRepository
     private val _processPaymentResult =
         MutableStateFlow<BaseResult<ProcessPaymentResponse>>(BaseResult.Loading(false))
     val processPaymentResult: StateFlow<BaseResult<ProcessPaymentResponse>> = _processPaymentResult
+
+    private val _validateOfferResult =
+        MutableStateFlow<BaseResult<OfferEligibilityResponse>>(BaseResult.Loading(false))
+    val validateOfferResult: StateFlow<BaseResult<OfferEligibilityResponse>> = _validateOfferResult
 
     private val _otpRequestResult =
         MutableStateFlow<BaseResult<OTPResponse>>(BaseResult.Loading(true))
@@ -63,6 +68,13 @@ class CardFragmentViewModel(private val expressRepositoryImpl: ExpressRepository
         viewModelScope.launch(Dispatchers.IO) {
             expressRepositoryImpl.processPayment(token, paymentData).collect {
                 _processPaymentResult.value = it
+            }
+        }
+
+    fun validateOffer(token: String?, paymentData: ProcessPaymentRequest?) =
+        viewModelScope.launch(Dispatchers.IO) {
+            expressRepositoryImpl.validateOffers(token, paymentData).collect {
+                _validateOfferResult.value = it
             }
         }
 

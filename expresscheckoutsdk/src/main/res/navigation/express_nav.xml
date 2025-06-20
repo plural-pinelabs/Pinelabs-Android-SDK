@@ -196,6 +196,24 @@
         android:label="fragment_tenure_selection"
         tools:layout="@layout/fragment_tenure_selection">
 
+        <action
+            android:id="@+id/action_tenureSelectionFragment_to_EMICardDetailsFragment"
+            app:destination="@id/EMICardDetailsFragment" />
+    </fragment>
+    <fragment
+        tools:layout="@layout/fragment_e_m_i_card_details"
+        android:id="@+id/EMICardDetailsFragment"
+        android:name="com.plural_pinelabs.expresscheckoutsdk.presentation.emi.EMICardDetailsFragment"
+        android:label="EMICardDetailsFragment" >
+        <action
+            android:id="@+id/action_EMICardDetailsFragment_to_nativeOTPFragment"
+            app:destination="@id/nativeOTPFragment" />
+        <action
+            android:id="@+id/action_EMICardDetailsFragment_to_ACSFragment"
+            app:destination="@id/ACSFragment" />
+        <action
+            android:id="@+id/action_EMICardDetailsFragment_to_failureFragment"
+            app:destination="@id/failureFragment" />
     </fragment>
 
 </navigation>

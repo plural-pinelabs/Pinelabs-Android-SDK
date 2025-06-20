@@ -13,6 +13,7 @@ import com.plural_pinelabs.expresscheckoutsdk.data.model.ExpressAddressResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.FetchResponseDTO
 import com.plural_pinelabs.expresscheckoutsdk.data.model.OTPRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.model.OTPResponse
+import com.plural_pinelabs.expresscheckoutsdk.data.model.OfferEligibilityResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ProcessPaymentRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ProcessPaymentResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.SavedCardResponse
@@ -109,6 +110,15 @@ class ExpressRepositoryImpl(
     ): Flow<BaseResult<ExpressAddressResponse>> {
         return toResultFlow(networkHelper = networkHelper) {
             (apiService as ExpressApiService).fetchAddress("Bearer ${token?.trim()}", request)
+        }
+    }
+
+    override suspend fun validateOffers(
+        token: String?,
+        paymentData: ProcessPaymentRequest?
+    ): Flow<BaseResult<OfferEligibilityResponse>> {
+        return toResultFlow(networkHelper = networkHelper) {
+            (apiService as CommonApiService).validateOffer(token, paymentData)
         }
     }
 }

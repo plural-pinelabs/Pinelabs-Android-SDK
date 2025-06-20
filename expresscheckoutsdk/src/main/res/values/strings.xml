@@ -151,5 +151,6 @@
     <string name="x_3_months">x %s months</string>
     <string name="x_one_time_processing_fee">%s One-time processing fee</string>
     <string name="total_payable">Total payable</string>
+    <string name="paying_in_emi_of_x_months">Paying in EMI of %s months</string>
 
 </resources>

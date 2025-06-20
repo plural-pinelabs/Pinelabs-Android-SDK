@@ -8,6 +8,7 @@ import com.plural_pinelabs.expresscheckoutsdk.data.model.ExpressAddressResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.FetchResponseDTO
 import com.plural_pinelabs.expresscheckoutsdk.data.model.OTPRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.model.OTPResponse
+import com.plural_pinelabs.expresscheckoutsdk.data.model.OfferEligibilityResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ProcessPaymentRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ProcessPaymentResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.SavedCardResponse
@@ -50,4 +51,9 @@ interface ExpressRepository {
     ): Flow<BaseResult<TransactionStatusResponse>>
 
     suspend fun fetchAddress(token: String?, request: ExpressAddress): Flow<BaseResult<ExpressAddressResponse>>
+
+    suspend fun validateOffers(
+        token: String?,
+        paymentData: ProcessPaymentRequest?
+    ): Flow<BaseResult<OfferEligibilityResponse>>
 }
