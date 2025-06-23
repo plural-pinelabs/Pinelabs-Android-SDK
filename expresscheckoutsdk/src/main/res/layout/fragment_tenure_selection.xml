@@ -55,7 +55,7 @@
         app:layout_constraintTop_toBottomOf="@id/top_bar_back_layout">
 
         <ImageView
-            android:id="@+id/wallet_logo"
+            android:id="@+id/logo"
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:background="@drawable/input_field_border"

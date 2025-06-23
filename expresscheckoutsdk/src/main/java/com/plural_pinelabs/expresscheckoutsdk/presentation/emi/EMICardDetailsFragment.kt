@@ -19,12 +19,17 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import coil.ImageLoader
+import coil.decode.SvgDecoder
+import coil.request.CachePolicy
+import coil.request.ImageRequest
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.plural_pinelabs.expresscheckoutsdk.ExpressSDKObject
 import com.plural_pinelabs.expresscheckoutsdk.R
 import com.plural_pinelabs.expresscheckoutsdk.common.BaseResult
 import com.plural_pinelabs.expresscheckoutsdk.common.CardFragmentViewModelFactory
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.BASE_IMAGES
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.BROWSER_ACCEPT_ALL
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.BROWSER_USER_AGENT_ANDROID
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.ERROR_KEY
@@ -62,6 +67,7 @@ class EMICardDetailsFragment : Fragment() {
     private lateinit var cardErrorText: TextView
     private lateinit var cardHolderErrorText: TextView
     private lateinit var backBtn: ImageView
+    private lateinit var logo: ImageView
 
     private var binData: CardBinMetaDataResponse? = null
     private var cardNumber: String = ""
@@ -72,6 +78,9 @@ class EMICardDetailsFragment : Fragment() {
     private var isCVVValid = false
     private var isCardHolderNameValid: Boolean = false
     private var bottomSheetDialog: BottomSheetDialog? = null
+    private lateinit var bankLogoMap: HashMap<String, String>
+    private lateinit var banKTitleToCodeMap: HashMap<String, String>
+    private lateinit var bankNameKeyList: List<String>
     private lateinit var viewModel: CardFragmentViewModel //TODO if required later move it to the its own view model or make this view model as common for two fr
 
     private var issuerId: String? = null
@@ -92,6 +101,7 @@ class EMICardDetailsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        mapBanKLogo()
         setEMIIssuer()
         setupViews(view)
         observeViewModel()
@@ -124,10 +134,41 @@ class EMICardDetailsFragment : Fragment() {
         cardHolderErrorText = view.findViewById(R.id.error_message_card_holder_name)
         cardErrorText = view.findViewById(R.id.error_message_card_details)
         backBtn = view.findViewById(R.id.back_button)
+        logo = view.findViewById(R.id.logo)
+        loadBankLogo()
         backBtn.setOnClickListener {
             findNavController().popBackStack()
         }
         setUpAmount()
+    }
+
+    private fun loadBankLogo() {
+        issuer?.let { item ->
+            val imageTitle =
+                bankNameKeyList.find {
+                    it.contains(
+                        item.display_name.removeSuffix(" BANK"),
+                        ignoreCase = true
+                    )
+                }
+
+            if (imageTitle != null) {
+                val imageUrl = BASE_IMAGES + bankLogoMap[banKTitleToCodeMap[imageTitle]]
+                val imageLoader = ImageLoader.Builder(requireContext())
+                    .components {
+                        add(SvgDecoder.Factory())
+                    }
+                    .crossfade(true)
+                    .build()
+                val request = ImageRequest.Builder(requireContext())
+                    .data(imageUrl)
+                    .target(logo)
+                    .memoryCachePolicy(CachePolicy.ENABLED)
+                    .build()
+                imageLoader.enqueue(request)
+            }
+
+        }
     }
 
     private fun setUpAmount() {
@@ -152,9 +193,6 @@ class EMICardDetailsFragment : Fragment() {
 
                         is BaseResult.Success -> {
                             bottomSheetDialog?.dismiss()
-                            navigateToNativeOTP(
-                                result.data.meta_data?.resend_after, result.data.next?.getOrNull(0)
-                            )
                         }
 
                         is BaseResult.Error -> {
@@ -281,17 +319,6 @@ class EMICardDetailsFragment : Fragment() {
                 }
             }
         }
-    }
-
-    private fun navigateToNativeOTP(resendAfter: String?, otpId: String?) {
-        val bundle = Bundle().apply {
-            putString("resend_after", resendAfter)
-            putString("otp_id", otpId)
-        }
-        bottomSheetDialog?.dismiss()
-        findNavController().navigate(
-            R.id.action_EMICardDetailsFragment_to_nativeOTPFragment, bundle
-        )
     }
 
     private fun redirectToACS(
@@ -682,5 +709,13 @@ class EMICardDetailsFragment : Fragment() {
         val otpRequest = OTPRequest(payment_id = paymentId)
         viewModel.generateOTP(ExpressSDKObject.getToken(), otpRequest)
     }
+
+
+    private fun mapBanKLogo() {
+        bankLogoMap = Utils.getBankLogoHashMap()
+        bankNameKeyList = Utils.getListOfBanKTitle()
+        banKTitleToCodeMap = Utils.bankTitleAndCodeMapper()
+    }
+
 
 }

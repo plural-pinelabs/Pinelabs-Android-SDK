@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
@@ -17,13 +18,22 @@ import com.plural_pinelabs.expresscheckoutsdk.common.Constants
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.TENURE_ID
 import com.plural_pinelabs.expresscheckoutsdk.common.ItemClickListener
 import com.plural_pinelabs.expresscheckoutsdk.common.PaymentModes
+import com.plural_pinelabs.expresscheckoutsdk.common.Utils
 import com.plural_pinelabs.expresscheckoutsdk.data.model.EMIPaymentModeData
 import com.plural_pinelabs.expresscheckoutsdk.data.model.Issuer
 import com.plural_pinelabs.expresscheckoutsdk.presentation.utils.DividerItemDecoration
 
 class EMIFragment : Fragment() {
     private lateinit var bankListRecyclerView: RecyclerView
+    private lateinit var emiCCPayment: TextView
+    private lateinit var emiCashlessPayment: TextView
+    private lateinit var emiDCPayment: TextView
     private lateinit var emiPaymentModeData: EMIPaymentModeData
+
+    private lateinit var bankLogoMap: HashMap<String, String>
+    private lateinit var banKTitleToCodeMap: HashMap<String, String>
+    private lateinit var bankNameKeyList: List<String>
+    private var currentSelectedTab: String? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -35,20 +45,39 @@ class EMIFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        mapBanKLogo()
         processDataForEMI()
         setViews(view)
     }
 
     private fun setViews(view: View) {
         bankListRecyclerView = view.findViewById(R.id.emi_bank_list_rv)
+        emiCCPayment = view.findViewById(R.id.emi_cc_selector_text)
+        emiDCPayment = view.findViewById(R.id.dc_emi_selector_text)
+        emiCashlessPayment = view.findViewById(R.id.card_less_selector_text)
         //TODO manage selection of all payment modes
+        emiCCPayment.setOnClickListener {
+            showEMIListBasedOnSelection(Constants.EMI_CC_TYPE)
+        }
+        emiDCPayment.setOnClickListener {
+            showEMIListBasedOnSelection(Constants.EMI_DC_TYPE)
+        }
+        emiCashlessPayment.setOnClickListener {
+            showEMIListBasedOnSelection(Constants.EMI_CASHLESS_TYPE)
+        }
         showEMIListBasedOnSelection(
             Constants.EMI_CC_TYPE
         )
     }
 
     private fun showEMIList(listOfCCBank: List<Issuer>) {
-        val adapter = EMIBankRecyclerViewAdapter(listOfCCBank, getItemClickListener())
+        val adapter = EMIBankRecyclerViewAdapter(
+            listOfCCBank,
+            getItemClickListener(),
+            bankLogoMap,
+            bankNameKeyList,
+            banKTitleToCodeMap
+        )
         bankListRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         bankListRecyclerView.addItemDecoration(
             DividerItemDecoration(
@@ -59,26 +88,51 @@ class EMIFragment : Fragment() {
     }
 
     private fun showEMIListBasedOnSelection(selection: String) {
+        if (!currentSelectedTab.isNullOrEmpty() && currentSelectedTab.equals(selection, true)) {
+            return // No change in selection, do nothing
+        }
+        currentSelectedTab = selection // Update the current selected tab
         when (selection) {
             Constants.EMI_CC_TYPE -> {
-                showEMIList(getListOfCCBanks(Constants.EMI_CC_TYPE))
+                showEMIList(getListOfBanks(Constants.EMI_CC_TYPE))
+                emiCCPayment.setTextColor(
+                    ContextCompat.getColor(requireContext(), R.color.white)
+                )
+                emiCCPayment.setBackgroundResource(R.drawable.emi_selected_mode_bg)
+                emiDCPayment.setBackgroundResource(android.R.color.transparent)
+                emiCashlessPayment.setBackgroundResource(android.R.color.transparent)
+                emiDCPayment.setTextColor(
+                    ContextCompat.getColor(requireContext(), R.color.black_text_80)
+                )
             }
 
             Constants.EMI_DC_TYPE -> {
+                emiDCPayment.setTextColor(
+                    ContextCompat.getColor(requireContext(), R.color.white)
+                )
+                emiDCPayment.setBackgroundResource(R.drawable.emi_selected_mode_bg)
                 // Handle DC type if needed
-                showEMIList(getListOfCCBanks(Constants.EMI_DC_TYPE))
+                showEMIList(getListOfBanks(Constants.EMI_DC_TYPE))
+                emiDCPayment.setBackgroundResource(R.drawable.emi_selected_mode_bg)
+                emiCCPayment.setBackgroundResource(android.R.color.transparent)
+                emiCashlessPayment.setBackgroundResource(android.R.color.transparent)
+                emiCCPayment.setTextColor(
+                    ContextCompat.getColor(requireContext(), R.color.black_text_80)
+                )
             }
 
             else -> {
                 // Handle other types or default case cardless
             }
         }
-        val listOfCCBank = getListOfCCBanks(Constants.EMI_CC_TYPE)
     }
 
-    private fun getListOfCCBanks(emiCcType: String): List<Issuer> {
+    private fun getListOfBanks(emiType: String): List<Issuer> {
         return emiPaymentModeData.issuers.filter { issuer ->
-            issuer.issuer_type.equals(emiCcType, true)
+            issuer.issuer_type.equals(
+                emiType,
+                true
+            ) && !(issuer.tenures.size == 1 && issuer.tenures[0].tenure_value == 0)
         }
 
     }
@@ -117,8 +171,10 @@ class EMIFragment : Fragment() {
 
     }
 
-    private fun mapBanKLogo(){
-
+    private fun mapBanKLogo() {
+        bankLogoMap = Utils.getBankLogoHashMap()
+        bankNameKeyList = Utils.getListOfBanKTitle()
+        banKTitleToCodeMap = Utils.bankTitleAndCodeMapper()
     }
 
 }

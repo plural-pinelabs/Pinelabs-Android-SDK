@@ -206,9 +206,6 @@
         android:name="com.plural_pinelabs.expresscheckoutsdk.presentation.emi.EMICardDetailsFragment"
         android:label="EMICardDetailsFragment" >
         <action
-            android:id="@+id/action_EMICardDetailsFragment_to_nativeOTPFragment"
-            app:destination="@id/nativeOTPFragment" />
-        <action
             android:id="@+id/action_EMICardDetailsFragment_to_ACSFragment"
             app:destination="@id/ACSFragment" />
         <action

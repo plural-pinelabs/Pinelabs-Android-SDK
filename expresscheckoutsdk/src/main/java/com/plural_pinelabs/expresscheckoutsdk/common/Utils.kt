@@ -27,15 +27,168 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.plural_pinelabs.expresscheckoutsdk.BuildConfig
 import com.plural_pinelabs.expresscheckoutsdk.R
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.ALLAHABAD_BANK_CODE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.ALLAHABAD_TITLE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.ANDHRA_BANK_CODE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.ANDHRA_CORPORATE_BANK_CODE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.ANDHRA_CORPORATE_TITLE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.ANDHRA_TITLE
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.APP_VERSION
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.AU_SMALL_FINANCE_BANK_CODE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.AU_SMALL_FINANCE_TITLE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.AXIS_BANK_CODE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.AXIS_TITLE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.BAHRAIN_AND_KUWAIT_BANK_CODE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.BAHRAIN_AND_KUWAIT_TITLE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.BANDHAN_BANK_CODE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.BANDHAN_BANK_CORPORATE_CODE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.BANDHAN_CORPORATE_TITLE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.BANDHAN_TITLE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.BARCLAYS_BANK_CODE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.BARCLAYS_TITLE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.BARODA_RETAIL_BANK_CODE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.BARODA_RETAIL_TITLE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.BARODA_TITLE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.BASSIEN_BANK_CODE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.BASSIEN_TITLE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.CANARA_BANK_CODE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.CANARA_TITLE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.CATHOLIC_SYRIAN_BANK_CODE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.CATHOLIC_SYRIAN_TITLE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.CENTRAL_BANK_CODE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.CENTRAL_TITLE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.CITY_UNION_BANK_CODE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.CITY_UNION_TITLE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.CORPORATION_BANK_CODE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.CORPORATION_CORPORATE_BANK_CODE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.CORPORATION_CORPORATE_TITLE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.CORPORATION_TITLE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.COSMOS_BANK_CODE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.COSMOS_TITLE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.DEDUSCHE_BANK_CODE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.DEDUSCHE_TITLE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.DEFAULT_BANK_CODE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.DEFAULT_TITLE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.DENA_BANK_CODE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.DENA_TITLE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.DEVELOPMENT_CREDIT_BANK_CODE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.DEVELOPMENT_CREDIT_TITLE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.DHANLAXMI_BANK_CODE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.DHANLAXMI_CORPORATE_BANK_CODE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.DHANLAXMI_CORPORATE_TITLE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.DHANLAXMI_TITLE
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.EMAIL_REGEX
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.EQUITAS_BANK_CODE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.EQUITAS_TITLE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.ESAF_BANK_CODE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.ESAF_TITLE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.FEDERAL_BANK_CODE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.FEDERAL_TITLE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.FINCARE_BANK_CODE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.FINCARE_TITLE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.HDFC_BANK_CODE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.HDFC_TITLE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.ICICI_BANK_CODE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.ICICI_TITLE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.IDBI_BANK_CODE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.IDBI_CORPORATE_BANK_CODE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.IDBI_CORPORATE_TITLE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.IDBI_TITLE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.IDFC_FIRST_BANK_CODE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.IDFC_FIRST_TITLE
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.IMAGE_LOGO
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.INDIAN_BANK_CODE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.INDIAN_OVERSEAS_BANK_CODE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.INDIAN_OVERSEAS_TITLE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.INDIAN_TITLE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.INDUSIND_BANK_CODE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.INDUSIND_TITLE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.JANATA_SAHAKARI_BANK_CODE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.JANATA_SAHAKARI_TITLE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.JK_BANK_CODE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.JK_TITLE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.KALYAN_JANATA_BANK_CODE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.KALYAN_JANATA_TITLE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.KARNATAKA_BANK_CODE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.KARNATAKA_GRAMIN_BANK_CODE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.KARNATAKA_GRAMIN_TITLE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.KARNATAKA_TITLE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.KARUR_VYSYA_BANK_CODE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.KARUR_VYSYA_TITLE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.KOTAK_BANK_CODE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.KOTAK_TITLE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.LAXMI_VILAS_BANK_CODE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.LAXMI_VILAS_BANK_RETAIL_CODE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.LAXMI_VILAS_RETAIL_TITLE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.LAXMI_VILAS_TITLE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.MAHARASHTRA_BANK_CODE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.MAHARASHTRA_TITLE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.MEHSANA_URBAN_BANK_CODE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.MEHSANA_URBAN_TITLE
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.MOBILE_REGEX
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.NORTH_EAST_BANK_CODE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.NORTH_EAST_TITLE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.ORIENTAL_BANK_CODE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.ORIENTAL_TITLE
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.OS
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PLATFORM_TYPE
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PLATFORM_VERSION
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PNB_BANK_CODE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PNB_CORPORATE_BANK_CODE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PNB_CORPORATE_TITLE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PNB_TITLE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PUNJAB_AND_SINDH_BANK_CODE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PUNJAB_AND_SINDH_TITLE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PUNJAB_MAHARASHTRA_BANK_CODE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PUNJAB_MAHARASHTRA_TITLE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.RBL_BANK_CODE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.RBL_CORPORATE_BANK_CODE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.RBL_CORPORATE_TITLE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.RBL_TITLE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.SARASWAT_BANK_CODE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.SARASWAT_TITLE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.SBI_BANK_CODE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.SBI_TITLE
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.SDK_TYPE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.SHAMRO_VITHAL_BANK_CODE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.SHAMRO_VITHAL_CORPORATE_BANK_CODE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.SHAMRO_VITHAL_CORPORATE_TITLE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.SHAMRO_VITHAL_TITLE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.SOUTH_INDIAN_BANK_CODE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.SOUTH_INDIAN_TITLE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.STANDARD_CHARTERED_BANK_CODE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.STANDARD_CHARTERED_TITLE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.SURYODAY_BANK_CODE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.SURYODAY_TITLE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.SYNDICATE_BANK_CODE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.SYNDICATE_TITLE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.TAMILNAD_MERCHANTILE_BANK_CODE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.TAMILNAD_MERCHANTILE_TITLE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.TAMIL_NADU_STATE_COOP_BANK_CODE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.TAMIL_NADU_STATE_COOP_TITLE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.THANE_BHARAT_BANK_CODE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.THANE_BHARAT_TITLE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.THE_KALUPUR_BANK_CODE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.THE_KALUPUR_TITLE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.TJSB_BANK_CODE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.TJSB_TITLE
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.TRANSACTION_TYPE_SDK
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.UCO_BANK_CODE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.UCO_TITLE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.UNION_BANK_CODE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.UNION_TITLE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.UNITED_BANK_CODE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.UNITED_TITLE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.VARACHHA_BANK_CODE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.VARACHHA_TITLE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.VIJAYA_BANK_CODE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.VIJAYA_TITLE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.YES_BANK_CODE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.YES_CORPORATE_BANK_CODE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.YES_CORPORATE_TITLE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.YES_TITLE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.ZOROASTRAIN_BANK_CODE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.ZOROASTRAIN_TITLE
 import com.plural_pinelabs.expresscheckoutsdk.data.model.Palette
 import com.plural_pinelabs.expresscheckoutsdk.data.model.PaymentMode
 import com.plural_pinelabs.expresscheckoutsdk.data.model.RecyclerViewPaymentOptionData
@@ -47,6 +200,7 @@ import java.text.DecimalFormat
 import java.util.TimeZone
 import java.util.regex.Pattern
 import kotlin.math.pow
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.BARODA_BANK_CODE as BARODA_BANK_CODE1
 
 internal object Utils {
 
@@ -437,6 +591,255 @@ internal object Utils {
         val remainingSeconds = seconds % 60
         Log.d("timer", "Minutes: $minutes, Remaining Seconds: $remainingSeconds")
         return String.format(context.getString(R.string.timer_format), minutes, remainingSeconds)
+    }
+
+    fun getBankLogoHashMap(): HashMap<String, String> {
+        val hashMap = HashMap<String, String>()
+        hashMap[Constants.AXIS_BANK_CODE] = Constants.AXIS
+        hashMap[Constants.HDFC_BANK_CODE] = Constants.HDFC
+        hashMap[Constants.ICICI_BANK_CODE] = Constants.ICICI
+        hashMap[Constants.JK_BANK_CODE] = Constants.JK
+        hashMap[Constants.FEDERAL_BANK_CODE] = Constants.FEDERAL
+        hashMap[Constants.KARNATAKA_BANK_CODE] = Constants.KARNATAKA
+        hashMap[Constants.CORPORATION_BANK_CODE] = Constants.CORPORATION
+        hashMap[Constants.INDIAN_BANK_CODE] = Constants.INDIAN
+        hashMap[Constants.YES_BANK_CODE] = Constants.YES
+        hashMap[Constants.CENTRAL_BANK_CODE] = Constants.CENTRAL
+        hashMap[Constants.KOTAK_BANK_CODE] = Constants.KOTAK
+        hashMap[Constants.ORIENTAL_BANK_CODE] = Constants.ORIENTAL
+        hashMap[Constants.UNITED_BANK_CODE] = Constants.UNITED_BANK
+        hashMap[Constants.INDIAN_OVERSEAS_BANK_CODE] = Constants.INDIAN_OVERSEAS
+        hashMap[Constants.CITY_UNION_BANK_CODE] = Constants.CITY_UNION
+        hashMap[Constants.UNION_BANK_CODE] = Constants.UNION_BANK
+        hashMap[Constants.CANARA_BANK_CODE] = Constants.CANARA_BANK
+        hashMap[Constants.MAHARASHTRA_BANK_CODE] = Constants.MAHARASHTRA_BANK
+        hashMap[Constants.CATHOLIC_SYRIAN_BANK_CODE] = Constants.CATHOLIC_SYRIAN
+        hashMap[Constants.DHANLAXMI_BANK_CODE] = Constants.DHANALAKSHMI
+        hashMap[Constants.ANDHRA_BANK_CODE] = Constants.ANDHRA
+        hashMap[Constants.VIJAYA_BANK_CODE] = Constants.VIJAYA
+        hashMap[Constants.SARASWAT_BANK_CODE] = Constants.SARASWAT
+        hashMap[Constants.PNB_BANK_CODE] = Constants.PNB
+        hashMap[Constants.UCO_BANK_CODE] = Constants.UCO
+        hashMap[Constants.PUNJAB_AND_SINDH_BANK_CODE] = Constants.PUNJAB_AND_SINDH
+        hashMap[Constants.INDUSIND_BANK_CODE] = Constants.INDUSIND
+        hashMap[Constants.TAMILNAD_MERCHANTILE_BANK_CODE] = Constants.TAMINAD_MERCHANTILE
+        hashMap[Constants.COSMOS_BANK_CODE] = Constants.COSMOS
+        hashMap[Constants.PNB_CORPORATE_BANK_CODE] = Constants.PNB_CORPORATE
+        hashMap[Constants.ANDHRA_CORPORATE_BANK_CODE] = Constants.ANDHRA_CORPORATE
+        hashMap[BARODA_BANK_CODE1] = Constants.BARODA
+        hashMap[Constants.BAHRAIN_AND_KUWAIT_BANK_CODE] = Constants.BAHRAIN_KUWAIT
+        hashMap[Constants.BARODA_RETAIL_BANK_CODE] = Constants.BARODA_RETAIL
+        hashMap[Constants.DEDUSCHE_BANK_CODE] = Constants.DEDUSHE
+        hashMap[Constants.DEVELOPMENT_CREDIT_BANK_CODE] = Constants.DEVELOPMENT
+        hashMap[Constants.DENA_BANK_CODE] = Constants.DENA
+        hashMap[Constants.IDBI_BANK_CODE] = Constants.IDBI
+        hashMap[Constants.KARUR_VYSYA_BANK_CODE] = Constants.KARUR
+        hashMap[Constants.LAXMI_VILAS_BANK_CODE] = Constants.LAXMI_VILAS
+        hashMap[Constants.LAXMI_VILAS_BANK_RETAIL_CODE] = Constants.LAXMI_VILAS_RETAIL
+        hashMap[Constants.PUNJAB_MAHARASHTRA_BANK_CODE] = Constants.PUNJAB_MAHARASHTRA
+        hashMap[Constants.STANDARD_CHARTERED_BANK_CODE] = Constants.STANDARD_CHARTERED_BANK
+        hashMap[Constants.SOUTH_INDIAN_BANK_CODE] = Constants.SOUTH_INDIAN_BANK
+        hashMap[Constants.SHAMRO_VITHAL_BANK_CODE] = Constants.SHAMRO
+        hashMap[Constants.SYNDICATE_BANK_CODE] = Constants.SYNDICATE
+        hashMap[Constants.TAMIL_NADU_STATE_COOP_BANK_CODE] = Constants.TAMIL_NADU_STATE_COORP
+        hashMap[Constants.JANATA_SAHAKARI_BANK_CODE] = Constants.JANATA
+        hashMap[Constants.TJSB_BANK_CODE] = Constants.TJSB
+        hashMap[Constants.KALYAN_JANATA_BANK_CODE] = Constants.KALYAN_JANATA
+        hashMap[Constants.MEHSANA_URBAN_BANK_CODE] = Constants.MEHSANA
+        hashMap[Constants.BANDHAN_BANK_CODE] = Constants.BANDHAN
+        hashMap[Constants.IDFC_FIRST_BANK_CODE] = Constants.IDFC
+        hashMap[Constants.BASSIEN_BANK_CODE] = Constants.BASSIEN
+        hashMap[Constants.RBL_BANK_CODE] = Constants.RBL
+        hashMap[Constants.THE_KALUPUR_BANK_CODE] = Constants.KALUPUR
+        hashMap[Constants.THANE_BHARAT_BANK_CODE] = Constants.THANE
+        hashMap[Constants.SURYODAY_BANK_CODE] = Constants.SURYODAY
+        hashMap[Constants.ESAF_BANK_CODE] = Constants.ESAF
+        hashMap[Constants.VARACHHA_BANK_CODE] = Constants.VARACHHA
+        hashMap[Constants.NORTH_EAST_BANK_CODE] = Constants.NORTH_EAST
+        hashMap[Constants.IDBI_CORPORATE_BANK_CODE] = Constants.IDBI_CORPORATE
+        hashMap[Constants.YES_CORPORATE_BANK_CODE] = Constants.YES_CORPORATE
+        hashMap[Constants.CORPORATION_CORPORATE_BANK_CODE] = Constants.CORPORATION_CORPORATE
+        hashMap[Constants.RBL_CORPORATE_BANK_CODE] = Constants.RBL_CORPORATE
+        hashMap[Constants.SHAMRO_VITHAL_CORPORATE_BANK_CODE] = Constants.SHAMRO_CORPORATE
+        hashMap[Constants.DHANLAXMI_CORPORATE_BANK_CODE] = Constants.DHANLAKSHMI
+        hashMap[Constants.BARCLAYS_BANK_CODE] = Constants.BARCLAYS
+        hashMap[ZOROASTRAIN_BANK_CODE] = Constants.ZOROASTRAIN
+        hashMap[Constants.AU_SMALL_FINANCE_BANK_CODE] = Constants.AU
+        hashMap[Constants.ALLAHABAD_BANK_CODE] = Constants.ALLAHABAD
+        hashMap[Constants.SBI_BANK_CODE] = Constants.SBI
+        hashMap[Constants.FINCARE_BANK_CODE] = Constants.FINCARE
+        hashMap[Constants.BANDHAN_BANK_CORPORATE_CODE] = Constants.BANDHAN_CORPORATE
+        hashMap[Constants.KARNATAKA_GRAMIN_BANK_CODE] = Constants.KARNATAKA_GRAMIN
+        hashMap[Constants.DEFAULT_BANK_CODE] = Constants.BASE_IMAGES
+        return hashMap
+    }
+
+    fun getListOfBanKTitle(): List<String> {
+        val bankTitleKeys = listOf(
+            AXIS_TITLE,
+            HDFC_TITLE,
+            JK_TITLE,
+            ICICI_TITLE,
+            FEDERAL_TITLE,
+            KARNATAKA_TITLE,
+            CORPORATION_TITLE,
+            INDIAN_TITLE,
+            YES_TITLE,
+            CENTRAL_TITLE,
+            KOTAK_TITLE,
+            ORIENTAL_TITLE,
+            UNITED_TITLE,
+            INDIAN_OVERSEAS_TITLE,
+            CITY_UNION_TITLE,
+            UNION_TITLE,
+            CANARA_TITLE,
+            MAHARASHTRA_TITLE,
+            CATHOLIC_SYRIAN_TITLE,
+            DHANLAXMI_TITLE,
+            ANDHRA_TITLE,
+            VIJAYA_TITLE,
+            SARASWAT_TITLE,
+            PNB_TITLE,
+            UCO_TITLE,
+            PUNJAB_AND_SINDH_TITLE,
+            INDUSIND_TITLE,
+            TAMILNAD_MERCHANTILE_TITLE,
+            COSMOS_TITLE,
+            PNB_CORPORATE_TITLE,
+            ANDHRA_CORPORATE_TITLE,
+            BARODA_TITLE,
+            BAHRAIN_AND_KUWAIT_TITLE,
+            BARODA_RETAIL_TITLE,
+            DEDUSCHE_TITLE,
+            DEVELOPMENT_CREDIT_TITLE,
+            DENA_TITLE,
+            IDBI_TITLE,
+            KARUR_VYSYA_TITLE,
+            LAXMI_VILAS_TITLE,
+            LAXMI_VILAS_RETAIL_TITLE,
+            PUNJAB_MAHARASHTRA_TITLE,
+            STANDARD_CHARTERED_TITLE,
+            SOUTH_INDIAN_TITLE,
+            SHAMRO_VITHAL_TITLE,
+            SYNDICATE_TITLE,
+            TAMIL_NADU_STATE_COOP_TITLE,
+            JANATA_SAHAKARI_TITLE,
+            TJSB_TITLE,
+            KALYAN_JANATA_TITLE,
+            MEHSANA_URBAN_TITLE,
+            BANDHAN_TITLE,
+            IDFC_FIRST_TITLE,
+            BASSIEN_TITLE,
+            RBL_TITLE,
+            THE_KALUPUR_TITLE,
+            EQUITAS_TITLE,
+            THANE_BHARAT_TITLE,
+            SURYODAY_TITLE,
+            ESAF_TITLE,
+            VARACHHA_TITLE,
+            NORTH_EAST_TITLE,
+            IDBI_CORPORATE_TITLE,
+            YES_CORPORATE_TITLE,
+            CORPORATION_CORPORATE_TITLE,
+            RBL_CORPORATE_TITLE,
+            SHAMRO_VITHAL_CORPORATE_TITLE,
+            DHANLAXMI_CORPORATE_TITLE,
+            BARCLAYS_TITLE,
+            ZOROASTRAIN_TITLE,
+            AU_SMALL_FINANCE_TITLE,
+            ALLAHABAD_TITLE,
+            SBI_TITLE,
+            FINCARE_TITLE,
+            BANDHAN_CORPORATE_TITLE,
+            KARNATAKA_GRAMIN_TITLE,
+            DEFAULT_TITLE
+        )
+        return bankTitleKeys
+    }
+
+    fun bankTitleAndCodeMapper(
+    ): HashMap<String, String> {
+        val bankTitleToCodeMap = hashMapOf(
+            AXIS_TITLE to AXIS_BANK_CODE,
+            HDFC_TITLE to HDFC_BANK_CODE,
+            JK_TITLE to JK_BANK_CODE,
+            ICICI_TITLE to ICICI_BANK_CODE,
+            FEDERAL_TITLE to FEDERAL_BANK_CODE,
+            KARNATAKA_TITLE to KARNATAKA_BANK_CODE,
+            CORPORATION_TITLE to CORPORATION_BANK_CODE,
+            INDIAN_TITLE to INDIAN_BANK_CODE,
+            YES_TITLE to YES_BANK_CODE,
+            CENTRAL_TITLE to CENTRAL_BANK_CODE,
+            KOTAK_TITLE to KOTAK_BANK_CODE,
+            ORIENTAL_TITLE to ORIENTAL_BANK_CODE,
+            UNITED_TITLE to UNITED_BANK_CODE,
+            INDIAN_OVERSEAS_TITLE to INDIAN_OVERSEAS_BANK_CODE,
+            CITY_UNION_TITLE to CITY_UNION_BANK_CODE,
+            UNION_TITLE to UNION_BANK_CODE,
+            CANARA_TITLE to CANARA_BANK_CODE,
+            MAHARASHTRA_TITLE to MAHARASHTRA_BANK_CODE,
+            CATHOLIC_SYRIAN_TITLE to CATHOLIC_SYRIAN_BANK_CODE,
+            DHANLAXMI_TITLE to DHANLAXMI_BANK_CODE,
+            ANDHRA_TITLE to ANDHRA_BANK_CODE,
+            VIJAYA_TITLE to VIJAYA_BANK_CODE,
+            SARASWAT_TITLE to SARASWAT_BANK_CODE,
+            PNB_TITLE to PNB_BANK_CODE,
+            UCO_TITLE to UCO_BANK_CODE,
+            PUNJAB_AND_SINDH_TITLE to PUNJAB_AND_SINDH_BANK_CODE,
+            INDUSIND_TITLE to INDUSIND_BANK_CODE,
+            TAMILNAD_MERCHANTILE_TITLE to TAMILNAD_MERCHANTILE_BANK_CODE,
+            COSMOS_TITLE to COSMOS_BANK_CODE,
+            PNB_CORPORATE_TITLE to PNB_CORPORATE_BANK_CODE,
+            ANDHRA_CORPORATE_TITLE to ANDHRA_CORPORATE_BANK_CODE,
+            BARODA_TITLE to BARODA_BANK_CODE1,
+            BAHRAIN_AND_KUWAIT_TITLE to BAHRAIN_AND_KUWAIT_BANK_CODE,
+            BARODA_RETAIL_TITLE to BARODA_RETAIL_BANK_CODE,
+            DEDUSCHE_TITLE to DEDUSCHE_BANK_CODE,
+            DEVELOPMENT_CREDIT_TITLE to DEVELOPMENT_CREDIT_BANK_CODE,
+            DENA_TITLE to DENA_BANK_CODE,
+            IDBI_TITLE to IDBI_BANK_CODE,
+            KARUR_VYSYA_TITLE to KARUR_VYSYA_BANK_CODE,
+            LAXMI_VILAS_TITLE to LAXMI_VILAS_BANK_CODE,
+            LAXMI_VILAS_RETAIL_TITLE to LAXMI_VILAS_BANK_RETAIL_CODE,
+            PUNJAB_MAHARASHTRA_TITLE to PUNJAB_MAHARASHTRA_BANK_CODE,
+            STANDARD_CHARTERED_TITLE to STANDARD_CHARTERED_BANK_CODE,
+            SOUTH_INDIAN_TITLE to SOUTH_INDIAN_BANK_CODE,
+            SHAMRO_VITHAL_TITLE to SHAMRO_VITHAL_BANK_CODE,
+            SYNDICATE_TITLE to SYNDICATE_BANK_CODE,
+            TAMIL_NADU_STATE_COOP_TITLE to TAMIL_NADU_STATE_COOP_BANK_CODE,
+            JANATA_SAHAKARI_TITLE to JANATA_SAHAKARI_BANK_CODE,
+            TJSB_TITLE to TJSB_BANK_CODE,
+            KALYAN_JANATA_TITLE to KALYAN_JANATA_BANK_CODE,
+            MEHSANA_URBAN_TITLE to MEHSANA_URBAN_BANK_CODE,
+            BANDHAN_TITLE to BANDHAN_BANK_CODE,
+            IDFC_FIRST_TITLE to IDFC_FIRST_BANK_CODE,
+            BASSIEN_TITLE to BASSIEN_BANK_CODE,
+            RBL_TITLE to RBL_BANK_CODE,
+            THE_KALUPUR_TITLE to THE_KALUPUR_BANK_CODE,
+            EQUITAS_TITLE to EQUITAS_BANK_CODE,
+            THANE_BHARAT_TITLE to THANE_BHARAT_BANK_CODE,
+            SURYODAY_TITLE to SURYODAY_BANK_CODE,
+            ESAF_TITLE to ESAF_BANK_CODE,
+            VARACHHA_TITLE to VARACHHA_BANK_CODE,
+            NORTH_EAST_TITLE to NORTH_EAST_BANK_CODE,
+            IDBI_CORPORATE_TITLE to IDBI_CORPORATE_BANK_CODE,
+            YES_CORPORATE_TITLE to YES_CORPORATE_BANK_CODE,
+            CORPORATION_CORPORATE_TITLE to CORPORATION_CORPORATE_BANK_CODE,
+            RBL_CORPORATE_TITLE to RBL_CORPORATE_BANK_CODE,
+            SHAMRO_VITHAL_CORPORATE_TITLE to SHAMRO_VITHAL_CORPORATE_BANK_CODE,
+            DHANLAXMI_CORPORATE_TITLE to DHANLAXMI_CORPORATE_BANK_CODE,
+            BARCLAYS_TITLE to BARCLAYS_BANK_CODE,
+            ZOROASTRAIN_TITLE to ZOROASTRAIN_BANK_CODE,
+            AU_SMALL_FINANCE_TITLE to AU_SMALL_FINANCE_BANK_CODE,
+            ALLAHABAD_TITLE to ALLAHABAD_BANK_CODE,
+            SBI_TITLE to SBI_BANK_CODE,
+            FINCARE_TITLE to FINCARE_BANK_CODE,
+            BANDHAN_CORPORATE_TITLE to BANDHAN_BANK_CORPORATE_CODE,
+            KARNATAKA_GRAMIN_TITLE to KARNATAKA_GRAMIN_BANK_CODE,
+            DEFAULT_TITLE to DEFAULT_BANK_CODE
+        )
+        return bankTitleToCodeMap
+
     }
 
 }

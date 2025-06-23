@@ -27,7 +27,6 @@ import com.google.gson.internal.LinkedTreeMap
 import com.plural_pinelabs.expresscheckoutsdk.ExpressSDKObject
 import com.plural_pinelabs.expresscheckoutsdk.R
 import com.plural_pinelabs.expresscheckoutsdk.common.BaseResult
-import com.plural_pinelabs.expresscheckoutsdk.common.Constants
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.BASE_IMAGES
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.ERROR_KEY
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.ERROR_MESSAGE_KEY
@@ -39,6 +38,7 @@ import com.plural_pinelabs.expresscheckoutsdk.common.NetworkHelper
 import com.plural_pinelabs.expresscheckoutsdk.common.PaymentModes
 import com.plural_pinelabs.expresscheckoutsdk.common.TransactionMode
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils
+import com.plural_pinelabs.expresscheckoutsdk.common.Utils.getBankLogoHashMap
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils.showProcessPaymentBottomSheetDialog
 import com.plural_pinelabs.expresscheckoutsdk.data.model.AcquirerWisePaymentData
 import com.plural_pinelabs.expresscheckoutsdk.data.model.DeviceInfo
@@ -318,87 +318,6 @@ class NetBankingFragment : Fragment() {
 
     }
 
-
-    private fun getBankLogoHashMap(): HashMap<String, String> {
-        val hashMap = HashMap<String, String>()
-        hashMap[Constants.AXIS_BANK_CODE] = Constants.AXIS
-        hashMap[Constants.HDFC_BANK_CODE] = Constants.HDFC
-        hashMap[Constants.ICICI_BANK_CODE] = Constants.ICICI
-        hashMap[Constants.JK_BANK_CODE] = Constants.JK
-        hashMap[Constants.FEDERAL_BANK_CODE] = Constants.FEDERAL
-        hashMap[Constants.KARNATAKA_BANK_CODE] = Constants.KARNATAKA
-        hashMap[Constants.CORPORATION_BANK_CODE] = Constants.CORPORATION
-        hashMap[Constants.INDIAN_BANK_CODE] = Constants.INDIAN
-        hashMap[Constants.YES_BANK_CODE] = Constants.YES
-        hashMap[Constants.CENTRAL_BANK_CODE] = Constants.CENTRAL
-        hashMap[Constants.KOTAK_BANK_CODE] = Constants.KOTAK
-        hashMap[Constants.ORIENTAL_BANK_CODE] = Constants.ORIENTAL
-        hashMap[Constants.UNITED_BANK_CODE] = Constants.UNITED_BANK
-        hashMap[Constants.INDIAN_OVERSEAS_BANK_CODE] = Constants.INDIAN_OVERSEAS
-        hashMap[Constants.CITY_UNION_BANK_CODE] = Constants.CITY_UNION
-        hashMap[Constants.UNION_BANK_CODE] = Constants.UNION_BANK
-        hashMap[Constants.CANARA_BANK_CODE] = Constants.CANARA_BANK
-        hashMap[Constants.MAHARASHTRA_BANK_CODE] = Constants.MAHARASHTRA_BANK
-        hashMap[Constants.CATHOLIC_SYRIAN_BANK_CODE] = Constants.CATHOLIC_SYRIAN
-        hashMap[Constants.DHANLAXMI_BANK_CODE] = Constants.DHANALAKSHMI
-        hashMap[Constants.ANDHRA_BANK_CODE] = Constants.ANDHRA
-        hashMap[Constants.VIJAYA_BANK_CODE] = Constants.VIJAYA
-        hashMap[Constants.SARASWAT_BANK_CODE] = Constants.SARASWAT
-        hashMap[Constants.PNB_BANK_CODE] = Constants.PNB
-        hashMap[Constants.UCO_BANK_CODE] = Constants.UCO
-        hashMap[Constants.PUNJAB_AND_SINDH_BANK_CODE] = Constants.PUNJAB_AND_SINDH
-        hashMap[Constants.INDUSIND_BANK_CODE] = Constants.INDUSIND
-        hashMap[Constants.TAMILNAD_MERCHANTILE_BANK_CODE] = Constants.TAMINAD_MERCHANTILE
-        hashMap[Constants.COSMOS_BANK_CODE] = Constants.COSMOS
-        hashMap[Constants.PNB_CORPORATE_BANK_CODE] = Constants.PNB_CORPORATE
-        hashMap[Constants.ANDHRA_CORPORATE_BANK_CODE] = Constants.ANDHRA_CORPORATE
-        hashMap[Constants.BARODA_BANK_CODE] = Constants.BARODA
-        hashMap[Constants.BAHRAIN_AND_KUWAIT_BANK_CODE] = Constants.BAHRAIN_KUWAIT
-        hashMap[Constants.BARODA_RETAIL_BANK_CODE] = Constants.BARODA_RETAIL
-        hashMap[Constants.DEDUSCHE_BANK_CODE] = Constants.DEDUSHE
-        hashMap[Constants.DEVELOPMENT_CREDIT_BANK_CODE] = Constants.DEVELOPMENT
-        hashMap[Constants.DENA_BANK_CODE] = Constants.DENA
-        hashMap[Constants.IDBI_BANK_CODE] = Constants.IDBI
-        hashMap[Constants.KARUR_VYSYA_BANK_CODE] = Constants.KARUR
-        hashMap[Constants.LAXMI_VILAS_BANK_CODE] = Constants.LAXMI_VILAS
-        hashMap[Constants.LAXMI_VILAS_BANK_RETAIL_CODE] = Constants.LAXMI_VILAS_RETAIL
-        hashMap[Constants.PUNJAB_MAHARASHTRA_BANK_CODE] = Constants.PUNJAB_MAHARASHTRA
-        hashMap[Constants.STANDARD_CHARTERED_BANK_CODE] = Constants.STANDARD_CHARTERED_BANK
-        hashMap[Constants.SOUTH_INDIAN_BANK_CODE] = Constants.SOUTH_INDIAN_BANK
-        hashMap[Constants.SHAMRO_VITHAL_BANK_CODE] = Constants.SHAMRO
-        hashMap[Constants.SYNDICATE_BANK_CODE] = Constants.SYNDICATE
-        hashMap[Constants.TAMIL_NADU_STATE_COOP_BANK_CODE] = Constants.TAMIL_NADU_STATE_COORP
-        hashMap[Constants.JANATA_SAHAKARI_BANK_CODE] = Constants.JANATA
-        hashMap[Constants.TJSB_BANK_CODE] = Constants.TJSB
-        hashMap[Constants.KALYAN_JANATA_BANK_CODE] = Constants.KALYAN_JANATA
-        hashMap[Constants.MEHSANA_URBAN_BANK_CODE] = Constants.MEHSANA
-        hashMap[Constants.BANDHAN_BANK_CODE] = Constants.BANDHAN
-        hashMap[Constants.IDFC_FIRST_BANK_CODE] = Constants.IDFC
-        hashMap[Constants.BASSIEN_BANK_CODE] = Constants.BASSIEN
-        hashMap[Constants.RBL_BANK_CODE] = Constants.RBL
-        hashMap[Constants.THE_KALUPUR_BANK_CODE] = Constants.KALUPUR
-        hashMap[Constants.THANE_BHARAT_BANK_CODE] = Constants.THANE
-        hashMap[Constants.SURYODAY_BANK_CODE] = Constants.SURYODAY
-        hashMap[Constants.ESAF_BANK_CODE] = Constants.ESAF
-        hashMap[Constants.VARACHHA_BANK_CODE] = Constants.VARACHHA
-        hashMap[Constants.NORTH_EAST_BANK_CODE] = Constants.NORTH_EAST
-        hashMap[Constants.IDBI_CORPORATE_BANK_CODE] = Constants.IDBI_CORPORATE
-        hashMap[Constants.YES_CORPORATE_BANK_CODE] = Constants.YES_CORPORATE
-        hashMap[Constants.CORPORATION_CORPORATE_BANK_CODE] = Constants.CORPORATION_CORPORATE
-        hashMap[Constants.RBL_CORPORATE_BANK_CODE] = Constants.RBL_CORPORATE
-        hashMap[Constants.SHAMRO_VITHAL_CORPORATE_BANK_CODE] = Constants.SHAMRO_CORPORATE
-        hashMap[Constants.DHANLAXMI_CORPORATE_BANK_CODE] = Constants.DHANLAKSHMI
-        hashMap[Constants.BARCLAYS_BANK_CODE] = Constants.BARCLAYS
-        hashMap[Constants.ZOROASTRAIN_BANK_CODE] = Constants.ZOROASTRAIN
-        hashMap[Constants.AU_SMALL_FINANCE_BANK_CODE] = Constants.AU
-        hashMap[Constants.ALLAHABAD_BANK_CODE] = Constants.ALLAHABAD
-        hashMap[Constants.SBI_BANK_CODE] = Constants.SBI
-        hashMap[Constants.FINCARE_BANK_CODE] = Constants.FINCARE
-        hashMap[Constants.BANDHAN_BANK_CORPORATE_CODE] = Constants.BANDHAN_CORPORATE
-        hashMap[Constants.KARNATAKA_GRAMIN_BANK_CODE] = Constants.KARNATAKA_GRAMIN
-        hashMap[Constants.DEFAULT_BANK_CODE] = Constants.BASE_IMAGES
-        return hashMap
-    }
 
     private fun createProcessPaymentRequest(
         bankName: String?,

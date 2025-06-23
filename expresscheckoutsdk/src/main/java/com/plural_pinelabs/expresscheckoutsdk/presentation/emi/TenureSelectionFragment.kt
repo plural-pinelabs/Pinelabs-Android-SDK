@@ -11,11 +11,17 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import coil.ImageLoader
+import coil.decode.SvgDecoder
+import coil.request.CachePolicy
+import coil.request.ImageRequest
 import com.plural_pinelabs.expresscheckoutsdk.ExpressSDKObject
 import com.plural_pinelabs.expresscheckoutsdk.R
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.BASE_IMAGES
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.ISSUE_ID
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.TENURE_ID
 import com.plural_pinelabs.expresscheckoutsdk.common.ItemClickListener
+import com.plural_pinelabs.expresscheckoutsdk.common.Utils
 import com.plural_pinelabs.expresscheckoutsdk.data.model.EMIPaymentModeData
 import com.plural_pinelabs.expresscheckoutsdk.data.model.Issuer
 import com.plural_pinelabs.expresscheckoutsdk.data.model.Tenure
@@ -25,11 +31,15 @@ class TenureSelectionFragment : Fragment() {
     private lateinit var goBackButton: ImageView
     private lateinit var tenureListRecyclerView: RecyclerView
     private lateinit var emiPayingInMonthsTv: TextView
+    private lateinit var logo: ImageView
 
     private var selectedIssuerId: String? = null
     private var issuer: Issuer? = null
     private var emiPaymentModeData: EMIPaymentModeData? = null
     private var selectedTenure: Tenure? = null
+    private lateinit var bankLogoMap: HashMap<String, String>
+    private lateinit var banKTitleToCodeMap: HashMap<String, String>
+    private lateinit var bankNameKeyList: List<String>
 
 
     override fun onCreateView(
@@ -42,6 +52,7 @@ class TenureSelectionFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        mapBanKLogo()
         setEMIIssuer()
         setViews(view)
         showListOfTenure()
@@ -65,8 +76,39 @@ class TenureSelectionFragment : Fragment() {
         goBackButton = view.findViewById(R.id.back_button)
         tenureListRecyclerView = view.findViewById(R.id.tenure_list_rv)
         emiPayingInMonthsTv = view.findViewById(R.id.emi_info_text)
+        logo = view.findViewById(R.id.logo)
+        loadBankLogo()
         view.findViewById<Button>(R.id.continue_btn).setOnClickListener {
             handleContinueButtonClick()
+        }
+    }
+
+    private fun loadBankLogo() {
+        issuer?.let { item ->
+            val imageTitle =
+                bankNameKeyList.find {
+                    it.contains(
+                        item.display_name.removeSuffix(" BANK"),
+                        ignoreCase = true
+                    )
+                }
+
+            if (imageTitle != null) {
+                val imageUrl = BASE_IMAGES + bankLogoMap[banKTitleToCodeMap[imageTitle]]
+                val imageLoader = ImageLoader.Builder(requireContext())
+                    .components {
+                        add(SvgDecoder.Factory())
+                    }
+                    .crossfade(true)
+                    .build()
+                val request = ImageRequest.Builder(requireContext())
+                    .data(imageUrl)
+                    .target(logo)
+                    .memoryCachePolicy(CachePolicy.ENABLED)
+                    .build()
+                imageLoader.enqueue(request)
+            }
+
         }
     }
 
@@ -108,5 +150,11 @@ class TenureSelectionFragment : Fragment() {
             R.id.action_tenureSelectionFragment_to_EMICardDetailsFragment,
             bundle
         )
+    }
+
+    private fun mapBanKLogo() {
+        bankLogoMap = Utils.getBankLogoHashMap()
+        bankNameKeyList = Utils.getListOfBanKTitle()
+        banKTitleToCodeMap = Utils.bankTitleAndCodeMapper()
     }
 }
