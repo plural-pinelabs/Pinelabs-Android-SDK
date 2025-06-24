@@ -322,5 +322,7 @@ internal object Constants {
     const val KARNATAKA_GRAMIN_TITLE = "KARNATAKA_GRAMIN"
     const val DEFAULT_TITLE = "DEFAULT"
 
+    const val DISPLAY_NAME_SUFFIX = " BANK"
+
 
 }

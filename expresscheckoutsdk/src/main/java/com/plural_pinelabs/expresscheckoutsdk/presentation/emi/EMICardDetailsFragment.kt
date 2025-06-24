@@ -52,6 +52,7 @@ import com.plural_pinelabs.expresscheckoutsdk.data.model.OfferDetails
 import com.plural_pinelabs.expresscheckoutsdk.data.model.OfferEligibilityResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ProcessPaymentRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ProcessPaymentResponse
+import com.plural_pinelabs.expresscheckoutsdk.data.model.Tenure
 import com.plural_pinelabs.expresscheckoutsdk.presentation.card.CardFragmentViewModel
 import kotlinx.coroutines.launch
 import java.util.Calendar
@@ -67,7 +68,11 @@ class EMICardDetailsFragment : Fragment() {
     private lateinit var cardErrorText: TextView
     private lateinit var cardHolderErrorText: TextView
     private lateinit var backBtn: ImageView
+
     private lateinit var logo: ImageView
+    private lateinit var issuerTitleTv: TextView
+    private lateinit var emiPerMonthAmount: TextView
+    private lateinit var emiForXMonthTv: TextView
 
     private var binData: CardBinMetaDataResponse? = null
     private var cardNumber: String = ""
@@ -86,6 +91,7 @@ class EMICardDetailsFragment : Fragment() {
     private var issuerId: String? = null
     private var tenureId: String? = null
     private var issuer: Issuer? = null
+    private var selectedTenure: Tenure? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -123,6 +129,11 @@ class EMICardDetailsFragment : Fragment() {
                 }
             }
         }
+        tenureId?.let {
+            issuer?.let { it1 ->
+                selectedTenure = it1.tenures.find { it.tenure_id == tenureId }
+            }
+        }
     }
 
     private fun setupViews(view: View) {
@@ -134,8 +145,19 @@ class EMICardDetailsFragment : Fragment() {
         cardHolderErrorText = view.findViewById(R.id.error_message_card_holder_name)
         cardErrorText = view.findViewById(R.id.error_message_card_details)
         backBtn = view.findViewById(R.id.back_button)
+
         logo = view.findViewById(R.id.logo)
+        issuerTitleTv = view.findViewById(R.id.issuer_title)
+        emiPerMonthAmount = view.findViewById(R.id.emi_per_month_value)
+        emiForXMonthTv = view.findViewById(R.id.for_x_month_tv)
         loadBankLogo()
+        issuerTitleTv.text = Utils.getTitleForEMI(requireContext(), issuer)
+        emiPerMonthAmount.text =
+            Utils.convertInRupees(selectedTenure?.monthly_emi_amount?.value).toString()
+        emiForXMonthTv.text =
+            String.format(getString(R.string.for_x_months), selectedTenure?.tenure_value.toString())
+
+
         backBtn.setOnClickListener {
             findNavController().popBackStack()
         }

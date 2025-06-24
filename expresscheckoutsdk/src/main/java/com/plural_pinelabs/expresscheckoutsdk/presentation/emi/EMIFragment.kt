@@ -71,12 +71,14 @@ class EMIFragment : Fragment() {
     }
 
     private fun showEMIList(listOfCCBank: List<Issuer>) {
+        val maxTenureMap = Utils.getMaxDiscountTenurePerIssuer(listOfCCBank)
         val adapter = EMIBankRecyclerViewAdapter(
             listOfCCBank,
             getItemClickListener(),
             bankLogoMap,
             bankNameKeyList,
-            banKTitleToCodeMap
+            banKTitleToCodeMap,
+            maxTenureMap
         )
         bankListRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         bankListRecyclerView.addItemDecoration(

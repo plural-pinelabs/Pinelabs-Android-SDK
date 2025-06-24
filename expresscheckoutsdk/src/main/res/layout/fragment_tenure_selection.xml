@@ -46,7 +46,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
-        android:background="@drawable/rounded_address_background"
+        android:background="@drawable/rounded_emi_title_bg"
         android:orientation="horizontal"
         android:paddingHorizontal="16dp"
         android:paddingVertical="8dp"
@@ -109,6 +109,8 @@
         app:layout_constraintBottom_toTopOf="@id/footer"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+        tools:listitem="@layout/tenure_item_layout"
+        tools:itemCount="4"
         app:layout_constraintTop_toBottomOf="@id/selected_emi_issuer" />
 
     <LinearLayout

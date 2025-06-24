@@ -29,5 +29,13 @@
     <color name="yellow_C96B00">#C96B00</color>
     <color name="AEB4BA_grey">#AEB4BA</color>
     <color name="grey_979797_text">#979797</color>
+    <color name="CC00722F_green_80">#CC00722F</color>
+    <color name="blue_4D85B4">#4D85B4</color>
+    <color name="blue_B9DFFF">#B9DFFF</color>
+    <color name="purple_B2C4BBFF">#B2C4BBFF</color>
+    <color name="purple_33C4BBFF">#33C4BBFF</color>
+    <color name="purple_6A60AF">#6A60AF</color>
+    <color name="purple_DDD8FF">#DDD8FF</color>
+    <color name="yellow_D6A243">#D6A243</color>
 
 </resources>

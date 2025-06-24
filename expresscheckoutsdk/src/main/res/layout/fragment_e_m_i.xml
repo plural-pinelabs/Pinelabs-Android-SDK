@@ -21,7 +21,7 @@
             android:importantForAccessibility="no"
             android:padding="8dp"
             android:src="@drawable/ic_back_arrow"
-            app:tint="@color/black_text_80" />
+            app:tint="@color/black_text" />
 
         <ImageView
             android:layout_width="32dp"
@@ -39,6 +39,7 @@
             android:layout_marginEnd="8dp"
             android:ellipsize="end"
             android:fontFamily="sans-serif-medium"
+            android:textColor="@color/black_text_80"
             android:gravity="start"
             android:text="@string/easy_emi_pick_a_bank_choose_a_plan_and_pay"
             android:textFontWeight="600"
@@ -68,11 +69,11 @@
                     android:id="@+id/emi_cc_selector_text"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="4dp"
+                    android:layout_marginStart="2dp"
                     android:layout_weight="1"
                     android:fontFamily="sans-serif"
                     android:paddingHorizontal="16dp"
-                    android:paddingVertical="12dp"
+                    android:paddingVertical="10dp"
                     android:text="@string/credit_card"
                     android:textColor="@color/black_text"
                     android:textFontWeight="600"
@@ -111,7 +112,7 @@
                     android:id="@+id/card_less_selector_text"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="4dp"
+                    android:layout_marginEnd="2dp"
                     android:layout_weight="1"
                     android:fontFamily="sans-serif"
                     android:paddingHorizontal="16dp"

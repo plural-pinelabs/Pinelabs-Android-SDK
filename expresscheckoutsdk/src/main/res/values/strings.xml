@@ -152,5 +152,16 @@
     <string name="x_one_time_processing_fee">%s One-time processing fee</string>
     <string name="total_payable">Total payable</string>
     <string name="paying_in_emi_of_x_months">Paying in EMI of %s months</string>
+    <string name="save_rs_x">Save %s</string>
+    <string name="issuer_title_with_emi_card">%s %s</string>
+    <string name="recommended">Recommended</string>
+    <string name="best_value">Best Value</string>
+    <string name="no_cost">No Cost</string>
+    <string name="low_interest_with_value">Low Interest @ %1$s%%</string>
+    <string name="low_interest">Low Interest</string>
+    <string name="no_cost_emi">No Cost EMI</string>
+    <string name="amount_emi_per_month">%s </string>
+    <string name="amount_emi_per_month_label">/month</string>
+    <string name="for_x_months">for %s months</string>
 
 </resources>

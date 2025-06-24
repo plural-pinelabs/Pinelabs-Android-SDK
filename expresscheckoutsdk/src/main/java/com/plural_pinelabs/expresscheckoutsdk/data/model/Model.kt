@@ -271,7 +271,7 @@ data class Extra(
     var dcc_status: String? = null,
     val sdk_data: SDKData? = null,
     val order_amount: Int? = null,
-    ) : Parcelable
+) : Parcelable
 
 data class PBPBank(
     val bankName: String,
@@ -550,7 +550,13 @@ data class Tenure(
     val processing_fee_details: ProcessingFeeDetails? = null,
     val emi_type: String,
     val additionalCashback: String? = null,
-    val label: String? = null
+    val label: String? = null,
+    val total_subvention_amount: Amount? = null,
+    val subvention: Subvention? = null,
+    val convenience_fee_breakdown: ConvenienceFeeBreakdown? = null,
+    var isBestValue: Boolean = false,
+    var isRecommended: Boolean = false
+
 ) : Parcelable
 
 @Parcelize
@@ -569,7 +575,10 @@ data class ProductDetail(
     val product_amount: Amount? = null,
     val interest_amount: Amount? = null,
     val interest_rate: Double? = null,
-    val discount: Discount? = null
+    val discount: Discount? = null,
+    val subvention: Subvention? = null,
+    val product_offer_parameters: List<IssuerOfferParameter>? = null
+
 ) : Parcelable
 
 @Parcelize
@@ -666,5 +675,24 @@ data class OfferEligibilityResponse(
     val code: String,
     val message: String
 ) : Parcelable
+
+
+@Parcelize
+data class Subvention(
+    val subvention_type: String,
+    val offer_type: String,
+    val percentage: Double,
+    val amount: Amount
+) : Parcelable
+
+@Parcelize
+data class ConvenienceFeeBreakdown(
+    val fee_calculated_on_amount: Amount? = null,
+    val fee_amount: Amount? = null,
+    val tax_amount: Amount? = null,
+    val maximum_fee_amount: Amount? = null,
+    val applicable_fee_amount: Amount? = null
+) : Parcelable
+
 
 

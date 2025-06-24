@@ -38,4 +38,37 @@
         tools:text="Wallet Title" />
 
 
+    <LinearLayout
+        android:visibility="gone"
+        android:id="@+id/saving_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="4dp"
+        android:background="@drawable/saving_gradient"
+        android:orientation="horizontal"
+        android:padding="6dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:src="@drawable/ic_saving_offer_tag" />
+
+        <TextView
+            android:id="@+id/saving_text_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:fontFamily="sans-serif-medium"
+            android:letterSpacing="0.02"
+            android:text="@string/save_rs_x"
+            android:textColor="@color/CC00722F_green_80"
+            android:textFontWeight="600"
+            android:textSize="12sp" />
+
+    </LinearLayout>
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>

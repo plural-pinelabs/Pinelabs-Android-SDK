@@ -10,10 +10,88 @@
     android:padding="4dp"
     android:paddingBottom="8dp">
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="4sp"
+        android:orientation="horizontal"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/best_value_tag"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/best_value_blue_bg"
+            android:fontFamily="sans-serif-medium"
+            android:paddingHorizontal="6dp"
+            android:paddingVertical="4dp"
+            android:text="@string/best_value"
+            android:textColor="@color/blue_4D85B4"
+            android:textFontWeight="600"
+            android:textSize="12sp"
+            android:visibility="gone"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/recommended_tag"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/recommended_tag_bg"
+            android:fontFamily="sans-serif-medium"
+            android:paddingHorizontal="6dp"
+            android:paddingVertical="4dp"
+            android:text="@string/recommended"
+            android:textColor="@color/purple_6A60AF"
+            android:textFontWeight="600"
+            android:textSize="12sp"
+            android:visibility="gone"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <LinearLayout
+            android:id="@+id/saving_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="4dp"
+            android:background="@drawable/saving_gradient"
+            android:orientation="horizontal"
+            android:padding="3dp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:src="@drawable/ic_saving_offer_tag" />
+
+            <TextView
+                android:id="@+id/saving_text_value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:fontFamily="sans-serif-medium"
+                android:letterSpacing="0.02"
+                android:text="@string/save_rs_x"
+                android:textColor="@color/CC00722F_green_80"
+                android:textFontWeight="600"
+                android:textSize="12sp" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+
     <RadioButton
         android:id="@+id/tenure_radio_button"
         android:layout_width="32dp"
         android:layout_height="24dp"
+        android:layout_marginTop="8dp"
         android:gravity="center|center_horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -49,9 +127,9 @@
 
     <TextView
         android:id="@+id/tenure_processing_fee_text_view"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
+        android:layout_marginTop="8dp"
         android:ellipsize="end"
         android:fontFamily="sans-serif"
         android:maxLines="1"
@@ -60,8 +138,28 @@
         android:textColor="@color/black_text_50"
         android:textFontWeight="500"
         android:textSize="12sp"
+        app:layout_constraintEnd_toStartOf="@id/tenure_emi_type_text_view"
         app:layout_constraintStart_toEndOf="@id/tenure_radio_button"
         app:layout_constraintTop_toBottomOf="@id/tenure_radio_button" />
+
+    <TextView
+        android:id="@+id/tenure_emi_type_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="10dp"
+        android:ellipsize="end"
+        android:fontFamily="sans-serif"
+        android:gravity="center_vertical"
+        android:maxLines="1"
+        android:paddingBottom="8dp"
+        android:textColor="@color/yellow_D6A243"
+        android:textFontWeight="500"
+        android:textSize="12sp"
+        android:visibility="visible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tenure_radio_button"
+        tools:text="EMI TYPE" />
 
     <TextView
         android:id="@+id/tenure_payable_amount_label_text_view"

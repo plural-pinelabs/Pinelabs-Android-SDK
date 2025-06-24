@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
@@ -14,48 +15,59 @@ import coil.request.ImageRequest
 import com.plural_pinelabs.expresscheckoutsdk.R
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.BASE_IMAGES
 import com.plural_pinelabs.expresscheckoutsdk.common.ItemClickListener
+import com.plural_pinelabs.expresscheckoutsdk.common.Utils
 import com.plural_pinelabs.expresscheckoutsdk.data.model.Issuer
+import com.plural_pinelabs.expresscheckoutsdk.data.model.Tenure
 
 class EMIBankRecyclerViewAdapter(
     private val list: List<Issuer>,
     private val emiBankSelectionCallback: ItemClickListener<Issuer>?,
     private val bankLogoMap: HashMap<String, String>,
     private val bankNameKeyList: List<String>,
-    private val banKTitleToCodeMap: HashMap<String, String>
-) :
-    RecyclerView.Adapter<EMIBankRecyclerViewAdapter.ItemViewHolder>() {
+    private val banKTitleToCodeMap: HashMap<String, String>,
+    private val maxTenureMap: HashMap<String, Tenure>
+) : RecyclerView.Adapter<EMIBankRecyclerViewAdapter.ItemViewHolder>() {
 
     inner class ItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
         fun setItem(item: Issuer, position: Int) {
-            val imageTitle =
-                bankNameKeyList.find {
-                    it.contains(
-                        item.display_name.removeSuffix(" BANK"),
-                        ignoreCase = true
-                    )
-                }
+            val imageTitle = bankNameKeyList.find {
+                it.contains(
+                    item.display_name.removeSuffix(" BANK"), ignoreCase = true
+                )
+            }
             val logo: ImageView = itemView.findViewById(R.id.bank_logo)
             val title: TextView = itemView.findViewById(R.id.bank_title)
-            val parentItem: ConstraintLayout =
-                itemView.findViewById(R.id.parent_item_layout)
+            val saveLayout: LinearLayout = itemView.findViewById(R.id.saving_layout)
+            val saveAmountTv: TextView = itemView.findViewById(R.id.saving_text_value)
+
+            val maxDiscount: String = maxTenureMap[item.id]?.let { tenure ->
+                tenure.total_discount_amount?.value?.let {
+                    Utils.convertToRupees(itemView.context, it)
+                } ?: tenure.total_subvention_amount?.value?.let {
+                    Utils.convertToRupees(itemView.context, it)
+                }
+            } ?: "error"
+
+            saveLayout.visibility = View.GONE
+            if (!maxDiscount.contains("error", true)) {
+                saveLayout.visibility = View.VISIBLE
+                saveAmountTv.text = maxDiscount
+            } else {
+                saveLayout.visibility = View.GONE
+            }
+            val parentItem: ConstraintLayout = itemView.findViewById(R.id.parent_item_layout)
             if (imageTitle != null) {
                 val imageUrl = BASE_IMAGES + bankLogoMap[banKTitleToCodeMap[imageTitle]]
-                val imageLoader = ImageLoader.Builder(itemView.context)
-                    .components {
-                        add(SvgDecoder.Factory())
-                    }
-                    .crossfade(true)
-                    .build()
-                val request = ImageRequest.Builder(itemView.context)
-                    .data(imageUrl)
-                    .target(logo)
-                    .memoryCachePolicy(CachePolicy.ENABLED)
-                    .build()
+                val imageLoader = ImageLoader.Builder(itemView.context).components {
+                    add(SvgDecoder.Factory())
+                }.crossfade(true).build()
+                val request = ImageRequest.Builder(itemView.context).data(imageUrl).target(logo)
+                    .memoryCachePolicy(CachePolicy.ENABLED).build()
                 imageLoader.enqueue(request)
                 // TODO add a fallback image
             }
-            title.text = item.display_name
+            title.text = item.display_name.removeSuffix(" BANK")
             parentItem.setOnClickListener {
                 emiBankSelectionCallback?.onItemClick(position, item)
             }
