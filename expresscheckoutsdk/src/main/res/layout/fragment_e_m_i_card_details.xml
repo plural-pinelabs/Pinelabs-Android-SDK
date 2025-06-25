@@ -59,8 +59,8 @@
             android:layout_marginTop="16dp"
             android:background="@drawable/input_field_border"
             android:importantForAccessibility="no"
-            android:padding="4dp"
-            android:src="@drawable/ic_gpay_upi"
+            android:padding="6dp"
+            android:src="@drawable/ic_generic"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 

@@ -106,7 +106,8 @@ class EMITenureListAdapter(
                 }
             }
 
-            // Set the radio button state based on the selected positiondioButton.isChecked = position == selectedPosition
+            // Set the radio button state based on the selected position
+            tenureRadioButton.isChecked = position == selectedPosition
             tenureRadioButton.setOnClickListener {
                 val previousPosition = selectedPosition
                 selectedPosition = adapterPosition

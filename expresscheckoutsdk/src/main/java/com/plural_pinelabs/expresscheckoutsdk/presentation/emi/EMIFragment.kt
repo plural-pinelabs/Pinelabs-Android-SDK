@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -29,6 +30,7 @@ class EMIFragment : Fragment() {
     private lateinit var emiCashlessPayment: TextView
     private lateinit var emiDCPayment: TextView
     private lateinit var emiPaymentModeData: EMIPaymentModeData
+    private lateinit var backButton: ImageView
 
     private lateinit var bankLogoMap: HashMap<String, String>
     private lateinit var banKTitleToCodeMap: HashMap<String, String>
@@ -55,7 +57,10 @@ class EMIFragment : Fragment() {
         emiCCPayment = view.findViewById(R.id.emi_cc_selector_text)
         emiDCPayment = view.findViewById(R.id.dc_emi_selector_text)
         emiCashlessPayment = view.findViewById(R.id.card_less_selector_text)
-        //TODO manage selection of all payment modes
+        backButton = view.findViewById(R.id.back_button)
+        backButton.setOnClickListener {
+            findNavController().popBackStack()
+        }
         emiCCPayment.setOnClickListener {
             showEMIListBasedOnSelection(Constants.EMI_CC_TYPE)
         }
@@ -90,9 +95,6 @@ class EMIFragment : Fragment() {
     }
 
     private fun showEMIListBasedOnSelection(selection: String) {
-        if (!currentSelectedTab.isNullOrEmpty() && currentSelectedTab.equals(selection, true)) {
-            return // No change in selection, do nothing
-        }
         currentSelectedTab = selection // Update the current selected tab
         when (selection) {
             Constants.EMI_CC_TYPE -> {

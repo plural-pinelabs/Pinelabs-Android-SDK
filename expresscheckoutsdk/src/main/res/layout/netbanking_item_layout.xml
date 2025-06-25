@@ -14,7 +14,7 @@
         android:background="@drawable/rectangle_upi_border"
         android:importantForAccessibility="no"
         android:padding="6dp"
-        android:src="@drawable/wallet_airtel_money"
+        android:src="@drawable/ic_generic"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 

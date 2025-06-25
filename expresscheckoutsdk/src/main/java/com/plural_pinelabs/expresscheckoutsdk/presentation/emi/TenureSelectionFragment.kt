@@ -23,6 +23,7 @@ import com.plural_pinelabs.expresscheckoutsdk.common.Constants.TENURE_ID
 import com.plural_pinelabs.expresscheckoutsdk.common.ItemClickListener
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils.customSorted
+import com.plural_pinelabs.expresscheckoutsdk.common.Utils.markBestValueInPlace
 import com.plural_pinelabs.expresscheckoutsdk.data.model.EMIPaymentModeData
 import com.plural_pinelabs.expresscheckoutsdk.data.model.Issuer
 import com.plural_pinelabs.expresscheckoutsdk.data.model.Tenure
@@ -34,6 +35,7 @@ class TenureSelectionFragment : Fragment() {
     private lateinit var emiPayingInMonthsTv: TextView
     private lateinit var logo: ImageView
     private lateinit var selectedBanKTitle: TextView
+    private lateinit var continueBtn: Button
 
     private var selectedIssuerId: String? = null
     private var issuer: Issuer? = null
@@ -80,9 +82,13 @@ class TenureSelectionFragment : Fragment() {
         emiPayingInMonthsTv = view.findViewById(R.id.emi_info_text)
         selectedBanKTitle = view.findViewById(R.id.issuer_title)
         logo = view.findViewById(R.id.logo)
+        continueBtn = view.findViewById(R.id.continue_btn)
         loadBankLogo()
-        view.findViewById<Button>(R.id.continue_btn).setOnClickListener {
+        continueBtn.setOnClickListener {
             handleContinueButtonClick()
+        }
+        goBackButton.setOnClickListener {
+            findNavController().popBackStack()
         }
 
         selectedBanKTitle.text = Utils.getTitleForEMI(requireContext(), issuer)
@@ -128,7 +134,7 @@ class TenureSelectionFragment : Fragment() {
                 tenure.tenure_value != 0 || !tenure.name.contains("No EMI", true)
             }.customSorted()
             val adapter = EMITenureListAdapter(
-                requireContext(), filteredList, getTenureClickListener()
+                requireContext(), filteredList.markBestValueInPlace(), getTenureClickListener()
             )
             tenureListRecyclerView.adapter = adapter
         }
@@ -144,6 +150,7 @@ class TenureSelectionFragment : Fragment() {
                         getString(R.string.paying_in_emi_of_x_months),
                         item?.tenure_value.toString()
                     )
+               continueBtn.text = String.format(getString(R.string.pay_emi_x_per_month),Utils.convertToRupees(requireContext(),item?.monthly_emi_amount?.value))
             }
         }
     }

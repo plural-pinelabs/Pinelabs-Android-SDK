@@ -163,5 +163,7 @@
     <string name="amount_emi_per_month">%s </string>
     <string name="amount_emi_per_month_label">/month</string>
     <string name="for_x_months">for %s months</string>
+    <string name="emi_details"><u>EMI Details</u></string>
+    <string name="pay_emi_x_per_month">Pay %s /month</string>
 
 </resources>

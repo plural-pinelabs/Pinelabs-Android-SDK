@@ -124,6 +124,7 @@ import com.plural_pinelabs.expresscheckoutsdk.common.Constants.LAXMI_VILAS_BANK_
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.LAXMI_VILAS_BANK_RETAIL_CODE
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.LAXMI_VILAS_RETAIL_TITLE
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.LAXMI_VILAS_TITLE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.LOW_COST_EMI
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.MAHARASHTRA_BANK_CODE
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.MAHARASHTRA_TITLE
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.MEHSANA_URBAN_BANK_CODE
@@ -131,6 +132,7 @@ import com.plural_pinelabs.expresscheckoutsdk.common.Constants.MEHSANA_URBAN_TIT
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.MOBILE_REGEX
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.NORTH_EAST_BANK_CODE
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.NORTH_EAST_TITLE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.NO_COST_EMI
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.ORIENTAL_BANK_CODE
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.ORIENTAL_TITLE
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.OS
@@ -161,6 +163,7 @@ import com.plural_pinelabs.expresscheckoutsdk.common.Constants.SOUTH_INDIAN_BANK
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.SOUTH_INDIAN_TITLE
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.STANDARD_CHARTERED_BANK_CODE
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.STANDARD_CHARTERED_TITLE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.STANDARD_EMI
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.SURYODAY_BANK_CODE
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.SURYODAY_TITLE
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.SYNDICATE_BANK_CODE
@@ -853,9 +856,9 @@ internal object Utils {
         return this.sortedWith(
             compareBy<Tenure> {
                 when (it.emi_type) {
-                    "NO_COST" -> 0
-                    "LOW_COST" -> 1
-                    "STANDARD" -> 2
+                    NO_COST_EMI -> 0
+                    LOW_COST_EMI -> 1
+                    STANDARD_EMI -> 2
                     else -> 3
                 }
             }.thenBy { it.tenure_value }
@@ -883,8 +886,10 @@ internal object Utils {
 
         for (issuer in issuers) {
             val maxTenure = issuer.tenures
-                .filter { it.total_discount_amount?.value != null }
-                .maxByOrNull { it.total_discount_amount!!.value }
+                .filter { it.total_discount_amount?.value != null || it.total_subvention_amount?.value != null }
+                .maxByOrNull {
+                    it.total_discount_amount?.value ?: it.total_subvention_amount?.value ?: 0
+                }
 
             if (maxTenure != null) {
                 result[issuer.id] = maxTenure
@@ -892,6 +897,24 @@ internal object Utils {
         }
 
         return result
+    }
+
+
+    fun List<Tenure>.markBestValueInPlace(): List<Tenure> {
+        this
+            .groupBy { it.emi_type }
+            .forEach { (_, tenures) ->
+                val bestTenure = tenures.maxByOrNull { tenure ->
+                    (tenure.total_discount_amount?.value ?: tenure.total_subvention_amount?.value
+                    ?: 0.0).toDouble()
+                }
+                if (bestTenure?.emi_type.equals(NO_COST_EMI, true)) {
+                    bestTenure?.isRecommended = true
+                } else if (bestTenure?.emi_type.equals(LOW_COST_EMI, true)) {
+                    bestTenure?.isBestValue = true
+                }
+            }
+        return this
     }
 
 

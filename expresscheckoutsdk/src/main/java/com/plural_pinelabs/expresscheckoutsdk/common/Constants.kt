@@ -324,5 +324,10 @@ internal object Constants {
 
     const val DISPLAY_NAME_SUFFIX = " BANK"
 
+    const val NO_COST_EMI = "NO_COST"
+    const val LOW_COST_EMI= "LOW_COST"
+    const val STANDARD_EMI="STANDARD"
+
+
 
 }

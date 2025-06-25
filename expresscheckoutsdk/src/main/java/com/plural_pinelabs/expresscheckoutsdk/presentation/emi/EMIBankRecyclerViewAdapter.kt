@@ -58,6 +58,7 @@ class EMIBankRecyclerViewAdapter(
             }
             val parentItem: ConstraintLayout = itemView.findViewById(R.id.parent_item_layout)
             if (imageTitle != null) {
+                logo.setImageDrawable(null)
                 val imageUrl = BASE_IMAGES + bankLogoMap[banKTitleToCodeMap[imageTitle]]
                 val imageLoader = ImageLoader.Builder(itemView.context).components {
                     add(SvgDecoder.Factory())
