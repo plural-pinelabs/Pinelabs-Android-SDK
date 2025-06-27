@@ -1,13 +1,26 @@
 package com.plural_pinelabs.expresscheckoutsdk.presentation.emi
 
+import android.content.Context
+import android.content.res.Resources
+import android.graphics.Color
 import android.os.Bundle
+import android.util.DisplayMetrics
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.webkit.WebView
 import android.widget.Button
+import android.widget.CheckBox
+import android.widget.FrameLayout
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.core.graphics.drawable.toDrawable
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -15,18 +28,36 @@ import coil.ImageLoader
 import coil.decode.SvgDecoder
 import coil.request.CachePolicy
 import coil.request.ImageRequest
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.plural_pinelabs.expresscheckoutsdk.ExpressSDKObject
 import com.plural_pinelabs.expresscheckoutsdk.R
+import com.plural_pinelabs.expresscheckoutsdk.common.BaseResult
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.BASE_IMAGES
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.BROWSER_ACCEPT_ALL
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.BROWSER_USER_AGENT_ANDROID
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.EMI_DC_TYPE
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.ISSUE_ID
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.TENURE_ID
 import com.plural_pinelabs.expresscheckoutsdk.common.ItemClickListener
+import com.plural_pinelabs.expresscheckoutsdk.common.KFSWebView
+import com.plural_pinelabs.expresscheckoutsdk.common.NetworkHelper
+import com.plural_pinelabs.expresscheckoutsdk.common.TenureSelectionViewModelFactory
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils.customSorted
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils.markBestValueInPlace
+import com.plural_pinelabs.expresscheckoutsdk.data.model.DeviceInfo
 import com.plural_pinelabs.expresscheckoutsdk.data.model.EMIPaymentModeData
+import com.plural_pinelabs.expresscheckoutsdk.data.model.EmiData
+import com.plural_pinelabs.expresscheckoutsdk.data.model.Extra
 import com.plural_pinelabs.expresscheckoutsdk.data.model.Issuer
+import com.plural_pinelabs.expresscheckoutsdk.data.model.OfferDetails
+import com.plural_pinelabs.expresscheckoutsdk.data.model.ProcessPaymentRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.model.Tenure
+import kotlinx.coroutines.launch
+import java.net.URLEncoder
+import java.util.Locale
 
 class TenureSelectionFragment : Fragment() {
 
@@ -44,6 +75,9 @@ class TenureSelectionFragment : Fragment() {
     private lateinit var bankLogoMap: HashMap<String, String>
     private lateinit var banKTitleToCodeMap: HashMap<String, String>
     private lateinit var bankNameKeyList: List<String>
+    private var bottomSheetDialog: BottomSheetDialog? = null
+
+    private lateinit var viewModel: TenureSelectionViewModel
 
 
     override fun onCreateView(
@@ -51,11 +85,16 @@ class TenureSelectionFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
+        viewModel = ViewModelProvider(
+            this,
+            TenureSelectionViewModelFactory(NetworkHelper(requireContext()))
+        )[TenureSelectionViewModel::class.java]
         return inflater.inflate(R.layout.fragment_tenure_selection, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        observeViewModel()
         mapBanKLogo()
         setEMIIssuer()
         setViews(view)
@@ -150,7 +189,10 @@ class TenureSelectionFragment : Fragment() {
                         getString(R.string.paying_in_emi_of_x_months),
                         item?.tenure_value.toString()
                     )
-               continueBtn.text = String.format(getString(R.string.pay_emi_x_per_month),Utils.convertToRupees(requireContext(),item?.monthly_emi_amount?.value))
+                continueBtn.text = String.format(
+                    getString(R.string.pay_emi_x_per_month),
+                    Utils.convertToRupees(requireContext(), item?.monthly_emi_amount?.value)
+                )
             }
         }
     }
@@ -160,13 +202,18 @@ class TenureSelectionFragment : Fragment() {
             // TODO handle error no tenure selected
             return
         }
-        val bundle = Bundle()
-        bundle.putString(ISSUE_ID, selectedIssuerId)
-        bundle.putString(TENURE_ID, selectedTenure?.tenure_id)
-        findNavController().navigate(
-            R.id.action_tenureSelectionFragment_to_EMICardDetailsFragment,
-            bundle
-        )
+        if (issuer?.issuer_type?.equals(EMI_DC_TYPE) == true) {
+            //user has choosen a Debit card show kfs and once consent is given navigate to card details
+             viewModel.getKFS(ExpressSDKObject.getToken(), createProcessPaymentRequest())
+        } else {
+            val bundle = Bundle()
+            bundle.putString(ISSUE_ID, selectedIssuerId)
+            bundle.putString(TENURE_ID, selectedTenure?.tenure_id)
+            findNavController().navigate(
+                R.id.action_tenureSelectionFragment_to_EMICardDetailsFragment,
+                bundle
+            )
+        }
     }
 
     private fun mapBanKLogo() {
@@ -174,4 +221,212 @@ class TenureSelectionFragment : Fragment() {
         bankNameKeyList = Utils.getListOfBanKTitle()
         banKTitleToCodeMap = Utils.bankTitleAndCodeMapper()
     }
+
+
+    private fun observeViewModel() {
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.kfsRequestResult.collect { result ->
+                    when (result) {
+                        is BaseResult.Loading -> {
+                            if (result.isLoading)
+                                showKFSConsentBottomSheet(requireContext(), null, false)
+                        }
+
+                        is BaseResult.Success -> {
+                            val url = result.data.key_fact_pdf_url
+                            showKFSConsentBottomSheet(requireContext(), url, false)
+                        }
+
+                        is BaseResult.Error -> {
+                            showKFSConsentBottomSheet(requireContext(), null, true)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun createProcessPaymentRequest(): ProcessPaymentRequest {
+        val tenureId = selectedTenure?.tenure_id ?: ""
+        val offerDetails =
+            ExpressSDKObject.getEMIPaymentModeData()?.offerDetails?.find { it.issuerId == selectedIssuerId }
+        val offerTenure = offerDetails?.tenureOffers?.find { it.tenureId == tenureId }
+
+
+        val paymentData = ExpressSDKObject.getFetchData()?.paymentData
+        if (paymentData == null) {
+            //TODO notify of payment failure
+            findNavController().navigate(R.id.action_EMICardDetailsFragment_to_failureFragment)
+        }
+        val amount = issuer?.tenures?.find { it.tenure_id == tenureId }?.loan_amount?.value
+            ?: 0
+        val currency = paymentData?.originalTxnAmount?.currency
+
+
+        val paymentMode = arrayListOf<String>()
+        paymentMode.add(Constants.DEBIT_EMI_ID)
+        val displayMetrics = DisplayMetrics()
+        requireActivity().windowManager.defaultDisplay.getMetrics(displayMetrics)
+        val height = displayMetrics.heightPixels
+        val width = displayMetrics.widthPixels
+        val pixelFormat = requireActivity().windowManager.defaultDisplay.pixelFormat
+
+        val screenSize: String = width.toString() + "x" + height.toString()
+        val deviceInfo = DeviceInfo(
+            null,
+            BROWSER_USER_AGENT_ANDROID,
+            BROWSER_ACCEPT_ALL,
+            Locale.getDefault().language,
+            height.toString(),
+            width.toString(),
+            Utils.getTimeOffset().toString(),
+            screenSize,
+            Utils.getColorDepth(pixelFormat).toString(),
+            true,
+            true,
+            Utils.getDeviceId(requireActivity()),
+            Utils.getLocalIpAddress().toString()
+        )
+
+        val cardDataExtra = Extra(
+            paymentMode,
+            amount,
+            currency,
+            null,
+            null, //TODO redeemableAmount pass this from reward points api
+            null,
+            null,
+            deviceInfo,
+            null,
+            null,// dccstatus pass this from dcc api call
+            Utils.createSDKData(requireActivity()),
+            order_amount = ExpressSDKObject.getAmount(),
+            language = "ENGLISH"
+        )
+        val emiData = EmiData(
+            OfferDetails(
+                id = issuer?.id,
+                name = issuer?.name,
+                display_name = issuer?.display_name,
+                issuer_type = issuer?.issuer_type,
+                priority = issuer?.priority,
+                issuer_data = issuer?.issuer_data,
+                label = offerTenure?.offerLabel,
+                subventionType = offerTenure?.emiType,
+                isMultiCartEmi = false,
+                issuerName = issuer?.name ?: "",
+                isSplitEmi = false,
+                tenure = issuer?.tenures?.find { it.tenure_id == tenureId },
+                tenures = issuer?.tenures
+            )
+        )
+        val processPaymentRequest = ProcessPaymentRequest(
+            null,
+            null,
+            null,
+            upi_data = null,
+            null,
+            null,
+            cardDataExtra,
+            null,
+            null,
+            emi_data = emiData
+        )
+        return processPaymentRequest
+    }
+
+    private fun showKFSConsentBottomSheet(context: Context, url: String?, isError: Boolean) {
+        bottomSheetDialog?.dismiss()
+        bottomSheetDialog = BottomSheetDialog(context)
+        val view = LayoutInflater.from(context)
+            .inflate(
+                R.layout.kfs_view_layout,
+                null
+            ) // Use `null` for parent in inflate
+
+        bottomSheetDialog?.setContentView(view)
+
+        val bottomSheet =
+            bottomSheetDialog?.findViewById<FrameLayout>(com.google.android.material.R.id.design_bottom_sheet)
+        bottomSheet?.let {
+
+            val behavior = BottomSheetBehavior.from(it) // Apply behavior to the correct FrameLayout
+            val layoutParams = it.layoutParams
+            val displayMetrics = Resources.getSystem().displayMetrics
+            val screenHeight = displayMetrics.heightPixels
+            layoutParams.height = screenHeight
+            it.layoutParams = layoutParams
+            behavior.peekHeight = screenHeight
+            behavior.state = BottomSheetBehavior.STATE_EXPANDED
+            behavior.isFitToContents = false
+            behavior.skipCollapsed = true
+            it.setBackgroundColor(Color.TRANSPARENT)
+        }
+        //handle logic and view binding
+        val languageTextView: TextView = view.findViewById(R.id.kfs_language)
+        val downloadPDfButton: TextView = view.findViewById(R.id.download_pdf)
+        val cancelButton: ImageView = view.findViewById(R.id.cancel_btn)
+        val progressBarContainer: LinearLayout = view.findViewById(R.id.progress_bar_container)
+        val errorLayout: LinearLayout = view.findViewById(R.id.error_layout)
+        val retryButton: Button = view.findViewById(R.id.retry_btn)
+        val webView: WebView = view.findViewById(R.id.kfs_webview)
+        val consentCheckBox: CheckBox = view.findViewById(R.id.terms_checkbox_consent)
+        val continueButton: Button = view.findViewById(R.id.continue_btn)
+
+        languageTextView.setOnClickListener {
+            //TODO handle language change
+        }
+        downloadPDfButton.setOnClickListener {
+            //TODO handle pdf download
+        }
+        cancelButton.setOnClickListener {
+            bottomSheetDialog?.dismiss()
+        }
+        retryButton.setOnClickListener {
+            //TODO handle retry logic
+        }
+        continueButton.setOnClickListener {
+            if (consentCheckBox.isChecked) {
+                bottomSheetDialog?.dismiss()
+                //TODO handle continue logic
+            }
+        }
+        consentCheckBox.setOnCheckedChangeListener { buttonView, isChecked ->
+            continueButton.isEnabled = isChecked
+        }
+        val kfsWebView = KFSWebView(
+            context = requireContext(),
+            webView = webView,
+            progressBarContainer = progressBarContainer,
+            errorView = errorLayout,
+            onScrollEnd = {
+                //Make the checkbox enable to click
+            }
+        )
+
+        if (url != null) {
+            webView.visibility = View.VISIBLE
+            val pdfUrl = "https://docs.google.com/gview?embedded=true&url=" + URLEncoder.encode(
+                url,
+                "UTF-8"
+            )
+            kfsWebView.loadUrl(pdfUrl)
+        }
+        bottomSheetDialog?.setCancelable(false)
+        bottomSheetDialog?.setCanceledOnTouchOutside(false)
+        bottomSheetDialog?.window?.setBackgroundDrawable(Color.TRANSPARENT.toDrawable())
+        bottomSheetDialog?.show()
+        if (isError) {
+            progressBarContainer.visibility = View.GONE
+            webView.visibility = View.GONE
+            errorLayout.visibility = View.VISIBLE
+        } else {
+            progressBarContainer.visibility = View.VISIBLE
+            webView.visibility = View.GONE
+            errorLayout.visibility = View.GONE
+        }
+    }
+
 }

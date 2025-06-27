@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingHorizontal="16dp"
+    android:paddingVertical="20dp">
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="sans-serif"
+        android:text="@string/emi_details_key_fact_statement"
+        android:textColor="@color/black_text"
+        android:textFontWeight="600"
+        android:textSize="16sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/cancel_btn"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:background="@drawable/circle_background"
+        android:backgroundTint="@color/black_text_30"
+        android:contentDescription="@string/cancel"
+        android:foregroundTint="@color/black_text"
+        android:padding="6dp"
+        android:src="@drawable/ic_cancel_close"
+        android:tint="@color/black_text"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/kfs_language"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:background="@drawable/input_field_border"
+        android:drawableStart="@drawable/ic_language_symbol"
+        android:drawableEnd="@drawable/ic_chevron_bottom"
+        android:drawablePadding="8dp"
+        android:drawableTint="@color/black_text_80"
+        android:fontFamily="sans-serif"
+        android:gravity="center"
+        android:paddingHorizontal="8dp"
+        android:paddingVertical="4dp"
+        android:text="@string/english"
+        android:textColor="@color/black_text_80"
+        android:textFontWeight="600"
+        android:textSize="16sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/title" />
+
+    <TextView
+        android:id="@+id/download_pdf"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="14sp"
+        android:layout_marginTop="12dp"
+        android:padding="8dp"
+        android:text="@string/download_pdf"
+        android:textColor="@color/black_text_80"
+        android:textFontWeight="600"
+
+        android:textSize="16sp"
+        app:layout_constraintStart_toEndOf="@id/kfs_language"
+        app:layout_constraintTop_toBottomOf="@id/title" />
+
+    <LinearLayout
+        android:id="@+id/kfs_webview_container"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="32dp"
+        android:layout_marginBottom="12dp"
+        android:background="@drawable/input_field_border"
+        android:gravity="center"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toTopOf="@id/terms_checkbox_consent"
+        app:layout_constraintTop_toBottomOf="@id/kfs_language">
+
+        <LinearLayout
+            android:id="@+id/progress_bar_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginHorizontal="16dp"
+            android:background="@drawable/rounded_address_background"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:paddingHorizontal="24dp"
+            android:paddingVertical="16dp"
+            android:visibility="gone">
+
+            <ProgressBar
+                android:id="@+id/progressBar"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:indeterminate="true"
+                android:indeterminateBehavior="repeat"
+                android:indeterminateTint="@color/black_text_80" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:fontFamily="sans-serif"
+                android:text="@string/loading_key_fact_statement_please_wait"
+                android:textColor="@color/black_text_50"
+                android:textFontWeight="500"
+                android:textSize="12sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/error_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginHorizontal="20dp"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <ImageView
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="12dp"
+                android:padding="12dp"
+                android:src="@drawable/ic_error_icon"
+                app:tint="@color/yellow_C96B00" />
+
+            <TextView
+
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif"
+                android:gravity="center_horizontal"
+                android:text="@string/unable_to_load_this_page_at_this_moment_please_try_again"
+                android:textColor="@color/black_text"
+                android:textFontWeight="600"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/retry_btn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:layout_marginBottom="12dp"
+                android:background="@drawable/primary_button_background"
+                android:enabled="false"
+                android:gravity="center"
+                android:minHeight="48dp"
+                android:text="@string/retry"
+                android:textColor="@color/white"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
+        </LinearLayout>
+
+        <WebView
+            android:id="@+id/kfs_webview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/input_field_border"
+            android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@id/kfs_language" />
+
+    </LinearLayout>
+
+    <CheckBox
+        android:id="@+id/terms_checkbox_consent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"
+        android:button="@drawable/checkbox_state"
+        android:fontFamily="sans-serif"
+        android:paddingStart="8dp"
+        android:text="@string/i_agree_to_the_terms_consent_clause"
+        android:textColor="@color/black_text_80"
+        android:textFontWeight="500"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toTopOf="@id/continue_btn" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/continue_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:layout_marginBottom="12dp"
+        android:background="@color/button_disabled_EAEDF0"
+        android:enabled="false"
+        android:gravity="center"
+        android:minHeight="48dp"
+        android:text="@string/continue_text"
+        android:textColor="@color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

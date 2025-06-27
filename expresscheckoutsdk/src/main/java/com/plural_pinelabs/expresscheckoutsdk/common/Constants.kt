@@ -21,6 +21,7 @@ internal object Constants {
     const val UPI_ID = "UPI"
     const val WALLET_ID = "WALLET"
     const val EMI_ID = "EMI"
+    const val DEBIT_EMI_ID = "DEBIT_EMI"
 
 
     const val CARD_NUMBER_CHUNK = 4
@@ -327,6 +328,8 @@ internal object Constants {
     const val NO_COST_EMI = "NO_COST"
     const val LOW_COST_EMI= "LOW_COST"
     const val STANDARD_EMI="STANDARD"
+
+    const val PDF_VIEWER_GOOGLE_DOC_URL= "https://docs.google.com/gview?embedded=true&url="
 
 
 

@@ -271,6 +271,7 @@ data class Extra(
     var dcc_status: String? = null,
     val sdk_data: SDKData? = null,
     val order_amount: Int? = null,
+    val language: String? = null
 ) : Parcelable
 
 data class PBPBank(
@@ -642,6 +643,7 @@ data class OfferDetails(
     val issuerName: String?,
     val isSplitEmi: Boolean?,
     val tenure: Tenure?,
+    val tenures: List<Tenure>? = null,
 ) : Parcelable
 
 
@@ -694,5 +696,10 @@ data class ConvenienceFeeBreakdown(
     val applicable_fee_amount: Amount? = null
 ) : Parcelable
 
+
+@Parcelize
+data class KFSResponse(
+    val key_fact_pdf_url: String? = null
+) : Parcelable
 
 

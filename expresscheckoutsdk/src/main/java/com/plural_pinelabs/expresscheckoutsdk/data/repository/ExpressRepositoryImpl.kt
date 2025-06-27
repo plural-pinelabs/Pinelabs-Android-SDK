@@ -11,6 +11,7 @@ import com.plural_pinelabs.expresscheckoutsdk.data.model.CardBinMetaDataResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ExpressAddress
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ExpressAddressResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.FetchResponseDTO
+import com.plural_pinelabs.expresscheckoutsdk.data.model.KFSResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.OTPRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.model.OTPResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.OfferEligibilityResponse
@@ -119,6 +120,15 @@ class ExpressRepositoryImpl(
     ): Flow<BaseResult<OfferEligibilityResponse>> {
         return toResultFlow(networkHelper = networkHelper) {
             (apiService as CommonApiService).validateOffer(token, paymentData)
+        }
+    }
+
+    override suspend fun getKFS(
+        token: String?,
+        paymentData: ProcessPaymentRequest?
+    ): Flow<BaseResult<KFSResponse>> {
+        return toResultFlow(networkHelper = networkHelper) {
+            (apiService as CommonApiService).getKFS(token, paymentData)
         }
     }
 }

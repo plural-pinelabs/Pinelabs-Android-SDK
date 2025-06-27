@@ -10,6 +10,7 @@ import com.plural_pinelabs.expresscheckoutsdk.presentation.card.SavedCardOTPView
 import com.plural_pinelabs.expresscheckoutsdk.presentation.d2c.AddressViewModel
 import com.plural_pinelabs.expresscheckoutsdk.presentation.d2c.NewAddressFragmentViewModel
 import com.plural_pinelabs.expresscheckoutsdk.presentation.d2c.VerifyOTPFragmentViewModel
+import com.plural_pinelabs.expresscheckoutsdk.presentation.emi.TenureSelectionViewModel
 import com.plural_pinelabs.expresscheckoutsdk.presentation.nativeotp.NativeOTPViewModel
 import com.plural_pinelabs.expresscheckoutsdk.presentation.netbanking.NetBankingViewModel
 import com.plural_pinelabs.expresscheckoutsdk.presentation.splash.SplashViewModel
@@ -151,3 +152,17 @@ class NetBankingViewModelFactory(private val networkHelper: NetworkHelper) :
         ) as T
     }
 }
+
+
+class TenureSelectionViewModelFactory(private val networkHelper: NetworkHelper) :
+    ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        return TenureSelectionViewModel(
+            ExpressRepositoryImpl(
+                RetrofitBuilder.commonApiService,
+                networkHelper = networkHelper
+            )
+        ) as T
+    }
+}
+
