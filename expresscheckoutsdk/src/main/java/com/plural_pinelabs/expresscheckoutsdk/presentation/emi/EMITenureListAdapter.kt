@@ -133,4 +133,9 @@ class EMITenureListAdapter(
     override fun onBindViewHolder(holder: ItemViewHolder, position: Int) {
         holder.setItem(tenures[position], position)
     }
+    override fun getItemViewType(position: Int): Int {
+        //Note: This is a temporary work around to avoid icon being repeated as we are fetching icons
+        // from a server upon scroll the previous icon items are shown only
+        return position
+    }
 }

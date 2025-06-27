@@ -142,11 +142,11 @@
     <string name="or_pay_using_bank_website">OR Pay using Bank website</string>
     <string name="pay_by_bank_website_descrption">You will be redirected to the selected bank’s website</string>
     <string name="search">Search</string>
-    <string name="easy_emi_pick_a_bank_choose_a_plan_and_pay">Easy EMI : \nPick a bank, choose a plan, and pay!</string>
+    <string name="easy_emi_pick_a_bank_choose_a_plan_and_pay">Pay Using EMI</string>
     <string name="card_less">Card Less</string>
     <string name="debit_card">Debit Card</string>
     <string name="credit_card">Credit Card</string>
-    <string name="emi_starting_at_x_month">EMI Starting ₹ 9,041/month</string>
+    <string name="emi_starting_at_x_month">EMI Starting ₹ %s /month</string>
     <string name="emi_label">EMI</string>
     <string name="x_3_months">x %s months</string>
     <string name="x_one_time_processing_fee">%s One-time processing fee</string>
@@ -172,5 +172,6 @@
     <string name="loading_key_fact_statement_please_wait">Loading Key Fact Statement, please wait</string>
     <string name="unable_to_load_this_page_at_this_moment_please_try_again">Unable to load this page at this moment./n Please try again.</string>
     <string name="retry">Retry</string>
+    <string name="you_re_saving_x_on_this_order">You’re saving ₹ %s on this order!</string>
 
 </resources>

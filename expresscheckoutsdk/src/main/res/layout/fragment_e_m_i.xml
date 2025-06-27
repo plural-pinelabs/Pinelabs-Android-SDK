@@ -28,8 +28,7 @@
             android:layout_height="32dp"
             android:layout_marginStart="4dp"
             android:importantForAccessibility="no"
-            android:src="@drawable/ic_cards_payment_icon"
-            app:tint="@color/green_3D50D387" />
+            android:src="@drawable/ic_emi_logo" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -39,9 +38,9 @@
             android:layout_marginEnd="8dp"
             android:ellipsize="end"
             android:fontFamily="sans-serif-medium"
-            android:textColor="@color/black_text_80"
             android:gravity="start"
             android:text="@string/easy_emi_pick_a_bank_choose_a_plan_and_pay"
+            android:textColor="@color/black_text_80"
             android:textFontWeight="600"
             android:textSize="14sp" />
 
@@ -50,7 +49,7 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="16dp">
+        android:layout_marginTop="24dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -62,7 +61,7 @@
                 android:layout_height="wrap_content"
                 android:background="@drawable/input_field_border"
                 android:orientation="horizontal"
-                android:padding="4dp">
+                android:padding="2dp">
 
 
                 <TextView
@@ -72,6 +71,7 @@
                     android:layout_marginStart="2dp"
                     android:layout_weight="1"
                     android:fontFamily="sans-serif"
+                    android:gravity="center"
                     android:paddingHorizontal="16dp"
                     android:paddingVertical="10dp"
                     android:text="@string/credit_card"
@@ -93,6 +93,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:fontFamily="sans-serif"
+                    android:gravity="center"
                     android:paddingHorizontal="16dp"
                     android:paddingVertical="12dp"
                     android:text="@string/debit_card"
@@ -106,7 +107,8 @@
                     android:layout_gravity="center_vertical"
                     android:layout_marginHorizontal="4dp"
                     android:layout_marginVertical="8dp"
-                    android:background="@color/black_text_20" />
+                    android:background="@color/black_text_20"
+                    android:visibility="gone" />
 
                 <TextView
                     android:id="@+id/card_less_selector_text"
@@ -120,7 +122,8 @@
                     android:text="@string/card_less"
                     android:textColor="@color/black_text"
                     android:textFontWeight="600"
-                    android:textSize="14sp" />
+                    android:textSize="14sp"
+                    android:visibility="gone" />
 
 
             </LinearLayout>
@@ -129,7 +132,7 @@
                 android:id="@+id/emi_saving_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="16dp"
                 android:background="@drawable/aeb4ba_gradient"
                 android:drawableStart="@drawable/ic_saving_icon"
                 android:drawablePadding="16dp"
@@ -147,7 +150,7 @@
                 android:id="@+id/emi_bank_list_rv"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
+                android:layout_marginTop="20dp"
                 android:background="@drawable/input_field_border"
                 android:elevation="4dp" />
 

@@ -67,6 +67,8 @@ class TenureSelectionFragment : Fragment() {
     private lateinit var logo: ImageView
     private lateinit var selectedBanKTitle: TextView
     private lateinit var continueBtn: Button
+    private lateinit var footerLayout: LinearLayout
+    private lateinit var saveInfoText: TextView
 
     private var selectedIssuerId: String? = null
     private var issuer: Issuer? = null
@@ -122,6 +124,8 @@ class TenureSelectionFragment : Fragment() {
         selectedBanKTitle = view.findViewById(R.id.issuer_title)
         logo = view.findViewById(R.id.logo)
         continueBtn = view.findViewById(R.id.continue_btn)
+        footerLayout = view.findViewById(R.id.footer)
+        saveInfoText = view.findViewById(R.id.save_info_text)
         loadBankLogo()
         continueBtn.setOnClickListener {
             handleContinueButtonClick()
@@ -193,6 +197,14 @@ class TenureSelectionFragment : Fragment() {
                     getString(R.string.pay_emi_x_per_month),
                     Utils.convertToRupees(requireContext(), item?.monthly_emi_amount?.value)
                 )
+                footerLayout.visibility = View.VISIBLE
+                val amount = Utils.convertInRupees(
+                    (item?.total_discount_amount?.value
+                        ?: 0) + (item?.total_subvention_amount?.value ?: 0)
+                )
+                saveInfoText.text = String.format(
+                    getString(R.string.you_re_saving_x_on_this_order), amount.toString()
+                )
             }
         }
     }
@@ -204,7 +216,7 @@ class TenureSelectionFragment : Fragment() {
         }
         if (issuer?.issuer_type?.equals(EMI_DC_TYPE) == true) {
             //user has choosen a Debit card show kfs and once consent is given navigate to card details
-             viewModel.getKFS(ExpressSDKObject.getToken(), createProcessPaymentRequest())
+            viewModel.getKFS(ExpressSDKObject.getToken(), createProcessPaymentRequest())
         } else {
             val bundle = Bundle()
             bundle.putString(ISSUE_ID, selectedIssuerId)

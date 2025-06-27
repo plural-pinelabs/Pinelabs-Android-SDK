@@ -11,7 +11,7 @@
         android:id="@+id/top_bar_back_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="16dp"
+        android:layout_marginHorizontal="20dp"
         android:layout_marginTop="12dp"
         android:orientation="horizontal"
         app:layout_constraintStart_toStartOf="parent"
@@ -46,7 +46,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="16dp"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="24dp"
         android:background="@drawable/rounded_emi_title_bg"
         android:orientation="horizontal"
         android:paddingHorizontal="16dp"
@@ -100,18 +100,35 @@
 
     </LinearLayout>
 
+    <TextView
+
+        android:id="@+id/select_a_plan_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="24dp"
+        android:layout_marginTop="32dp"
+        android:fontFamily="sans-serif-medium"
+        android:letterSpacing="0.12"
+        android:text="Select a Plan"
+        android:textAllCaps="true"
+        android:textColor="@color/black_text_60"
+        android:textFontWeight="700"
+        android:textSize="12sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/selected_emi_issuer" />
+
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/tenure_list_rv"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginHorizontal="16dp"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="16dp"
         android:layout_marginBottom="12dp"
         app:layout_constraintBottom_toTopOf="@id/footer"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/selected_emi_issuer"
+        app:layout_constraintTop_toBottomOf="@id/select_a_plan_text"
         tools:itemCount="4"
         tools:listitem="@layout/tenure_item_layout" />
 
@@ -122,11 +139,25 @@
         android:layout_gravity="bottom"
         android:background="@color/white"
         android:orientation="vertical"
+        android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
+        <TextView
+            android:id="@+id/save_info_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:background="@drawable/confetti_saving_bg"
+            android:drawableStart="@drawable/ic_success_offer_saving"
+            android:gravity="center"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="8dp"
+            android:text="@string/you_re_saving_x_on_this_order" />
+
         <LinearLayout
+            android:id="@+id/paying_info_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"

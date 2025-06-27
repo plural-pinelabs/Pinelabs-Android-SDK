@@ -853,16 +853,7 @@ internal object Utils {
     //Custom sort extension for list of tenure type so that we can sort in the order of nocost > low cost > standard
     // and each group sorted by the tenure value among itself
     fun List<Tenure>.customSorted(): List<Tenure> {
-        return this.sortedWith(
-            compareBy<Tenure> {
-                when (it.emi_type) {
-                    NO_COST_EMI -> 0
-                    LOW_COST_EMI -> 1
-                    STANDARD_EMI -> 2
-                    else -> 3
-                }
-            }.thenBy { it.tenure_value }
-        )
+        return return this.sortedBy { it.tenure_value }
     }
 
     fun getTitleForEMI(context: Context, issuer: Issuer?): String {

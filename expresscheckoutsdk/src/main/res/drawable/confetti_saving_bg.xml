@@ -1,0 +1,11 @@
+<!-- res/drawable/bg_confetti_layer.xml -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Light background color -->
+    <item android:drawable="@color/white" />
+    <item android:drawable="@color/green_1F20D39C" />
+
+    <!-- Confetti pattern overlay -->
+    <item android:drawable="@drawable/ic_saving_confetti" />
+
+</layer-list>

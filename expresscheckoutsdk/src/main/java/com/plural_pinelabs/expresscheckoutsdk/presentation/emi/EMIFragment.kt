@@ -22,6 +22,7 @@ import com.plural_pinelabs.expresscheckoutsdk.common.PaymentModes
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils
 import com.plural_pinelabs.expresscheckoutsdk.data.model.EMIPaymentModeData
 import com.plural_pinelabs.expresscheckoutsdk.data.model.Issuer
+import com.plural_pinelabs.expresscheckoutsdk.data.model.Tenure
 import com.plural_pinelabs.expresscheckoutsdk.presentation.utils.DividerItemDecoration
 
 class EMIFragment : Fragment() {
@@ -31,6 +32,7 @@ class EMIFragment : Fragment() {
     private lateinit var emiDCPayment: TextView
     private lateinit var emiPaymentModeData: EMIPaymentModeData
     private lateinit var backButton: ImageView
+    private lateinit var startingEmiTv: TextView
 
     private lateinit var bankLogoMap: HashMap<String, String>
     private lateinit var banKTitleToCodeMap: HashMap<String, String>
@@ -58,6 +60,7 @@ class EMIFragment : Fragment() {
         emiDCPayment = view.findViewById(R.id.dc_emi_selector_text)
         emiCashlessPayment = view.findViewById(R.id.card_less_selector_text)
         backButton = view.findViewById(R.id.back_button)
+        startingEmiTv = view.findViewById(R.id.emi_saving_text)
         backButton.setOnClickListener {
             findNavController().popBackStack()
         }
@@ -73,11 +76,17 @@ class EMIFragment : Fragment() {
         showEMIListBasedOnSelection(
             Constants.EMI_CC_TYPE
         )
+        startingEmiTv.text = String.format(
+            getString(R.string.emi_starting_at_x_month),
+            Utils.convertInRupees(getLeastEmiAmount()?.monthly_emi_amount?.value ?: 0).toString()
+        )
+
     }
 
     private fun showEMIList(listOfCCBank: List<Issuer>) {
         val maxTenureMap = Utils.getMaxDiscountTenurePerIssuer(listOfCCBank)
         val adapter = EMIBankRecyclerViewAdapter(
+            requireContext(),
             listOfCCBank,
             getItemClickListener(),
             bankLogoMap,
@@ -179,6 +188,14 @@ class EMIFragment : Fragment() {
         bankLogoMap = Utils.getBankLogoHashMap()
         bankNameKeyList = Utils.getListOfBanKTitle()
         banKTitleToCodeMap = Utils.bankTitleAndCodeMapper()
+    }
+
+    private fun getLeastEmiAmount(): Tenure? {
+        val leastEmiTenure: Tenure? = emiPaymentModeData.issuers
+            .flatMap { it.tenures }
+            .filter { it.monthly_emi_amount?.value != null && it.tenure_id != "7" }
+            .minByOrNull { it.monthly_emi_amount?.value!! }
+        return leastEmiTenure
     }
 
 }

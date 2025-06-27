@@ -39,7 +39,6 @@ import com.plural_pinelabs.expresscheckoutsdk.common.NetworkHelper
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils.cardIcons
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils.cardTypes
-import com.plural_pinelabs.expresscheckoutsdk.common.Utils.showProcessPaymentBottomSheetDialog
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils.showProcessPaymentDialog
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CardBinMetaDataResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CardData
@@ -290,16 +289,12 @@ class EMICardDetailsFragment : Fragment() {
                         is BaseResult.Error -> {
                             showCardDetailsError("OfferEligibility")
                             Log.e("Error", it.errorMessage ?: "Unknown error")
-                            bottomSheetDialog?.dismiss()
                         }
 
                         is BaseResult.Loading -> {
-                            if (it.isLoading) bottomSheetDialog =
-                                showProcessPaymentBottomSheetDialog(requireContext())
                         }
 
                         is BaseResult.Success<OfferEligibilityResponse> -> {
-                            bottomSheetDialog?.dismiss()
                             if (it.data.code.equals("ELIGIBLE", true)) {
                                 // If the offer is eligible, proceed with payment
                                 //enable the payment button

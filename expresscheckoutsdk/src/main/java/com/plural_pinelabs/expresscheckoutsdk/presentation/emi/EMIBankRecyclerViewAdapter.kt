@@ -1,5 +1,6 @@
 package com.plural_pinelabs.expresscheckoutsdk.presentation.emi
 
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,8 +11,8 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
 import coil.ImageLoader
 import coil.decode.SvgDecoder
+import coil.load
 import coil.request.CachePolicy
-import coil.request.ImageRequest
 import com.plural_pinelabs.expresscheckoutsdk.R
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.BASE_IMAGES
 import com.plural_pinelabs.expresscheckoutsdk.common.ItemClickListener
@@ -20,6 +21,7 @@ import com.plural_pinelabs.expresscheckoutsdk.data.model.Issuer
 import com.plural_pinelabs.expresscheckoutsdk.data.model.Tenure
 
 class EMIBankRecyclerViewAdapter(
+    private val context: Context,
     private val list: List<Issuer>,
     private val emiBankSelectionCallback: ItemClickListener<Issuer>?,
     private val bankLogoMap: HashMap<String, String>,
@@ -27,6 +29,13 @@ class EMIBankRecyclerViewAdapter(
     private val banKTitleToCodeMap: HashMap<String, String>,
     private val maxTenureMap: HashMap<String, Tenure>
 ) : RecyclerView.Adapter<EMIBankRecyclerViewAdapter.ItemViewHolder>() {
+
+
+    private val imageLoader = ImageLoader.Builder(context)
+        .components { add(SvgDecoder.Factory()) }
+        .crossfade(true)
+        .build()
+
 
     inner class ItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
@@ -41,18 +50,20 @@ class EMIBankRecyclerViewAdapter(
             val saveLayout: LinearLayout = itemView.findViewById(R.id.saving_layout)
             val saveAmountTv: TextView = itemView.findViewById(R.id.saving_text_value)
 
+
             val maxDiscount: String = maxTenureMap[item.id]?.let { tenure ->
-                tenure.total_discount_amount?.value?.let {
-                    Utils.convertToRupees(itemView.context, it)
-                } ?: tenure.total_subvention_amount?.value?.let {
-                    Utils.convertToRupees(itemView.context, it)
-                }
+                val discount: Int = tenure.total_discount_amount?.value ?: 0
+                val subvention: Int = tenure.total_subvention_amount?.value ?: 0
+                val total = discount + subvention
+                Utils.convertToRupees(itemView.context, total)
             } ?: "error"
+
 
             saveLayout.visibility = View.GONE
             if (!maxDiscount.contains("error", true)) {
                 saveLayout.visibility = View.VISIBLE
-                saveAmountTv.text = maxDiscount
+                saveAmountTv.text =
+                    String.format(itemView.context.getString(R.string.save_rs_x), maxDiscount)
             } else {
                 saveLayout.visibility = View.GONE
             }
@@ -60,14 +71,19 @@ class EMIBankRecyclerViewAdapter(
             if (imageTitle != null) {
                 logo.setImageDrawable(null)
                 val imageUrl = BASE_IMAGES + bankLogoMap[banKTitleToCodeMap[imageTitle]]
-                val imageLoader = ImageLoader.Builder(itemView.context).components {
-                    add(SvgDecoder.Factory())
-                }.crossfade(true).build()
-                val request = ImageRequest.Builder(itemView.context).data(imageUrl).target(logo)
-                    .memoryCachePolicy(CachePolicy.ENABLED).build()
-                imageLoader.enqueue(request)
-                // TODO add a fallback image
+                if (imageUrl.isNotBlank()) {
+                    logo.load(imageUrl, imageLoader) {
+                        placeholder(R.drawable.ic_generic)
+                        error(R.drawable.ic_generic)
+                        memoryCachePolicy(CachePolicy.ENABLED)
+                    }
+                } else {
+                    logo.setImageResource(R.drawable.ic_generic)
+                }
+
             }
+
+
             title.text = item.display_name.removeSuffix(" BANK")
             parentItem.setOnClickListener {
                 emiBankSelectionCallback?.onItemClick(position, item)
@@ -89,6 +105,12 @@ class EMIBankRecyclerViewAdapter(
 
     override fun onBindViewHolder(holder: ItemViewHolder, position: Int) {
         holder.setItem(list[position], position)
+    }
+
+    override fun getItemViewType(position: Int): Int {
+        //Note: This is a temporary work around to avoid icon being repeated as we are fetching icons
+        // from a server upon scroll the previous icon items are shown only
+        return position
     }
 
 }

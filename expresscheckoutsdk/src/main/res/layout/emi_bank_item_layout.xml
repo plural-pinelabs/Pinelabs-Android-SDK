@@ -23,23 +23,27 @@
 
     <TextView
         android:id="@+id/bank_title"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:layout_marginStart="16dp"
+        android:layout_marginEnd="8dp"
         android:layout_weight="1"
+        android:ellipsize="end"
         android:fontFamily="sans-serif"
+        android:maxLines="1"
         android:textColor="@color/black_text_80"
         android:textFontWeight="600"
         android:textSize="16sp"
+
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/saving_layout"
         app:layout_constraintStart_toEndOf="@id/bank_logo"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="Wallet Title" />
 
 
     <LinearLayout
-        android:visibility="gone"
         android:id="@+id/saving_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -47,6 +51,7 @@
         android:background="@drawable/saving_gradient"
         android:orientation="horizontal"
         android:padding="6dp"
+        android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -54,6 +59,7 @@
         <ImageView
             android:layout_width="18dp"
             android:layout_height="18dp"
+            android:layout_gravity="center_vertical"
             android:src="@drawable/ic_saving_offer_tag" />
 
         <TextView
