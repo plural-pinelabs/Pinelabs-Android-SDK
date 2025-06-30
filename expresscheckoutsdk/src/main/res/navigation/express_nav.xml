@@ -199,6 +199,9 @@
         <action
             android:id="@+id/action_tenureSelectionFragment_to_EMICardDetailsFragment"
             app:destination="@id/EMICardDetailsFragment" />
+        <action
+            android:id="@+id/action_tenureSelectionFragment_to_DCEMICardDetailsFragment"
+            app:destination="@id/DCEMICardDetailsFragment" />
     </fragment>
     <fragment
         tools:layout="@layout/fragment_e_m_i_card_details"
@@ -211,6 +214,18 @@
         <action
             android:id="@+id/action_EMICardDetailsFragment_to_failureFragment"
             app:destination="@id/failureFragment" />
+    </fragment>
+    <fragment
+        tools:layout="@layout/fragment_d_c_e_m_i_card_details"
+        android:id="@+id/DCEMICardDetailsFragment"
+        android:name="com.plural_pinelabs.expresscheckoutsdk.presentation.emi.DCEMICardDetailsFragment"
+        android:label="DCEMICardDetailsFragment" >
+        <action
+            android:id="@+id/action_DCEMICardDetailsFragment_to_failureFragment"
+            app:destination="@id/failureFragment" />
+        <action
+            android:id="@+id/action_DCEMICardDetailsFragment_to_ACSFragment"
+            app:destination="@id/ACSFragment" />
     </fragment>
 
 </navigation>

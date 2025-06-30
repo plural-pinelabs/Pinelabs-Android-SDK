@@ -96,4 +96,5 @@ class KFSWebView(
     fun destroy() {
         webView.removeJavascriptInterface("AndroidInterface")
     }
+
 }

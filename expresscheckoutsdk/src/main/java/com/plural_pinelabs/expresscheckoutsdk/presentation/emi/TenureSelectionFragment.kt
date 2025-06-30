@@ -14,6 +14,7 @@ import android.widget.CheckBox
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.PopupMenu
 import android.widget.TextView
 import androidx.core.graphics.drawable.toDrawable
 import androidx.fragment.app.Fragment
@@ -43,6 +44,7 @@ import com.plural_pinelabs.expresscheckoutsdk.common.Constants.TENURE_ID
 import com.plural_pinelabs.expresscheckoutsdk.common.ItemClickListener
 import com.plural_pinelabs.expresscheckoutsdk.common.KFSWebView
 import com.plural_pinelabs.expresscheckoutsdk.common.NetworkHelper
+import com.plural_pinelabs.expresscheckoutsdk.common.PdfDownloader
 import com.plural_pinelabs.expresscheckoutsdk.common.TenureSelectionViewModelFactory
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils.customSorted
@@ -368,9 +370,9 @@ class TenureSelectionFragment : Fragment() {
             val layoutParams = it.layoutParams
             val displayMetrics = Resources.getSystem().displayMetrics
             val screenHeight = displayMetrics.heightPixels
-            layoutParams.height = screenHeight
+            layoutParams.height = (screenHeight * 0.75).toInt()
             it.layoutParams = layoutParams
-            behavior.peekHeight = screenHeight
+            behavior.peekHeight = (screenHeight * 0.75).toInt()
             behavior.state = BottomSheetBehavior.STATE_EXPANDED
             behavior.isFitToContents = false
             behavior.skipCollapsed = true
@@ -386,25 +388,16 @@ class TenureSelectionFragment : Fragment() {
         val webView: WebView = view.findViewById(R.id.kfs_webview)
         val consentCheckBox: CheckBox = view.findViewById(R.id.terms_checkbox_consent)
         val continueButton: Button = view.findViewById(R.id.continue_btn)
+        var pdfUrl = ""
+        if (url != null) {
+            webView.visibility = View.VISIBLE
+            pdfUrl = "https://docs.google.com/gview?embedded=true&url=" + URLEncoder.encode(
+                url,
+                "UTF-8"
+            )
 
-        languageTextView.setOnClickListener {
-            //TODO handle language change
         }
-        downloadPDfButton.setOnClickListener {
-            //TODO handle pdf download
-        }
-        cancelButton.setOnClickListener {
-            bottomSheetDialog?.dismiss()
-        }
-        retryButton.setOnClickListener {
-            //TODO handle retry logic
-        }
-        continueButton.setOnClickListener {
-            if (consentCheckBox.isChecked) {
-                bottomSheetDialog?.dismiss()
-                //TODO handle continue logic
-            }
-        }
+
         consentCheckBox.setOnCheckedChangeListener { buttonView, isChecked ->
             continueButton.isEnabled = isChecked
         }
@@ -418,18 +411,33 @@ class TenureSelectionFragment : Fragment() {
             }
         )
 
-        if (url != null) {
-            webView.visibility = View.VISIBLE
-            val pdfUrl = "https://docs.google.com/gview?embedded=true&url=" + URLEncoder.encode(
-                url,
-                "UTF-8"
-            )
-            kfsWebView.loadUrl(pdfUrl)
-        }
         bottomSheetDialog?.setCancelable(false)
         bottomSheetDialog?.setCanceledOnTouchOutside(false)
         bottomSheetDialog?.window?.setBackgroundDrawable(Color.TRANSPARENT.toDrawable())
+        kfsWebView.loadUrl(pdfUrl)// Loading the URL
         bottomSheetDialog?.show()
+
+        languageTextView.setOnClickListener {
+            //TODO handle language change
+            showLanguagePopup(languageTextView)
+
+        }
+        downloadPDfButton.setOnClickListener {
+            //TODO handle pdf download
+            PdfDownloader(requireContext()).downloadPdf(pdfUrl)
+        }
+        cancelButton.setOnClickListener {
+            bottomSheetDialog?.dismiss()
+        }
+        retryButton.setOnClickListener {
+            kfsWebView.loadUrl(pdfUrl)
+        }
+        continueButton.setOnClickListener {
+            if (consentCheckBox.isChecked) {
+                bottomSheetDialog?.dismiss()
+                findNavController().navigate(R.id.action_tenureSelectionFragment_to_DCEMICardDetailsFragment)
+            }
+        }
         if (isError) {
             progressBarContainer.visibility = View.GONE
             webView.visibility = View.GONE
@@ -439,6 +447,24 @@ class TenureSelectionFragment : Fragment() {
             webView.visibility = View.GONE
             errorLayout.visibility = View.GONE
         }
+    }
+
+    private fun showLanguagePopup(anchor: TextView) {
+        val languages = listOf("English", "Hindi", "Spanish", "French", "German")
+        val popupMenu = PopupMenu(anchor.context, anchor)
+
+        languages.forEachIndexed { index, language ->
+            popupMenu.menu.add(0, index, index, language)
+        }
+
+        popupMenu.setOnMenuItemClickListener { item ->
+            val selectedLanguage = languages[item.itemId]
+            (anchor as? TextView)?.text = selectedLanguage
+            //TODO pass this value when selecting the langugage
+            true
+        }
+
+        popupMenu.show()
     }
 
 }

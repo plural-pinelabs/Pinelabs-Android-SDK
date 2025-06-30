@@ -46,7 +46,6 @@ import com.plural_pinelabs.expresscheckoutsdk.data.model.DeviceInfo
 import com.plural_pinelabs.expresscheckoutsdk.data.model.EmiData
 import com.plural_pinelabs.expresscheckoutsdk.data.model.Extra
 import com.plural_pinelabs.expresscheckoutsdk.data.model.Issuer
-import com.plural_pinelabs.expresscheckoutsdk.data.model.OTPRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.model.OfferDetails
 import com.plural_pinelabs.expresscheckoutsdk.data.model.OfferEligibilityResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ProcessPaymentRequest
@@ -54,20 +53,16 @@ import com.plural_pinelabs.expresscheckoutsdk.data.model.ProcessPaymentResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.Tenure
 import com.plural_pinelabs.expresscheckoutsdk.presentation.card.CardFragmentViewModel
 import kotlinx.coroutines.launch
-import java.util.Calendar
 import java.util.Locale
 
-class EMICardDetailsFragment : Fragment() {
+class DCEMICardDetailsFragment : Fragment() {
 
     private lateinit var cardEditText: EditText
-    private lateinit var expiryEditText: EditText
-    private lateinit var cvvEditText: EditText
-    private lateinit var cardHolderText: EditText
     private lateinit var payBtn: Button
     private lateinit var cardErrorText: TextView
-    private lateinit var cardHolderErrorText: TextView
+    private lateinit var phoneNumberErrorText: TextView
     private lateinit var backBtn: ImageView
-
+    private lateinit var phoneNumberText: EditText
     private lateinit var logo: ImageView
     private lateinit var issuerTitleTv: TextView
     private lateinit var emiPerMonthAmount: TextView
@@ -78,9 +73,7 @@ class EMICardDetailsFragment : Fragment() {
     private var formattedCardNumber: String? = null
     private var cursorPosition = 0
     private var isCardValid = false
-    private var isExpiryValid = false
-    private var isCVVValid = false
-    private var isCardHolderNameValid: Boolean = false
+    private var isPhoneValid = false
     private var bottomSheetDialog: BottomSheetDialog? = null
     private lateinit var bankLogoMap: HashMap<String, String>
     private lateinit var banKTitleToCodeMap: HashMap<String, String>
@@ -93,7 +86,8 @@ class EMICardDetailsFragment : Fragment() {
     private var selectedTenure: Tenure? = null
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
     ): View? {
         tenureId = arguments?.getString(TENURE_ID)
         issuerId = arguments?.getString(Constants.ISSUE_ID)
@@ -101,8 +95,9 @@ class EMICardDetailsFragment : Fragment() {
             this, CardFragmentViewModelFactory(NetworkHelper(requireContext()))
         )[CardFragmentViewModel::class.java]
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_e_m_i_card_details, container, false)
+        return inflater.inflate(R.layout.fragment_d_c_e_m_i_card_details, container, false)
     }
+
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -112,9 +107,7 @@ class EMICardDetailsFragment : Fragment() {
         observeViewModel()
         setCardFocusListener()
         setUpCardNumberValidation()
-        setupCardHolderNameValidation(cardHolderText)
-        setupCVVValidation(cvvEditText)
-        setupExpiryValidation(expiryEditText)
+        setUpPhoneNumberValidation()
     }
 
     private fun setEMIIssuer() {
@@ -137,14 +130,10 @@ class EMICardDetailsFragment : Fragment() {
 
     private fun setupViews(view: View) {
         cardEditText = view.findViewById(R.id.card_number_et)
-        expiryEditText = view.findViewById(R.id.expiry_date_et)
-        cvvEditText = view.findViewById(R.id.cvv_et)
         payBtn = view.findViewById(R.id.continue_btn)
-        cardHolderText = view.findViewById(R.id.full_name_et)
-        cardHolderErrorText = view.findViewById(R.id.error_message_card_holder_name)
         cardErrorText = view.findViewById(R.id.error_message_card_details)
         backBtn = view.findViewById(R.id.back_button)
-
+        phoneNumberText = view.findViewById(R.id.editTextMobileNumber)
         logo = view.findViewById(R.id.logo)
         issuerTitleTv = view.findViewById(R.id.issuer_title)
         emiPerMonthAmount = view.findViewById(R.id.emi_per_month_value)
@@ -385,6 +374,28 @@ class EMICardDetailsFragment : Fragment() {
         })
     }
 
+    private fun setUpPhoneNumberValidation() {
+        phoneNumberText.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+                // No action needed before text change
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                // No action needed during text change
+            }
+
+            override fun afterTextChanged(s: Editable?) {
+                val phoneNumber = s.toString()
+                if (phoneNumber.length < 10 || !Utils.isValidPhoneNumber(phoneNumber)) {
+                    showCardDetailsError("Phone")
+                } else {
+                    isPhoneValid = true
+                    phoneNumberErrorText.visibility = View.GONE
+                }
+            }
+        })
+    }
+
 
     private fun setCardBrandIcon(etCardNumber: EditText, cardType: String?) {
         val iconResId = cardIcons[cardType]
@@ -394,110 +405,6 @@ class EMICardDetailsFragment : Fragment() {
             )
         } else {
             etCardNumber.setCompoundDrawablesWithIntrinsicBounds(null, null, null, null)
-        }
-    }
-
-    private fun setupCardHolderNameValidation(etCardHolderName: EditText) {
-        etCardHolderName.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-
-            override fun afterTextChanged(s: Editable?) {
-                val name = s?.toString()?.trim()
-                val filteredName = name?.filter { it.isLetter() || it.isWhitespace() }
-                if (name != filteredName) {
-                    etCardHolderName.setText(filteredName)
-                    etCardHolderName.setSelection(filteredName?.length ?: 0)
-                }
-                isCardHolderNameValid = !filteredName.isNullOrEmpty()
-                if (!isCardHolderNameValid) {
-                    showCardDetailsError("CardHolderName")
-                } else {
-                    hideCardHolderNameError()
-                }
-            }
-        })
-    }
-
-    private fun setupExpiryValidation(
-        etExpiry: EditText,
-    ) {
-        etExpiry.addTextChangedListener(object : TextWatcher {
-            private var isEditing = false
-
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-            }
-
-            override fun afterTextChanged(s: Editable?) {
-                if (isEditing) return
-                isEditing = true
-
-                val input = s.toString().replace(Regex("[^\\d]"), "")
-                val formattedInput = when {
-                    input.length <= 2 -> input
-                    input.length <= 4 -> "${input.substring(0, 2)}/${input.substring(2)}"
-                    else -> "${input.substring(0, 2)}/${input.substring(2, 4)}"
-                }
-
-                etExpiry.setText(formattedInput)
-                etExpiry.setSelection(formattedInput.length)
-
-                isEditing = false
-            }
-        })
-
-        etExpiry.setOnFocusChangeListener { _, hasFocus ->
-            if (!hasFocus) {
-                val parts = etExpiry.text.toString().split("/")
-                if (parts.size == 2) {
-                    val month = parts[0].toIntOrNull()
-                    val year = parts[1].toIntOrNull()?.plus(2000)
-
-                    if (month == null || year == null || month !in 1..12) {
-                        showCardDetailsError("Expiry")
-                    } else {
-                        val calendar = Calendar.getInstance()
-                        val currentYear = calendar.get(Calendar.YEAR)
-                        val currentMonth = calendar.get(Calendar.MONTH) + 1
-
-                        if (year < currentYear || (year == currentYear && month < currentMonth)) {
-                            showCardDetailsError("Expiry")
-                        } else {
-                            isExpiryValid = true
-                        }
-                    }
-                } else {
-                    showCardDetailsError("Expiry")
-                }
-            }
-        }
-    }
-
-    private fun setupCVVValidation(etCVV: EditText) {
-        etCVV.addTextChangedListener(object : TextWatcher {
-            private var isEditing = false
-
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-
-            override fun afterTextChanged(s: Editable?) {
-            }
-        })
-
-        etCVV.setOnFocusChangeListener { _, hasFocus ->
-            if (!hasFocus) {
-                val cvv = etCVV.text.toString()
-                if (cvv.isEmpty() || cvv.length < 3) {
-                    showCardDetailsError("CVV")
-                } else {
-                    isCVVValid = true
-                    hideCardDetailsError()
-                }
-            }
         }
     }
 
@@ -533,9 +440,6 @@ class EMICardDetailsFragment : Fragment() {
         cardErrorText.visibility = View.GONE
     }
 
-    private fun hideCardHolderNameError() {
-        cardHolderErrorText.visibility = View.GONE
-    }
 
     private fun showCardDetailsError(errorType: String) {
         when (errorType) {
@@ -545,29 +449,18 @@ class EMICardDetailsFragment : Fragment() {
                 cardErrorText.visibility = View.VISIBLE
             }
 
-            "Expiry" -> {
-                isExpiryValid = false
-                cardErrorText.text = getString(R.string.please_enter_a_valid_expiry)
-                cardErrorText.visibility = View.VISIBLE
-            }
-
-            "CVV" -> {
-                isCVVValid = false
-                cardErrorText.text = getString(R.string.please_enter_a_valid_cvv)
-                cardErrorText.visibility = View.VISIBLE
-            }
-
-            "CardHolderName" -> {
-                isCardHolderNameValid = false
-                cardHolderErrorText.text = getString(R.string.please_enter_a_valid_card_holder_name)
-                cardHolderErrorText.visibility = View.VISIBLE
-            }
-
             "OfferEligibility" -> {
                 isCardValid = false
                 cardErrorText.text = "Card is not eligible for the selected offer"
                 // cardErrorText.text = getString(R.string.offer_not_eligible) TODO get string from garima
                 cardErrorText.visibility = View.VISIBLE
+            }
+
+            "Phone" -> {
+                isPhoneValid = false
+                phoneNumberErrorText.text = "Enter a valid number"
+                phoneNumberErrorText.visibility = View.VISIBLE
+
             }
 
             else -> {
@@ -578,20 +471,11 @@ class EMICardDetailsFragment : Fragment() {
     }
 
     private fun validateAllFields() {
-        if (isCardValid && isExpiryValid && isCVVValid && isCardHolderNameValid) {
+        if (isCardValid) {
             initProcessPayment()
         } else {
             if (!isCardValid) {
                 showCardDetailsError("CardNumber")
-            }
-            if (!isExpiryValid) {
-                showCardDetailsError("Expiry")
-            }
-            if (!isCVVValid) {
-                showCardDetailsError("CVV")
-            }
-            if (!isCardHolderNameValid) {
-                showCardDetailsError("CardHolderName")
             }
         }
     }
@@ -614,15 +498,9 @@ class EMICardDetailsFragment : Fragment() {
     private fun createProcessPaymentRequest(shouldSaveCard: Boolean): ProcessPaymentRequest {
 
         val cardNumber = cardEditText.text.toString().filter { !it.isWhitespace() }
-        val cvv = cvvEditText.text.toString()
-        val cardHolderName = cardHolderText.text.toString()
-        val cardExpiry = expiryEditText.text.toString()
+
         var cardExpiryMonth = ""
         var cardExpiryYear = ""
-        if (cardExpiry.isNotEmpty() && cardExpiry.contains("/")) {
-            cardExpiryMonth = cardExpiry.split("/")[0]
-            cardExpiryYear = "20" + cardExpiry.split("/")[1]
-        }
         val offerDetails =
             ExpressSDKObject.getEMIPaymentModeData()?.offerDetails?.find { it.issuerId == issuerId }
         val offerTenure = offerDetails?.tenureOffers?.find { it.tenureId == tenureId }
@@ -681,8 +559,8 @@ class EMICardDetailsFragment : Fragment() {
         )
         val cardData = CardData(
             cardNumber,
-            cvv,
-            cardHolderName,
+            "",
+            "",
             cardExpiryYear,
             cardExpiryMonth,
             false,
@@ -725,6 +603,5 @@ class EMICardDetailsFragment : Fragment() {
         bankNameKeyList = Utils.getListOfBanKTitle()
         banKTitleToCodeMap = Utils.bankTitleAndCodeMapper()
     }
-
 
 }

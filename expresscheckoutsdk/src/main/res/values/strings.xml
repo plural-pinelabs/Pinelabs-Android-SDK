@@ -173,5 +173,6 @@
     <string name="unable_to_load_this_page_at_this_moment_please_try_again">Unable to load this page at this moment./n Please try again.</string>
     <string name="retry">Retry</string>
     <string name="you_re_saving_x_on_this_order">You’re saving ₹ %s on this order!</string>
+    <string name="registered_mobile_no">Registered mobile no.</string>
 
 </resources>

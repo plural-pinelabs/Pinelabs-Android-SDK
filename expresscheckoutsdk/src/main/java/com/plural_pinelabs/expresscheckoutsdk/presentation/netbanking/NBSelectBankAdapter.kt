@@ -34,7 +34,7 @@ class NBSelectBankAdapter(
             imageLoader?.let {
                 walletLogo.load(item.bankImage.toUri(), it) {
                     crossfade(true)
-                    placeholder(R.drawable.wallet_yes_bank)
+                    placeholder(R.drawable.ic_generic)
                 }
             }
             walletTitle.text = item.bankName

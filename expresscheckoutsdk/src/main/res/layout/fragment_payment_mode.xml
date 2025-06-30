@@ -29,6 +29,8 @@
                 android:text="@string/contact_and_delivery_details"
                 android:textAllCaps="true"
                 android:textFontWeight="700"
+                android:textSize="12sp"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -119,7 +121,8 @@
             android:fontFamily="sans-serif"
             android:letterSpacing="0.12"
             android:text="@string/saved_cards"
-            android:textAllCaps="true" />
+            android:textAllCaps="true"
+            android:textSize="12sp" />
 
         <LinearLayout
             android:id="@+id/saved_cards_card_view"
@@ -149,7 +152,8 @@
             android:fontFamily="sans-serif"
             android:letterSpacing="0.12"
             android:text="@string/select_a_payment_option"
-            android:textAllCaps="true" />
+            android:textAllCaps="true"
+            android:textSize="12sp" />
 
         <androidx.cardview.widget.CardView
             android:id="@+id/payment_option_card"
