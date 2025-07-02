@@ -42,7 +42,7 @@
     <string name="please_enter_a_valid_expiry">Please enter a valid expiry date</string>
     <string name="please_enter_a_valid_cvv">Please enter a valid CVV</string>
     <string name="please_enter_a_valid_card_holder_name">Please enter a valid card holder name.</string>
-    <string name="pay_amount_text">"Pay %1$s %2$.2f"</string>
+    <string name="pay_amount_text">"Pay %1$s %2$s"</string>
     <string name="rupee_symbol">\u20B9</string>
     <string name="card_number_hint">1234 1234 1234 1234</string>
     <string name="processing_payment">Processing your payment</string>
@@ -174,5 +174,6 @@
     <string name="retry">Retry</string>
     <string name="you_re_saving_x_on_this_order">You’re saving ₹ %s on this order!</string>
     <string name="registered_mobile_no">Registered mobile no.</string>
+    <string name="retry_payment_of_9_449">Retry payment of %s</string>
 
 </resources>

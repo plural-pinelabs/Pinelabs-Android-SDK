@@ -9,18 +9,24 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.cardview.widget.CardView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.navigation.findNavController
 import com.plural_pinelabs.expresscheckoutsdk.ExpressSDKObject
 import com.plural_pinelabs.expresscheckoutsdk.R
+import com.plural_pinelabs.expresscheckoutsdk.common.BottomSheetRetryFragment
 import com.plural_pinelabs.expresscheckoutsdk.common.CustomExceptionHandler
+import com.plural_pinelabs.expresscheckoutsdk.common.PaymentModeSharedViewModel
+import com.plural_pinelabs.expresscheckoutsdk.common.PaymentModes
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CustomerInfo
 import com.plural_pinelabs.expresscheckoutsdk.data.model.FetchResponseDTO
+import com.plural_pinelabs.expresscheckoutsdk.data.model.PaymentMode
 
 class LandingActivity : AppCompatActivity() {
     private lateinit var merchantLogoCard: CardView
@@ -37,8 +43,8 @@ class LandingActivity : AppCompatActivity() {
     private lateinit var customerInfoData: CustomerInfo
     private lateinit var headerParentLayout: ConstraintLayout
 
-
     private lateinit var mainContentLayout: ConstraintLayout
+    private val sharedViewModel: PaymentModeSharedViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
@@ -91,14 +97,14 @@ class LandingActivity : AppCompatActivity() {
         showHideHeaderLayout(false)
         mainContentLayout = findViewById(R.id.main)
         cancelBtn.setOnClickListener {
-            Utils.showCancelPaymentDialog(this)
+            Utils.showCancelPaymentDialog(this).show()
         }
+        setupObservers()
     }
 
 
     fun updateValueForHeaderLayout(fetchResponse: FetchResponseDTO?) {
         fetchResponse?.let { fetchData ->
-
             showHideHeaderLayout(true)
             fetchData.customerInfo?.let { customerInfo ->
                 strikeAmount.visibility = View.GONE
@@ -113,7 +119,6 @@ class LandingActivity : AppCompatActivity() {
                     }
 
                 } else {
-
                     contactDetailsLayout.visibility = View.GONE
                     customerId.text = ""
                     customerEmail.text = ""
@@ -162,5 +167,37 @@ class LandingActivity : AppCompatActivity() {
 
             }
         }
+    }
+
+
+    private fun setupObservers() {
+        // Observe payment failure
+        sharedViewModel.retryEvent.observe(this) {
+            if (it)
+                showRetryBottomSheet()
+        }
+
+        // Observe retry selection
+        sharedViewModel.selectedPaymentMethod.observe(this) { selectedMethod ->
+            navigateToPaymentFragment(selectedMethod)
+        }
+    }
+
+    private fun showRetryBottomSheet() {
+        val bottomSheetDialog =
+            BottomSheetRetryFragment()
+        bottomSheetDialog.isCancelable = false
+        bottomSheetDialog.show(supportFragmentManager, "")
+    }
+
+
+    private fun navigateToPaymentFragment(selectedMethod: PaymentMode) {
+        val navHostController = findNavController(R.id.nav_host_fragment_container)
+//        val destinationId = when (selectedMethod.paymentModeId) {
+//            PaymentModes.CREDIT_DEBIT.paymentModeID -> R.id.cardFragment
+//
+//            PaymentModes.UPI.paymentModeID -> {}
+//        }
+
     }
 }

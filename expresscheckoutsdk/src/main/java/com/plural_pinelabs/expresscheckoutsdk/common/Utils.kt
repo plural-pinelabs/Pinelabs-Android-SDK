@@ -163,7 +163,6 @@ import com.plural_pinelabs.expresscheckoutsdk.common.Constants.SOUTH_INDIAN_BANK
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.SOUTH_INDIAN_TITLE
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.STANDARD_CHARTERED_BANK_CODE
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.STANDARD_CHARTERED_TITLE
-import com.plural_pinelabs.expresscheckoutsdk.common.Constants.STANDARD_EMI
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.SURYODAY_BANK_CODE
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.SURYODAY_TITLE
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.SYNDICATE_BANK_CODE
@@ -355,18 +354,27 @@ internal object Utils {
         "Diners Club" to R.drawable.diners
     )
 
+
+    fun formatToIndianNumbering(value: Double): String {
+        val formatter = DecimalFormat("##,##,###.00")
+        return formatter.format(value)
+    }
+
+
     fun convertToRupees(context: Context, amountInPaisa: Int?): String {
         if (amountInPaisa == null) {
             return "Some error occurred"
         }
-        return context.getString(R.string.rupee_symbol) + " " + roundToDecimal(amountInPaisa.toDouble() / 100)
+        return context.getString(R.string.rupee_symbol) + " " + formatToIndianNumbering(
+            amountInPaisa.toDouble() / 100
+        )
     }
 
-    fun convertInRupees(amountInPaisa: Int?): Double {
+    fun convertInRupees(amountInPaisa: Int?): String {
         if (amountInPaisa == null) {
-            return 0.0
+            return "Error"
         }
-        return amountInPaisa.toDouble() / 100
+        return formatToIndianNumbering(amountInPaisa.toDouble() / 100)
     }
 
     fun convertToPaisa(amountInRupees: Double): Double {

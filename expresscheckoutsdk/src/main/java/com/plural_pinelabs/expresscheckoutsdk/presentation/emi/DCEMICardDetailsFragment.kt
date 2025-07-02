@@ -134,6 +134,7 @@ class DCEMICardDetailsFragment : Fragment() {
         cardErrorText = view.findViewById(R.id.error_message_card_details)
         backBtn = view.findViewById(R.id.back_button)
         phoneNumberText = view.findViewById(R.id.editTextMobileNumber)
+        phoneNumberErrorText = view.findViewById(R.id.error_message_registered_number)
         logo = view.findViewById(R.id.logo)
         issuerTitleTv = view.findViewById(R.id.issuer_title)
         emiPerMonthAmount = view.findViewById(R.id.emi_per_month_value)
@@ -287,6 +288,7 @@ class DCEMICardDetailsFragment : Fragment() {
                             if (it.data.code.equals("ELIGIBLE", true)) {
                                 // If the offer is eligible, proceed with payment
                                 //enable the payment button
+                                initProcessPayment(false)
                             } else {
                                 // If not eligible, show error or handle accordingly
                                 showCardDetailsError("OfferEligibility")
@@ -314,13 +316,8 @@ class DCEMICardDetailsFragment : Fragment() {
                     if (cardType.isNullOrEmpty()) {
                         showCardDetailsError("CardNumber")
                     } else {
-                        if (validCard(cardNumber)) {
                             isCardValid = true
                             hideCardDetailsError()
-                            createValidateOfferRequest()
-                        } else {
-                            showCardDetailsError("CardNumber")
-                        }
                     }
                 }
             }
@@ -408,24 +405,6 @@ class DCEMICardDetailsFragment : Fragment() {
         }
     }
 
-    private fun validCard(cardNumber: String): Boolean {
-        // Luhn Algorithm to validate the card number
-        var sum = 0
-        var alternate = false
-        for (i in cardNumber.length - 1 downTo 0) {
-            var n = cardNumber[i].digitToInt()
-            if (alternate) {
-                n *= 2
-                if (n > 9) {
-                    n -= 9
-                }
-            }
-            sum += n
-            alternate = !alternate
-        }
-        return sum % 10 == 0
-    }
-
     private fun validateCardType(cardNumber: String): String? {
         for ((cardType, regex) in cardTypes) {
             if (regex.matches(cardNumber)) {
@@ -471,11 +450,16 @@ class DCEMICardDetailsFragment : Fragment() {
     }
 
     private fun validateAllFields() {
-        if (isCardValid) {
-            initProcessPayment()
+        if (isCardValid && isPhoneValid) {
+            createValidateOfferRequest()
         } else {
             if (!isCardValid) {
                 showCardDetailsError("CardNumber")
+            } else if (!isPhoneValid) {
+                showCardDetailsError("Phone")
+            } else {
+                // Handle other validation errors if needed
+                Log.e("EMICardDetailsFragment", "Validation failed for card or phone number")
             }
         }
     }
@@ -517,7 +501,7 @@ class DCEMICardDetailsFragment : Fragment() {
 
 
         val paymentMode = arrayListOf<String>()
-        paymentMode.add(Constants.EMI_ID)
+        paymentMode.add(Constants.DEBIT_EMI_ID)
         val last4 = cardNumber.substring(cardNumber.length - 4, cardNumber.length)
 
         val displayMetrics = DisplayMetrics()
@@ -549,7 +533,7 @@ class DCEMICardDetailsFragment : Fragment() {
             currency,
             last4,
             null, //TODO redeemableAmount pass this from reward points api
-            null,
+            phoneNumberText.text.toString(),
             null,
             deviceInfo,
             null,

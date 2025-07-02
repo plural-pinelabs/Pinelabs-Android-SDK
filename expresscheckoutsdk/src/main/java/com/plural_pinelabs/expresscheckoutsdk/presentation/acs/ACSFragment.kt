@@ -15,6 +15,7 @@ import android.webkit.WebViewClient
 import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -33,6 +34,7 @@ import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PROCESSED_FAILED
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PROCESSED_PENDING
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PROCESSED_STATUS
 import com.plural_pinelabs.expresscheckoutsdk.common.NetworkHelper
+import com.plural_pinelabs.expresscheckoutsdk.common.PaymentModeSharedViewModel
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils.MTAG
 import com.plural_pinelabs.expresscheckoutsdk.data.model.TransactionStatusResponse
 import kotlinx.coroutines.launch
@@ -48,6 +50,7 @@ internal class ACSFragment : Fragment() {
     private var orderId: String? = null
     private var paymentId: String? = null
     var token: String? = null
+    private val sharedViewModel: PaymentModeSharedViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -83,7 +86,7 @@ internal class ACSFragment : Fragment() {
                     when (it) {
                         is BaseResult.Error -> {
                             //Throw error and exit SDK
-                            findNavController().navigate(R.id.action_UPIFragment_to_failureFragment)
+                            findNavController().navigate(R.id.action_ACSFragment_to_failureFragment)
                         }
 
                         is BaseResult.Loading -> {
@@ -107,7 +110,8 @@ internal class ACSFragment : Fragment() {
                                         "Payment attempted TODO handle retry flow",
                                         Toast.LENGTH_SHORT
                                     ).show()
-                                    findNavController().navigate(R.id.action_cardFragment_to_failureFragment)
+                                    sharedViewModel.retryEvent.value = true
+                                    // findNavController().navigate(R.id.action_cardFragment_to_failureFragment)
                                     // TODO ATTEMPTED Handle the scenario for retry or failure
                                 }
 

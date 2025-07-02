@@ -40,7 +40,7 @@
         app:layout_constraintEnd_toStartOf="@id/saving_layout"
         app:layout_constraintStart_toEndOf="@id/bank_logo"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="Wallet Title" />
+        tools:text="Bank Title" />
 
 
     <LinearLayout

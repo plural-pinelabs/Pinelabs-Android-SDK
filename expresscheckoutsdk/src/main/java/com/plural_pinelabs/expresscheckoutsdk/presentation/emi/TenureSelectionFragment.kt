@@ -1,10 +1,11 @@
 package com.plural_pinelabs.expresscheckoutsdk.presentation.emi
 
 import android.content.Context
+import android.content.Intent
 import android.content.res.Resources
-import android.graphics.Color
 import android.os.Bundle
 import android.util.DisplayMetrics
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,7 +17,6 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.PopupMenu
 import android.widget.TextView
-import androidx.core.graphics.drawable.toDrawable
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
@@ -44,9 +44,10 @@ import com.plural_pinelabs.expresscheckoutsdk.common.Constants.TENURE_ID
 import com.plural_pinelabs.expresscheckoutsdk.common.ItemClickListener
 import com.plural_pinelabs.expresscheckoutsdk.common.KFSWebView
 import com.plural_pinelabs.expresscheckoutsdk.common.NetworkHelper
-import com.plural_pinelabs.expresscheckoutsdk.common.PdfDownloader
+import com.plural_pinelabs.expresscheckoutsdk.common.PdfActivity
 import com.plural_pinelabs.expresscheckoutsdk.common.TenureSelectionViewModelFactory
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils
+import com.plural_pinelabs.expresscheckoutsdk.common.Utils.MTAG
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils.customSorted
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils.markBestValueInPlace
 import com.plural_pinelabs.expresscheckoutsdk.data.model.DeviceInfo
@@ -351,34 +352,119 @@ class TenureSelectionFragment : Fragment() {
         return processPaymentRequest
     }
 
-    private fun showKFSConsentBottomSheet(context: Context, url: String?, isError: Boolean) {
+//    private fun showKFSConsentBottomSheet(context: Context, url: String?, isError: Boolean) {
+//        bottomSheetDialog?.dismiss()
+//        bottomSheetDialog = BottomSheetDialog(context)
+//        val view = LayoutInflater.from(context).inflate(R.layout.kfs_view_layout, null, true)
+//        bottomSheetDialog?.setContentView(view)
+//
+//        // ✅ Apply height and behavior after dialog is shown
+//        bottomSheetDialog?.setOnShowListener { dialogInterface ->
+//            val dialog = dialogInterface as BottomSheetDialog
+//            val bottomSheet = dialog.findViewById<FrameLayout>(com.google.android.material.R.id.design_bottom_sheet)
+//            bottomSheet?.let {
+//                val behavior = BottomSheetBehavior.from(it)
+//                val screenHeight = Resources.getSystem().displayMetrics.heightPixels
+//                val desiredHeight = (screenHeight * 0.75).toInt()
+//
+//                val layoutParams = it.layoutParams
+//                layoutParams.height = desiredHeight
+//                it.layoutParams = layoutParams
+//
+//                behavior.peekHeight = desiredHeight
+//                behavior.state = BottomSheetBehavior.STATE_COLLAPSED
+//                behavior.isFitToContents = false
+//                behavior.skipCollapsed = true
+//
+//                it.setBackgroundColor(Color.WHITE) // ✅ Ensure solid background
+//            }
+//        }
+//
+//        // View bindings
+//        val languageTextView: TextView = view.findViewById(R.id.kfs_language)
+//        val downloadPDfButton: TextView = view.findViewById(R.id.download_pdf)
+//        val cancelButton: ImageView = view.findViewById(R.id.cancel_btn)
+//        val progressBarContainer: LinearLayout = view.findViewById(R.id.progress_bar_container)
+//        val errorLayout: LinearLayout = view.findViewById(R.id.error_layout)
+//        val retryButton: Button = view.findViewById(R.id.retry_btn)
+//        val webView: WebView = view.findViewById(R.id.kfs_webview)
+//        val consentCheckBox: CheckBox = view.findViewById(R.id.terms_checkbox_consent)
+//        val continueButton: Button = view.findViewById(R.id.continue_btn)
+//
+//        var pdfUrl = ""
+//        if (url != null) {
+//            webView.visibility = View.VISIBLE
+//            pdfUrl = "https://docs.google.com/gview?embedded=true&url=" + URLEncoder.encode(url, "UTF-8")
+//        }
+//
+//        consentCheckBox.setOnCheckedChangeListener { _, isChecked ->
+//            continueButton.isEnabled = isChecked
+//        }
+//
+//        val kfsWebView = KFSWebView(
+//            context = requireContext(),
+//            webView = webView,
+//            progressBarContainer = progressBarContainer,
+//            errorView = errorLayout,
+//            onScrollEnd = {
+//                // Enable checkbox or other logic
+//            }
+//        )
+//
+//        bottomSheetDialog?.setCancelable(false)
+//        bottomSheetDialog?.setCanceledOnTouchOutside(false)
+//
+//        // ❌ Removed window background override to prevent floating
+//        // bottomSheetDialog?.window?.setBackgroundDrawable(Color.TRANSPARENT.toDrawable())
+//
+//        kfsWebView.loadUrl(pdfUrl)
+//        bottomSheetDialog?.show()
+//
+//        languageTextView.setOnClickListener {
+//            showLanguagePopup(languageTextView)
+//        }
+//
+//        downloadPDfButton.setOnClickListener {
+//            PdfDownloader(requireContext()).downloadPdf(pdfUrl)
+//        }
+//
+//        cancelButton.setOnClickListener {
+//            bottomSheetDialog?.dismiss()
+//        }
+//
+//        retryButton.setOnClickListener {
+//            kfsWebView.loadUrl(pdfUrl)
+//        }
+//
+//        continueButton.setOnClickListener {
+//            if (consentCheckBox.isChecked) {
+//                bottomSheetDialog?.dismiss()
+//                findNavController().navigate(R.id.action_tenureSelectionFragment_to_DCEMICardDetailsFragment)
+//            }
+//        }
+//
+//        if (isError) {
+//            progressBarContainer.visibility = View.GONE
+//            webView.visibility = View.GONE
+//            errorLayout.visibility = View.VISIBLE
+//        } else {
+//            progressBarContainer.visibility = View.VISIBLE
+//            webView.visibility = View.GONE
+//            errorLayout.visibility = View.GONE
+//        }
+//    }
+
+
+    private fun showKFSConsentBottomSheet(
+        context: Context,
+        url: String?,
+        isError: Boolean
+    ) {
         bottomSheetDialog?.dismiss()
         bottomSheetDialog = BottomSheetDialog(context)
-        val view = LayoutInflater.from(context)
-            .inflate(
-                R.layout.kfs_view_layout,
-                null
-            ) // Use `null` for parent in inflate
 
-        bottomSheetDialog?.setContentView(view)
-
-        val bottomSheet =
-            bottomSheetDialog?.findViewById<FrameLayout>(com.google.android.material.R.id.design_bottom_sheet)
-        bottomSheet?.let {
-
-            val behavior = BottomSheetBehavior.from(it) // Apply behavior to the correct FrameLayout
-            val layoutParams = it.layoutParams
-            val displayMetrics = Resources.getSystem().displayMetrics
-            val screenHeight = displayMetrics.heightPixels
-            layoutParams.height = (screenHeight * 0.75).toInt()
-            it.layoutParams = layoutParams
-            behavior.peekHeight = (screenHeight * 0.75).toInt()
-            behavior.state = BottomSheetBehavior.STATE_EXPANDED
-            behavior.isFitToContents = false
-            behavior.skipCollapsed = true
-            it.setBackgroundColor(Color.TRANSPARENT)
-        }
-        //handle logic and view binding
+        val view = LayoutInflater.from(context).inflate(R.layout.kfs_view_layout, null)
+        //        // View bindings
         val languageTextView: TextView = view.findViewById(R.id.kfs_language)
         val downloadPDfButton: TextView = view.findViewById(R.id.download_pdf)
         val cancelButton: ImageView = view.findViewById(R.id.cancel_btn)
@@ -388,6 +474,28 @@ class TenureSelectionFragment : Fragment() {
         val webView: WebView = view.findViewById(R.id.kfs_webview)
         val consentCheckBox: CheckBox = view.findViewById(R.id.terms_checkbox_consent)
         val continueButton: Button = view.findViewById(R.id.continue_btn)
+        bottomSheetDialog?.setCancelable(false)
+        bottomSheetDialog?.setCanceledOnTouchOutside(false)
+        bottomSheetDialog?.setContentView(view)
+
+        val bottomSheet =
+            bottomSheetDialog?.findViewById<FrameLayout>(com.google.android.material.R.id.design_bottom_sheet)
+        bottomSheet?.let {
+
+            val behavior = BottomSheetBehavior.from(it)
+            val layoutParams = it.layoutParams
+            val displayMetrics = Resources.getSystem().displayMetrics
+            val screenHeight = displayMetrics.heightPixels
+            layoutParams.height = (screenHeight * 0.95).toInt()
+            it.layoutParams = layoutParams
+            behavior.expandedOffset =
+                (screenHeight * 0.05).toInt() // Set expanded offset to 15% of screen height
+            behavior.state = BottomSheetBehavior.STATE_EXPANDED
+            behavior.isDraggable = false
+            behavior.isFitToContents = false
+            behavior.skipCollapsed = true
+        }
+
         var pdfUrl = ""
         if (url != null) {
             webView.visibility = View.VISIBLE
@@ -398,46 +506,61 @@ class TenureSelectionFragment : Fragment() {
 
         }
 
-        consentCheckBox.setOnCheckedChangeListener { buttonView, isChecked ->
+        consentCheckBox.setOnCheckedChangeListener { _, isChecked ->
             continueButton.isEnabled = isChecked
         }
+
         val kfsWebView = KFSWebView(
             context = requireContext(),
             webView = webView,
             progressBarContainer = progressBarContainer,
             errorView = errorLayout,
             onScrollEnd = {
-                //Make the checkbox enable to click
+                // Enable checkbox or other logic
+                Log.i(MTAG, "Scroll reached ")
             }
         )
 
         bottomSheetDialog?.setCancelable(false)
         bottomSheetDialog?.setCanceledOnTouchOutside(false)
-        bottomSheetDialog?.window?.setBackgroundDrawable(Color.TRANSPARENT.toDrawable())
-        kfsWebView.loadUrl(pdfUrl)// Loading the URL
+
+        kfsWebView.loadUrl(pdfUrl)
         bottomSheetDialog?.show()
 
         languageTextView.setOnClickListener {
-            //TODO handle language change
             showLanguagePopup(languageTextView)
+        }
 
-        }
         downloadPDfButton.setOnClickListener {
-            //TODO handle pdf download
-            PdfDownloader(requireContext()).downloadPdf(pdfUrl)
+            //PdfDownloader(requireContext()).downloadPdf(pdfUrl)
+
+            //TODO dummy code
+            val intent = Intent(requireActivity(), PdfActivity::class.java)
+            intent.putExtra("pdf_url", url)
+            startActivity(intent)
         }
+
         cancelButton.setOnClickListener {
             bottomSheetDialog?.dismiss()
         }
+
         retryButton.setOnClickListener {
             kfsWebView.loadUrl(pdfUrl)
         }
+
         continueButton.setOnClickListener {
             if (consentCheckBox.isChecked) {
                 bottomSheetDialog?.dismiss()
-                findNavController().navigate(R.id.action_tenureSelectionFragment_to_DCEMICardDetailsFragment)
+                val bundle = Bundle()
+                bundle.putString(ISSUE_ID, selectedIssuerId)
+                bundle.putString(TENURE_ID, selectedTenure?.tenure_id)
+                findNavController().navigate(
+                    R.id.action_tenureSelectionFragment_to_DCEMICardDetailsFragment,
+                    bundle
+                )
             }
         }
+
         if (isError) {
             progressBarContainer.visibility = View.GONE
             webView.visibility = View.GONE
@@ -447,7 +570,10 @@ class TenureSelectionFragment : Fragment() {
             webView.visibility = View.GONE
             errorLayout.visibility = View.GONE
         }
+
+        bottomSheetDialog?.show() // Show the dialog first
     }
+
 
     private fun showLanguagePopup(anchor: TextView) {
         val languages = listOf("English", "Hindi", "Spanish", "French", "German")

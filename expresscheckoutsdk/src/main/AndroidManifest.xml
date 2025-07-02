@@ -23,7 +23,11 @@
             android:value="1" />
 
         <activity
+            android:windowSoftInputMode="adjustResize"
             android:name=".presentation.LandingActivity"
+            android:exported="false" />
+
+        <activity android:name=".common.PdfActivity"
             android:exported="false" />
     </application>
 

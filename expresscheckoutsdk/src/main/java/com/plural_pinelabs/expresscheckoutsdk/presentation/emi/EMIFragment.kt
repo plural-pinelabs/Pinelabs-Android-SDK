@@ -49,8 +49,8 @@ class EMIFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        mapBanKLogo()
         processDataForEMI()
+        mapBanKLogo()
         setViews(view)
     }
 

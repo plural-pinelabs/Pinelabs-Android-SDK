@@ -1,16 +1,90 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:backgroundTint="@color/white"
     android:paddingBottom="30dp">
 
-    <TextView
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+    <ImageView
+        android:id="@+id/x_icon"
+        android:layout_width="26dp"
+        android:layout_height="26dp"
+        android:layout_gravity="center"
+        android:layout_margin="15dp"
+        android:src="@drawable/ic_cancel_close"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/img_cancel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="TODO handle the retry flow " />
+        android:layout_marginTop="50dp"
+        android:src="@drawable/ic_failure_cancel"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
+    <TextView
+        android:id="@+id/txt_heading"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="sans-serif-medium"
+        android:text="@string/payment_not_completed"
+        android:textColor="@color/black_text"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintLeft_toLeftOf="@+id/img_cancel"
+        app:layout_constraintRight_toRightOf="@+id/img_cancel"
+        app:layout_constraintTop_toBottomOf="@+id/img_cancel" />
+
+    <TextView
+        android:id="@+id/txt_payment"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="15dp"
+        android:layout_marginRight="20dp"
+        android:alpha=".8"
+        android:fontFamily="sans-serif-medium"
+        android:gravity="center"
+        android:text="@string/your_payment_has_been_failed_try_again_or_complete_the_payment_later"
+        android:textColor="@color/black_text_60"
+        android:textSize="14sp"
+        app:layout_constraintLeft_toLeftOf="@+id/txt_heading"
+        app:layout_constraintRight_toRightOf="@+id/txt_heading"
+        app:layout_constraintTop_toBottomOf="@+id/txt_heading" />
+
+    <TextView
+        android:id="@+id/retry_payment_amount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="15dp"
+        android:layout_marginRight="20dp"
+        android:alpha=".8"
+        android:fontFamily="sans-serif-medium"
+        android:gravity="center"
+        android:letterSpacing="0.12"
+        android:text="@string/retry_payment_of_9_449"
+        android:textAllCaps="true"
+        android:textColor="@color/black_text_60"
+        android:textFontWeight="700"
+        android:textSize="14sp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/txt_payment" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_payment_options"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="15dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginRight="15dp"
+        android:background="@drawable/input_field_border"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/retry_payment_amount" />
 </androidx.constraintlayout.widget.ConstraintLayout>

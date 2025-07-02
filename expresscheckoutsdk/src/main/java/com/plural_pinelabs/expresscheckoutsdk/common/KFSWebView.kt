@@ -3,6 +3,7 @@ package com.plural_pinelabs.expresscheckoutsdk.common
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
+import android.util.Log
 import android.view.View
 import android.webkit.JavascriptInterface
 import android.webkit.WebResourceError
@@ -74,7 +75,7 @@ class KFSWebView(
         webView.evaluateJavascript(
             """
             window.onscroll = function() {
-                if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
+                if ((window.innerHeight + window.scrollY) &gt; document.body.offsetHeight) {
                     AndroidInterface.onScrollEnd();
                 }
             }
@@ -85,6 +86,8 @@ class KFSWebView(
     inner class WebAppInterface {
         @JavascriptInterface
         fun onScrollEnd() {
+            Log.d("WebView", "JavaScript scroll end triggered")
+
             onScrollEnd?.invoke()
         }
     }

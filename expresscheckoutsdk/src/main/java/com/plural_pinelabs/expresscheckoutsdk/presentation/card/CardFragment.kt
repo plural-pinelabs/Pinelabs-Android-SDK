@@ -15,9 +15,11 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -34,6 +36,7 @@ import com.plural_pinelabs.expresscheckoutsdk.common.Constants.BROWSER_USER_AGEN
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.ERROR_KEY
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.ERROR_MESSAGE_KEY
 import com.plural_pinelabs.expresscheckoutsdk.common.NetworkHelper
+import com.plural_pinelabs.expresscheckoutsdk.common.PaymentModeSharedViewModel
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils.cardIcons
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils.cardTypes
@@ -100,8 +103,14 @@ class CardFragment : Fragment() {
     private var redeemableAmount: Int = 0 // TODO to configure this from the server
     private var isPBPChecked = false // TODO to configure this from the server
 
-
     private lateinit var viewModel: CardFragmentViewModel
+    private val sharedViewModel: PaymentModeSharedViewModel by activityViewModels()
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        observeViewModel()
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -110,6 +119,7 @@ class CardFragment : Fragment() {
             this,
             CardFragmentViewModelFactory(NetworkHelper(requireContext()))
         )[CardFragmentViewModel::class.java]
+        observeSaveCardCallbackResponse()
         return inflater.inflate(R.layout.fragment_card, container, false)
     }
 
@@ -118,13 +128,13 @@ class CardFragment : Fragment() {
         isPBPEnabled = checkIfPBPIsEnabled()
         setFlags(ExpressSDKObject.getFetchData())
         setupViews(view)
-        observeViewModel()
         setCardFocusListener()
         setUpCardNumberValidation()
         setupCardHolderNameValidation(cardHolderText)
         setupCVVValidation(cvvEditText)
         setupExpiryValidation(expiryEditText)
         showPBPView(1)
+        enableDisableContinueBtn(false)
     }
 
     private fun showPBPView(viewType: Int) {
@@ -159,6 +169,8 @@ class CardFragment : Fragment() {
         savedCardParentLayout = view.findViewById(R.id.saved_card_parent_layout)
         if (isSavedCardEnabled) {
             savedCardParentLayout.visibility = View.VISIBLE
+        } else {
+            savedCardParentLayout.visibility = View.GONE
         }
 
         //PBP Views
@@ -222,6 +234,7 @@ class CardFragment : Fragment() {
 
                         is BaseResult.Success -> {
                             bottomSheetDialog?.dismiss()
+                            viewModel.resetGenerateOtpState()
                             navigateToNativeOTP(
                                 result.data.meta_data?.resend_after,
                                 result.data.next?.getOrNull(0)
@@ -236,7 +249,6 @@ class CardFragment : Fragment() {
                 }
             }
         }
-
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED)
             {
@@ -280,10 +292,7 @@ class CardFragment : Fragment() {
                             bundle.putString(ERROR_KEY, it.errorCode)
                             bundle.putString(ERROR_MESSAGE_KEY, it.errorMessage)
                             bottomSheetDialog?.dismiss()
-                            findNavController().navigate(
-                                R.id.action_cardFragment_to_failureFragment,
-                                bundle
-                            )
+                            sharedViewModel.retryEvent.value = true
                         }
 
                         is BaseResult.Loading -> {
@@ -324,6 +333,7 @@ class CardFragment : Fragment() {
                         if (validCard(cardNumber)) {
                             isCardValid = true
                             hideCardDetailsError()
+                            enableDisableContinueBtn(true)
                         } else {
                             showCardDetailsError("CardNumber")
                         }
@@ -425,6 +435,7 @@ class CardFragment : Fragment() {
                     showCardDetailsError("CardHolderName")
                 } else {
                     hideCardHolderNameError()
+                    enableDisableContinueBtn(true)
                 }
             }
         })
@@ -477,6 +488,7 @@ class CardFragment : Fragment() {
                             showCardDetailsError("Expiry")
                         } else {
                             isExpiryValid = true
+                            enableDisableContinueBtn(true)
                         }
                     }
                 } else {
@@ -506,6 +518,7 @@ class CardFragment : Fragment() {
                 } else {
                     isCVVValid = true
                     hideCardDetailsError()
+                    enableDisableContinueBtn(true)
                 }
             }
         }
@@ -548,6 +561,7 @@ class CardFragment : Fragment() {
     }
 
     private fun showCardDetailsError(errorType: String) {
+        enableDisableContinueBtn(false)
         when (errorType) {
             "CardNumber" -> {
                 isCardValid = false
@@ -613,8 +627,8 @@ class CardFragment : Fragment() {
         val savedStateHandle = navController.currentBackStackEntry?.savedStateHandle
 
         savedStateHandle?.getLiveData<Boolean>("success")?.observe(viewLifecycleOwner) { result ->
-            savedStateHandle.remove<Boolean>("success")
             initProcessPayment(result)
+            savedStateHandle.remove<Boolean>("success")
         }
 
     }
@@ -650,10 +664,6 @@ class CardFragment : Fragment() {
         val height = displayMetrics.heightPixels
         val width = displayMetrics.widthPixels
         val pixelFormat = requireActivity().windowManager.defaultDisplay.pixelFormat
-//        var dccStatus: String? =
-//            if (isDCCEnabled && binData?.is_international_card == true && binData?.is_currency_supported == false)
-//                DCC_STATUS.FORCE_OPT_OUT.toString()
-//            else null
 
         val screenSize: String = width.toString() + "x" + height.toString()
         val deviceInfo = DeviceInfo(
@@ -754,11 +764,10 @@ class CardFragment : Fragment() {
     }
 
     private fun navigateToSaveCardOTPFragment() {
-        observeSaveCardCallbackResponse()
         val last4Digits = cardNumber.substring(
-            formattedCardNumber?.length?.minus(
+            cardNumber.length.minus(
                 4
-            ) ?: 0
+            )
         )
         val bundle = Bundle()
         bundle.putString("last4Digits", last4Digits)
@@ -766,6 +775,34 @@ class CardFragment : Fragment() {
             R.id.action_cardFragment_to_saveCardOTPFragment,
             bundle
         )
+    }
+
+    private fun enableDisableContinueBtn(isEnabled: Boolean) {
+        if (isEnabled && isCardValid && isExpiryValid && isCVVValid && isCardHolderNameValid) {
+            payBtn.background = AppCompatResources.getDrawable(
+                requireContext(),
+                R.drawable.primary_button_background
+            )
+            payBtn.setTextColor(
+                AppCompatResources.getColorStateList(
+                    requireContext(),
+                    R.color.white
+                )
+            )
+            payBtn.isEnabled = true
+        } else {
+            payBtn.background = AppCompatResources.getDrawable(
+                requireContext(),
+                R.drawable.primary_button_disabled_bg
+            )
+            payBtn.setTextColor(
+                AppCompatResources.getColorStateList(
+                    requireContext(),
+                    R.color.text_disabled_C0C9D2
+                )
+            )
+            payBtn.isEnabled = false
+        }
     }
 
 }

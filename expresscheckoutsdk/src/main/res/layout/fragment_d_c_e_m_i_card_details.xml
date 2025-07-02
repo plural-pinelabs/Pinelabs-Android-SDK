@@ -193,7 +193,7 @@
         android:text="@string/please_enter_a_valid_card_number"
         android:textColor="@color/error_DD4D42"
         android:textFontWeight="500"
-        android:visibility="visible"
+        android:visibility="gone"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/card_detail_layout" />
 
@@ -265,7 +265,7 @@
     </LinearLayout>
 
     <TextView
-        android:id="@+id/error_message_card_holder_name"
+        android:id="@+id/error_message_registered_number"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
@@ -275,7 +275,7 @@
         android:text="Please enter a valid card holder name"
         android:textColor="@color/error_DD4D42"
         android:textFontWeight="500"
-        android:visibility="visible"
+        android:visibility="gone"
         app:layout_constraintTop_toBottomOf="@id/phone_number_input_layout" />
 
     <LinearLayout

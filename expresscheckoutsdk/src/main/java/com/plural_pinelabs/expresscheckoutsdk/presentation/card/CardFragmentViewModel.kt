@@ -35,7 +35,7 @@ class CardFragmentViewModel(private val expressRepositoryImpl: ExpressRepository
     val validateOfferResult: StateFlow<BaseResult<OfferEligibilityResponse>> = _validateOfferResult
 
     private val _otpRequestResult =
-        MutableStateFlow<BaseResult<OTPResponse>>(BaseResult.Loading(true))
+        MutableStateFlow<BaseResult<OTPResponse>>(BaseResult.Loading(false))
     val otpRequestResult: StateFlow<BaseResult<OTPResponse>> = _otpRequestResult
 
     fun getCardBinMetaData(cardNumber: String, token: String) {
@@ -84,4 +84,8 @@ class CardFragmentViewModel(private val expressRepositoryImpl: ExpressRepository
                 _otpRequestResult.value = values
             }
         }
+
+    fun resetGenerateOtpState() {
+        _otpRequestResult.value = BaseResult.Loading(false)
+    }
 }
