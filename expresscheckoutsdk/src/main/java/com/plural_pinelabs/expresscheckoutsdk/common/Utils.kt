@@ -916,5 +916,29 @@ internal object Utils {
         return this
     }
 
+    fun handleCTAEnableDisable(context: Context, isEnabled: Boolean, button: Button) {
+        button.isEnabled = isEnabled
+        if (isEnabled) {
+            button.setBackgroundResource(R.drawable.primary_button_background)
+            button.setTextColor(
+                AppCompatResources.getColorStateList(
+                    context,
+                    R.color.white
+                )
+            )
+        } else {
+            button.setBackgroundResource(R.drawable.primary_button_disabled_bg)
+            button.setTextColor(
+                AppCompatResources.getColorStateList(
+                    context,
+                    R.color.text_disabled_C0C9D2
+                )
+            )
+
+        }
+
+
+    }
+
 
 }

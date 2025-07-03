@@ -111,9 +111,8 @@ class UPIFragment : Fragment() {
         }
         verifyContinueButton.setOnClickListener {
             payAction(upiIdEt.text.toString(), UPI_COLLECT)
-            // TODO Handle the click event for the "Verify and Continue" button
         }
-        view.findViewById<ImageView>(R.id.btnBack).setOnClickListener {
+        view.findViewById<ImageView>(R.id.back_button).setOnClickListener {
             findNavController().popBackStack()
         }
 
@@ -192,8 +191,8 @@ class UPIFragment : Fragment() {
 
             override fun afterTextChanged(s: Editable?) {
                 val isValidUPI = UPI_REGEX.matches(s.toString())
-                verifyContinueButton.isEnabled = isValidUPI
-                if (!verifyContinueButton.isEnabled) {
+                Utils.handleCTAEnableDisable(requireContext(), isValidUPI, verifyContinueButton)
+                if (!isValidUPI) {
                     errorinfoTextView.visibility = View.VISIBLE
                 } else {
                     errorinfoTextView.visibility = View.GONE
@@ -210,7 +209,6 @@ class UPIFragment : Fragment() {
         }
         val chooser = Intent.createChooser(upiPayIntent, getString(R.string.upi_open_with))
         if (chooser.resolveActivity(requireActivity().packageManager) != null) {
-            // val chooser = Intent.createChooser(upiPayIntent, getString(R.string.upi_open_with))
             startActivity(chooser)
         } else {
             cancelTransactionProcess()

@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="16dp"
+    android:orientation="vertical">
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:drawableStart="@drawable/ic_back_arrow"
+        android:drawablePadding="4dp"
+        android:drawableTint="@color/black_text_80"
+        android:fontFamily="sans-serif"
+        android:text="@string/go_back"
+        android:textColor="@color/black_text_80"
+        android:textFontWeight="600"
+        android:textSize="14sp" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        tools:context=".presentation.terminal.SuccessFragment">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="32dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/ic_failure_cancel" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="24dp"
+                android:fontFamily="sans-serif"
+                android:text="@string/payment_not_completed"
+                android:textColor="@color/black_text"
+                android:textFontWeight="500"
+                android:textSize="24sp" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="12dp"
+                android:fontFamily="sans-serif"
+                android:gravity="center"
+                android:text="@string/your_payment_has_been_failed_try_again_or_complete_the_payment_later"
+                android:textAlignment="center"
+                android:textColor="@color/black_text_60"
+                android:textFontWeight="500"
+                android:textSize="14sp" />
+
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="32dp"
+                android:fontFamily="sans-serif"
+                android:letterSpacing="0.12"
+                android:text="Retry payment of "
+                android:textAllCaps="true"
+                android:textColor="@color/black_text_60"
+                android:textFontWeight="700"
+                android:textSize="12sp" />
+
+
+            <androidx.fragment.app.FragmentContainerView
+                android:name="com.plural_pinelabs.expresscheckoutsdk.presentation.landing.PaymentModeFragment"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                tools:layout="@layout/fragment_payment_mode" />
+
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</LinearLayout>

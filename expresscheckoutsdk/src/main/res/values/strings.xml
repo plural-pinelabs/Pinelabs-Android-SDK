@@ -175,5 +175,7 @@
     <string name="you_re_saving_x_on_this_order">You’re saving ₹ %s on this order!</string>
     <string name="registered_mobile_no">Registered mobile no.</string>
     <string name="retry_payment_of_9_449">Retry payment of %s</string>
+    <string name="select_a_bank">Select a Bank</string>
+    <string name="verify_continue">Verify &amp; Continue</string>
 
 </resources>

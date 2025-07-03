@@ -75,13 +75,13 @@
 
         <androidx.appcompat.widget.AppCompatCheckBox
             android:id="@+id/cvv_less_selection"
-            app:buttonTint= "@null"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
+            android:layout_width="19dp"
+            android:layout_height="20dp"
             android:layout_gravity="center_vertical|end"
             android:background="@null"
-            android:buttonTint="@null"
             android:button="@drawable/circle_checkbox_state"
+            android:buttonTint="@null"
+            app:buttonTint="@null"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />

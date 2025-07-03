@@ -205,6 +205,17 @@ class NetBankingFragment : Fragment() {
         payByBankWebsite.setOnClickListener {
             showAllBanksBottomSheet()
         }
+        conventionalSearchEt.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) {
+                conventionalSearchEt.setBackgroundResource(R.drawable.black_field_border)
+            } else {
+                conventionalSearchEt.setBackgroundResource(R.drawable.input_field_border)
+
+            }
+        }
+
+        view.findViewById<ImageView>(R.id.back_button)
+            .setOnClickListener { findNavController().popBackStack() }
     }
 
     private fun setUpConventionalViews() {
@@ -215,7 +226,6 @@ class NetBankingFragment : Fragment() {
             }
 
             override fun afterTextChanged(s: Editable?) {
-                //TODO filter based on input
                 filter(text = s.toString(), nbSelectBankAdapter)
             }
         })
@@ -290,7 +300,7 @@ class NetBankingFragment : Fragment() {
                 }
             }
         }
-        if (filteredList.isEmpty()) {
+        if (text.isEmpty()) {
             nbSelectBankAdapter.updateListWithNewItems(bankList)
         } else {
             nbSelectBankAdapter.updateListWithNewItems(filteredList.toList())

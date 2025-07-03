@@ -1,5 +1,6 @@
 package com.plural_pinelabs.expresscheckoutsdk.presentation.emi
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.res.Resources
@@ -174,7 +175,8 @@ class TenureSelectionFragment : Fragment() {
         val list = issuer?.tenures?.sortedBy { it.tenure_value }
         list?.let {
             if (it.isEmpty()) {
-                return // TODO handle error no tenure in there
+                findNavController().navigate(R.id.action_tenureSelectionFragment_to_failureFragment)
+                return
             }
             val filteredList = it.filter { tenure ->
                 tenure.tenure_value != 0 || !tenure.name.contains("No EMI", true)
@@ -189,7 +191,6 @@ class TenureSelectionFragment : Fragment() {
     private fun getTenureClickListener(): ItemClickListener<Tenure?> {
         return object : ItemClickListener<Tenure?> {
             override fun onItemClick(position: Int, item: Tenure?) {
-                //TODO handle click of wallet item
                 selectedTenure = item
                 emiPayingInMonthsTv.text =
                     String.format(
@@ -214,11 +215,9 @@ class TenureSelectionFragment : Fragment() {
 
     private fun handleContinueButtonClick() {
         if (selectedTenure == null) {
-            // TODO handle error no tenure selected
             return
         }
         if (issuer?.issuer_type?.equals(EMI_DC_TYPE) == true) {
-            //user has choosen a Debit card show kfs and once consent is given navigate to card details
             viewModel.getKFS(ExpressSDKObject.getToken(), createProcessPaymentRequest())
         } else {
             val bundle = Bundle()
@@ -245,8 +244,6 @@ class TenureSelectionFragment : Fragment() {
                 viewModel.kfsRequestResult.collect { result ->
                     when (result) {
                         is BaseResult.Loading -> {
-                            if (result.isLoading)
-                                showKFSConsentBottomSheet(requireContext(), null, false)
                         }
 
                         is BaseResult.Success -> {
@@ -272,7 +269,6 @@ class TenureSelectionFragment : Fragment() {
 
         val paymentData = ExpressSDKObject.getFetchData()?.paymentData
         if (paymentData == null) {
-            //TODO notify of payment failure
             findNavController().navigate(R.id.action_EMICardDetailsFragment_to_failureFragment)
         }
         val amount = issuer?.tenures?.find { it.tenure_id == tenureId }?.loan_amount?.value
@@ -455,6 +451,7 @@ class TenureSelectionFragment : Fragment() {
 //    }
 
 
+    @SuppressLint("InflateParams")
     private fun showKFSConsentBottomSheet(
         context: Context,
         url: String?,
@@ -507,7 +504,7 @@ class TenureSelectionFragment : Fragment() {
         }
 
         consentCheckBox.setOnCheckedChangeListener { _, isChecked ->
-            continueButton.isEnabled = isChecked
+            Utils.handleCTAEnableDisable(requireContext(), isChecked, continueButton)
         }
 
         val kfsWebView = KFSWebView(

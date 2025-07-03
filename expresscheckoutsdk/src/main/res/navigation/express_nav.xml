@@ -202,6 +202,9 @@
         <action
             android:id="@+id/action_tenureSelectionFragment_to_DCEMICardDetailsFragment"
             app:destination="@id/DCEMICardDetailsFragment" />
+        <action
+            android:id="@+id/action_tenureSelectionFragment_to_failureFragment"
+            app:destination="@id/failureFragment" />
     </fragment>
     <fragment
         tools:layout="@layout/fragment_e_m_i_card_details"
