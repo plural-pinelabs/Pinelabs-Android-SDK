@@ -22,7 +22,6 @@ import com.plural_pinelabs.expresscheckoutsdk.R
 import com.plural_pinelabs.expresscheckoutsdk.common.BottomSheetRetryFragment
 import com.plural_pinelabs.expresscheckoutsdk.common.CustomExceptionHandler
 import com.plural_pinelabs.expresscheckoutsdk.common.PaymentModeSharedViewModel
-import com.plural_pinelabs.expresscheckoutsdk.common.PaymentModes
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CustomerInfo
 import com.plural_pinelabs.expresscheckoutsdk.data.model.FetchResponseDTO
@@ -85,7 +84,7 @@ class LandingActivity : AppCompatActivity() {
         merchantLogoCard = findViewById(R.id.merchant_logo_cardview)
         merchantLogo = findViewById(R.id.merchant_logo_img)
         merchantName = findViewById(R.id.merchant_name_title)
-        cancelBtn = findViewById(R.id.cancel_btn)
+        cancelBtn = findViewById(R.id.cancel_btn_process)
         originalAmount = findViewById(R.id.txt_amount)
         strikeAmount = findViewById(R.id.amount_strike)
         orderSummary = findViewById(R.id.order_summary)
@@ -97,7 +96,7 @@ class LandingActivity : AppCompatActivity() {
         showHideHeaderLayout(false)
         mainContentLayout = findViewById(R.id.main)
         cancelBtn.setOnClickListener {
-            Utils.showCancelPaymentDialog(this).show()
+            Utils.showCancelPaymentDialog(this)
         }
         setupObservers()
     }
@@ -141,11 +140,11 @@ class LandingActivity : AppCompatActivity() {
                             e.printStackTrace()
                         }
                     } else {
-                        merchantLogoCard.visibility = View.INVISIBLE
+                        merchantLogoCard.visibility = View.GONE
                         merchantLogo.visibility = View.GONE
                     }
                 } ?: run {
-                    merchantLogoCard.visibility = View.INVISIBLE
+                    merchantLogoCard.visibility = View.GONE
                     merchantLogo.visibility = View.GONE
                 }
 

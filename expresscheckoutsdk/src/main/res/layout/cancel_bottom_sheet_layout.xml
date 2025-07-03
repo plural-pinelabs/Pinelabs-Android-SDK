@@ -32,18 +32,17 @@
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/cancel_btn"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
             android:background="@drawable/circle_background"
             android:backgroundTint="@color/black_text_30"
             android:contentDescription="@string/cancel"
-            android:foregroundTint="@color/black_text"
-
+            android:padding="7dp"
             android:src="@drawable/ic_cancel_close"
-            android:tint="@color/black_text"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="@color/black_text_50" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -86,6 +85,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_weight="1"
+            android:textAllCaps="false"
             android:background="@drawable/primary_button_background"
             android:gravity="center"
             android:minHeight="48dp"

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -78,14 +79,38 @@
                 android:textFontWeight="700"
                 android:textSize="12sp" />
 
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginTop="12dp"
+                android:layout_marginBottom="16dp"
+                android:layout_weight="700"
+                android:fontFamily="sans-serif"
+                android:letterSpacing="0.12"
+                android:text="@string/select_a_payment_option"
+                android:textAllCaps="true"
+                android:textSize="12sp" />
 
-            <androidx.fragment.app.FragmentContainerView
-                android:name="com.plural_pinelabs.expresscheckoutsdk.presentation.landing.PaymentModeFragment"
+            <androidx.cardview.widget.CardView
+                android:id="@+id/payment_option_card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                tools:layout="@layout/fragment_payment_mode" />
+                android:layout_marginHorizontal="2dp"
+                android:layout_marginBottom="40dp"
+                android:background="@drawable/input_field_border"
+                android:elevation="8dp"
+                android:minHeight="100dp"
+                app:cardCornerRadius="8dp">
 
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/payment_option_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    tools:itemCount="5"
+                    tools:listitem="@layout/payment_item_layout" />
+            </androidx.cardview.widget.CardView>
+
+            <include layout="@layout/footer" />
 
         </LinearLayout>
 

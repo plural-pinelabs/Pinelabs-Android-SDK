@@ -202,13 +202,17 @@ class TenureSelectionFragment : Fragment() {
                     Utils.convertToRupees(requireContext(), item?.monthly_emi_amount?.value)
                 )
                 footerLayout.visibility = View.VISIBLE
-                val amount = Utils.convertInRupees(
-                    (item?.total_discount_amount?.value
-                        ?: 0) + (item?.total_subvention_amount?.value ?: 0)
-                )
-                saveInfoText.text = String.format(
-                    getString(R.string.you_re_saving_x_on_this_order), amount.toString()
-                )
+                val totalSaving = (item?.total_discount_amount?.value
+                    ?: 0) + (item?.total_subvention_amount?.value ?: 0)
+                if (totalSaving != 0) {
+                    val amount = Utils.convertInRupees(totalSaving)
+                    saveInfoText.text = String.format(
+                        getString(R.string.you_re_saving_x_on_this_order), amount
+                    )
+                } else {
+                    saveInfoText.visibility = View.GONE
+
+                }
             }
         }
     }

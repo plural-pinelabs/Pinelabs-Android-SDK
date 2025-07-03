@@ -17,6 +17,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.widget.Button
 import android.widget.FrameLayout
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.graphics.drawable.toDrawable
@@ -578,7 +579,7 @@ internal object Utils {
         bottomSheetDialog.setContentView(view)
         val cancelYesButton: Button = view.findViewById(R.id.cancel_yes_btn)
         val cancelNoButton: Button = view.findViewById(R.id.cancel_no_btn)
-        val cancelButton: Button = view.findViewById(R.id.cancel_btn)
+        val cancelButton: ImageView = view.findViewById(R.id.cancel_btn)
         cancelNoButton.setOnClickListener {
             bottomSheetDialog.dismiss()
         }
@@ -594,8 +595,8 @@ internal object Utils {
             bottomSheetDialog.dismiss()
         }
 
-        bottomSheetDialog.setCancelable(true)
-        bottomSheetDialog.setCanceledOnTouchOutside(true)
+        bottomSheetDialog.setCancelable(false)
+        bottomSheetDialog.setCanceledOnTouchOutside(false)
         bottomSheetDialog.window?.setBackgroundDrawable(Color.TRANSPARENT.toDrawable())
         bottomSheetDialog.show()
         return bottomSheetDialog

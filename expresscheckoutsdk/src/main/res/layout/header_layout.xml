@@ -8,53 +8,65 @@
     android:paddingBottom="13dp">
 
     <ImageView
-        android:id="@+id/cancel_btn"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
+        android:id="@+id/cancel_btn_process"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
         android:layout_marginTop="24dp"
+        android:clickable="true"
         android:layout_marginEnd="20dp"
         android:background="@drawable/circle_background"
         android:contentDescription="@string/cancel"
-        android:padding="5dp"
+        android:padding="8dp"
         android:src="@drawable/ic_cancel_close"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <androidx.cardview.widget.CardView
-        android:id="@+id/merchant_logo_cardview"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
+    <LinearLayout
+        android:id="@+id/merchant_info_title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
         android:layout_marginStart="26dp"
         android:layout_marginTop="25dp"
-        app:cardCornerRadius="7dp"
+        android:layout_marginEnd="8dp"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toStartOf="@id/cancel_btn"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <ImageView
-            android:id="@+id/merchant_logo_img"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:importantForAccessibility="no"
-            android:scaleType="fitCenter" />
+        <androidx.cardview.widget.CardView
+            android:id="@+id/merchant_logo_cardview"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            app:cardCornerRadius="7dp">
 
-    </androidx.cardview.widget.CardView>
+            <ImageView
+                android:id="@+id/merchant_logo_img"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:importantForAccessibility="no"
+                android:scaleType="fitCenter" />
 
-    <TextView
-        android:id="@+id/merchant_name_title"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="14dp"
-        android:layout_marginRight="14dp"
-        android:ellipsize="end"
-        android:fontFamily="sans-serif-medium"
-        android:singleLine="true"
-        android:text="Croma"
-        android:textColor="@color/white"
-        android:textSize="20sp"
-        app:layout_constraintBottom_toBottomOf="@id/merchant_logo_cardview"
-        app:layout_constraintEnd_toStartOf="@id/cancel_btn"
-        app:layout_constraintStart_toEndOf="@id/merchant_logo_cardview"
-        app:layout_constraintTop_toTopOf="@id/merchant_logo_cardview" />
+        </androidx.cardview.widget.CardView>
+
+        <TextView
+            android:id="@+id/merchant_name_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="14dp"
+            android:layout_marginRight="14dp"
+            android:ellipsize="end"
+            android:fontFamily="sans-serif-medium"
+            android:singleLine="true"
+            android:text="Croma"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            app:layout_constraintBottom_toBottomOf="@id/merchant_logo_cardview"
+            app:layout_constraintEnd_toStartOf="@id/cancel_btn"
+            app:layout_constraintStart_toEndOf="@id/merchant_logo_cardview"
+            app:layout_constraintTop_toTopOf="@id/merchant_logo_cardview" />
+
+    </LinearLayout>
+
 
     <TextView
         android:id="@+id/txt_amount"
@@ -67,7 +79,7 @@
         android:textSize="30sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/merchant_name_title" />
+        app:layout_constraintTop_toBottomOf="@id/merchant_info_title" />
 
     <TextView
         android:id="@+id/amount_strike"
