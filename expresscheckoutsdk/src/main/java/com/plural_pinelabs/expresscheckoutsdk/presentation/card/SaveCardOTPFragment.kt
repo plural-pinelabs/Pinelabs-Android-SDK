@@ -137,12 +137,7 @@ class SaveCardOTPFragment : Fragment() {
 
                     is BaseResult.Success -> {
                         otpId = result.data.otpId
-                        if (result.data.otpAttemptLeft == 0) {
-                            resendAction.visibility = View.GONE
-                            resendTimerView.visibility - View.VISIBLE
-                        } else {
-                            showResendTimer()
-                        }
+                        showResendTimer()
                         bottomSheetDialog?.dismiss()
                     }
 
