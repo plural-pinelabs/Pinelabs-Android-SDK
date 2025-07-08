@@ -12,7 +12,6 @@ import android.webkit.JavascriptInterface
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -37,6 +36,7 @@ import com.plural_pinelabs.expresscheckoutsdk.common.NetworkHelper
 import com.plural_pinelabs.expresscheckoutsdk.common.PaymentModeSharedViewModel
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils.MTAG
 import com.plural_pinelabs.expresscheckoutsdk.data.model.TransactionStatusResponse
+import com.plural_pinelabs.expresscheckoutsdk.presentation.LandingActivity
 import kotlinx.coroutines.launch
 
 internal class ACSFragment : Fragment() {
@@ -70,8 +70,7 @@ internal class ACSFragment : Fragment() {
             WindowManager.LayoutParams.FLAG_SECURE,
             WindowManager.LayoutParams.FLAG_SECURE
         )
-        val headerLayout = requireActivity().findViewById<ConstraintLayout>(R.id.header_layout)
-        headerLayout.visibility = View.GONE
+        (activity as LandingActivity).showHideHeaderLayout(false)
         initializeValueFromProcessPaymentResponse()
         setUpViews(view)
         observeViewModel()
@@ -105,14 +104,7 @@ internal class ACSFragment : Fragment() {
                                 }
 
                                 PROCESSED_ATTEMPTED -> {
-                                    Toast.makeText(
-                                        requireContext(),
-                                        "Payment attempted TODO handle retry flow",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                    sharedViewModel.retryEvent.value = true
-                                    // findNavController().navigate(R.id.action_cardFragment_to_failureFragment)
-                                    // TODO ATTEMPTED Handle the scenario for retry or failure
+                                   // findNavController().navigate(R.id.action_ACSFragment_to_successFragment)
                                 }
 
                                 PROCESSED_FAILED -> {

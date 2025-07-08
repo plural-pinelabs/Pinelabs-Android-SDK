@@ -217,14 +217,23 @@ data class CustomerData(
 
 @Parcelize
 data class CardData(
-    val card_number: String,
-    val cvv: String,
-    val card_holder_name: String,
-    val card_expiry_year: String,
-    val card_expiry_month: String,
+    val card_number: String?,
+    val cvv: String?,
+    val card_holder_name: String?,
+    val card_expiry_year: String?,
+    val card_expiry_month: String?,
     val isNativeOTPSupported: Boolean?,
-    var save: Boolean?
-) : Parcelable
+    var save: Boolean?,
+    val card_type: String? = null,
+    val network_name: String? = null,
+    val issuer_name: String? = null,
+    val card_category: String? = null,
+    val country_code: String? = null,
+    val token_txn_type: String? = null,
+    val last4_digit: String? = null,
+    val is_native_otp_eligible: Boolean? = null,
+
+    ) : Parcelable
 
 @Parcelize
 data class DeviceInfo(
@@ -343,8 +352,75 @@ data class TransactionStatus(
     val response_code: Int?,
     val response_message: String?,
     val payment_id: String?,
-    val deep_link: String?
+    val deep_link: String?,
+    val order_summary: OrderSummary?
 )
+
+data class OrderSummary(
+    val order_id: String,
+    val merchant_order_reference: String,
+    val type: String,
+    val status: String,
+    val callback_url: String,
+    val merchant_id: String,
+    val order_amount: Amount,
+    val pre_auth: Boolean,
+    val part_payment: Boolean,
+    val allowed_payment_methods: List<String>,
+    val purchase_details: PurchaseDetails,
+    val payments: List<Payment>,
+    val created_at: String,
+    val updated_at: String,
+    val integration_mode: String,
+    val payment_retries_remaining: Int
+)
+
+
+data class PurchaseDetails(
+    val customer: CustomerInfo,
+    val merchant_metadata: MerchantMetadata,
+    val products: List<ProductDetail>
+)
+
+
+data class MerchantMetadata(
+    val key1: String,
+    val key2: String
+)
+
+
+data class Payment(
+    val id: String,
+    val merchant_payment_reference: String,
+    val status: String,
+    val payment_amount: Amount,
+    val payment_method: String,
+    val error_detail: ErrorDetail,
+    val created_at: String,
+    val updated_at: String,
+    val challenge_url: String? = null,
+    val payment_option: PaymentOptions? = null,
+    val acquirer_data: AcquirerData? = null,
+)
+
+data class AcquirerData(
+    val approval_code: String,
+    val acquirer_reference: String,
+    val rrn: String,
+    val is_aggregator: Boolean,
+    val acquirer_name: String
+)
+
+
+data class PaymentOptions(
+    val card_data: CardData? = null,
+)
+
+data class ErrorDetail(
+    val code: String,
+    val message: String
+)
+
 
 data class CancelTransactionResponse(
     val response_code: Int,
@@ -363,13 +439,14 @@ data class GlobalBinsData(val issuerName: String, val cardType: String, val isDo
 
 data class ResultInfo(val responseCode: String, val totalBins: String)
 
+@Parcelize
 data class OTPRequest(
     val payment_id: String? = null,
     var otp: String? = null,
     val customerId: String? = null,
     val otpId: String? = null,
     val updateOrderDetails: UpdateOrderDetails? = null
-)
+) : Parcelable
 
 data class OTPResponse(val next: List<String>?, val status: String?, val meta_data: MetaData?)
 
@@ -424,9 +501,10 @@ data class SavedCardDataObject(
     val cvvRequired: Boolean
 ) : Parcelable
 
+@Parcelize
 data class UpdateOrderDetails(
     val customer: CustomerInfo?
-)
+) : Parcelable
 
 @Parcelize
 data class SDKData(

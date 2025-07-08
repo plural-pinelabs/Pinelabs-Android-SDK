@@ -67,7 +67,7 @@
         android:fontFamily="sans-serif-medium"
         android:gravity="center"
         android:letterSpacing="0.12"
-        android:text="@string/retry_payment_of_9_449"
+        android:text="@string/retry_payment_of_x"
         android:textAllCaps="true"
         android:textColor="@color/black_text_60"
         android:textFontWeight="700"

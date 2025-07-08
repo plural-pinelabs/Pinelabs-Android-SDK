@@ -19,13 +19,12 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.navigation.findNavController
 import com.plural_pinelabs.expresscheckoutsdk.ExpressSDKObject
 import com.plural_pinelabs.expresscheckoutsdk.R
-import com.plural_pinelabs.expresscheckoutsdk.common.BottomSheetRetryFragment
 import com.plural_pinelabs.expresscheckoutsdk.common.CustomExceptionHandler
+import com.plural_pinelabs.expresscheckoutsdk.common.ItemClickListener
 import com.plural_pinelabs.expresscheckoutsdk.common.PaymentModeSharedViewModel
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CustomerInfo
 import com.plural_pinelabs.expresscheckoutsdk.data.model.FetchResponseDTO
-import com.plural_pinelabs.expresscheckoutsdk.data.model.PaymentMode
 
 class LandingActivity : AppCompatActivity() {
     private lateinit var merchantLogoCard: CardView
@@ -71,7 +70,7 @@ class LandingActivity : AppCompatActivity() {
     }
 
 
-    private fun showHideHeaderLayout(isShow: Boolean) {
+    fun showHideHeaderLayout(isShow: Boolean) {
         val headerLayout = findViewById<View>(R.id.header_layout)
         headerLayout.visibility = if (!isShow) {
             View.GONE
@@ -96,7 +95,15 @@ class LandingActivity : AppCompatActivity() {
         showHideHeaderLayout(false)
         mainContentLayout = findViewById(R.id.main)
         cancelBtn.setOnClickListener {
-            Utils.showCancelPaymentDialog(this)
+            Utils.showCancelPaymentDialog(this, object : ItemClickListener<Boolean> {
+                override fun onItemClick(position: Int, item: Boolean) {
+                    if (item) {
+                        val navHostController = findNavController(R.id.nav_host_fragment_container)
+                        navHostController.navigate(R.id.failureFragment)
+                    }
+                }
+
+            })
         }
         setupObservers()
     }
@@ -172,31 +179,10 @@ class LandingActivity : AppCompatActivity() {
     private fun setupObservers() {
         // Observe payment failure
         sharedViewModel.retryEvent.observe(this) {
-            if (it)
-                showRetryBottomSheet()
+            if (it) {
+                val navHostController = findNavController(R.id.nav_host_fragment_container)
+                navHostController.navigate(R.id.action_global_retryFragment)
+            }
         }
-
-        // Observe retry selection
-        sharedViewModel.selectedPaymentMethod.observe(this) { selectedMethod ->
-            navigateToPaymentFragment(selectedMethod)
-        }
-    }
-
-    private fun showRetryBottomSheet() {
-        val bottomSheetDialog =
-            BottomSheetRetryFragment()
-        bottomSheetDialog.isCancelable = false
-        bottomSheetDialog.show(supportFragmentManager, "")
-    }
-
-
-    private fun navigateToPaymentFragment(selectedMethod: PaymentMode) {
-        val navHostController = findNavController(R.id.nav_host_fragment_container)
-//        val destinationId = when (selectedMethod.paymentModeId) {
-//            PaymentModes.CREDIT_DEBIT.paymentModeID -> R.id.cardFragment
-//
-//            PaymentModes.UPI.paymentModeID -> {}
-//        }
-
     }
 }

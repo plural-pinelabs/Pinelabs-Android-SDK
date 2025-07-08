@@ -104,7 +104,6 @@ class CardFragment : Fragment() {
     private var isPBPChecked = false // TODO to configure this from the server
 
     private lateinit var viewModel: CardFragmentViewModel
-    private val sharedViewModel: PaymentModeSharedViewModel by activityViewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -292,7 +291,7 @@ class CardFragment : Fragment() {
                             bundle.putString(ERROR_KEY, it.errorCode)
                             bundle.putString(ERROR_MESSAGE_KEY, it.errorMessage)
                             bottomSheetDialog?.dismiss()
-                            sharedViewModel.retryEvent.value = true
+                            findNavController().navigate(R.id.action_cardFragment_to_successFragment)
                         }
 
                         is BaseResult.Loading -> {

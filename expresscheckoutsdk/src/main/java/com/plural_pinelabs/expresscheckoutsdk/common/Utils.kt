@@ -1,5 +1,6 @@
 package com.plural_pinelabs.expresscheckoutsdk.common
 
+import android.app.Activity
 import android.content.Context
 import android.content.res.Resources
 import android.graphics.Bitmap
@@ -209,6 +210,10 @@ import java.util.TimeZone
 import java.util.regex.Pattern
 import kotlin.math.pow
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.BARODA_BANK_CODE as BARODA_BANK_CODE1
+import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 internal object Utils {
 
@@ -497,7 +502,26 @@ internal object Utils {
     }
 
 
-    fun showProcessPaymentDialog(context: Context): BottomSheetDialog {
+    fun formatToReadableDate(input: String): String {
+        if (input.isNullOrEmpty()){
+            return ""
+        }
+        val instant = Instant.parse(input)
+        val formatter = DateTimeFormatter.ofPattern("MMM d, yyyy | hh:mm a", Locale.ENGLISH)
+            .withZone(ZoneId.of("Asia/Kolkata")) // Use your desired timezone
+        return formatter.format(instant)
+    }
+
+
+
+    fun showProcessPaymentDialog(context: Context): BottomSheetDialog? {
+
+
+        if (context !is Activity || context.isFinishing || context.isDestroyed) {
+            Log.w("DialogLeakFix", "Context is not valid. Skipping dialog.")
+            return null
+        }
+
         val bottomSheetDialog = BottomSheetDialog(context)
         val view = LayoutInflater.from(context)
             .inflate(
@@ -533,7 +557,11 @@ internal object Utils {
         bottomSheetDialog.setCancelable(false)
         bottomSheetDialog.setCanceledOnTouchOutside(false)
         bottomSheetDialog.window?.setBackgroundDrawable(Color.TRANSPARENT.toDrawable())
+        Log.d("bottom", "showinh")
         bottomSheetDialog.show()
+        bottomSheetDialog.setOnDismissListener {
+            Log.d("bottom", "dismissed")
+        }
         return bottomSheetDialog
     }
 
@@ -555,7 +583,6 @@ internal object Utils {
         processCancelButton.setOnClickListener {
             itemClickListener?.onItemClick(0, true)
             bottomSheetDialog.dismiss()
-            showCancelPaymentDialog(context)
         }
         processImageLogo.setAnimationFromUrl(IMAGE_LOGO)
         processImageLogo.repeatCount = 350
@@ -569,7 +596,7 @@ internal object Utils {
     }
 
 
-    fun showCancelPaymentDialog(context: Context): BottomSheetDialog {
+    fun showCancelPaymentDialog(context: Context,itemClickListener: ItemClickListener<Boolean>?): BottomSheetDialog {
         val bottomSheetDialog = BottomSheetDialog(context)
         val view = LayoutInflater.from(context)
             .inflate(
@@ -584,13 +611,12 @@ internal object Utils {
             bottomSheetDialog.dismiss()
         }
         cancelYesButton.setOnClickListener {
-            // Handle the cancel action here
-            //TODO cancel the payment
             bottomSheetDialog.dismiss()
         }
 
         cancelButton.setOnClickListener {
             // Handle the cancel action here
+            itemClickListener?.onItemClick(0, true)
             //TODO cancel the payment pass an interface to here and listen to the click use the existing item click listener with boolean
             bottomSheetDialog.dismiss()
         }

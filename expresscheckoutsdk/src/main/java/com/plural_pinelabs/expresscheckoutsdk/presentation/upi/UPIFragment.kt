@@ -270,16 +270,12 @@ class UPIFragment : Fragment() {
                 viewModel.processPaymentResult.collect {
                     when (it) {
                         is BaseResult.Error -> {
-                            //Throw error and exit SDK
-                            //TODO Pass error message and description
                             cancelTransactionProcess()
-                            findNavController().navigate(R.id.action_UPIFragment_to_failureFragment)
+                            findNavController().navigate(R.id.action_UPIFragment_to_successFragment)
                         }
 
                         is BaseResult.Loading -> {
-                            //show the process dialog payment
                             if (it.isLoading)
-                            //show the process dialog payment
                                 bottomSheetDialog = showProcessPaymentDialog(requireContext())
                         }
 
@@ -328,14 +324,13 @@ class UPIFragment : Fragment() {
                                 }
 
                                 PROCESSED_STATUS -> {
-                                    bottomSheetDialog?.dismiss()
-                                    transactionStatusJob?.cancel()
+                                    cancelTransactionProcess()
                                     findNavController().navigate(R.id.action_UPIFragment_to_successFragment)
                                 }
 
                                 PROCESSED_ATTEMPTED -> {
                                     cancelTransactionProcess()
-                                    // TODO ATTEMPTED OR FAILED Handle the scenario for retry or failure
+                                    findNavController().navigate(R.id.action_UPIFragment_to_retryFragment)
                                 }
 
                                 PROCESSED_FAILED -> {
@@ -416,10 +411,28 @@ class UPIFragment : Fragment() {
                 //TODO throw error
             }
         }.start()
-        bottomSheetDialog?.setCancelable(false)
-        bottomSheetDialog?.setCanceledOnTouchOutside(false)
-        bottomSheetDialog?.setContentView(view)
-        bottomSheetDialog?.show() // Show the dialog first
+        bottomSheetDialog?.setOnShowListener { dialogInterface ->
+            val bottomSheet = (dialogInterface as BottomSheetDialog)
+                .findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)
+            bottomSheet?.let {
+                val behavior = BottomSheetBehavior.from(it)
+//                val layoutParams = it.layoutParams
+//                val displayMetrics = Resources.getSystem().displayMetrics
+//                val screenHeight = displayMetrics.heightPixels
+//                layoutParams.height = (screenHeight * 0.95).toInt()
+//                it.layoutParams = layoutParams
+//                behavior.expandedOffset =
+//                    (screenHeight * 0.05).toInt() // Set expanded offset to 15% of screen height
+//                behavior.state = BottomSheetBehavior.STATE_EXPANDED
+                behavior.isDraggable = false
+                behavior.isFitToContents = false
+                behavior.skipCollapsed = false
+            }
+            bottomSheetDialog?.setCancelable(false)
+            bottomSheetDialog?.setCanceledOnTouchOutside(false)
+            bottomSheetDialog?.setContentView(view)
+            bottomSheetDialog?.show() // Show the dialog first
+        }
     }
 
     private fun showProcessPaymentVPADialog() {
@@ -427,7 +440,6 @@ class UPIFragment : Fragment() {
             LayoutInflater.from(requireActivity())
                 .inflate(R.layout.upi_vpa_process_payment_bottom_sheet, null)
         val cancelPaymentTextView: TextView = view.findViewById(R.id.cancelPaymentTextView)
-        val circularProgressBar: ProgressBar = view.findViewById(R.id.progressBar)
         val vpaId: TextView = view.findViewById(R.id.vpaId)
         vpaId.text = upiIdEt.text.toString()
 
@@ -435,16 +447,19 @@ class UPIFragment : Fragment() {
         bottomSheetDialog?.setOnShowListener { dialogInterface ->
             val bottomSheet = (dialogInterface as BottomSheetDialog)
                 .findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)
-
             bottomSheet?.let {
                 val behavior = BottomSheetBehavior.from(it)
-
-                // Set desired height here
-                val layoutParams = it.layoutParams
-                layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT // or a specific height
-                it.layoutParams = layoutParams
-
-                behavior.state = BottomSheetBehavior.STATE_EXPANDED
+//                val layoutParams = it.layoutParams
+//                val displayMetrics = Resources.getSystem().displayMetrics
+//                val screenHeight = displayMetrics.heightPixels
+//                layoutParams.height = (screenHeight * 0.95).toInt()
+//                it.layoutParams = layoutParams
+//                behavior.expandedOffset =
+//                    (screenHeight * 0.05).toInt() // Set expanded offset to 15% of screen height
+//                behavior.state = BottomSheetBehavior.STATE_EXPANDED
+                behavior.isDraggable = false
+                behavior.isFitToContents = false
+                behavior.skipCollapsed = false
             }
         }
         cancelPaymentTextView.setOnClickListener {

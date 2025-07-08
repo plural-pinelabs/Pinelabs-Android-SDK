@@ -14,6 +14,7 @@ import com.plural_pinelabs.expresscheckoutsdk.presentation.emi.TenureSelectionVi
 import com.plural_pinelabs.expresscheckoutsdk.presentation.nativeotp.NativeOTPViewModel
 import com.plural_pinelabs.expresscheckoutsdk.presentation.netbanking.NetBankingViewModel
 import com.plural_pinelabs.expresscheckoutsdk.presentation.splash.SplashViewModel
+import com.plural_pinelabs.expresscheckoutsdk.presentation.terminal.SuccessViewModel
 import com.plural_pinelabs.expresscheckoutsdk.presentation.upi.UPIViewModel
 import com.plural_pinelabs.expresscheckoutsdk.presentation.wallets.WalletViewModel
 
@@ -166,3 +167,15 @@ class TenureSelectionViewModelFactory(private val networkHelper: NetworkHelper) 
     }
 }
 
+
+class SuccessViewModelFactory(private val networkHelper: NetworkHelper) :
+    ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        return SuccessViewModel(
+            ExpressRepositoryImpl(
+                RetrofitBuilder.commonApiService,
+                networkHelper = networkHelper
+            )
+        ) as T
+    }
+}

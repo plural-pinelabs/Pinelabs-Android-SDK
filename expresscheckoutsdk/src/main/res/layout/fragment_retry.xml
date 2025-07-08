@@ -7,23 +7,9 @@
     android:layout_marginHorizontal="16dp"
     android:orientation="vertical">
 
-    <androidx.appcompat.widget.AppCompatTextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:drawableStart="@drawable/ic_back_arrow"
-        android:drawablePadding="4dp"
-        android:drawableTint="@color/black_text_80"
-        android:fontFamily="sans-serif"
-        android:text="@string/go_back"
-        android:textColor="@color/black_text_80"
-        android:textFontWeight="600"
-        android:textSize="14sp" />
-
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
         tools:context=".presentation.terminal.SuccessFragment">
 
         <LinearLayout
@@ -38,6 +24,7 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="32dp"
                 android:importantForAccessibility="no"
+                android:padding="6dp"
                 android:src="@drawable/ic_failure_cancel" />
 
             <androidx.appcompat.widget.AppCompatTextView
@@ -66,18 +53,51 @@
 
 
             <TextView
+                android:id="@+id/retry_payment_amount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginStart="24dp"
                 android:layout_marginTop="32dp"
                 android:fontFamily="sans-serif"
                 android:letterSpacing="0.12"
-                android:text="Retry payment of "
+                android:text="@string/retry_payment_of_x"
                 android:textAllCaps="true"
                 android:textColor="@color/black_text_60"
                 android:textFontWeight="700"
                 android:textSize="12sp" />
+
+
+            <TextView
+                android:id="@+id/saved_cards_title"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginTop="32dp"
+                android:layout_marginBottom="16dp"
+                android:layout_weight="700"
+                android:fontFamily="sans-serif"
+                android:letterSpacing="0.12"
+                android:text="@string/saved_cards"
+                android:textAllCaps="true"
+                android:textSize="12sp" />
+
+            <LinearLayout
+                android:id="@+id/saved_cards_card_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="2dp"
+                android:layout_marginBottom="40dp"
+                android:background="@drawable/input_field_border"
+                android:orientation="vertical"
+                app:cardCornerRadius="8dp">
+
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/saved_cards_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+
+            </LinearLayout>
 
             <TextView
                 android:layout_width="match_parent"
@@ -109,9 +129,6 @@
                     tools:itemCount="5"
                     tools:listitem="@layout/payment_item_layout" />
             </androidx.cardview.widget.CardView>
-
-            <include layout="@layout/footer" />
-
         </LinearLayout>
 
     </ScrollView>

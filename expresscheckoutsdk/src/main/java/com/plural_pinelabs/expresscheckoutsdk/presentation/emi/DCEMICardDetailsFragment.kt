@@ -37,6 +37,7 @@ import com.plural_pinelabs.expresscheckoutsdk.common.Constants.ERROR_MESSAGE_KEY
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.TENURE_ID
 import com.plural_pinelabs.expresscheckoutsdk.common.NetworkHelper
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils
+import com.plural_pinelabs.expresscheckoutsdk.common.Utils.MTAG
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils.cardIcons
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils.cardTypes
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils.showProcessPaymentDialog
@@ -197,31 +198,11 @@ class DCEMICardDetailsFragment : Fragment() {
 
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.otpRequestResult.collect { result ->
-                    when (result) {
-                        is BaseResult.Loading -> {
-                        }
-
-                        is BaseResult.Success -> {
-                            bottomSheetDialog?.dismiss()
-                        }
-
-                        is BaseResult.Error -> {
-                            bottomSheetDialog?.dismiss()
-                            redirectToACS()
-                        }
-                    }
-                }
-            }
-        }
-
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.metaDataResult.collect { result ->
                     when (result) {
                         is BaseResult.Error -> {
                             result.errorCode.let { exception ->
-                                Log.e("Error", exception)
+                                Log.e(MTAG, exception)
                             }
 
                         }
@@ -232,8 +213,7 @@ class DCEMICardDetailsFragment : Fragment() {
                                 setCardBrandIcon(
                                     cardEditText, it.card_payment_details[0].card_network
                                 )
-                                Log.d("Success", " Meta Data fetched successfully")
-
+                                Log.d(MTAG, " Meta Data fetched successfully")
                             }
                         }
 
@@ -254,7 +234,7 @@ class DCEMICardDetailsFragment : Fragment() {
                             bundle.putString(ERROR_MESSAGE_KEY, it.errorMessage)
                             bottomSheetDialog?.dismiss()
                             findNavController().navigate(
-                                R.id.action_EMICardDetailsFragment_to_failureFragment, bundle
+                                R.id.action_DCEMICardDetailsFragment_to_successFragment, bundle
                             )
                         }
 
@@ -316,8 +296,8 @@ class DCEMICardDetailsFragment : Fragment() {
                     if (cardType.isNullOrEmpty()) {
                         showCardDetailsError("CardNumber")
                     } else {
-                            isCardValid = true
-                            hideCardDetailsError()
+                        isCardValid = true
+                        hideCardDetailsError()
                     }
                 }
             }

@@ -97,7 +97,7 @@ class NetBankingFragment : Fragment() {
                             bundle.putString(ERROR_MESSAGE_KEY, it.errorMessage)
                             bottomSheetDialog?.dismiss()
                             findNavController().navigate(
-                                R.id.action_netBankingFragment_to_failureFragment, bundle
+                                R.id.action_netBankingFragment_to_successFragment,
                             )
                         }
 

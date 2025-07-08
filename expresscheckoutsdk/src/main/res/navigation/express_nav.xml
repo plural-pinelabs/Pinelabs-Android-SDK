@@ -89,6 +89,8 @@
         <action
             android:id="@+id/action_cardFragment_to_saveCardOTPFragment"
             app:destination="@id/saveCardOTPFragment" />
+        <action app:destination="@+id/successFragment"
+            android:id="@+id/action_cardFragment_to_successFragment"/>
     </fragment>
     <fragment
         android:id="@+id/ACSFragment"
@@ -128,6 +130,9 @@
         <action
             android:id="@+id/action_UPIFragment_to_successFragment"
             app:destination="@id/successFragment" />
+        <action
+            android:id="@+id/action_UPIFragment_to_retryFragment"
+            app:destination="@id/retryFragment" />
     </fragment>
     <fragment
         android:id="@+id/failureFragment"
@@ -138,7 +143,14 @@
         android:id="@+id/successFragment"
         android:name="com.plural_pinelabs.expresscheckoutsdk.presentation.terminal.SuccessFragment"
         android:label="fragment_success"
-        tools:layout="@layout/fragment_success" />
+        tools:layout="@layout/fragment_success">
+        <action
+            android:id="@+id/action_successFragment_to_retryFragment"
+            app:destination="@id/retryFragment" />
+        <action
+            android:id="@+id/action_successFragment_to_failureFragment"
+            app:destination="@id/failureFragment" />
+    </fragment>
     <fragment
         android:id="@+id/saveCardOTPFragment"
         android:name="com.plural_pinelabs.expresscheckoutsdk.presentation.card.SaveCardOTPFragment"
@@ -207,28 +219,59 @@
             app:destination="@id/failureFragment" />
     </fragment>
     <fragment
-        tools:layout="@layout/fragment_e_m_i_card_details"
         android:id="@+id/EMICardDetailsFragment"
         android:name="com.plural_pinelabs.expresscheckoutsdk.presentation.emi.EMICardDetailsFragment"
-        android:label="EMICardDetailsFragment" >
+        android:label="EMICardDetailsFragment"
+        tools:layout="@layout/fragment_e_m_i_card_details">
         <action
             android:id="@+id/action_EMICardDetailsFragment_to_ACSFragment"
             app:destination="@id/ACSFragment" />
         <action
             android:id="@+id/action_EMICardDetailsFragment_to_failureFragment"
             app:destination="@id/failureFragment" />
+        <action
+            android:id="@+id/action_EMICardDetailsFragment_to_successFragment"
+            app:destination="@id/successFragment" />
     </fragment>
     <fragment
-        tools:layout="@layout/fragment_d_c_e_m_i_card_details"
         android:id="@+id/DCEMICardDetailsFragment"
         android:name="com.plural_pinelabs.expresscheckoutsdk.presentation.emi.DCEMICardDetailsFragment"
-        android:label="DCEMICardDetailsFragment" >
+        android:label="DCEMICardDetailsFragment"
+        tools:layout="@layout/fragment_d_c_e_m_i_card_details">
         <action
             android:id="@+id/action_DCEMICardDetailsFragment_to_failureFragment"
             app:destination="@id/failureFragment" />
         <action
             android:id="@+id/action_DCEMICardDetailsFragment_to_ACSFragment"
             app:destination="@id/ACSFragment" />
+        <action
+            android:id="@+id/action_DCEMICardDetailsFragment_to_successFragment"
+            app:destination="@id/successFragment" />
     </fragment>
+    <fragment
+        android:id="@+id/retryFragment"
+        android:name="com.plural_pinelabs.expresscheckoutsdk.presentation.terminal.retry.RetryFragment"
+        android:label="RetryFragment">
+        <action
+            android:id="@+id/action_retryFragment_to_upiFragment"
+            app:destination="@id/UPIFragment" />
+        <action
+            android:id="@+id/action_retryFragment_to_cardFragment"
+            app:destination="@id/cardFragment" />
+        <action
+            android:id="@+id/action_retryFragment_to_EMIFragment"
+            app:destination="@id/EMIFragment" />
+        <action
+            android:id="@+id/action_retryFragment_to_walletFragment"
+            app:destination="@id/walletFragment" />
+        <action
+            android:id="@+id/action_retryFragment_to_netBankingFragment"
+            app:destination="@id/netBankingFragment" />
+    </fragment>
+    <action
+        android:id="@+id/action_global_retryFragment"
+        app:destination="@id/retryFragment"
+        app:popUpTo="@id/express_nav"
+        app:popUpToInclusive="true" />
 
 </navigation>

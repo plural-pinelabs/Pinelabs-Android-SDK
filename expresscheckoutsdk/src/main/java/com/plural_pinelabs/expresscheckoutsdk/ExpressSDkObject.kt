@@ -56,6 +56,10 @@ internal object ExpressSDKObject {
         })
     }
 
+    fun getCallback(): ExpressSDKCallback? {
+        return getSDKObject()?.callback
+    }
+
     fun getCurrency(): String {
         val fetchResponse = getFetchData()
         return (fetchResponse?.paymentData?.originalTxnAmount?.currency ?: run {
@@ -82,6 +86,7 @@ internal object ExpressSDKObject {
     fun setEMIPaymentModeData(emiPaymentModeData: EMIPaymentModeData) {
         getSDKObject()?.emiPaymentModeData = emiPaymentModeData
     }
+
     fun getEMIPaymentModeData(): EMIPaymentModeData? {
         return getSDKObject()?.emiPaymentModeData
     }

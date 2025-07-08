@@ -39,12 +39,12 @@ class BottomSheetRetryFragment(
 
         retryText = view.findViewById(R.id.txt_payment)
         retryText.text = getString(
-            R.string.retry_payment_of_9_449,
+            R.string.retry_payment_of_x,
             Utils.convertInRupees(ExpressSDKObject.getAmount()).toString()
         )
         closeIcon = view.findViewById(R.id.x_icon)
         closeIcon.setOnClickListener {
-            Utils.showCancelPaymentDialog(requireContext())
+         //   Utils.showCancelPaymentDialog(requireContext())
         }
         paymentModeRecyclerView = view.findViewById(R.id.recycler_payment_options)
         setPaymentMode()

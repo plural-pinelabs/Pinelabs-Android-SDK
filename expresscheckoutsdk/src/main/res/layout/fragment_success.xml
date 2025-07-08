@@ -3,16 +3,23 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/success_parent_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-
     tools:context=".presentation.terminal.SuccessFragment">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="16dp"
         android:orientation="vertical">
+
+        <TextView
+            android:background="@color/dense_background"
+            android:gravity="center"
+            android:padding="8dp"
+            android:text="@string/redirecting_to_website_in_x_sec"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
 
         <ImageView
             android:layout_width="64dp"
@@ -72,11 +79,11 @@
             android:paddingVertical="20dp">
 
             <TextView
-                android:id="@+id/order_number_label"
+                android:id="@+id/date_time_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif"
-                android:text="@string/order_number"
+                android:text="Date time "
                 android:textColor="@color/black_text_80"
                 android:textFontWeight="500"
                 android:textSize="14sp"
@@ -85,17 +92,52 @@
 
 
             <TextView
-                android:id="@+id/order_number_value"
+                android:id="@+id/date_time_value"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif"
                 android:gravity="end"
+                android:layout_marginStart="12dp"
+
                 android:textColor="@color/black_text_80"
                 android:textFontWeight="600"
                 android:textSize="14sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/order_number_label"
                 app:layout_constraintTop_toTopOf="parent"
+                tools:text="04-07-2025|17:55" />
+
+
+            <TextView
+                android:id="@+id/order_number_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:fontFamily="sans-serif"
+                android:text="@string/order_number"
+                android:textColor="@color/black_text_80"
+                android:textFontWeight="500"
+                android:textSize="14sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/date_time_label" />
+
+
+            <TextView
+                android:id="@+id/order_number_value"
+                android:layout_width="0dp"
+                android:layout_marginStart="12dp"
+
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:fontFamily="sans-serif"
+
+                android:gravity="end"
+                android:textColor="@color/black_text_80"
+                android:textFontWeight="600"
+                android:textSize="14sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/order_number_label"
+                app:layout_constraintTop_toBottomOf="@id/date_time_value"
                 tools:text="1234567890" />
 
             <TextView
@@ -117,6 +159,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
+                android:layout_marginStart="12dp"
                 android:layout_marginBottom="20dp"
                 android:drawableEnd="@drawable/ic_copy_icon"
                 android:drawablePadding="4dp"
@@ -173,6 +216,7 @@
 
 
             <LinearLayout
+                android:layout_marginStart="12dp"
                 android:id="@+id/paid_using_value"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -195,11 +239,13 @@
                     android:src="@drawable/wallet_paytm" />
 
                 <TextView
+                    android:id="@+id/card_name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="600"
                     android:fontFamily="sans-serif"
                     android:gravity="center_vertical"
+                    android:maxLength="12"
                     android:text="HDFC"
                     android:textColor="@color/black_text_80"
                     android:textSize="14sp" />
@@ -218,12 +264,13 @@
                     android:src="@drawable/saved_card_dots" />
 
                 <TextView
+                    android:id="@+id/card_number"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="600"
                     android:fontFamily="sans-serif"
                     android:gravity="center_vertical"
-                    android:text="HDFC"
+                    android:text="1234`"
                     android:textColor="@color/black_text_80"
                     android:textSize="14sp" />
 
@@ -249,7 +296,7 @@
                 android:id="@+id/original_price_value"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-
+                android:layout_marginStart="12dp"
                 android:layout_marginTop="20dp"
                 android:layout_marginEnd="16dp"
                 android:layout_marginBottom="20dp"
@@ -295,6 +342,8 @@
                 android:id="@+id/final_price_value"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+
                 android:layout_marginTop="20dp"
                 android:layout_marginEnd="16dp"
                 android:layout_marginBottom="20dp"
