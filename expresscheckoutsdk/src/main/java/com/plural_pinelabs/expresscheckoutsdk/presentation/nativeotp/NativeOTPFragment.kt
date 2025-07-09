@@ -5,6 +5,8 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.Build
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -47,6 +49,7 @@ class NativeOTPFragment : Fragment() {
     private lateinit var errorMessageOtp: TextView
     private lateinit var continueButton: AppCompatButton
     private lateinit var bankWebsiteText: TextView
+    private lateinit var otpSentMessage: TextView
     private lateinit var smsBroadcastReceiver: SmsBroadcastReceiver
     private lateinit var paymentId: String
     private var resendEnable: Boolean? = false
@@ -80,8 +83,30 @@ class NativeOTPFragment : Fragment() {
         handleBackButtonClick()
         observeViewModel()
         handleContinueButtonClick()
-        initTimer(resendTimer?.toLong())// TODO pass the timer value from the server if available to get it passed from the card fragment along with the  otp id
+        initTimer(resendTimer?.toLong())
+        setOTPTextListener()
+    }
 
+    private fun setOTPTextListener() {
+        otpInputField.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+            }
+
+            override fun afterTextChanged(s: Editable?) {
+                if (!s.isNullOrEmpty() && s.length >= 4) {
+                    errorMessageOtp.visibility = View.GONE
+                    continueButton.isEnabled = true
+                    Utils.handleCTAEnableDisable(requireContext(), true, continueButton)
+                } else {
+                    continueButton.isEnabled = false
+                    Utils.handleCTAEnableDisable(requireContext(), false, continueButton)
+                }
+            }
+        })
     }
 
     private fun initTimer(timeInMillis: Long?) {
@@ -106,18 +131,22 @@ class NativeOTPFragment : Fragment() {
                 viewModel.otpSubmitResult.collect { result ->
                     when (result) {
                         is BaseResult.Loading -> {
-                            // Show loading state TODO loading state
+                            if (result.isLoading){
+                                bottomSheetDialog = Utils.showProcessPaymentDialog(
+                                    requireContext(),
+                                )
+                            }
+
                         }
 
                         is BaseResult.Success -> {
-                            // Handle success TODO OTP submitted successfully, navigate to next screen
-                            // dismiss process dialog or loading indicator
+                            bottomSheetDialog?.dismiss()
                             viewModel.getTransactionStatus(ExpressSDKObject.getToken())
-
                         }
 
                         is BaseResult.Error -> {
-                            // TODO Handle error
+                            bottomSheetDialog?.dismiss()
+                            findNavController().navigate(R.id.action_nativeOTPFragment_to_retryFragment)
                         }
                     }
                 }
@@ -129,7 +158,6 @@ class NativeOTPFragment : Fragment() {
                 viewModel.transactionStatusResult.collect { result ->
                     when (result) {
                         is BaseResult.Loading -> {
-                            // Show loading state TODO loading state
                         }
 
                         is BaseResult.Success -> {
@@ -138,7 +166,7 @@ class NativeOTPFragment : Fragment() {
                                     findNavController().navigate(R.id.action_nativeOTPFragment_to_successFragment)
                                 } else {
                                     if (data.is_retry_available) {
-                                        //TODO show retry screen
+                                        findNavController().navigate(R.id.action_nativeOTPFragment_to_retryFragment)
                                     } else {
                                         findNavController().navigate(R.id.action_nativeOTPFragment_to_failureFragment)
                                     }
@@ -147,9 +175,7 @@ class NativeOTPFragment : Fragment() {
                         }
 
                         is BaseResult.Error -> {
-                            // TODO Handle error
                             findNavController().navigate(R.id.action_nativeOTPFragment_to_ACSFragment)
-
                         }
                     }
                 }
@@ -179,6 +205,13 @@ class NativeOTPFragment : Fragment() {
         errorMessageOtp = view.findViewById(R.id.error_message_otp)
         continueButton = view.findViewById(R.id.continue_btn)
         bankWebsiteText = view.findViewById(R.id.bank_Website_)
+        otpSentMessage = view.findViewById(R.id.otp_sent_message)
+        bankWebsiteText.setOnClickListener {
+            findNavController().navigate(R.id.action_nativeOTPFragment_to_ACSFragment)
+        }
+
+        val mobileNumber = ExpressSDKObject.getFetchData()?.customerInfo?.mobileNumber
+            ?: ExpressSDKObject.getFetchData()?.customerInfo?.mobile_number
     }
 
     private fun handleBackButtonClick() {
@@ -189,7 +222,6 @@ class NativeOTPFragment : Fragment() {
 
     private fun handleContinueButtonClick() {
         continueButton.setOnClickListener {
-            // Handle continue button click
             val otp = otpInputField.text.toString()
             if (otp.isNotEmpty()) {
                 submitOTP(otp)

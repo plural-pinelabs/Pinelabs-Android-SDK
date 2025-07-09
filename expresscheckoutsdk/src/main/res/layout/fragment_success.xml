@@ -14,12 +14,13 @@
         android:orientation="vertical">
 
         <TextView
+            android:id="@+id/redirecting_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:background="@color/dense_background"
             android:gravity="center"
             android:padding="8dp"
-            android:text="@string/redirecting_to_website_in_x_sec"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:text="@string/redirecting_to_website_in_x_sec" />
 
         <ImageView
             android:layout_width="64dp"
@@ -95,9 +96,9 @@
                 android:id="@+id/date_time_value"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
                 android:fontFamily="sans-serif"
                 android:gravity="end"
-                android:layout_marginStart="12dp"
 
                 android:textColor="@color/black_text_80"
                 android:textFontWeight="600"
@@ -125,9 +126,9 @@
             <TextView
                 android:id="@+id/order_number_value"
                 android:layout_width="0dp"
-                android:layout_marginStart="12dp"
-
                 android:layout_height="wrap_content"
+
+                android:layout_marginStart="12dp"
                 android:layout_marginTop="20dp"
                 android:fontFamily="sans-serif"
 
@@ -158,8 +159,8 @@
                 android:id="@+id/transaction_id_value"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
                 android:layout_marginStart="12dp"
+                android:layout_marginTop="20dp"
                 android:layout_marginBottom="20dp"
                 android:drawableEnd="@drawable/ic_copy_icon"
                 android:drawablePadding="4dp"
@@ -216,10 +217,10 @@
 
 
             <LinearLayout
-                android:layout_marginStart="12dp"
                 android:id="@+id/paid_using_value"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
                 android:layout_marginTop="20dp"
                 android:layout_marginEnd="16dp"
                 android:fontFamily="sans-serif"
@@ -233,15 +234,19 @@
                 tools:text="1234567890">
 
                 <ImageView
+                    android:id="@+id/payment_icon"
                     android:layout_width="24dp"
                     android:layout_height="24dp"
+                    android:layout_marginHorizontal="2dp"
+                    android:importantForAccessibility="no"
                     android:padding="2dp"
-                    android:src="@drawable/wallet_paytm" />
+                    android:src="@drawable/ic_generic" />
 
                 <TextView
                     android:id="@+id/card_name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
                     android:layout_weight="600"
                     android:fontFamily="sans-serif"
                     android:gravity="center_vertical"
@@ -251,15 +256,20 @@
                     android:textSize="14sp" />
 
                 <View
+                    android:id="@+id/card_divider"
                     android:layout_width="1dp"
                     android:layout_height="match_parent"
                     android:layout_gravity="center_vertical"
                     android:layout_marginVertical="4dp"
+                    android:layout_marginStart="2dp"
                     android:background="@color/black_text_80" />
 
                 <ImageView
+                    android:id="@+id/card_dots"
                     android:layout_width="14dp"
                     android:layout_height="18dp"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginHorizontal="2dp"
                     android:padding="2dp"
                     android:src="@drawable/saved_card_dots" />
 
@@ -267,6 +277,7 @@
                     android:id="@+id/card_number"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
                     android:layout_weight="600"
                     android:fontFamily="sans-serif"
                     android:gravity="center_vertical"
@@ -376,6 +387,7 @@
             android:visibility="gone" />
 
         <TextView
+            android:id="@+id/continue_to_merchant_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"

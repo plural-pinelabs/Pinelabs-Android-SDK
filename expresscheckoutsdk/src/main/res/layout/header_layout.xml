@@ -29,7 +29,7 @@
         android:layout_marginTop="25dp"
         android:layout_marginEnd="8dp"
         android:orientation="horizontal"
-        app:layout_constraintEnd_toStartOf="@id/cancel_btn"
+        app:layout_constraintEnd_toStartOf="@id/cancel_btn_process"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
@@ -50,20 +50,15 @@
 
         <TextView
             android:id="@+id/merchant_name_title"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="14dp"
             android:layout_marginRight="14dp"
             android:ellipsize="end"
             android:fontFamily="sans-serif-medium"
             android:singleLine="true"
-            android:text="Croma"
             android:textColor="@color/white"
-            android:textSize="20sp"
-            app:layout_constraintBottom_toBottomOf="@id/merchant_logo_cardview"
-            app:layout_constraintEnd_toStartOf="@id/cancel_btn"
-            app:layout_constraintStart_toEndOf="@id/merchant_logo_cardview"
-            app:layout_constraintTop_toTopOf="@id/merchant_logo_cardview" />
+            android:textSize="20sp" />
 
     </LinearLayout>
 

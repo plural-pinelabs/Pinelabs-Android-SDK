@@ -53,7 +53,7 @@ class RetryFragment : Fragment() {
             getString(
                 R.string.retry_payment_of_x,
             ),
-            Utils.convertToRupees(requireContext(), ExpressSDKObject.getAmount())
+            Utils.convertToRupeesWithSymobl(requireContext(), ExpressSDKObject.getAmount())
         )
     }
 

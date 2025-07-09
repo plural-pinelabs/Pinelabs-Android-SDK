@@ -43,9 +43,9 @@ class EMITenureListAdapter(
 
             val maxDiscount: String = item.let { tenure ->
                 tenure.total_discount_amount?.value?.let {
-                    Utils.convertToRupees(itemView.context, it)
+                    Utils.convertToRupeesWithSymobl(itemView.context, it)
                 } ?: tenure.total_subvention_amount?.value?.let {
-                    Utils.convertToRupees(itemView.context, it)
+                    Utils.convertToRupeesWithSymobl(itemView.context, it)
                 }
             } ?: "error"
             saveLayout.visibility = View.GONE
@@ -56,7 +56,7 @@ class EMITenureListAdapter(
                 saveLayout.visibility = View.GONE
             }
             tenureAmountTextView.text =
-                Utils.convertToRupees(context, item.monthly_emi_amount?.value)
+                Utils.convertToRupeesWithSymobl(context, item.monthly_emi_amount?.value)
             tenureXMonthsTextView.text = context.getString(
                 R.string.x_3_months,
                 item.tenure_value.toString()
@@ -66,12 +66,12 @@ class EMITenureListAdapter(
             } else {
                 processingFeesTextView.text = context.getString(
                     R.string.x_one_time_processing_fee,
-                    Utils.convertToRupees(context, item.processing_fee_details.amount.value)
+                    Utils.convertToRupeesWithSymobl(context, item.processing_fee_details.amount.value)
                 )
                 processingFeesTextView.visibility = View.VISIBLE
             }
             tenureTotalPayableTextView.text =
-                Utils.convertToRupees(context, item.net_payment_amount?.value)
+                Utils.convertToRupeesWithSymobl(context, item.net_payment_amount?.value)
             if (item.isBestValue) {
                 bestValueLabel.visibility = View.VISIBLE
             } else if (item.isRecommended) {

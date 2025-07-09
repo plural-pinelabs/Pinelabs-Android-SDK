@@ -14,8 +14,28 @@ data class FetchResponseDTO(
     var dccData: DccData? = null,
     val customerInfo: CustomerInfo?,  // New field for customer information
     val shippingAddress: Address,
-    val billingAddress: Address
+    val billingAddress: Address,
+    val cartDetails: CartDetails? = null // New field added
 )
+
+@Parcelize
+data class CartItem(
+    val item_id: String? = null,
+    val item_name: String? = null,
+    val item_description: String? = null,
+    val item_details_url: String? = null,
+    val item_image_url: String? = null,
+    val item_original_unit_price: Long? = null,
+    val item_discounted_unit_price: Long? = null,
+    val item_quantity: Int? = null,
+    val item_currency: String? = null
+) : Parcelable
+
+@Parcelize
+data class CartDetails(
+    val cart_items: List<CartItem>? = null
+) : Parcelable
+
 
 @Parcelize
 data class DccData(
@@ -356,6 +376,7 @@ data class TransactionStatus(
     val order_summary: OrderSummary?
 )
 
+@Parcelize
 data class OrderSummary(
     val order_id: String,
     val merchant_order_reference: String,
@@ -373,22 +394,24 @@ data class OrderSummary(
     val updated_at: String,
     val integration_mode: String,
     val payment_retries_remaining: Int
-)
+) : Parcelable
 
 
+@Parcelize
 data class PurchaseDetails(
     val customer: CustomerInfo,
     val merchant_metadata: MerchantMetadata,
     val products: List<ProductDetail>
-)
+) : Parcelable
 
-
+@Parcelize
 data class MerchantMetadata(
     val key1: String,
     val key2: String
-)
+) : Parcelable
 
 
+@Parcelize
 data class Payment(
     val id: String,
     val merchant_payment_reference: String,
@@ -401,25 +424,28 @@ data class Payment(
     val challenge_url: String? = null,
     val payment_option: PaymentOptions? = null,
     val acquirer_data: AcquirerData? = null,
-)
+) : Parcelable
 
+@Parcelize
 data class AcquirerData(
     val approval_code: String,
     val acquirer_reference: String,
     val rrn: String,
     val is_aggregator: Boolean,
     val acquirer_name: String
-)
+) : Parcelable
 
 
+@Parcelize
 data class PaymentOptions(
     val card_data: CardData? = null,
-)
+) : Parcelable
 
+@Parcelize
 data class ErrorDetail(
     val code: String,
     val message: String
-)
+) : Parcelable
 
 
 data class CancelTransactionResponse(

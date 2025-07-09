@@ -16,11 +16,11 @@ class NativeOTPViewModel(private val expressRepositoryImpl: ExpressRepositoryImp
     ViewModel() {
 
     private val _otpSubmitResult =
-        MutableStateFlow<BaseResult<OTPResponse>>(BaseResult.Loading(true))
+        MutableStateFlow<BaseResult<OTPResponse>>(BaseResult.Loading(false))
     val otpSubmitResult: StateFlow<BaseResult<OTPResponse>> = _otpSubmitResult
 
     private val _transactionStatusResult =
-        MutableStateFlow<BaseResult<TransactionStatusResponse>>(BaseResult.Loading(true))
+        MutableStateFlow<BaseResult<TransactionStatusResponse>>(BaseResult.Loading(false))
     val transactionStatusResult: StateFlow<BaseResult<TransactionStatusResponse>> =
         _transactionStatusResult
 

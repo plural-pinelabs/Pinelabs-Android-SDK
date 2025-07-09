@@ -49,7 +49,7 @@
     <string name="payment_verification">We’re verifying your payment status.\n Please do not go back or refresh.</string>
     <string name="go_back">Go back</string>
     <string name="enter_otp_to_complete_payment">Enter OTP to complete payment</string>
-    <string name="otp_sent_to_the_mobile_linked_to_your_bank">OTP sent to the mobile linked to your bank</string>
+    <string name="otp_sent_to_the_mobile_linked_to_your_bank">OTP sent to the mobile number linked to your card ending with ****%s</string>
     <string name="enter_otp">Enter OTP</string>
     <string name="waiting_to_auto_read_otp">Waiting to auto-read OTP</string>
     <string name="wrong_otp_please_re_enter">Wrong OTP, please re-enter</string>
@@ -178,5 +178,7 @@
     <string name="select_a_bank">Select a Bank</string>
     <string name="verify_continue">Verify &amp; Continue</string>
     <string name="redirecting_to_website_in_x_sec">Redirecting to website in %s sec</string>
+    <string name="close">Close</string>
+    <string name="qty_x">Qty:x</string>
 
 </resources>

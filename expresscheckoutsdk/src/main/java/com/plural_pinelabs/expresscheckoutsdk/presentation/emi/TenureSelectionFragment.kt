@@ -199,7 +199,7 @@ class TenureSelectionFragment : Fragment() {
                     )
                 continueBtn.text = String.format(
                     getString(R.string.pay_emi_x_per_month),
-                    Utils.convertToRupees(requireContext(), item?.monthly_emi_amount?.value)
+                    Utils.convertToRupeesWithSymobl(requireContext(), item?.monthly_emi_amount?.value)
                 )
                 footerLayout.visibility = View.VISIBLE
                 val totalSaving = (item?.total_discount_amount?.value

@@ -17,10 +17,12 @@ import android.util.Base64
 import android.util.Log
 import android.view.LayoutInflater
 import android.widget.Button
+import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.content.res.AppCompatResources
+import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toDrawable
 import androidx.core.graphics.toColorInt
 import com.airbnb.lottie.LottieAnimationView
@@ -206,14 +208,14 @@ import java.net.Inet4Address
 import java.net.NetworkInterface
 import java.net.SocketException
 import java.text.DecimalFormat
-import java.util.TimeZone
-import java.util.regex.Pattern
-import kotlin.math.pow
-import com.plural_pinelabs.expresscheckoutsdk.common.Constants.BARODA_BANK_CODE as BARODA_BANK_CODE1
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Locale
+import java.util.TimeZone
+import java.util.regex.Pattern
+import kotlin.math.pow
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.BARODA_BANK_CODE as BARODA_BANK_CODE1
 
 internal object Utils {
 
@@ -367,7 +369,7 @@ internal object Utils {
     }
 
 
-    fun convertToRupees(context: Context, amountInPaisa: Int?): String {
+    fun convertToRupeesWithSymobl(context: Context, amountInPaisa: Int?): String {
         if (amountInPaisa == null) {
             return "Some error occurred"
         }
@@ -503,7 +505,7 @@ internal object Utils {
 
 
     fun formatToReadableDate(input: String): String {
-        if (input.isNullOrEmpty()){
+        if (input.isNullOrEmpty()) {
             return ""
         }
         val instant = Instant.parse(input)
@@ -511,7 +513,6 @@ internal object Utils {
             .withZone(ZoneId.of("Asia/Kolkata")) // Use your desired timezone
         return formatter.format(instant)
     }
-
 
 
     fun showProcessPaymentDialog(context: Context): BottomSheetDialog? {
@@ -596,7 +597,10 @@ internal object Utils {
     }
 
 
-    fun showCancelPaymentDialog(context: Context,itemClickListener: ItemClickListener<Boolean>?): BottomSheetDialog {
+    fun showCancelPaymentDialog(
+        context: Context,
+        itemClickListener: ItemClickListener<Boolean>?
+    ): BottomSheetDialog {
         val bottomSheetDialog = BottomSheetDialog(context)
         val view = LayoutInflater.from(context)
             .inflate(
@@ -965,6 +969,35 @@ internal object Utils {
         }
 
 
+    }
+
+    fun Int.dpToPx(): Int {
+        return (this * Resources.getSystem().displayMetrics.density).toInt()
+    }
+
+    fun showRemoveErrorBackground(
+        context: Context,
+        editText: EditText,
+        drawable: Int,
+        isShow: Boolean
+    ) {
+        val backgroundDrawable =
+            ContextCompat.getDrawable(context, drawable)
+                ?.mutate()
+        val gradientDrawable = backgroundDrawable as? GradientDrawable
+        if (isShow) {
+            gradientDrawable?.setStroke(
+                1.dpToPx(),
+                ContextCompat.getColor(context, R.color.error_DD4D42)
+            )
+        } else {
+            gradientDrawable?.setStroke(
+                1.dpToPx(),
+                ContextCompat.getColor(context, R.color.black_text_12)
+            )
+        }
+
+        editText.background = gradientDrawable
     }
 
 

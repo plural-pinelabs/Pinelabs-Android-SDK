@@ -159,27 +159,22 @@
                 android:textFontWeight="500"
                 android:textSize="16sp" />
 
-            <LinearLayout
+
+            <EditText
+                android:id="@+id/full_name_et"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:background="@drawable/input_field_border">
-
-                <EditText
-                    android:id="@+id/full_name_et"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="15dp"
-                    android:autofillHints="name"
-                    android:background="@color/transparent"
-                    android:fontFamily="sans-serif-medium"
-                    android:hint="@string/full_name_on_card"
-                    android:importantForAutofill="no"
-                    android:inputType="textPersonName"
-                    android:letterSpacing="0.04"
-                    android:textColorHint="@color/black_text_30"
-                    android:textSize="14sp" />
-            </LinearLayout>
+                android:autofillHints="name"
+                android:background="@drawable/input_field_border"
+                android:fontFamily="sans-serif-medium"
+                android:hint="@string/full_name_on_card"
+                android:importantForAutofill="no"
+                android:inputType="textPersonName"
+                android:letterSpacing="0.04"
+                android:padding="15dp"
+                android:textColorHint="@color/black_text_30"
+                android:textSize="14sp" />
 
             <TextView
                 android:id="@+id/error_message_card_holder_name"
@@ -404,7 +399,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:background="@drawable/input_field_border"
-                android:padding="16dp"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="12dp"
                 android:visibility="visible">
 
                 <androidx.appcompat.widget.AppCompatCheckBox

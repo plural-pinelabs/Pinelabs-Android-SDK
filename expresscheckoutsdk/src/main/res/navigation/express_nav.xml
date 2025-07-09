@@ -118,6 +118,9 @@
         <action
             android:id="@+id/action_nativeOTPFragment_to_ACSFragment"
             app:destination="@id/ACSFragment" />
+        <action
+            android:id="@+id/action_nativeOTPFragment_to_retryFragment"
+            app:destination="@id/retryFragment" />
     </fragment>
     <fragment
         android:id="@+id/UPIFragment"

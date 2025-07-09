@@ -14,7 +14,6 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -33,7 +32,6 @@ import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PROCESSED_FAILED
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PROCESSED_PENDING
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PROCESSED_STATUS
 import com.plural_pinelabs.expresscheckoutsdk.common.NetworkHelper
-import com.plural_pinelabs.expresscheckoutsdk.common.PaymentModeSharedViewModel
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils.MTAG
 import com.plural_pinelabs.expresscheckoutsdk.data.model.TransactionStatusResponse
 import com.plural_pinelabs.expresscheckoutsdk.presentation.LandingActivity
@@ -50,7 +48,6 @@ internal class ACSFragment : Fragment() {
     private var orderId: String? = null
     private var paymentId: String? = null
     var token: String? = null
-    private val sharedViewModel: PaymentModeSharedViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -104,7 +101,7 @@ internal class ACSFragment : Fragment() {
                                 }
 
                                 PROCESSED_ATTEMPTED -> {
-                                   // findNavController().navigate(R.id.action_ACSFragment_to_successFragment)
+                                    // findNavController().navigate(R.id.action_ACSFragment_to_successFragment)
                                 }
 
                                 PROCESSED_FAILED -> {

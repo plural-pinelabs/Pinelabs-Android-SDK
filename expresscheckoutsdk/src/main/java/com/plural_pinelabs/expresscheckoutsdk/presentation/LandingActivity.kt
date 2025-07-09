@@ -9,7 +9,6 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.cardview.widget.CardView
@@ -21,7 +20,7 @@ import com.plural_pinelabs.expresscheckoutsdk.ExpressSDKObject
 import com.plural_pinelabs.expresscheckoutsdk.R
 import com.plural_pinelabs.expresscheckoutsdk.common.CustomExceptionHandler
 import com.plural_pinelabs.expresscheckoutsdk.common.ItemClickListener
-import com.plural_pinelabs.expresscheckoutsdk.common.PaymentModeSharedViewModel
+import com.plural_pinelabs.expresscheckoutsdk.presentation.ordersummary.TopSheetDialogFragment
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CustomerInfo
 import com.plural_pinelabs.expresscheckoutsdk.data.model.FetchResponseDTO
@@ -42,7 +41,6 @@ class LandingActivity : AppCompatActivity() {
     private lateinit var headerParentLayout: ConstraintLayout
 
     private lateinit var mainContentLayout: ConstraintLayout
-    private val sharedViewModel: PaymentModeSharedViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
@@ -105,7 +103,11 @@ class LandingActivity : AppCompatActivity() {
 
             })
         }
-        setupObservers()
+
+        orderSummary.setOnClickListener {
+            val topFragment = TopSheetDialogFragment()
+            topFragment.show(supportFragmentManager,"TopSheetDialogFragment")
+        }
     }
 
 
@@ -157,7 +159,7 @@ class LandingActivity : AppCompatActivity() {
 
                 merchantName.text = fetchData.merchantInfo?.merchantDisplayName
                 val amount = ExpressSDKObject.getAmount()
-                val amountString = Utils.convertToRupees(this, amount)
+                val amountString = Utils.convertToRupeesWithSymobl(this, amount)
 
                 val spannable: Spannable = SpannableString(amountString)
                 val end = amountString.length
@@ -175,14 +177,4 @@ class LandingActivity : AppCompatActivity() {
         }
     }
 
-
-    private fun setupObservers() {
-        // Observe payment failure
-        sharedViewModel.retryEvent.observe(this) {
-            if (it) {
-                val navHostController = findNavController(R.id.nav_host_fragment_container)
-                navHostController.navigate(R.id.action_global_retryFragment)
-            }
-        }
-    }
 }

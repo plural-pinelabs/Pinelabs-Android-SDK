@@ -55,7 +55,7 @@ class EMIBankRecyclerViewAdapter(
                 val discount: Int = tenure.total_discount_amount?.value ?: 0
                 val subvention: Int = tenure.total_subvention_amount?.value ?: 0
                 val total = discount + subvention
-                Utils.convertToRupees(itemView.context, total)
+                Utils.convertToRupeesWithSymobl(itemView.context, total)
             } ?: "error"
 
 

@@ -19,7 +19,6 @@ import androidx.appcompat.content.res.AppCompatResources
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -36,7 +35,6 @@ import com.plural_pinelabs.expresscheckoutsdk.common.Constants.BROWSER_USER_AGEN
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.ERROR_KEY
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.ERROR_MESSAGE_KEY
 import com.plural_pinelabs.expresscheckoutsdk.common.NetworkHelper
-import com.plural_pinelabs.expresscheckoutsdk.common.PaymentModeSharedViewModel
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils.cardIcons
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils.cardTypes
@@ -166,7 +164,7 @@ class CardFragment : Fragment() {
         saveCardCheckbox = view.findViewById(R.id.save_card_checkbox)
         backBtn = view.findViewById(R.id.back_button)
         savedCardParentLayout = view.findViewById(R.id.saved_card_parent_layout)
-        if (isSavedCardEnabled) {
+        if (isSavedCardEnabled && (ExpressSDKObject.getFetchData()?.customerInfo?.customerId != null)) {
             savedCardParentLayout.visibility = View.VISIBLE
         } else {
             savedCardParentLayout.visibility = View.GONE
@@ -486,6 +484,12 @@ class CardFragment : Fragment() {
                         if (year < currentYear || (year == currentYear && month < currentMonth)) {
                             showCardDetailsError("Expiry")
                         } else {
+                            Utils.showRemoveErrorBackground(
+                                requireContext(),
+                                etExpiry,
+                                R.drawable.input_field_bottom_left_border,
+                                false
+                            )
                             isExpiryValid = true
                             enableDisableContinueBtn(true)
                         }
@@ -518,6 +522,12 @@ class CardFragment : Fragment() {
                     isCVVValid = true
                     hideCardDetailsError()
                     enableDisableContinueBtn(true)
+                    Utils.showRemoveErrorBackground(
+                        requireContext(),
+                        etCVV,
+                        R.drawable.input_field_bottom_right_border,
+                        false
+                    )
                 }
             }
         }
@@ -553,10 +563,22 @@ class CardFragment : Fragment() {
 
     private fun hideCardDetailsError() {
         cardErrorText.visibility = View.GONE
+        Utils.showRemoveErrorBackground(
+            requireContext(),
+            cardEditText,
+            R.drawable.input_field_top_border,
+            false
+        )
     }
 
     private fun hideCardHolderNameError() {
         cardHolderErrorText.visibility = View.GONE
+        Utils.showRemoveErrorBackground(
+            requireContext(),
+            cardHolderText,
+            R.drawable.input_field_border,
+            false
+        )
     }
 
     private fun showCardDetailsError(errorType: String) {
@@ -566,24 +588,48 @@ class CardFragment : Fragment() {
                 isCardValid = false
                 cardErrorText.text = getString(R.string.please_enter_a_valid_card_number)
                 cardErrorText.visibility = View.VISIBLE
+                Utils.showRemoveErrorBackground(
+                    requireContext(),
+                    cardEditText,
+                    R.drawable.input_field_top_border,
+                    true
+                )
             }
 
             "Expiry" -> {
                 isExpiryValid = false
                 cardErrorText.text = getString(R.string.please_enter_a_valid_expiry)
                 cardErrorText.visibility = View.VISIBLE
+                Utils.showRemoveErrorBackground(
+                    requireContext(),
+                    expiryEditText,
+                    R.drawable.input_field_bottom_left_border,
+                    true
+                )
             }
 
             "CVV" -> {
                 isCVVValid = false
                 cardErrorText.text = getString(R.string.please_enter_a_valid_cvv)
                 cardErrorText.visibility = View.VISIBLE
+                Utils.showRemoveErrorBackground(
+                    requireContext(),
+                    cvvEditText,
+                    R.drawable.input_field_bottom_right_border,
+                    true
+                )
             }
 
             "CardHolderName" -> {
                 isCardHolderNameValid = false
                 cardHolderErrorText.text = getString(R.string.please_enter_a_valid_card_holder_name)
                 cardHolderErrorText.visibility = View.VISIBLE
+                Utils.showRemoveErrorBackground(
+                    requireContext(),
+                    cardHolderText,
+                    R.drawable.input_field_border,
+                    true
+                )
             }
         }
     }
