@@ -3,6 +3,8 @@ package com.plural_pinelabs.expresscheckoutsdk.domain.repository
 import com.plural_pinelabs.expresscheckoutsdk.common.BaseResult
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CardBinMetaDataRequestList
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CardBinMetaDataResponse
+import com.plural_pinelabs.expresscheckoutsdk.data.model.CustomerInfo
+import com.plural_pinelabs.expresscheckoutsdk.data.model.CustomerInfoResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ExpressAddress
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ExpressAddressResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.FetchResponseDTO
@@ -56,6 +58,11 @@ interface ExpressRepository {
         request: ExpressAddress
     ): Flow<BaseResult<ExpressAddressResponse>>
 
+   suspend fun createInactiveUser(
+    token: String?,
+    request: CustomerInfo?
+    ): Flow<BaseResult<CustomerInfo>>
+
     suspend fun validateOffers(
         token: String?,
         paymentData: ProcessPaymentRequest?
@@ -65,4 +72,9 @@ interface ExpressRepository {
         token: String?,
         paymentData: ProcessPaymentRequest?
     ): Flow<BaseResult<KFSResponse>>
+
+    suspend fun validateUpdateOrder(
+        token: String?,
+        request: OTPRequest?
+    ): Flow<BaseResult<CustomerInfoResponse>>
 }

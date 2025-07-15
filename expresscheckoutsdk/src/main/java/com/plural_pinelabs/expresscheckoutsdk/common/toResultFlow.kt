@@ -3,10 +3,10 @@ package com.plural_pinelabs.expresscheckoutsdk.common
 import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import com.plural_pinelabs.expresscheckoutsdk.common.Utils.MTAG
 import com.plural_pinelabs.expresscheckoutsdk.data.model.FetchError
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 
@@ -18,13 +18,12 @@ inline fun <reified T> toResultFlow(
         val isInternetConnected = networkHelper.hasInternetConnection()
         if (isInternetConnected) {
             emit(BaseResult.Loading(true))
-            val c = call()
-            c?.let { response ->
-                try {
+            try {
+                val c = call()
+                c?.let { response ->
                     Log.d("Toresultflow", "Response: ${response.raw().body}")
                     Log.d("Toresultflow", "Response: ${response.raw().isSuccessful}")
                     Log.d("Toresultflow", "Response: ${response.raw().toString()}")
-
                     if (c.isSuccessful && c.body() != null) {
                         c.body()?.let {
                             emit(BaseResult.Success(it))
@@ -41,21 +40,44 @@ inline fun <reified T> toResultFlow(
                             )
                         )
                     }
-                } catch (e: Exception) {
-                    Log.d("Toresultflow", "exception error: ${e.message}")
-
-                    emit(
-                        BaseResult.Error(
-                            ErrorCode.EXCEPTION_THROWN.code,
-                            e.message,
-                            e.stackTrace.toString()
-                        )
-                    )
                 }
+            } catch (e: Exception) {
+                Log.d("Toresultflow", "exception error: ${e.message}")
+
+                emit(
+                    BaseResult.Error(
+                        ErrorCode.EXCEPTION_THROWN.code,
+                        e.message,
+                        e.stackTrace.toString()
+                    )
+                )
             }
         } else {
             emit(BaseResult.Error(ErrorCode.INTERNET_NOT_AVAILABLE.code))
         }
-    }.flowOn(Dispatchers.IO)
+    }.catch { e ->
+            Log.e("Toresultflow", "Caught exception: ${e.message}")
+            when (e) {
+                is java.net.SocketTimeoutException -> {
+                    emit(
+                        BaseResult.Error(
+                            ErrorCode.UNKNOWN_PAYMENT_ERROR.code,
+                            "Request timed out. Please try again.",
+                            e.stackTraceToString()
+                        )
+                    )
+                }
+
+                else -> {
+                    emit(
+                        BaseResult.Error(
+                            ErrorCode.EXCEPTION_THROWN.code,
+                            e.message,
+                            e.stackTraceToString()
+                        )
+                    )
+                }
+            }
+        }.flowOn(Dispatchers.IO)
 }
 

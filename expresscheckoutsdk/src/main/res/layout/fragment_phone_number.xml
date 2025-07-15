@@ -31,12 +31,15 @@
             android:layout_marginBottom="8dp"
             android:fontFamily="sans-serif-medium"
             android:text="@string/mobile_number"
+            android:textColor="@color/black_text_80"
+            android:textFontWeight="500"
             android:textSize="14sp" />
 
         <LinearLayout
+            android:id="@+id/phone_parent_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/rounded_edittext_background"
+            android:background="@drawable/input_field_border"
             android:gravity="center_vertical"
             android:orientation="horizontal"
             android:padding="12dp">
@@ -63,8 +66,10 @@
                 android:id="@+id/textViewCountryCode"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-medium"
                 android:text="@string/_91"
-                android:textColor="@android:color/black"
+                android:textColor="@color/black_text_50"
+                android:textFontWeight="500"
                 android:textSize="16sp" />
 
             <EditText
@@ -75,10 +80,12 @@
                 android:layout_weight="1"
                 android:autofillHints="phone"
                 android:background="@null"
+                android:fontFamily="sans-serif-medium"
                 android:hint="@string/mobile_number"
-                android:inputType="phone"
-                android:textColor="@android:color/black"
-                android:textColorHint="#888888"
+                android:inputType="number"
+                android:textColor="@color/black_text_80"
+                android:textColorHint="@color/black_text_30"
+                android:textFontWeight="500"
                 android:textSize="16sp" />
 
         </LinearLayout>
@@ -91,21 +98,24 @@
         android:id="@+id/textViewLabelEmail"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
         android:layout_marginBottom="8dp"
         android:fontFamily="sans-serif-medium"
         android:text="@string/email"
+        android:textColor="@color/black_text_80"
+        android:textFontWeight="500"
         android:textSize="14sp"
-        android:visibility="gone" />
+        android:visibility="visible" />
 
     <LinearLayout
         android:id="@+id/email_et_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/rounded_edittext_background"
+        android:background="@drawable/input_field_border"
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:padding="12dp"
-        android:visibility="gone">
+        android:visibility="visible">
 
 
         <EditText
@@ -114,12 +124,17 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_weight="1"
-            android:autofillHints="phone"
+            android:autofillHints="emailAddress"
             android:background="@null"
+            android:clickable="true"
+            android:focusable="true"
+            android:fontFamily="sans-serif-medium"
             android:hint="@string/email"
-            android:inputType="phone"
-            android:textColor="@android:color/black"
-            android:textColorHint="#888888"
+            android:inputType="textEmailAddress"
+            android:textColor="@color/black_text_80"
+            android:textColorHint="@color/black_text_30"
+            android:textFontWeight="500"
+            android:drawableEnd="@drawable/ic_info_icon"
             android:textSize="16sp" />
 
     </LinearLayout>
@@ -129,10 +144,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
-        android:background="@drawable/primary_button_background"
+        android:background="@drawable/primary_button_disabled_bg"
         android:gravity="center"
         android:minHeight="48dp"
         android:text="@string/continue_text"
-        android:textColor="@color/white" />
+        android:textColor="@color/text_disabled_C0C9D2" />
 
 </LinearLayout>

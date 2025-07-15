@@ -8,6 +8,8 @@ import com.plural_pinelabs.expresscheckoutsdk.data.fetch.ExpressApiService
 import com.plural_pinelabs.expresscheckoutsdk.data.fetch.FetchApiService
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CardBinMetaDataRequestList
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CardBinMetaDataResponse
+import com.plural_pinelabs.expresscheckoutsdk.data.model.CustomerInfo
+import com.plural_pinelabs.expresscheckoutsdk.data.model.CustomerInfoResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ExpressAddress
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ExpressAddressResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.FetchResponseDTO
@@ -114,6 +116,15 @@ class ExpressRepositoryImpl(
         }
     }
 
+    override suspend fun createInactiveUser(
+        token: String?,
+        request: CustomerInfo?
+    ): Flow<BaseResult<CustomerInfo>> {
+        return toResultFlow(networkHelper = networkHelper) {
+            (apiService as ExpressApiService).createInactive(token, request)
+        }
+    }
+
     override suspend fun validateOffers(
         token: String?,
         paymentData: ProcessPaymentRequest?
@@ -129,6 +140,15 @@ class ExpressRepositoryImpl(
     ): Flow<BaseResult<KFSResponse>> {
         return toResultFlow(networkHelper = networkHelper) {
             (apiService as CommonApiService).getKFS(token, paymentData)
+        }
+    }
+
+    override suspend fun validateUpdateOrder(
+        token: String?,
+        request: OTPRequest?
+    ): Flow<BaseResult<CustomerInfoResponse>> {
+        return toResultFlow(networkHelper = networkHelper) {
+            (apiService as CommonApiService).validateUpdateOrder(token, request)
         }
     }
 }

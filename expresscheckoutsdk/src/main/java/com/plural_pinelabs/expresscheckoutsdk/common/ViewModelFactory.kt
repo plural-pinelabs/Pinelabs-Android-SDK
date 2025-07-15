@@ -8,8 +8,8 @@ import com.plural_pinelabs.expresscheckoutsdk.presentation.acs.ACSFragmentViewMo
 import com.plural_pinelabs.expresscheckoutsdk.presentation.card.CardFragmentViewModel
 import com.plural_pinelabs.expresscheckoutsdk.presentation.card.SavedCardOTPViewModel
 import com.plural_pinelabs.expresscheckoutsdk.presentation.d2c.AddressViewModel
+import com.plural_pinelabs.expresscheckoutsdk.presentation.d2c.D2CViewModel
 import com.plural_pinelabs.expresscheckoutsdk.presentation.d2c.NewAddressFragmentViewModel
-import com.plural_pinelabs.expresscheckoutsdk.presentation.d2c.VerifyOTPFragmentViewModel
 import com.plural_pinelabs.expresscheckoutsdk.presentation.emi.TenureSelectionViewModel
 import com.plural_pinelabs.expresscheckoutsdk.presentation.nativeotp.NativeOTPViewModel
 import com.plural_pinelabs.expresscheckoutsdk.presentation.netbanking.NetBankingViewModel
@@ -45,19 +45,6 @@ class NativeOTPFragmentViewModelFactory(private val networkHelper: NetworkHelper
     ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return NativeOTPViewModel(
-            ExpressRepositoryImpl(
-                RetrofitBuilder.commonApiService,
-                networkHelper = networkHelper
-            )
-        ) as T
-    }
-}
-
-
-class VerifyOTPFragmentViewModelFactory(private val networkHelper: NetworkHelper) :
-    ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return VerifyOTPFragmentViewModel(
             ExpressRepositoryImpl(
                 RetrofitBuilder.commonApiService,
                 networkHelper = networkHelper
@@ -172,6 +159,23 @@ class SuccessViewModelFactory(private val networkHelper: NetworkHelper) :
     ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return SuccessViewModel(
+            ExpressRepositoryImpl(
+                RetrofitBuilder.commonApiService,
+                networkHelper = networkHelper
+            )
+        ) as T
+    }
+}
+
+
+class D2CViewModelFactory(private val networkHelper: NetworkHelper) :
+    ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        return D2CViewModel(
+            ExpressRepositoryImpl(
+                RetrofitBuilder.expressApiService,
+                networkHelper = networkHelper
+            ),
             ExpressRepositoryImpl(
                 RetrofitBuilder.commonApiService,
                 networkHelper = networkHelper

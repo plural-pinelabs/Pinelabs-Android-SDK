@@ -81,6 +81,7 @@ internal object ExpressSDKObject {
 
     fun getPhoneNumber(): String? {
         return getSDKObject()?.phoneNumber
+            ?: getSDKObject()?.fetchResponseDTO?.customerInfo?.mobileNumber
     }
 
     fun setEMIPaymentModeData(emiPaymentModeData: EMIPaymentModeData) {

@@ -8,8 +8,8 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
@@ -17,13 +17,13 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.plural_pinelabs.expresscheckoutsdk.ExpressSDKObject
 import com.plural_pinelabs.expresscheckoutsdk.R
 import com.plural_pinelabs.expresscheckoutsdk.common.BaseResult
+import com.plural_pinelabs.expresscheckoutsdk.common.D2CViewModelFactory
 import com.plural_pinelabs.expresscheckoutsdk.common.NetworkHelper
 import com.plural_pinelabs.expresscheckoutsdk.common.OtpInputView
 import com.plural_pinelabs.expresscheckoutsdk.common.TimerManager
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils
-import com.plural_pinelabs.expresscheckoutsdk.common.VerifyOTPFragmentViewModelFactory
+import com.plural_pinelabs.expresscheckoutsdk.data.model.CustomerInfoResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.OTPRequest
-import com.plural_pinelabs.expresscheckoutsdk.data.model.SavedCardResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.UpdateOrderDetails
 import kotlinx.coroutines.launch
 
@@ -34,29 +34,25 @@ class VerifyOTPFragment : Fragment() {
     private lateinit var otpInputView: OtpInputView
     private lateinit var verifyOtpBtn: Button
     private lateinit var resendTimer: TimerManager
-
-    private lateinit var viewModel: VerifyOTPFragmentViewModel
     private var bottomSheetDialog: BottomSheetDialog? = null
-    private var otpId: String? = null
+    private var isOtpVerified: Boolean = false
+
+    private val viewModel: D2CViewModel by activityViewModels {
+        D2CViewModelFactory(NetworkHelper(requireContext()))
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        viewModel = ViewModelProvider(
-            this,
-            VerifyOTPFragmentViewModelFactory(NetworkHelper(requireContext()))
-        )[VerifyOTPFragmentViewModel::class.java]
         return inflater.inflate(R.layout.fragment_verify_o_t_p, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setView(view)
-        //  observeViewModel()
-        // showProcessPaymentDialog()
-        //   sendOTP()
+        observeViewModel()
+        startResendOtpTimer()
     }
 
     private fun setView(view: View) {
@@ -66,12 +62,29 @@ class VerifyOTPFragment : Fragment() {
         verifyOtpBtn = view.findViewById(R.id.verify_otp_btn)
         setPhoneNumber()
         startResendOtpTimer()
+        handleVerifyOtpButton()
         handleClickListener()
+        otpInputView.setOtpCompleteListener {
+            if (otpInputView.getOtp().length >= 5) {
+                // Handle OTP input completion
+                isOtpVerified = true
+                Utils.handleCTAEnableDisable(requireContext(), true, verifyOtpBtn)
+            }
+        }
+    }
+
+    private fun handleVerifyOtpButton() {
+
     }
 
     private fun handleClickListener() {
         resentOTPTv.setOnClickListener {
             // TODO resend otp
+            val otpRequest = OTPRequest(customerId = viewModel.customerInfo?.customerId)
+            viewModel.sendOtp(
+                ExpressSDKObject.getToken(),
+                otpRequest
+            ) // TODO observe change and show bottomsheet
         }
 
         verifyOtpBtn.setOnClickListener {
@@ -80,38 +93,29 @@ class VerifyOTPFragment : Fragment() {
             return@setOnClickListener
             val otp = otpInputView.getOtp()
             val token = ExpressSDKObject.getToken()
-            if (otp.isEmpty() || otp.length < 5) {
-                // set error to show correct otp
-            } else {
-                val customerId = ExpressSDKObject.getFetchData()?.customerInfo?.customerId
-                    ?: ExpressSDKObject.getFetchData()?.customerInfo?.customer_id
-                val otpRequest = OTPRequest(null, otp, customerId)
-                val customerInfo = ExpressSDKObject.getFetchData()?.customerInfo
-                if (customerInfo != null) {
-                    customerInfo.email_id = customerInfo.emailId
-                    customerInfo.mobile_number = customerInfo?.mobileNumber
-                    customerInfo?.country_code = customerInfo?.countryCode
-                    customerInfo?.is_edit_customer_details_allowed =
-                        customerInfo?.isEditCustomerDetailsAllowed
-                    customerInfo?.first_name = customerInfo?.firstName
-                    customerInfo?.last_name = customerInfo?.lastName
+            val otpId = viewModel.otpId ?: ""
+            val customerId = viewModel.customerInfo?.customerId ?: ""
+            val customerInfo = ExpressSDKObject.getFetchData()?.customerInfo
+            customerInfo?.mobileNumber = ExpressSDKObject.getPhoneNumber()
+            customerInfo?.customerId = customerId
+            customerInfo?.countryCode = viewModel.countryCode // harcoded for now
+            val updateOrderDetails = UpdateOrderDetails(
+                customerInfo
+            )
+            val otpRequest = OTPRequest(
+                otp = otp,
+                otpId = otpId,
+                customerId = customerId,
+                updateOrderDetails = updateOrderDetails
+            )
+            viewModel.validateUpdateOrderDetails(ExpressSDKObject.getToken(), otpRequest)
 
-                    val updateOrderDetails = UpdateOrderDetails(customerInfo)
-
-                    val otpRequest = OTPRequest(null, otp, customerId, otpId, updateOrderDetails)
-                    viewModel.validateUpdateOrderDetails(token, otpRequest)
-                } else {
-                    val otpRequest = OTPRequest(null, otp, customerId, otpId, null)
-                    viewModel.submitOTP(token, otpRequest)
-                }
-
-            }
         }
     }
 
     private fun startResendOtpTimer() {
         resendTimer = TimerManager
-        resendTimer.startTimer(120 * 60)
+        resendTimer.startTimer(100000) // 10 seconds for demo, adjust as needed
         resendTimer.timeLeft.observe(viewLifecycleOwner) { timeLeft ->
             if (timeLeft > 0) {
 
@@ -137,50 +141,8 @@ class VerifyOTPFragment : Fragment() {
         phoneNumberTv.text = sendOtpWithPhoneNumber
     }
 
-    private fun showProcessPaymentDialog() {
-        bottomSheetDialog = Utils.showProcessPaymentDialog(
-            requireContext()
-        )
-    }
-
-    private fun sendOTP() {
-        val customerId = ExpressSDKObject.getFetchData()?.customerInfo?.customerId
-            ?: ExpressSDKObject.getFetchData()?.customerInfo?.customer_id
-        val otpRequest = OTPRequest(null, null, customerId, null, null)
-        viewModel.requestOTP(otpRequest)
-    }
 
     private fun observeViewModel() {
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED)
-            {
-                viewModel.requestOTPResult.collect { result ->
-                    when (result) {
-                        is BaseResult.Error -> {
-                            result.errorCode.let { exception ->
-                                Log.e("Error", exception)
-                            }
-
-                        }
-
-                        is BaseResult.Success<SavedCardResponse> -> {
-                            result.data.let { it ->
-                                //  otp sent successfully
-                                otpId = it.otpId
-                                bottomSheetDialog?.dismiss()
-                            }
-                        }
-
-                        is BaseResult.Loading -> {
-                            // handle loading
-                            Log.d("Loading", "Loading data...")
-                            result.isLoading
-                        }
-                    }
-                }
-            }
-        }
-
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED)
             {
@@ -193,17 +155,11 @@ class VerifyOTPFragment : Fragment() {
 
                         }
 
-                        is BaseResult.Success<SavedCardResponse> -> {
-                            result.data.let { it ->
-                                //  otp sent successfully
-                                bottomSheetDialog?.dismiss()
-                            }
+                        is BaseResult.Success<CustomerInfoResponse> -> {
+                            //TODO handle success flow
                         }
 
                         is BaseResult.Loading -> {
-                            // handle loading
-                            Log.d("Loading", "Loading data...")
-                            result.isLoading
                         }
                     }
                 }

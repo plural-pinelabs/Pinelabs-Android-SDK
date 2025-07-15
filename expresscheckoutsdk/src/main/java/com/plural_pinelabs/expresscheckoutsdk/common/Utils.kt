@@ -16,6 +16,7 @@ import android.text.TextUtils
 import android.util.Base64
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.FrameLayout
@@ -977,15 +978,22 @@ internal object Utils {
 
     fun showRemoveErrorBackground(
         context: Context,
-        editText: EditText,
+        editText: EditText?=null,
         drawable: Int,
-        isShow: Boolean
+        isShow: Boolean,
+        isFocus: Boolean = false,
+        viewGroup: ViewGroup? = null
     ) {
         val backgroundDrawable =
             ContextCompat.getDrawable(context, drawable)
                 ?.mutate()
         val gradientDrawable = backgroundDrawable as? GradientDrawable
-        if (isShow) {
+        if (isFocus) {
+            gradientDrawable?.setStroke(
+                1.dpToPx(),
+                ContextCompat.getColor(context, R.color.black_text_60)
+            )
+        } else if (isShow) {
             gradientDrawable?.setStroke(
                 1.dpToPx(),
                 ContextCompat.getColor(context, R.color.error_DD4D42)
@@ -997,7 +1005,8 @@ internal object Utils {
             )
         }
 
-        editText.background = gradientDrawable
+        editText?.background = gradientDrawable
+        viewGroup?.background = gradientDrawable
     }
 
 
