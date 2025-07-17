@@ -42,11 +42,13 @@ class EMITenureListAdapter(
 
 
             val maxDiscount: String = item.let { tenure ->
-                tenure.total_discount_amount?.value?.let {
-                    Utils.convertToRupeesWithSymobl(itemView.context, it)
-                } ?: tenure.total_subvention_amount?.value?.let {
-                    Utils.convertToRupeesWithSymobl(itemView.context, it)
-                }
+                val discount: Int = tenure.total_discount_amount?.value ?: 0
+                val subvention: Int = tenure.total_subvention_amount?.value ?: 0
+                val total = discount + subvention
+                if (total == 0) {
+                    "error"
+                } else
+                    Utils.convertToRupeesWithSymobl(context, total)
             } ?: "error"
             saveLayout.visibility = View.GONE
             if (!maxDiscount.contains("error", true)) {
@@ -66,7 +68,10 @@ class EMITenureListAdapter(
             } else {
                 processingFeesTextView.text = context.getString(
                     R.string.x_one_time_processing_fee,
-                    Utils.convertToRupeesWithSymobl(context, item.processing_fee_details.amount.value)
+                    Utils.convertToRupeesWithSymobl(
+                        context,
+                        item.processing_fee_details.amount.value
+                    )
                 )
                 processingFeesTextView.visibility = View.VISIBLE
             }
@@ -133,6 +138,7 @@ class EMITenureListAdapter(
     override fun onBindViewHolder(holder: ItemViewHolder, position: Int) {
         holder.setItem(tenures[position], position)
     }
+
     override fun getItemViewType(position: Int): Int {
         //Note: This is a temporary work around to avoid icon being repeated as we are fetching icons
         // from a server upon scroll the previous icon items are shown only

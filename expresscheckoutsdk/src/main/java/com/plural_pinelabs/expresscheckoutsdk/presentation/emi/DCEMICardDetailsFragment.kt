@@ -143,7 +143,10 @@ class DCEMICardDetailsFragment : Fragment() {
         loadBankLogo()
         issuerTitleTv.text = Utils.getTitleForEMI(requireContext(), issuer)
         emiPerMonthAmount.text =
-            Utils.convertInRupees(selectedTenure?.monthly_emi_amount?.value).toString()
+            Utils.convertToRupeesWithSymobl(
+                requireContext(),
+                selectedTenure?.monthly_emi_amount?.value
+            )
         emiForXMonthTv.text =
             String.format(getString(R.string.for_x_months), selectedTenure?.tenure_value.toString())
 

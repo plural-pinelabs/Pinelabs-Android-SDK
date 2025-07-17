@@ -24,6 +24,7 @@ import com.plural_pinelabs.expresscheckoutsdk.common.BaseResult
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.NET_BANKING
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PAYMENT_REFERENCE_TYPE_CARD
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PROCESSED_ATTEMPTED
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PROCESSED_CREATED
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PROCESSED_FAILED
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PROCESSED_PENDING
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PROCESSED_STATUS
@@ -91,7 +92,7 @@ class SuccessFragment : Fragment() {
         cardDotsView = view.findViewById(R.id.card_dots)
         cardsDivider = view.findViewById(R.id.card_divider)
         originalPaidValue = view.findViewById(R.id.original_price_value)
-        reDirectingText= view.findViewById(R.id.redirecting_text)
+        reDirectingText = view.findViewById(R.id.redirecting_text)
         continueToMerchantButton = view.findViewById(R.id.continue_to_merchant_text)
         continueToMerchantButton.setOnClickListener {
             ExpressSDKObject.getCallback()?.onSuccess(
@@ -135,7 +136,7 @@ class SuccessFragment : Fragment() {
                             bottomSheetDialog?.dismiss()
                             val status = it.data.data.status
                             when (status) {
-                                PROCESSED_PENDING -> {
+                                PROCESSED_PENDING, PROCESSED_CREATED -> {
                                     findNavController().navigate(R.id.action_successFragment_to_retryFragment)
                                 }
 
@@ -145,8 +146,10 @@ class SuccessFragment : Fragment() {
                                 }
 
                                 PROCESSED_ATTEMPTED -> {
-                                    findNavController().navigate(R.id.action_successFragment_to_retryFragment)
-
+                                    if (it.data.data.is_retry_available)
+                                        findNavController().navigate(R.id.action_successFragment_to_retryFragment)
+                                    else
+                                        findNavController().navigate(R.id.action_successFragment_to_failureFragment)
                                 }
 
                                 PROCESSED_FAILED -> {
@@ -217,11 +220,10 @@ class SuccessFragment : Fragment() {
             if (timeLeft == 0L) {
                 ExpressSDKObject.getCallback()?.onSuccess("200", "success", "trt")
                 requireActivity().finish()
-            }
-            else{
+            } else {
                 reDirectingText.text = String.format(
                     getString(R.string.redirecting_to_website_in_x_sec),
-                    Utils.formatTimeInMinutes(requireContext(),timeLeft)
+                    Utils.formatTimeInMinutes(requireContext(), timeLeft)
                 )
             }
         }

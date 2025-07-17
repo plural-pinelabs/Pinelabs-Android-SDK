@@ -102,7 +102,7 @@ class PaymentModeFragment : Fragment() {
             availablePaymentModes.add(it.paymentModeID.lowercase())
         }
         val filteredPaymentModes = ExpressSDKObject.getFetchData()?.paymentModes?.filter {
-            availablePaymentModes.contains(it.paymentModeId.lowercase())
+            availablePaymentModes.contains(it.paymentModeId.lowercase()) && it.paymentModeData != null
         }
         return filteredPaymentModes
     }
@@ -132,6 +132,7 @@ class PaymentModeFragment : Fragment() {
                         // Handle Wallet selection
                         findNavController().navigate(R.id.action_paymentModeFragment_to_walletFragment)
                     }
+
                     PaymentModes.EMI.paymentModeID -> {
                         // Handle EMI selection
                         findNavController().navigate(R.id.action_paymentModeFragment_to_EMIFragment)

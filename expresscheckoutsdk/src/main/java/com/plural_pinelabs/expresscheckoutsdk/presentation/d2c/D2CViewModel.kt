@@ -2,12 +2,16 @@ package com.plural_pinelabs.expresscheckoutsdk.presentation.d2c
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.plural_pinelabs.expresscheckoutsdk.ExpressSDKObject
 import com.plural_pinelabs.expresscheckoutsdk.common.BaseResult
 import com.plural_pinelabs.expresscheckoutsdk.data.model.Address
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CustomerInfo
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CustomerInfoResponse
+import com.plural_pinelabs.expresscheckoutsdk.data.model.ExpressAddress
+import com.plural_pinelabs.expresscheckoutsdk.data.model.ExpressAddressResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.OTPRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.model.SavedCardResponse
+import com.plural_pinelabs.expresscheckoutsdk.data.model.Variables
 import com.plural_pinelabs.expresscheckoutsdk.data.repository.ExpressRepositoryImpl
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -32,6 +36,11 @@ class D2CViewModel(
     private val _submitOTPResult =
         MutableStateFlow<BaseResult<CustomerInfoResponse>>(BaseResult.Loading(false))
     val submitOTPResult: StateFlow<BaseResult<CustomerInfoResponse>> = _submitOTPResult
+
+
+    private val _addressResponse =
+        MutableStateFlow<BaseResult<ExpressAddressResponse>>(BaseResult.Loading(false))
+    val addressResponse: StateFlow<BaseResult<ExpressAddressResponse>> = _addressResponse
 
 
     var phoneNumber: String? = null
@@ -76,6 +85,25 @@ class D2CViewModel(
                     _submitOTPResult.value = it
                 }
         }
+    }
+
+    fun getAddressList() {
+        viewModelScope.launch(Dispatchers.IO) {
+            expressRepositoryImpl.fetchAddress(
+                token = ExpressSDKObject.getToken(),
+                getAddressObject()
+            ).collect {
+                _addressResponse.value = it
+            }
+        }
+    }
+
+    private fun getAddressObject(): ExpressAddress {
+        val query =
+            "query GetCustomerAddresses(\$customerId: String!) { getCustomerAddresses(customerId: \$customerId) { success message data { addresses { full_name address1 address2 address3 pincode city state country address_type address_category } } error } }"
+        val variables = Variables(ExpressSDKObject.getFetchData()?.customerInfo?.customerId ?: "")
+        val expressAddress = ExpressAddress(query, variables)
+        return expressAddress
     }
 
 }

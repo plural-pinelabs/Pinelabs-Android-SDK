@@ -180,5 +180,7 @@
     <string name="redirecting_to_website_in_x_sec">Redirecting to website in %s sec</string>
     <string name="close">Close</string>
     <string name="qty_x">Qty:x</string>
+    <string name="add_new">+ Add new</string>
+    <string name="select_delivery_address">Select delivery address</string>
 
 </resources>

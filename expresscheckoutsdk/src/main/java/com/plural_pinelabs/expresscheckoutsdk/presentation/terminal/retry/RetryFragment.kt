@@ -112,7 +112,7 @@ class RetryFragment : Fragment() {
             availablePaymentModes.add(it.paymentModeID.lowercase())
         }
         val filteredPaymentModes = ExpressSDKObject.getFetchData()?.paymentModes?.filter {
-            availablePaymentModes.contains(it.paymentModeId.lowercase())
+            availablePaymentModes.contains(it.paymentModeId.lowercase()) && it.paymentModeData != null
         }
         return filteredPaymentModes
     }

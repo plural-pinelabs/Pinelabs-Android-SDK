@@ -71,10 +71,11 @@ class UPIFragment : Fragment() {
     private lateinit var upiIdEt: EditText
     private lateinit var verifyContinueButton: Button
     private lateinit var errorinfoTextView: TextView
-    private val UPI_REGEX = Regex("^[\\w.]{1,}-?[\\w.]{0,}-?[\\w.]{1,}@[a-zA-Z]{2,}$")
+    private val UPI_REGEX = Regex("^[\\w.\\-]+@[a-zA-Z0-9]{2,}$")
     private lateinit var viewModel: UPIViewModel
     private var mTransactionMode: String? = null
     private var bottomSheetDialog: BottomSheetDialog? = null
+    private var bottomVPASheetDialog: BottomSheetDialog? = null
     private var transactionStatusJob: Job? = null
     private var selectUPIPackage: String? = null
 
@@ -281,10 +282,8 @@ class UPIFragment : Fragment() {
 
                         is BaseResult.Success<ProcessPaymentResponse> -> {
                             bottomSheetDialog?.dismiss()
-                            if (mTransactionMode == UPI_COLLECT) {
-                                //hit the transaction status api
-                                getTransactionStatus(ExpressSDKObject.getToken())
-                            } else if (mTransactionMode == UPI_INTENT) {
+                            if (mTransactionMode == UPI_INTENT) {
+                                showProcessPaymentDialog()
                                 showUpiTray(
                                     it.data.deep_link ?: "",
                                     upiAppPackageName = selectUPIPackage
@@ -293,7 +292,7 @@ class UPIFragment : Fragment() {
                             bottomSheetDialog?.dismiss()
                             ExpressSDKObject.setProcessPaymentResponse(it.data)
                             getTransactionStatus(ExpressSDKObject.getToken())
-
+                            viewModel.resetPaymentFlowResponse()
                         }
                     }
                 }
@@ -319,6 +318,7 @@ class UPIFragment : Fragment() {
                         is BaseResult.Success<TransactionStatusResponse> -> {
                             val status = it.data.data.status
                             when (status) {
+
                                 PROCESSED_PENDING -> {
                                     // Do nothing, we will keep polling for the transaction status
                                 }
@@ -330,14 +330,18 @@ class UPIFragment : Fragment() {
 
                                 PROCESSED_ATTEMPTED -> {
                                     cancelTransactionProcess()
-                                    findNavController().navigate(R.id.action_UPIFragment_to_retryFragment)
+                                    if (it.data.data.is_retry_available)
+                                        findNavController().navigate(R.id.action_successFragment_to_retryFragment)
+                                    else
+                                        findNavController().navigate(R.id.action_successFragment_to_failureFragment)
                                 }
 
                                 PROCESSED_FAILED -> {
                                     cancelTransactionProcess()
-                                    findNavController().navigate(R.id.action_UPIFragment_to_failureFragment)
+                                    findNavController().navigate(R.id.action_UPIFragment_to_successFragment)
                                 }
                             }
+                            viewModel.resetTransactionResponse()
                         }
                     }
                 }
@@ -353,9 +357,7 @@ class UPIFragment : Fragment() {
 
 
     private fun getTransactionStatus(token: String?) {
-        if (mTransactionMode == UPI_INTENT) {
-            showProcessPaymentDialog()
-        } else {
+        if (mTransactionMode == UPI_COLLECT) {
             showProcessPaymentVPADialog()
         }
         transactionStatusJob = lifecycleScope.launch(Dispatchers.IO) {
@@ -416,14 +418,6 @@ class UPIFragment : Fragment() {
                 .findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)
             bottomSheet?.let {
                 val behavior = BottomSheetBehavior.from(it)
-//                val layoutParams = it.layoutParams
-//                val displayMetrics = Resources.getSystem().displayMetrics
-//                val screenHeight = displayMetrics.heightPixels
-//                layoutParams.height = (screenHeight * 0.95).toInt()
-//                it.layoutParams = layoutParams
-//                behavior.expandedOffset =
-//                    (screenHeight * 0.05).toInt() // Set expanded offset to 15% of screen height
-//                behavior.state = BottomSheetBehavior.STATE_EXPANDED
                 behavior.isDraggable = false
                 behavior.isFitToContents = false
                 behavior.skipCollapsed = false
@@ -436,40 +430,20 @@ class UPIFragment : Fragment() {
     }
 
     private fun showProcessPaymentVPADialog() {
+        bottomVPASheetDialog = BottomSheetDialog(requireContext())
         val view =
             LayoutInflater.from(requireActivity())
                 .inflate(R.layout.upi_vpa_process_payment_bottom_sheet, null)
         val cancelPaymentTextView: TextView = view.findViewById(R.id.cancelPaymentTextView)
         val vpaId: TextView = view.findViewById(R.id.vpaId)
         vpaId.text = upiIdEt.text.toString()
-
-
-        bottomSheetDialog?.setOnShowListener { dialogInterface ->
-            val bottomSheet = (dialogInterface as BottomSheetDialog)
-                .findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)
-            bottomSheet?.let {
-                val behavior = BottomSheetBehavior.from(it)
-//                val layoutParams = it.layoutParams
-//                val displayMetrics = Resources.getSystem().displayMetrics
-//                val screenHeight = displayMetrics.heightPixels
-//                layoutParams.height = (screenHeight * 0.95).toInt()
-//                it.layoutParams = layoutParams
-//                behavior.expandedOffset =
-//                    (screenHeight * 0.05).toInt() // Set expanded offset to 15% of screen height
-//                behavior.state = BottomSheetBehavior.STATE_EXPANDED
-                behavior.isDraggable = false
-                behavior.isFitToContents = false
-                behavior.skipCollapsed = false
-            }
-        }
         cancelPaymentTextView.setOnClickListener {
-            bottomSheetDialog?.dismiss()
+            bottomVPASheetDialog?.dismiss()
             cancelTransactionProcess()
-            //TODO cancel payment retry mechnaism
         }
-        bottomSheetDialog?.setCancelable(false)
-        bottomSheetDialog?.setCanceledOnTouchOutside(false)
-        bottomSheetDialog?.setContentView(view)
-        bottomSheetDialog?.show() // Show the dialog first
+        bottomVPASheetDialog?.setCancelable(false)
+        bottomVPASheetDialog?.setCanceledOnTouchOutside(false)
+        bottomVPASheetDialog?.setContentView(view)
+        bottomVPASheetDialog?.show() // Show the dialog first
     }
 }

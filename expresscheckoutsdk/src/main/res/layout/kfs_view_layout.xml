@@ -163,6 +163,51 @@
 
         </LinearLayout>
 
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/pdf_image_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:layout_marginHorizontal="4dp"
+            android:orientation="vertical"
+            android:visibility="visible">
+
+            <ImageView
+                android:id="@+id/kfs_image_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageView
+                android:id="@+id/next_page"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:background="@drawable/rectangle_denser_bg"
+                android:padding="4dp"
+                android:src="@drawable/ic_chevron_white"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:tint="@color/black_text_80" />
+
+
+            <ImageView
+                android:id="@+id/prev_page"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:background="@drawable/rectangle_denser_bg"
+                android:padding="4dp"
+                android:src="@drawable/ic_chevron_left"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:tint="@color/black_text_80" />
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
         <WebView
             android:id="@+id/kfs_webview"
             android:layout_width="match_parent"
@@ -179,14 +224,14 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="12dp"
         android:button="@drawable/checkbox_state"
-        android:fontFamily="sans-serif"
         android:buttonTint="@null"
-        app:buttonTint="@null"
+        android:fontFamily="sans-serif"
         android:paddingStart="8dp"
         android:text="@string/i_agree_to_the_terms_consent_clause"
         android:textColor="@color/black_text_80"
         android:textFontWeight="500"
         android:textSize="14sp"
+        app:buttonTint="@null"
         app:layout_constraintBottom_toTopOf="@id/continue_btn" />
 
     <androidx.appcompat.widget.AppCompatButton

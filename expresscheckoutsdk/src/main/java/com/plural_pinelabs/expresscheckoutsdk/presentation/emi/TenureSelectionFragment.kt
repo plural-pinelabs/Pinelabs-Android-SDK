@@ -2,15 +2,15 @@ package com.plural_pinelabs.expresscheckoutsdk.presentation.emi
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.Intent
 import android.content.res.Resources
+import android.graphics.Bitmap
+import android.graphics.pdf.PdfRenderer
 import android.os.Bundle
+import android.os.ParcelFileDescriptor
 import android.util.DisplayMetrics
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.webkit.WebView
 import android.widget.Button
 import android.widget.CheckBox
 import android.widget.FrameLayout
@@ -43,12 +43,10 @@ import com.plural_pinelabs.expresscheckoutsdk.common.Constants.EMI_DC_TYPE
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.ISSUE_ID
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.TENURE_ID
 import com.plural_pinelabs.expresscheckoutsdk.common.ItemClickListener
-import com.plural_pinelabs.expresscheckoutsdk.common.KFSWebView
 import com.plural_pinelabs.expresscheckoutsdk.common.NetworkHelper
-import com.plural_pinelabs.expresscheckoutsdk.common.PdfActivity
+import com.plural_pinelabs.expresscheckoutsdk.common.PdfDownloader
 import com.plural_pinelabs.expresscheckoutsdk.common.TenureSelectionViewModelFactory
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils
-import com.plural_pinelabs.expresscheckoutsdk.common.Utils.MTAG
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils.customSorted
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils.markBestValueInPlace
 import com.plural_pinelabs.expresscheckoutsdk.data.model.DeviceInfo
@@ -59,8 +57,16 @@ import com.plural_pinelabs.expresscheckoutsdk.data.model.Issuer
 import com.plural_pinelabs.expresscheckoutsdk.data.model.OfferDetails
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ProcessPaymentRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.model.Tenure
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.net.URLEncoder
+import kotlinx.coroutines.withContext
+import okhttp3.internal.closeQuietly
+import java.io.BufferedInputStream
+import java.io.File
+import java.io.FileOutputStream
+import java.net.HttpURLConnection
+import java.net.URL
 import java.util.Locale
 
 class TenureSelectionFragment : Fragment() {
@@ -82,6 +88,11 @@ class TenureSelectionFragment : Fragment() {
     private lateinit var banKTitleToCodeMap: HashMap<String, String>
     private lateinit var bankNameKeyList: List<String>
     private var bottomSheetDialog: BottomSheetDialog? = null
+
+    private var pageIndex = 0
+    private lateinit var pdfRenderer: PdfRenderer
+    private lateinit var currentPage: PdfRenderer.Page
+    private lateinit var parcelFileDescriptor: ParcelFileDescriptor
 
     private lateinit var viewModel: TenureSelectionViewModel
 
@@ -199,7 +210,10 @@ class TenureSelectionFragment : Fragment() {
                     )
                 continueBtn.text = String.format(
                     getString(R.string.pay_emi_x_per_month),
-                    Utils.convertToRupeesWithSymobl(requireContext(), item?.monthly_emi_amount?.value)
+                    Utils.convertToRupeesWithSymobl(
+                        requireContext(),
+                        item?.monthly_emi_amount?.value
+                    )
                 )
                 footerLayout.visibility = View.VISIBLE
                 val totalSaving = (item?.total_discount_amount?.value
@@ -352,6 +366,92 @@ class TenureSelectionFragment : Fragment() {
         return processPaymentRequest
     }
 
+
+    private fun showLanguagePopup(anchor: TextView) {
+        val languages = listOf("English", "Hindi", "Spanish", "French", "German")
+        val popupMenu = PopupMenu(anchor.context, anchor)
+
+        languages.forEachIndexed { index, language ->
+            popupMenu.menu.add(0, index, index, language)
+        }
+
+        popupMenu.setOnMenuItemClickListener { item ->
+            val selectedLanguage = languages[item.itemId]
+            (anchor as? TextView)?.text = selectedLanguage
+            //TODO pass this value when selecting the langugage
+            true
+        }
+
+        popupMenu.show()
+    }
+
+    private fun downloadAndRenderPdf(pdfUrl: String, imageView: ImageView) {
+        pageIndex = 0
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val url = URL(pdfUrl)
+                val connection = url.openConnection() as HttpURLConnection
+                connection.connect()
+
+                val file = File(requireActivity().cacheDir, "downloaded.pdf")
+                val inputStream = BufferedInputStream(connection.inputStream)
+                val outputStream = FileOutputStream(file)
+
+                val buffer = ByteArray(1024)
+                var count: Int
+                while (inputStream.read(buffer).also { count = it } != -1) {
+                    outputStream.write(buffer, 0, count)
+                }
+
+                outputStream.flush()
+                outputStream.close()
+                inputStream.close()
+
+                withContext(Dispatchers.Main) {
+                    openPdfRenderer(file)
+                    showPage(0, imageView = imageView)
+                }
+
+            } catch (e: Exception) {
+                e.printStackTrace()
+                withContext(Dispatchers.Main) {
+                    // TODO unable load pdf
+                }
+            }
+        }
+    }
+
+    private fun openPdfRenderer(file: File) {
+        try {
+            parcelFileDescriptor =
+                ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY)
+            pdfRenderer = PdfRenderer(parcelFileDescriptor)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            //TODO error loading pdf
+        }
+    }
+
+    @SuppressLint("UseKtx")
+    private fun showPage(index: Int, imageView: ImageView) {
+        // Close previous page if initialized
+        if (::currentPage.isInitialized) {
+            currentPage.close()
+        }
+
+        // Open and render new page
+        currentPage = pdfRenderer.openPage(index)
+
+        val bitmap = Bitmap.createBitmap(
+            currentPage.width,
+            currentPage.height,
+            Bitmap.Config.ARGB_8888
+        )
+        currentPage.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
+
+        imageView.setImageBitmap(bitmap)
+    }
+
     @SuppressLint("InflateParams")
     private fun showKFSConsentBottomSheet(
         context: Context,
@@ -359,8 +459,8 @@ class TenureSelectionFragment : Fragment() {
         isError: Boolean
     ) {
         bottomSheetDialog?.dismiss()
+        bottomSheetDialog = null
         bottomSheetDialog = BottomSheetDialog(context)
-
         val view = LayoutInflater.from(context).inflate(R.layout.kfs_view_layout, null)
         //        // View bindings
         val languageTextView: TextView = view.findViewById(R.id.kfs_language)
@@ -369,9 +469,14 @@ class TenureSelectionFragment : Fragment() {
         val progressBarContainer: LinearLayout = view.findViewById(R.id.progress_bar_container)
         val errorLayout: LinearLayout = view.findViewById(R.id.error_layout)
         val retryButton: Button = view.findViewById(R.id.retry_btn)
-        val webView: WebView = view.findViewById(R.id.kfs_webview)
         val consentCheckBox: CheckBox = view.findViewById(R.id.terms_checkbox_consent)
         val continueButton: Button = view.findViewById(R.id.continue_btn)
+
+        val kfsImageView: ImageView = view.findViewById(R.id.kfs_image_view)
+        val previousPage: ImageView = view.findViewById(R.id.prev_page)
+        val nextPage: ImageView = view.findViewById(R.id.next_page)
+
+
         bottomSheetDialog?.setCancelable(false)
         bottomSheetDialog?.setCanceledOnTouchOutside(false)
         bottomSheetDialog?.setContentView(view)
@@ -396,46 +501,25 @@ class TenureSelectionFragment : Fragment() {
 
         var pdfUrl = ""
         if (url != null) {
-            webView.visibility = View.VISIBLE
-            pdfUrl = "https://docs.google.com/gview?embedded=true&url=" + URLEncoder.encode(
-                url,
-                "UTF-8"
-            )
-
+            kfsImageView.visibility = View.VISIBLE
+            pdfUrl = url
         }
 
         consentCheckBox.setOnCheckedChangeListener { _, isChecked ->
             Utils.handleCTAEnableDisable(requireContext(), isChecked, continueButton)
         }
-
-        val kfsWebView = KFSWebView(
-            context = requireContext(),
-            webView = webView,
-            progressBarContainer = progressBarContainer,
-            errorView = errorLayout,
-            onScrollEnd = {
-                // Enable checkbox or other logic
-                Log.i(MTAG, "Scroll reached ")
-            }
-        )
-
         bottomSheetDialog?.setCancelable(false)
         bottomSheetDialog?.setCanceledOnTouchOutside(false)
-
-        kfsWebView.loadUrl(pdfUrl)
         bottomSheetDialog?.show()
+        downloadAndRenderPdf(pdfUrl, kfsImageView)
+
 
         languageTextView.setOnClickListener {
             showLanguagePopup(languageTextView)
         }
 
         downloadPDfButton.setOnClickListener {
-            //PdfDownloader(requireContext()).downloadPdf(pdfUrl)
-
-            //TODO dummy code
-            val intent = Intent(requireActivity(), PdfActivity::class.java)
-            intent.putExtra("pdf_url", url)
-            startActivity(intent)
+            PdfDownloader(requireContext()).downloadPdf(pdfUrl)
         }
 
         cancelButton.setOnClickListener {
@@ -443,52 +527,70 @@ class TenureSelectionFragment : Fragment() {
         }
 
         retryButton.setOnClickListener {
-            kfsWebView.loadUrl(pdfUrl)
+            downloadAndRenderPdf(pdfUrl, kfsImageView)
+            errorLayout.visibility = View.GONE
+            kfsImageView.visibility = View.VISIBLE
+            progressBarContainer.visibility = View.VISIBLE
+        }
+
+        previousPage.setOnClickListener {
+            if (pageIndex > 0) {
+                showPage(--pageIndex, kfsImageView)
+            }
+        }
+
+        nextPage.setOnClickListener {
+            if (pageIndex < pdfRenderer.pageCount - 1) {
+                showPage(++pageIndex, kfsImageView)
+            }
         }
 
         continueButton.setOnClickListener {
             if (consentCheckBox.isChecked) {
                 bottomSheetDialog?.dismiss()
+                val authType = issuer?.issuer_data?.auth_type ?: ""
                 val bundle = Bundle()
                 bundle.putString(ISSUE_ID, selectedIssuerId)
                 bundle.putString(TENURE_ID, selectedTenure?.tenure_id)
-                findNavController().navigate(
-                    R.id.action_tenureSelectionFragment_to_DCEMICardDetailsFragment,
-                    bundle
-                )
+                if (authType.equals("OTP", true)) {
+                    findNavController().navigate(
+                        R.id.action_tenureSelectionFragment_to_DCEMICardDetailsFragment,
+                        bundle
+                    )
+                } else {
+                    findNavController().navigate(
+                        R.id.action_tenureSelectionFragment_to_EMICardDetailsFragment,
+                        bundle
+                    )
+                }
+
             }
         }
 
         if (isError) {
             progressBarContainer.visibility = View.GONE
-            webView.visibility = View.GONE
+            kfsImageView.visibility = View.GONE
             errorLayout.visibility = View.VISIBLE
         } else {
-            progressBarContainer.visibility = View.VISIBLE
-            webView.visibility = View.GONE
+            //  progressBarContainer.visibility = View.VISIBLE
+            kfsImageView.visibility = View.VISIBLE
             errorLayout.visibility = View.GONE
         }
 
         bottomSheetDialog?.show() // Show the dialog first
-    }
+        bottomSheetDialog?.setOnDismissListener {
 
-
-    private fun showLanguagePopup(anchor: TextView) {
-        val languages = listOf("English", "Hindi", "Spanish", "French", "German")
-        val popupMenu = PopupMenu(anchor.context, anchor)
-
-        languages.forEachIndexed { index, language ->
-            popupMenu.menu.add(0, index, index, language)
+            try {
+                if (::pdfRenderer.isInitialized) {
+                    currentPage.close()
+                    pdfRenderer.close()
+                    parcelFileDescriptor
+                    parcelFileDescriptor.closeQuietly()
+                }
+            } catch (_: Exception) {
+                // TODO do nothing
+            }
         }
-
-        popupMenu.setOnMenuItemClickListener { item ->
-            val selectedLanguage = languages[item.itemId]
-            (anchor as? TextView)?.text = selectedLanguage
-            //TODO pass this value when selecting the langugage
-            true
-        }
-
-        popupMenu.show()
     }
 
 }

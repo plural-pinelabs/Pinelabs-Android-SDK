@@ -7,9 +7,7 @@ import com.plural_pinelabs.expresscheckoutsdk.data.retrofit.RetrofitBuilder
 import com.plural_pinelabs.expresscheckoutsdk.presentation.acs.ACSFragmentViewModel
 import com.plural_pinelabs.expresscheckoutsdk.presentation.card.CardFragmentViewModel
 import com.plural_pinelabs.expresscheckoutsdk.presentation.card.SavedCardOTPViewModel
-import com.plural_pinelabs.expresscheckoutsdk.presentation.d2c.AddressViewModel
 import com.plural_pinelabs.expresscheckoutsdk.presentation.d2c.D2CViewModel
-import com.plural_pinelabs.expresscheckoutsdk.presentation.d2c.NewAddressFragmentViewModel
 import com.plural_pinelabs.expresscheckoutsdk.presentation.emi.TenureSelectionViewModel
 import com.plural_pinelabs.expresscheckoutsdk.presentation.nativeotp.NativeOTPViewModel
 import com.plural_pinelabs.expresscheckoutsdk.presentation.netbanking.NetBankingViewModel
@@ -77,32 +75,6 @@ class UPIViewModelFactory(private val networkHelper: NetworkHelper) :
         ) as T
     }
 }
-
-class NewAddressFragmentViewModelFactory(private val networkHelper: NetworkHelper) :
-    ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return NewAddressFragmentViewModel(
-            ExpressRepositoryImpl(
-                RetrofitBuilder.commonApiService,
-                networkHelper = networkHelper
-            )
-        ) as T
-    }
-}
-
-
-class AddressViewModelFactory(private val networkHelper: NetworkHelper) :
-    ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return AddressViewModel(
-            ExpressRepositoryImpl(
-                RetrofitBuilder.expressApiService,
-                networkHelper = networkHelper
-            )
-        ) as T
-    }
-}
-
 
 class ACSViewModelFactory(private val networkHelper: NetworkHelper) :
     ViewModelProvider.Factory {

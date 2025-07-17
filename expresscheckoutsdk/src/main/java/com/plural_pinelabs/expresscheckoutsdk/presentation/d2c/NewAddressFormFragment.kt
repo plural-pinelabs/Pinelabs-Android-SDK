@@ -16,11 +16,8 @@ import android.widget.RadioGroup
 import android.widget.TextView
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.plural_pinelabs.expresscheckoutsdk.R
-import com.plural_pinelabs.expresscheckoutsdk.common.NetworkHelper
-import com.plural_pinelabs.expresscheckoutsdk.common.NewAddressFragmentViewModelFactory
 
 class NewAddressFormFragment : Fragment() {
     private lateinit var fullNameEt: EditText
@@ -34,24 +31,19 @@ class NewAddressFormFragment : Fragment() {
     private lateinit var saveBtn: Button
     private var selectedAddressType: String = "Home" // Default value
 
-    private lateinit var viewModel: NewAddressFragmentViewModel
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        viewModel = ViewModelProvider(
-            this,
-            NewAddressFragmentViewModelFactory(NetworkHelper(requireContext()))
-        )[NewAddressFragmentViewModel::class.java]
         return inflater.inflate(R.layout.fragment_new_address_form, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-      //  setViews(view)
+        //  setViews(view)
 
-         findNavController().navigate(R.id.action_newAddressFormFragment_to_paymentModeFragment)
+        findNavController().navigate(R.id.action_newAddressFormFragment_to_paymentModeFragment)
     }
 
 
@@ -127,7 +119,7 @@ class NewAddressFormFragment : Fragment() {
         saveBtn.setOnClickListener {
             // Validate fields and save address
             if (isAllFieldValid()) {
-            //    val request = getSaveAddressRequest()
+                //    val request = getSaveAddressRequest()
 
                 // Proceed with saving the address
                 // You can call a method in your ViewModel to handle the save operation

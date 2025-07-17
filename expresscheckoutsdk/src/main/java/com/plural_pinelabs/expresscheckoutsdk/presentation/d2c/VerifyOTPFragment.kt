@@ -96,9 +96,9 @@ class VerifyOTPFragment : Fragment() {
             val otpId = viewModel.otpId ?: ""
             val customerId = viewModel.customerInfo?.customerId ?: ""
             val customerInfo = ExpressSDKObject.getFetchData()?.customerInfo
-            customerInfo?.mobileNumber = ExpressSDKObject.getPhoneNumber()
-            customerInfo?.customerId = customerId
-            customerInfo?.countryCode = viewModel.countryCode // harcoded for now
+            customerInfo?.mobile_number = ExpressSDKObject.getPhoneNumber()
+            customerInfo?.customer_id = customerId
+            customerInfo?.country_code = viewModel.countryCode // harcoded for now
             val updateOrderDetails = UpdateOrderDetails(
                 customerInfo
             )

@@ -617,12 +617,10 @@ internal object Utils {
         }
         cancelYesButton.setOnClickListener {
             bottomSheetDialog.dismiss()
+            itemClickListener?.onItemClick(0, true)
         }
 
         cancelButton.setOnClickListener {
-            // Handle the cancel action here
-            itemClickListener?.onItemClick(0, true)
-            //TODO cancel the payment pass an interface to here and listen to the click use the existing item click listener with boolean
             bottomSheetDialog.dismiss()
         }
 
@@ -917,7 +915,7 @@ internal object Utils {
 
         for (issuer in issuers) {
             val maxTenure = issuer.tenures
-                .filter { it.total_discount_amount?.value != null || it.total_subvention_amount?.value != null }
+                .filter { (it.total_discount_amount?.value != null || it.total_subvention_amount?.value != null) && (it.tenure_id != "7") }
                 .maxByOrNull {
                     it.total_discount_amount?.value ?: it.total_subvention_amount?.value ?: 0
                 }
@@ -978,7 +976,7 @@ internal object Utils {
 
     fun showRemoveErrorBackground(
         context: Context,
-        editText: EditText?=null,
+        editText: EditText? = null,
         drawable: Int,
         isShow: Boolean,
         isFocus: Boolean = false,

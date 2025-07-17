@@ -31,6 +31,14 @@ class UPIViewModel(private val expressRepositoryImpl: ExpressRepositoryImpl) : V
             }
         }
 
+    fun resetPaymentFlowResponse() {
+        _processPaymentResult.value = BaseResult.Loading(false)
+    }
+
+    fun resetTransactionResponse() {
+        _transactionStatusResult.value = BaseResult.Loading(false)
+    }
+
 
     fun getTransactionStatus(token: String?) =
         viewModelScope.launch(Dispatchers.IO) {
