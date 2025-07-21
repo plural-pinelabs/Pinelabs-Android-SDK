@@ -121,10 +121,11 @@ class SplashFragment : Fragment() {
                                 (activity as? LandingActivity)?.updateValueForHeaderLayout(it)
                                 if (it.customerInfo?.customerId.isNullOrEmpty()) {
                                     // no customer id new user
-                                    findNavController().navigate(R.id.action_splashFragment_to_phoneNumberFragment)
+                                  //  findNavController().navigate(R.id.action_splashFragment_to_phoneNumberFragment)
+                                    findNavController().navigate(R.id.action_splashFragment_to_paymentModeFragment)
                                 } else
                                 // TODO UNCOMMENT NAVIGATION TO LANDING AND REMOVE THIS
-                                    findNavController().navigate(R.id.action_splashFragment_to_phoneNumberFragment)
+                                    findNavController().navigate(R.id.action_splashFragment_to_paymentModeFragment)
                                 //  findNavController().navigate(R.id.action_splashFragment_to_landingFragment)
                             }
                         }

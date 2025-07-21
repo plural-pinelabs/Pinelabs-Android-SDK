@@ -182,8 +182,8 @@
 
             <ImageView
                 android:id="@+id/next_page"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
                 android:background="@drawable/rectangle_denser_bg"
                 android:padding="4dp"
                 android:src="@drawable/ic_chevron_white"
@@ -195,8 +195,8 @@
 
             <ImageView
                 android:id="@+id/prev_page"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
                 android:background="@drawable/rectangle_denser_bg"
                 android:padding="4dp"
                 android:src="@drawable/ic_chevron_left"

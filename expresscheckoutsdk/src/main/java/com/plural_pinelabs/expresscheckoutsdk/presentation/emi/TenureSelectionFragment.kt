@@ -475,7 +475,7 @@ class TenureSelectionFragment : Fragment() {
         val kfsImageView: ImageView = view.findViewById(R.id.kfs_image_view)
         val previousPage: ImageView = view.findViewById(R.id.prev_page)
         val nextPage: ImageView = view.findViewById(R.id.next_page)
-
+        consentCheckBox.isEnabled = false
 
         bottomSheetDialog?.setCancelable(false)
         bottomSheetDialog?.setCanceledOnTouchOutside(false)
@@ -542,6 +542,9 @@ class TenureSelectionFragment : Fragment() {
         nextPage.setOnClickListener {
             if (pageIndex < pdfRenderer.pageCount - 1) {
                 showPage(++pageIndex, kfsImageView)
+            }
+            if (pageIndex == pdfRenderer.pageCount - 1) {
+                consentCheckBox.isEnabled = true
             }
         }
 
