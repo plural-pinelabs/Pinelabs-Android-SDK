@@ -231,7 +231,7 @@ data class CardTokenData(
 @Parcelize
 data class CustomerData(
     val mobileNo: String?,
-    val email_id: String?
+    val emailId: String?
 ) : Parcelable
 
 
@@ -516,7 +516,8 @@ data class SavedCardData(val icon: Int, val text: String)
 data class SavedCardTokens(
     val tokenId: String,
     val expiredAt: String,
-    val cardData: SavedCardDataObject
+    val cardData: SavedCardDataObject,
+    var cvvInput: String? = null,
 ) : Parcelable
 
 @Parcelize

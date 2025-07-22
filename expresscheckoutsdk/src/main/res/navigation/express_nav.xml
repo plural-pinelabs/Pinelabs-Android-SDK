@@ -71,6 +71,15 @@
         <action
             android:id="@+id/action_paymentModeFragment_to_EMIFragment"
             app:destination="@id/EMIFragment" />
+        <action
+            android:id="@+id/action_paymentModeFragment_to_nativeOTPFragment"
+            app:destination="@id/nativeOTPFragment" />
+        <action
+            android:id="@+id/action_paymentModeFragment_to_ACSFragment"
+            app:destination="@id/ACSFragment" />
+        <action
+            android:id="@+id/action_paymentModeFragment_to_successFragment"
+            app:destination="@id/successFragment" />
     </fragment>
     <fragment
         android:id="@+id/cardFragment"

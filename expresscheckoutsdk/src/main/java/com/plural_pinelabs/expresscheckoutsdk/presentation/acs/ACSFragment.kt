@@ -12,6 +12,7 @@ import android.webkit.JavascriptInterface
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import androidx.activity.OnBackPressedCallback
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
@@ -67,6 +68,15 @@ internal class ACSFragment : Fragment() {
             WindowManager.LayoutParams.FLAG_SECURE,
             WindowManager.LayoutParams.FLAG_SECURE
         )
+        requireActivity().onBackPressedDispatcher.addCallback(
+            viewLifecycleOwner,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    // Do nothing or show a message
+                    // This disables the back press
+                }
+            }
+        )
         (activity as LandingActivity).showHideHeaderLayout(false)
         initializeValueFromProcessPaymentResponse()
         setUpViews(view)
@@ -101,7 +111,7 @@ internal class ACSFragment : Fragment() {
                                 }
 
                                 PROCESSED_ATTEMPTED -> {
-                                    // findNavController().navigate(R.id.action_ACSFragment_to_successFragment)
+                                     findNavController().navigate(R.id.action_ACSFragment_to_successFragment)
                                 }
 
                                 PROCESSED_FAILED -> {
@@ -158,6 +168,7 @@ internal class ACSFragment : Fragment() {
                     webAcs.visibility = View.GONE
                     constrainSuccess.visibility = View.VISIBLE
                     viewModel.getTransactionStatus(ExpressSDKObject.getToken())
+
                 }
             }
         }
@@ -177,5 +188,6 @@ internal class ACSFragment : Fragment() {
             viewModel.getTransactionStatus(ExpressSDKObject.getToken())
         }
     }
+
 
 }

@@ -8,24 +8,45 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.airbnb.lottie.LottieAnimationView
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.plural_pinelabs.expresscheckoutsdk.ExpressSDKObject
 import com.plural_pinelabs.expresscheckoutsdk.R
+import com.plural_pinelabs.expresscheckoutsdk.common.BaseResult
+import com.plural_pinelabs.expresscheckoutsdk.common.CardFragmentViewModelFactory
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.ERROR_KEY
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.ERROR_MESSAGE_KEY
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PAY_BY_POINTS_ID
 import com.plural_pinelabs.expresscheckoutsdk.common.ItemClickListener
+import com.plural_pinelabs.expresscheckoutsdk.common.NetworkHelper
 import com.plural_pinelabs.expresscheckoutsdk.common.PaymentModes
+import com.plural_pinelabs.expresscheckoutsdk.common.Utils.showProcessPaymentDialog
+import com.plural_pinelabs.expresscheckoutsdk.data.model.CardTokenData
+import com.plural_pinelabs.expresscheckoutsdk.data.model.CustomerData
+import com.plural_pinelabs.expresscheckoutsdk.data.model.Extra
 import com.plural_pinelabs.expresscheckoutsdk.data.model.PaymentMode
+import com.plural_pinelabs.expresscheckoutsdk.data.model.ProcessPaymentRequest
+import com.plural_pinelabs.expresscheckoutsdk.data.model.ProcessPaymentResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.SavedCardTokens
+import com.plural_pinelabs.expresscheckoutsdk.presentation.card.CardFragmentViewModel
 import com.plural_pinelabs.expresscheckoutsdk.presentation.utils.DividerItemDecoration
+import kotlinx.coroutines.launch
 
 class PaymentModeFragment : Fragment() {
     private lateinit var savedCardRecyclerView: RecyclerView
     private lateinit var savedCardsHeading: TextView
     private lateinit var paymentModeRecyclerView: RecyclerView
     private lateinit var logoAnimation: LottieAnimationView
+    private lateinit var viewModel: CardFragmentViewModel
+    private var bottomSheetDialog: BottomSheetDialog? = null
 
 
     override fun onCreateView(
@@ -33,6 +54,10 @@ class PaymentModeFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
+        viewModel = ViewModelProvider(
+            this,
+            CardFragmentViewModelFactory(NetworkHelper(requireContext()))
+        )[CardFragmentViewModel::class.java]
         return inflater.inflate(R.layout.fragment_payment_mode, container, false)
     }
 
@@ -71,10 +96,62 @@ class PaymentModeFragment : Fragment() {
         return object : ItemClickListener<SavedCardTokens> {
             override fun onItemClick(position: Int, item: SavedCardTokens) {
                 // Handle saved card selection
-                findNavController().navigate(R.id.action_paymentModeFragment_to_cardFragment)
+                observeViewModel()
+                val createProcessPaymentRequest = createProcessPaymentRequest(item)
+                viewModel.processPayment(
+                    token = ExpressSDKObject.getToken(),
+                    paymentData = createProcessPaymentRequest
+                )
             }
         }
     }
+
+    private fun createProcessPaymentRequest(savedCardTokens: SavedCardTokens): ProcessPaymentRequest {
+        val paymentData = ExpressSDKObject.getFetchData()?.paymentData
+        if (paymentData == null) {
+            findNavController().navigate(R.id.action_paymentModeFragment_to_successFragment)
+        }
+        val customerInfo = ExpressSDKObject.getFetchData()?.customerInfo
+        val amount = paymentData?.originalTxnAmount?.amount
+        val currency = paymentData?.originalTxnAmount?.currency
+        val cardTokenData = CardTokenData(savedCardTokens.tokenId, savedCardTokens.cvvInput)
+        val customerInfoData = CustomerData(
+            emailId = customerInfo?.emailId ?: "",
+            mobileNo = customerInfo?.mobileNumber ?: customerInfo?.mobileNo ?: ""
+        )
+        val paymentMode = arrayListOf<String>()
+        paymentMode.add(Constants.CREDIT_DEBIT_ID)
+
+        val cardDataExtra =
+            Extra(
+                paymentMode,
+                amount,
+                currency,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,// dccstatus pass this from dcc api call
+                null
+            )
+
+        val processPaymentRequest =
+            ProcessPaymentRequest(
+                cardTokenData,
+                customerInfoData,
+                null,
+                upi_data = null,
+                null,
+                null,
+                cardDataExtra,
+                null,
+                null
+            )
+        return processPaymentRequest
+    }
+
 
     private fun setPaymentMode() {
         paymentModeRecyclerView.layoutManager = LinearLayoutManager(requireContext())
@@ -152,4 +229,34 @@ class PaymentModeFragment : Fragment() {
         logoAnimation.playAnimation()
     }
 
+    private fun observeViewModel() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED)
+            {
+                viewModel.processPaymentResult.collect {
+                    when (it) {
+                        is BaseResult.Error -> {
+                            val bundle = Bundle()
+                            bundle.putString(ERROR_KEY, it.errorCode)
+                            bundle.putString(ERROR_MESSAGE_KEY, it.errorMessage)
+                            bottomSheetDialog?.dismiss()
+                            findNavController().navigate(R.id.action_paymentModeFragment_to_successFragment)
+                        }
+
+                        is BaseResult.Loading -> {
+                            if (it.isLoading)
+                                bottomSheetDialog = showProcessPaymentDialog(requireContext())
+                        }
+
+                        is BaseResult.Success<ProcessPaymentResponse> -> {
+                            ExpressSDKObject.setProcessPaymentResponse(it.data)
+                            bottomSheetDialog?.dismiss()
+                            findNavController().navigate(R.id.action_paymentModeFragment_to_ACSFragment)
+
+                        }
+                    }
+                }
+            }
+        }
+    }
 }

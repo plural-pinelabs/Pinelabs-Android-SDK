@@ -2,9 +2,10 @@
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/saved_card_cvv_parent_layout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginHorizontal="8dp"
     android:orientation="vertical">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -25,25 +26,30 @@
 
         <TextView
             android:id="@+id/card_issuer_name"
+            style="bold"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:layout_marginStart="12dp"
             android:ellipsize="end"
+            android:fontFamily="sans-serif-medium"
             android:maxWidth="200dp"
-            android:text="SBI Credit Card"
+            android:maxLines="1"
+            android:textColor="@color/black_text_80"
+            android:textSize="16sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@id/card_icon"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Name Credit Card" />
 
         <View
             android:id="@+id/seperator"
             android:layout_width="1dp"
             android:layout_height="18dp"
             android:layout_gravity="center_vertical"
-            android:layout_marginStart="4dp"
-            android:layout_marginEnd="4dp"
-            android:background="@color/black_text_80"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:background="@color/black_text_50"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@id/card_issuer_name"
             app:layout_constraintTop_toTopOf="parent" />
@@ -66,17 +72,21 @@
             android:layout_height="wrap_content"
             android:layout_gravity="start|center_vertical"
             android:layout_marginStart="4dp"
-            android:text="1234"
+            android:fontFamily="sans-serif-medium"
+            android:maxLines="1"
             android:textAlignment="viewStart"
+            android:textColor="@color/black_text_80"
+            android:textSize="16sp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/cvv_less_selection"
+            app:layout_constraintEnd_toStartOf="@id/cvv_input_field"
             app:layout_constraintStart_toEndOf="@id/card_dots"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="1234" />
 
         <androidx.appcompat.widget.AppCompatCheckBox
             android:id="@+id/cvv_less_selection"
-            android:layout_width="19dp"
-            android:layout_height="20dp"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
             android:layout_gravity="center_vertical|end"
             android:background="@null"
             android:button="@drawable/circle_checkbox_state"
@@ -91,9 +101,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/input_field_border"
-            android:backgroundTint="@color/white"
-            android:hint="CVV"
+            android:fontFamily="sans-serif"
+            android:hint="@string/cvv"
+            android:inputType="number"
+            android:maxLines="1"
             android:padding="12dp"
+            android:textColorHint="@color/black_text_30"
+            android:textFontWeight="500"
+            android:textSize="14sp"
             android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -101,15 +116,32 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <TextView
+        android:id="@+id/cvv_error_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginVertical="8dp"
+        android:fontFamily="sans-serif-medium"
+        android:text="@string/enter_cvv_to_proceed_with_payment"
+        android:textColor="@color/error_DD4D42"
+        android:textFontWeight="500"
+        android:textSize="12sp"
+        android:visibility="gone"
+        app:drawableStartCompat="@drawable/ic_error_icon" />
+
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/pay_by_saved_card"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
         android:layout_marginTop="4dp"
+        android:layout_marginBottom="12dp"
         android:background="@drawable/primary_button_background"
         android:gravity="center"
         android:minHeight="48dp"
         android:text="@string/continue_text"
-        android:textColor="@color/white" />
+        android:textColor="@color/white"
+        android:visibility="gone" />
 
 </LinearLayout>

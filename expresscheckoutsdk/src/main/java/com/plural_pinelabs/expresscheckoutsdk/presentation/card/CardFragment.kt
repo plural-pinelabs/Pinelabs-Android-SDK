@@ -636,11 +636,12 @@ class CardFragment : Fragment() {
 
     private fun validateAllFields() {
         if (isCardValid && isExpiryValid && isCVVValid && isCardHolderNameValid) {
-
-            if (saveCardCheckbox.isChecked) {
+            val isOTPRequiredForSavingCard =
+                ExpressSDKObject.getFetchData()?.customerInfo?.customerId != null && ExpressSDKObject.getFetchData()?.customerInfo?.tokens?.isEmpty() == true
+            if (saveCardCheckbox.isChecked && isOTPRequiredForSavingCard) {
                 navigateToSaveCardOTPFragment()
             } else {
-                initProcessPayment()
+                initProcessPayment(saveCardCheckbox.isChecked && !isOTPRequiredForSavingCard)
             }
         } else {
             if (!isCardValid) {
