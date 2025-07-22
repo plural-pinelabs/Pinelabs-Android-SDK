@@ -165,9 +165,9 @@ class UPIFragment : Fragment() {
             BHIM_UPI// Paytm
         )
         val listOfPaymentReadyApps = mutableListOf<String>()
-        //  listOfPaymentReadyApps.addAll(getListOfActiveUPIApps(listOfUPIPackage)) TODO uncomment this before going QA
-        //  return listOfPaymentReadyApps
-        return listOfUPIPackage
+        listOfPaymentReadyApps.addAll(getListOfActiveUPIApps(listOfUPIPackage))
+        return listOfPaymentReadyApps
+        // return listOfUPIPackage // only for testing purposes
     }
 
     private fun getListOfActiveUPIApps(listOfUPIPackage: List<String>): List<String> {
