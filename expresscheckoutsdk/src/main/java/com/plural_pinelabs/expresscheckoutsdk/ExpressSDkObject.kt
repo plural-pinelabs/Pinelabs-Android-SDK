@@ -14,7 +14,8 @@ internal data class SDKObject(
     var fetchResponseDTO: FetchResponseDTO? = null,
     var processPaymentResponse: ProcessPaymentResponse? = null,
     var phoneNumber: String? = null,
-    var emiPaymentModeData: EMIPaymentModeData? = null
+    var emiPaymentModeData: EMIPaymentModeData? = null,
+    var payableAmount: Int? = null
 )
 
 internal object ExpressSDKObject {
@@ -90,6 +91,15 @@ internal object ExpressSDKObject {
 
     fun getEMIPaymentModeData(): EMIPaymentModeData? {
         return getSDKObject()?.emiPaymentModeData
+    }
+
+    fun setPayableAmount(amount: Int) {
+        getSDKObject()?.payableAmount = amount
+    }
+
+    fun getPayableAmount(): Int? {
+        return getSDKObject()?.payableAmount
+            ?: getFetchData()?.paymentData?.originalTxnAmount?.amount ?: -1
     }
 }
 

@@ -46,6 +46,7 @@ import com.plural_pinelabs.expresscheckoutsdk.common.Constants.UPI_INTENT
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.UPI_INTENT_PREFIX
 import com.plural_pinelabs.expresscheckoutsdk.common.ItemClickListener
 import com.plural_pinelabs.expresscheckoutsdk.common.NetworkHelper
+import com.plural_pinelabs.expresscheckoutsdk.common.PaymentModes
 import com.plural_pinelabs.expresscheckoutsdk.common.UPIViewModelFactory
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils.showProcessPaymentDialog
@@ -55,6 +56,7 @@ import com.plural_pinelabs.expresscheckoutsdk.data.model.ProcessPaymentResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.TransactionStatusResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.UpiData
 import com.plural_pinelabs.expresscheckoutsdk.data.model.UpiTransactionData
+import com.plural_pinelabs.expresscheckoutsdk.presentation.LandingActivity
 import kotlinx.coroutines.launch
 
 
@@ -111,6 +113,7 @@ class UPIFragment : Fragment() {
         setUpPayByUPIApps()
         setupUPIIdValidation()
         observeViewModel()
+        handleConvenienceFees()
     }
 
     private fun setViews(view: View) {
@@ -435,6 +438,26 @@ class UPIFragment : Fragment() {
         bottomTimerSheetDialog?.dismiss()
         bottomVPASheetDialog?.dismiss()
         super.onDestroyView()
+    }
+
+    private fun handleConvenienceFees() {
+        val fetchData = ExpressSDKObject.getFetchData()
+        if (fetchData?.convenienceFeesInfo.isNullOrEmpty()) {
+            (requireActivity() as LandingActivity).showHideConvenienceFessMessage(false)
+            return
+        }
+        val convenienceFeesInfo =
+            fetchData?.convenienceFeesInfo?.filter { it.paymentModeType == PaymentModes.UPI.paymentModeID }
+
+        if (convenienceFeesInfo.isNullOrEmpty()) {
+            (requireActivity() as LandingActivity).showHideConvenienceFessMessage(false)
+        } else {
+            (requireActivity() as LandingActivity).showHideConvenienceFessMessage(
+                true,
+                convenienceFeesInfo[0]
+            )
+        }
+
     }
 
 }

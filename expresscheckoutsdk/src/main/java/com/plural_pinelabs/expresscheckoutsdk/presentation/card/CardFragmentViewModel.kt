@@ -8,6 +8,7 @@ import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PAYMENT_REFERENCE
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CardBinMetaDataRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CardBinMetaDataRequestList
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CardBinMetaDataResponse
+import com.plural_pinelabs.expresscheckoutsdk.data.model.ConvenienceFeesInfo
 import com.plural_pinelabs.expresscheckoutsdk.data.model.OTPRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.model.OTPResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.OfferEligibilityResponse
@@ -37,6 +38,9 @@ class CardFragmentViewModel(private val expressRepositoryImpl: ExpressRepository
     private val _otpRequestResult =
         MutableStateFlow<BaseResult<OTPResponse>>(BaseResult.Loading(false))
     val otpRequestResult: StateFlow<BaseResult<OTPResponse>> = _otpRequestResult
+
+    var convenienceFeesInfo: List<ConvenienceFeesInfo>? = null
+    var selectedConvenienceFee: ConvenienceFeesInfo? = null
 
     fun getCardBinMetaData(cardNumber: String, token: String) {
         val binRequest = CardBinMetaDataRequest(cardNumber, PAYMENT_REFERENCE_TYPE_CARD)
@@ -88,4 +92,5 @@ class CardFragmentViewModel(private val expressRepositoryImpl: ExpressRepository
     fun resetGenerateOtpState() {
         _otpRequestResult.value = BaseResult.Loading(false)
     }
+
 }

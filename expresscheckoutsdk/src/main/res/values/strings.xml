@@ -54,8 +54,7 @@
     <string name="waiting_to_auto_read_otp">Waiting to auto-read OTP</string>
     <string name="wrong_otp_please_re_enter">Wrong OTP, please re-enter</string>
     <string name="verify_pay">Verify &amp; Pay</string>
-    <string name="or_complete_payment_on_your"><font color='background: #1C1C1C80;
-'> Or, complete payment on your </font><font color='#CC1C1C1C'><u>bank’s website</u></font></string>
+    <string name="or_complete_payment_on_your"><font color='background: #1C1C1C80;'> Or, complete payment on your </font><font color='#CC1C1C1C'><u>bank’s website</u></font></string>
     <string name="pay_using_upi">Pay using UPI</string>
     <string name="pay_by_any_upi_app">Pay by any UPI app</string>
     <string name="upi_app_google_pay">Google Pay</string>
@@ -183,5 +182,8 @@
     <string name="add_new">+ Add new</string>
     <string name="select_delivery_address">Select delivery address</string>
     <string name="enter_cvv_to_proceed_with_payment">Enter CVV to proceed with payment</string>
+    <string name="add_new_card">+ Add new card</string>
+    <string name="a_convenience_fee_may_be_added_based_on_your_selected_payment_method">A convenience fee may be added based on your selected payment method</string>
+    <string name="convenience_fees_x_added">A convenience fee of %s has been added for UPI payments</string>
 
 </resources>

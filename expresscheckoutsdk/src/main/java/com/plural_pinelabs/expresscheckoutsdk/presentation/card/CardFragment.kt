@@ -35,6 +35,7 @@ import com.plural_pinelabs.expresscheckoutsdk.common.Constants.BROWSER_USER_AGEN
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.ERROR_KEY
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.ERROR_MESSAGE_KEY
 import com.plural_pinelabs.expresscheckoutsdk.common.NetworkHelper
+import com.plural_pinelabs.expresscheckoutsdk.common.PaymentModes
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils.cardIcons
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils.cardTypes
@@ -47,6 +48,7 @@ import com.plural_pinelabs.expresscheckoutsdk.data.model.FetchResponseDTO
 import com.plural_pinelabs.expresscheckoutsdk.data.model.OTPRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ProcessPaymentRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ProcessPaymentResponse
+import com.plural_pinelabs.expresscheckoutsdk.presentation.LandingActivity
 import kotlinx.coroutines.launch
 import java.util.Calendar
 import java.util.Locale
@@ -132,6 +134,7 @@ class CardFragment : Fragment() {
         setupExpiryValidation(expiryEditText)
         showPBPView(1)
         enableDisableContinueBtn(false)
+        handleConvenienceFees()
     }
 
     private fun showPBPView(viewType: Int) {
@@ -261,11 +264,26 @@ class CardFragment : Fragment() {
                         is BaseResult.Success<CardBinMetaDataResponse> -> {
                             result.data.let { it ->
                                 binData = it
+                                if (it.card_payment_details.isEmpty()) {
+                                    showCardDetailsError("CardNumber")
+                                    return@let
+                                }
                                 setCardBrandIcon(
                                     cardEditText,
                                     it.card_payment_details[0].card_network
                                 )
                                 isNativeOTP = it.card_payment_details[0].is_native_otp_supported
+                                viewModel.selectedConvenienceFee =
+                                    viewModel.convenienceFeesInfo?.filter { fees ->
+                                        fees.networkType.equals(
+                                            it.card_payment_details[0].card_network,
+                                            true
+                                        )
+                                    }?.getOrNull(0)
+                                (requireActivity() as LandingActivity).showHideConvenienceFessMessage(
+                                    viewModel.selectedConvenienceFee != null,
+                                    viewModel.selectedConvenienceFee
+                                )
                                 // TODO Procss the data for DCC
                                 Log.d("Success", " Meta Data fetched successfully")
 
@@ -849,6 +867,18 @@ class CardFragment : Fragment() {
             )
             payBtn.isEnabled = false
         }
+    }
+
+
+    fun handleConvenienceFees() {
+        val fetchData = ExpressSDKObject.getFetchData()
+        if (fetchData?.convenienceFeesInfo.isNullOrEmpty()) {
+            (requireActivity() as LandingActivity).showHideConvenienceFessMessage(false)
+            return
+        }
+        viewModel.convenienceFeesInfo =
+            fetchData?.convenienceFeesInfo?.filter { it.paymentModeType == PaymentModes.CREDIT_DEBIT.paymentModeID }
+
     }
 
 }

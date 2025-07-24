@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/header_layout_parent"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -12,9 +13,9 @@
         android:layout_width="32dp"
         android:layout_height="32dp"
         android:layout_marginTop="24dp"
-        android:clickable="true"
         android:layout_marginEnd="20dp"
         android:background="@drawable/circle_background"
+        android:clickable="true"
         android:contentDescription="@string/cancel"
         android:padding="8dp"
         android:src="@drawable/ic_cancel_close"
@@ -69,7 +70,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="26dp"
         android:layout_marginTop="12dp"
-        android:text="$ 95000.00"
+        tools:text="$ 95000.00"
         android:textColor="@color/white"
         android:textSize="30sp"
         android:textStyle="bold"
@@ -82,7 +83,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:fontFamily="sans-serif-medium"
-        android:text="$ 95000.00"
+        tools:text="$ 95000.00"
         android:textColor="@color/white"
         android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="@+id/txt_amount"
@@ -116,7 +117,6 @@
         android:orientation="horizontal"
         android:paddingStart="16dp"
         android:paddingEnd="8dp"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/order_summary">
@@ -181,4 +181,23 @@
             android:src="@drawable/ic_chevron_white"
             android:visibility="visible" />
     </LinearLayout>
+
+
+    <TextView
+        android:id="@+id/convenience_fees_message"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="8dp"
+        android:drawableStart="@drawable/ic_info_icon"
+        android:drawablePadding="8dp"
+        android:drawableTint="@color/grey_99FFFFFF"
+        android:fontFamily="sans-serif-medium"
+        android:text="@string/a_convenience_fee_may_be_added_based_on_your_selected_payment_method"
+        android:textColor="@color/grey_99FFFFFF"
+        android:textFontWeight="500"
+        android:textSize="13sp"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/contact_details_layout" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

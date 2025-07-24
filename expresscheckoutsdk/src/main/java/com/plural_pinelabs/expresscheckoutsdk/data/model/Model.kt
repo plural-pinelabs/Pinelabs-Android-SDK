@@ -12,10 +12,11 @@ data class FetchResponseDTO(
     val paymentModes: List<PaymentMode>? = null,
     var merchantBrandingData: MerchantBranding? = null,
     var dccData: DccData? = null,
-    val customerInfo: CustomerInfo?,  // New field for customer information
+    val customerInfo: CustomerInfo?,
     val shippingAddress: Address,
     val billingAddress: Address,
-    val cartDetails: CartDetails? = null // New field added
+    val cartDetails: CartDetails? = null,
+    val convenienceFeesInfo: List<ConvenienceFeesInfo>? = null
 )
 
 @Parcelize
@@ -698,7 +699,8 @@ data class Discount(
 @Parcelize
 data class Amount(
     val currency: String,
-    val value: Int
+    val value: Int,
+    val amount: Int,
 ) : Parcelable
 
 @Parcelize
@@ -805,6 +807,21 @@ data class ConvenienceFeeBreakdown(
 @Parcelize
 data class KFSResponse(
     val key_fact_pdf_url: String? = null
+) : Parcelable
+
+@Parcelize
+data class ConvenienceFeesInfo(
+    val paymentAmount: Amount,
+    val convenienceFeesAmount: Amount? = null,
+    val convenienceFeesGSTAmount: Amount? = null,
+    val convenienceFeesAdditionalAmount: Amount? = null,
+    val convenienceFeesMaximumFeeAmount: Amount? = null,
+    val convenienceFeesApplicableFeeAmount: Amount? = null,
+    val originalTxnAmount: Amount,
+    val paymentModeType: String? = null,
+    val networkType: String? = null,
+    val cardType: String? = null,
+    val feeType: String
 ) : Parcelable
 
 

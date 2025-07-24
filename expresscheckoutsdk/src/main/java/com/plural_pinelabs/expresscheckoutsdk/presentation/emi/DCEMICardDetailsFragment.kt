@@ -68,6 +68,8 @@ class DCEMICardDetailsFragment : Fragment() {
     private lateinit var issuerTitleTv: TextView
     private lateinit var emiPerMonthAmount: TextView
     private lateinit var emiForXMonthTv: TextView
+    private lateinit var saveInfoText: TextView
+    private lateinit var emiPayingTenureText: TextView
 
     private var binData: CardBinMetaDataResponse? = null
     private var cardNumber: String = ""
@@ -140,6 +142,8 @@ class DCEMICardDetailsFragment : Fragment() {
         issuerTitleTv = view.findViewById(R.id.issuer_title)
         emiPerMonthAmount = view.findViewById(R.id.emi_per_month_value)
         emiForXMonthTv = view.findViewById(R.id.for_x_month_tv)
+        saveInfoText = view.findViewById(R.id.save_info_text)
+        emiPayingTenureText = view.findViewById(R.id.emi_info_text)
         loadBankLogo()
         issuerTitleTv.text = Utils.getTitleForEMI(requireContext(), issuer)
         emiPerMonthAmount.text =
@@ -149,6 +153,20 @@ class DCEMICardDetailsFragment : Fragment() {
             )
         emiForXMonthTv.text =
             String.format(getString(R.string.for_x_months), selectedTenure?.tenure_value.toString())
+        val saving = selectedTenure?.total_discount_amount?.value
+
+        saveInfoText.text =
+            String.format(
+                getString(R.string.you_re_saving_x_on_this_order), Utils.convertInRupees(saving)
+
+            )
+
+        emiPayingTenureText.text =
+            String.format(
+                getString(R.string.paying_in_emi_of_x_months),
+                selectedTenure?.tenure_value.toString()
+            )
+
 
 
         backBtn.setOnClickListener {

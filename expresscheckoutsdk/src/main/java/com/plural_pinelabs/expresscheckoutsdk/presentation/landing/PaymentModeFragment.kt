@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
@@ -36,6 +37,7 @@ import com.plural_pinelabs.expresscheckoutsdk.data.model.PaymentMode
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ProcessPaymentRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ProcessPaymentResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.SavedCardTokens
+import com.plural_pinelabs.expresscheckoutsdk.presentation.LandingActivity
 import com.plural_pinelabs.expresscheckoutsdk.presentation.card.CardFragmentViewModel
 import com.plural_pinelabs.expresscheckoutsdk.presentation.utils.DividerItemDecoration
 import kotlinx.coroutines.launch
@@ -46,6 +48,8 @@ class PaymentModeFragment : Fragment() {
     private lateinit var paymentModeRecyclerView: RecyclerView
     private lateinit var logoAnimation: LottieAnimationView
     private lateinit var viewModel: CardFragmentViewModel
+    private lateinit var addNewCardText: TextView
+    private lateinit var savedCardView: CardView
     private var bottomSheetDialog: BottomSheetDialog? = null
 
 
@@ -67,9 +71,15 @@ class PaymentModeFragment : Fragment() {
         savedCardRecyclerView = view.findViewById(R.id.saved_cards_list)
         savedCardsHeading = view.findViewById(R.id.saved_cards_title)
         logoAnimation = view.findViewById(R.id.offers_gif)
+        addNewCardText = view.findViewById(R.id.add_new_card_btn)
+        savedCardView = view.findViewById(R.id.saved_cards_card_view)
         initOffersAnimation()
         setPaymentMode()
         setSavedCardsView()
+        addNewCardText.setOnClickListener {
+            findNavController().navigate(R.id.action_paymentModeFragment_to_cardFragment)
+        }
+        (requireActivity() as LandingActivity).showHideConvenienceFessMessage(ExpressSDKObject.getFetchData()?.convenienceFeesInfo?.isEmpty() == true)
     }
 
     private fun setSavedCardsView() {
@@ -83,6 +93,7 @@ class PaymentModeFragment : Fragment() {
         if (savedCards.isNullOrEmpty()) {
             savedCardsHeading.visibility = View.GONE
             savedCardRecyclerView.visibility = View.GONE
+            savedCardView.visibility = View.GONE
         } else {
             savedCardsHeading.visibility = View.VISIBLE
             savedCardRecyclerView.visibility = View.VISIBLE
@@ -179,7 +190,10 @@ class PaymentModeFragment : Fragment() {
             availablePaymentModes.add(it.paymentModeID.lowercase())
         }
         val filteredPaymentModes = ExpressSDKObject.getFetchData()?.paymentModes?.filter {
-            availablePaymentModes.contains(it.paymentModeId.lowercase()) && it.paymentModeData != null
+            val isCard = it.paymentModeId == PaymentModes.CREDIT_DEBIT.paymentModeID
+            val hasToken = !ExpressSDKObject.getFetchData()?.customerInfo?.tokens.isNullOrEmpty()
+            availablePaymentModes.contains(it.paymentModeId.lowercase()) &&
+                    !(isCard && hasToken)
         }
         return filteredPaymentModes
     }

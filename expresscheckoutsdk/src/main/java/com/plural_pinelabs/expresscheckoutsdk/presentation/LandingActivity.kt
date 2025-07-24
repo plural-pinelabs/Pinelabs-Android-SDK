@@ -20,10 +20,11 @@ import com.plural_pinelabs.expresscheckoutsdk.ExpressSDKObject
 import com.plural_pinelabs.expresscheckoutsdk.R
 import com.plural_pinelabs.expresscheckoutsdk.common.CustomExceptionHandler
 import com.plural_pinelabs.expresscheckoutsdk.common.ItemClickListener
-import com.plural_pinelabs.expresscheckoutsdk.presentation.ordersummary.TopSheetDialogFragment
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils
+import com.plural_pinelabs.expresscheckoutsdk.data.model.ConvenienceFeesInfo
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CustomerInfo
 import com.plural_pinelabs.expresscheckoutsdk.data.model.FetchResponseDTO
+import com.plural_pinelabs.expresscheckoutsdk.presentation.ordersummary.TopSheetDialogFragment
 
 class LandingActivity : AppCompatActivity() {
     private lateinit var merchantLogoCard: CardView
@@ -39,6 +40,7 @@ class LandingActivity : AppCompatActivity() {
     private lateinit var separator: TextView
     private lateinit var customerInfoData: CustomerInfo
     private lateinit var headerParentLayout: ConstraintLayout
+    private lateinit var convenienceFessMessage: TextView
 
     private lateinit var mainContentLayout: ConstraintLayout
 
@@ -90,6 +92,7 @@ class LandingActivity : AppCompatActivity() {
         customerEmail = findViewById(R.id.txt_customer_email)
         separator = findViewById(R.id.seperator)
         headerParentLayout = findViewById(R.id.header_layout_parent)
+        convenienceFessMessage = findViewById(R.id.convenience_fees_message)
         showHideHeaderLayout(false)
         mainContentLayout = findViewById(R.id.main)
         cancelBtn.setOnClickListener {
@@ -106,7 +109,7 @@ class LandingActivity : AppCompatActivity() {
 
         orderSummary.setOnClickListener {
             val topFragment = TopSheetDialogFragment()
-            topFragment.show(supportFragmentManager,"TopSheetDialogFragment")
+            topFragment.show(supportFragmentManager, "TopSheetDialogFragment")
         }
     }
 
@@ -172,9 +175,51 @@ class LandingActivity : AppCompatActivity() {
                     Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
                 )
                 originalAmount.setText(spannable, TextView.BufferType.SPANNABLE)
-
+            }
+            if (!fetchResponse.convenienceFeesInfo.isNullOrEmpty()) {
+                showHideConvenienceFessMessage(true)
             }
         }
+    }
+
+    fun showHideConvenienceFessMessage(
+        isShow: Boolean,
+        convenienceFeesInfo: ConvenienceFeesInfo? = null
+    ) {
+        val amount = convenienceFeesInfo?.convenienceFeesApplicableFeeAmount?.amount ?: -1
+        val payableAmount = convenienceFeesInfo?.paymentAmount?.amount ?: -1
+        if (payableAmount > 0) {
+            ExpressSDKObject.setPayableAmount(payableAmount)
+            updateOrderAmount(payableAmount)
+        }else{
+            ExpressSDKObject.setPayableAmount(ExpressSDKObject.getAmount())
+            updateOrderAmount(ExpressSDKObject.getAmount())
+        }
+        convenienceFessMessage.visibility = if (isShow) View.VISIBLE else View.GONE
+        convenienceFessMessage.text = if (amount > 0) {
+            String.format(
+                getString(R.string.convenience_fees_x_added),
+                Utils.convertToRupeesWithSymobl(this, amount)
+            )
+        } else {
+            getString(R.string.a_convenience_fee_may_be_added_based_on_your_selected_payment_method)
+        }
+    }
+
+
+    fun updateOrderAmount(payableAmount: Int) {
+        val amountString = Utils.convertToRupeesWithSymobl(this, payableAmount)
+        val spannable: Spannable = SpannableString(amountString)
+        val end = amountString.length
+        val start = end - (amountString.split(".")[1]).length
+
+        spannable.setSpan(
+            ForegroundColorSpan(resources.getColor(R.color.grey_99FFFFFF)),
+            start,
+            end,
+            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+        originalAmount.setText(spannable, TextView.BufferType.SPANNABLE)
     }
 
 }
