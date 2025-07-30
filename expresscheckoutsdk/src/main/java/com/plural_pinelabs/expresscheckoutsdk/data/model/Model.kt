@@ -800,7 +800,8 @@ data class ConvenienceFeeBreakdown(
     val fee_amount: Amount? = null,
     val tax_amount: Amount? = null,
     val maximum_fee_amount: Amount? = null,
-    val applicable_fee_amount: Amount? = null
+    val applicable_fee_amount: Amount? = null,
+    val additional_fee_amount: Amount? = null,
 ) : Parcelable
 
 
@@ -811,17 +812,17 @@ data class KFSResponse(
 
 @Parcelize
 data class ConvenienceFeesInfo(
-    val paymentAmount: Amount,
+    val paymentAmount: Amount? = null,
     val convenienceFeesAmount: Amount? = null,
     val convenienceFeesGSTAmount: Amount? = null,
     val convenienceFeesAdditionalAmount: Amount? = null,
     val convenienceFeesMaximumFeeAmount: Amount? = null,
     val convenienceFeesApplicableFeeAmount: Amount? = null,
-    val originalTxnAmount: Amount,
+    val originalTxnAmount: Amount? = null,
     val paymentModeType: String? = null,
     val networkType: String? = null,
     val cardType: String? = null,
-    val feeType: String
+    val feeType: String? = null
 ) : Parcelable
 
 

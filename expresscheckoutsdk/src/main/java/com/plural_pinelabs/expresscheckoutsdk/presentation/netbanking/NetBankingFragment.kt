@@ -49,6 +49,7 @@ import com.plural_pinelabs.expresscheckoutsdk.data.model.PaymentModeData
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ProcessPaymentRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ProcessPaymentResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.issuerDataList
+import com.plural_pinelabs.expresscheckoutsdk.presentation.LandingActivity
 import com.plural_pinelabs.expresscheckoutsdk.presentation.utils.DividerItemDecoration
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -84,6 +85,7 @@ class NetBankingFragment : Fragment() {
         observeViewModel()
         setNBList()
         setViews(view)
+        handleConvenienceFees()
     }
 
     private fun observeViewModel() {
@@ -374,5 +376,25 @@ class NetBankingFragment : Fragment() {
                 null
             )
         return processPaymentRequest;
+    }
+
+    private fun handleConvenienceFees() {
+        val fetchData = ExpressSDKObject.getFetchData()
+        if (fetchData?.convenienceFeesInfo.isNullOrEmpty()) {
+            (requireActivity() as LandingActivity).showHideConvenienceFessMessage(false)
+            return
+        }
+        val convenienceFeesInfo =
+            fetchData?.convenienceFeesInfo?.filter { it.paymentModeType == PaymentModes.NET_BANKING.paymentModeID }
+
+        if (convenienceFeesInfo.isNullOrEmpty()) {
+            (requireActivity() as LandingActivity).showHideConvenienceFessMessage(false)
+        } else {
+            (requireActivity() as LandingActivity).showHideConvenienceFessMessage(
+                true,
+                convenienceFeesInfo[0]
+            )
+        }
+
     }
 }

@@ -42,6 +42,7 @@ class RetryFragment : Fragment() {
         setupViews(view)
         setPaymentMode()
         setSavedCardsView()
+        (requireActivity() as LandingActivity).showHideConvenienceFessMessage(ExpressSDKObject.getFetchData()?.convenienceFeesInfo?.isEmpty() == false)
     }
 
     private fun setupViews(view: View) {

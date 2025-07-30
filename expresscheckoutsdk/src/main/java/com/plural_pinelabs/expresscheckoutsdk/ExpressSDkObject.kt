@@ -4,6 +4,7 @@ import android.content.Context
 import com.plural_pinelabs.expresscheckoutsdk.data.model.EMIPaymentModeData
 import com.plural_pinelabs.expresscheckoutsdk.data.model.FetchResponseDTO
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ProcessPaymentResponse
+import com.plural_pinelabs.expresscheckoutsdk.data.model.Tenure
 import java.util.concurrent.atomic.AtomicReference
 
 internal data class SDKObject(
@@ -15,7 +16,10 @@ internal data class SDKObject(
     var processPaymentResponse: ProcessPaymentResponse? = null,
     var phoneNumber: String? = null,
     var emiPaymentModeData: EMIPaymentModeData? = null,
-    var payableAmount: Int? = null
+    var payableAmount: Int? = null,
+    var convenienceFee: Int? = null,
+    var convenienceFeeGst: Int? = null,
+    var selectedTenure: Tenure? = null,
 )
 
 internal object ExpressSDKObject {
@@ -51,6 +55,13 @@ internal object ExpressSDKObject {
     }
 
     fun getAmount(): Int {
+        val fetchResponse = getFetchData()
+        return getPayableAmount() ?: (fetchResponse?.paymentData?.originalTxnAmount?.amount ?: run {
+            -1
+        })
+    }
+
+    fun getOriginalOrderAmount(): Int {
         val fetchResponse = getFetchData()
         return (fetchResponse?.paymentData?.originalTxnAmount?.amount ?: run {
             -1
@@ -99,7 +110,29 @@ internal object ExpressSDKObject {
 
     fun getPayableAmount(): Int? {
         return getSDKObject()?.payableAmount
-            ?: getFetchData()?.paymentData?.originalTxnAmount?.amount ?: -1
+    }
+
+    fun setConvenienceFee(fee: Int?) {
+        getSDKObject()?.convenienceFee = fee
+    }
+
+    fun getConvenienceFee(): Int? {
+        return getSDKObject()?.convenienceFee
+    }
+
+    fun setConvenienceFeeGst(gst: Int?) {
+        getSDKObject()?.convenienceFeeGst = gst
+    }
+
+    fun getConvenienceFeeGst(): Int? {
+        return getSDKObject()?.convenienceFeeGst
+    }
+    fun setSelectedTenure(tenure: Tenure?) {
+        getSDKObject()?.selectedTenure = tenure
+    }
+
+    fun getSelectedTenure(): Tenure? {
+        return getSDKObject()?.selectedTenure
     }
 }
 

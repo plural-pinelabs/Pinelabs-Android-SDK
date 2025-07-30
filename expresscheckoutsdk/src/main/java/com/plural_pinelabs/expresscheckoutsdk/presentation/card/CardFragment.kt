@@ -280,10 +280,39 @@ class CardFragment : Fragment() {
                                             true
                                         )
                                     }?.getOrNull(0)
+
+                                viewModel.selectedConvenienceFee = viewModel.convenienceFeesInfo
+                                    ?.filter { fees ->
+                                        fees.networkType.equals(
+                                            it.card_payment_details[0].card_network,
+                                            ignoreCase = true
+                                        ) ||
+                                                fees.networkType.equals(
+                                                    "DEFAULT",
+                                                    ignoreCase = true
+                                                )
+                                    }
+                                    ?.let { filteredFees ->
+                                        // Try to find exact cardType match
+                                        filteredFees.find { fee ->
+                                            fee.cardType.equals(
+                                                it.card_payment_details[0].card_type,
+                                                ignoreCase = true
+                                            )
+                                        } ?: filteredFees.find { fee ->
+                                            fee.cardType.equals("DEFAULT", ignoreCase = true)
+                                        }
+                                    }
+
+
+
                                 (requireActivity() as LandingActivity).showHideConvenienceFessMessage(
                                     viewModel.selectedConvenienceFee != null,
-                                    viewModel.selectedConvenienceFee
+                                    viewModel.selectedConvenienceFee,
+                                    false,
+                                    it.card_payment_details[0].card_network
                                 )
+                                setUpAmount()
                                 // TODO Procss the data for DCC
                                 Log.d("Success", " Meta Data fetched successfully")
 
@@ -711,7 +740,7 @@ class CardFragment : Fragment() {
             //TODO notify of payment failure
             findNavController().navigate(R.id.action_cardFragment_to_failureFragment)
         }
-        var amount = paymentData?.originalTxnAmount?.amount
+        var amount = ExpressSDKObject.getAmount()
         val currency = paymentData?.originalTxnAmount?.currency
 
 
@@ -719,7 +748,7 @@ class CardFragment : Fragment() {
         paymentMode.add(Constants.CREDIT_DEBIT_ID)
         if (isPBPChecked) {
             paymentMode.add(Constants.PAY_BY_POINTS_ID)
-            amount = amount?.minus(redeemableAmount)
+            amount = amount.minus(redeemableAmount)
         }
         val last4 = cardNumber.substring(cardNumber.length - 4, cardNumber.length)
 
@@ -743,6 +772,8 @@ class CardFragment : Fragment() {
             true, true, Utils.getDeviceId(requireActivity()),
             Utils.getLocalIpAddress().toString()
         )
+        val selectedFees = viewModel.selectedConvenienceFee
+        val convenienceFeesData = selectedFees?.let { Utils.getConvenienceFeesRequest(it) }
 
         val cardDataExtra =
             Extra(
@@ -778,7 +809,7 @@ class CardFragment : Fragment() {
                 null,
                 cardDataExtra,
                 null,
-                null
+                convenienceFeesData
             )
         return processPaymentRequest
     }
@@ -870,15 +901,20 @@ class CardFragment : Fragment() {
     }
 
 
-    fun handleConvenienceFees() {
+    private fun handleConvenienceFees() {
         val fetchData = ExpressSDKObject.getFetchData()
         if (fetchData?.convenienceFeesInfo.isNullOrEmpty()) {
             (requireActivity() as LandingActivity).showHideConvenienceFessMessage(false)
+            setUpAmount()
             return
         }
         viewModel.convenienceFeesInfo =
             fetchData?.convenienceFeesInfo?.filter { it.paymentModeType == PaymentModes.CREDIT_DEBIT.paymentModeID }
-
+        (requireActivity() as LandingActivity).showHideConvenienceFessMessage(
+            true,
+            showDefaultCardMessage = true
+        )
+        setUpAmount()
     }
 
 }

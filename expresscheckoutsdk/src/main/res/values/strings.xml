@@ -184,6 +184,20 @@
     <string name="enter_cvv_to_proceed_with_payment">Enter CVV to proceed with payment</string>
     <string name="add_new_card">+ Add new card</string>
     <string name="a_convenience_fee_may_be_added_based_on_your_selected_payment_method">A convenience fee may be added based on your selected payment method</string>
-    <string name="convenience_fees_x_added">A convenience fee of %s has been added for UPI payments</string>
+    <string name="a_convenience_fee_may_be_added_based_on_your_selected_card_network">A convenience fee may apply based on your selected card network</string>
+    <string name="convenience_fees_x_added_upi">A convenience fee of %s has been added for UPI payments</string>
+    <string name="convenience_fees_x_added_nb">A convenience fee of %s has been added for NetBanking payments</string>
+    <string name="convenience_fees_x_added_general">A convenience fee of %s has been added for your payments</string>
+    <string name="convenience_fees_x_added_for_x_card_payments">A convenience fee of %s has been added for %s card payments</string>
+    <string name="subtotal">Subtotal</string>
+    <string name="convenience_fee">Convenience Fee</string>
+    <string name="convenience_fee_gst">GST on Convenience Fee </string>
+    <string name="no_cost_discount">No Cost Discount</string>
+    <string name="cashback">Cashback</string>
+    <string name="processing_fee_info">%s processing fee + GST will be charged by %s bank.</string>
+    <string name="total_amount">Total Amount</string>
+    <string name="emi_interest">EMI Interest</string>
+    <string name="total_emi_cost">Total EMI Cost</string>
+    <string name="discount">Discount</string>
 
 </resources>

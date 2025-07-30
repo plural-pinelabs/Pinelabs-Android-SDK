@@ -257,6 +257,11 @@ class UPIFragment : Fragment() {
             Utils.createSDKData(requireActivity())
         )
         val upiData = UpiData(UPI_ID, vpa, transactionMode)
+        val convenienceFeesData = viewModel.selectedConvenienceFee?.let {
+            Utils.getConvenienceFeesRequest(
+                it
+            )
+        }
         val upiTxnData = UpiTransactionData(10)
         val processPaymentRequest =
             ProcessPaymentRequest(
@@ -268,7 +273,7 @@ class UPIFragment : Fragment() {
                 null,
                 extra,
                 upiTxnData,
-                null
+                convenienceFeesData
             )
         initProcessPayment(processPaymentRequest)
     }
@@ -448,13 +453,14 @@ class UPIFragment : Fragment() {
         }
         val convenienceFeesInfo =
             fetchData?.convenienceFeesInfo?.filter { it.paymentModeType == PaymentModes.UPI.paymentModeID }
+        viewModel.selectedConvenienceFee = convenienceFeesInfo?.getOrNull(0)
 
         if (convenienceFeesInfo.isNullOrEmpty()) {
             (requireActivity() as LandingActivity).showHideConvenienceFessMessage(false)
         } else {
             (requireActivity() as LandingActivity).showHideConvenienceFessMessage(
                 true,
-                convenienceFeesInfo[0]
+                viewModel.selectedConvenienceFee
             )
         }
 

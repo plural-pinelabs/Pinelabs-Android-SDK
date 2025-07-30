@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.plural_pinelabs.expresscheckoutsdk.ExpressSDKObject
 import com.plural_pinelabs.expresscheckoutsdk.common.BaseResult
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.UPI_TRANSACTION_STATUS_INTERVAL
+import com.plural_pinelabs.expresscheckoutsdk.data.model.ConvenienceFeesInfo
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ProcessPaymentRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ProcessPaymentResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.TransactionStatusResponse
@@ -31,6 +32,7 @@ class UPIViewModel(private val expressRepositoryImpl: ExpressRepositoryImpl) : V
 
     private val _countDownTimer = MutableStateFlow<Long>(-1)
     val countDownTimer: StateFlow<Long> = _countDownTimer
+    var selectedConvenienceFee: ConvenienceFeesInfo? = null
 
 
     private var pollingJob: Job? = null

@@ -3,6 +3,7 @@ package com.plural_pinelabs.expresscheckoutsdk.presentation.emi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.plural_pinelabs.expresscheckoutsdk.common.BaseResult
+import com.plural_pinelabs.expresscheckoutsdk.data.model.ConvenienceFeesInfo
 import com.plural_pinelabs.expresscheckoutsdk.data.model.KFSResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ProcessPaymentRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.repository.ExpressRepositoryImpl
@@ -13,6 +14,8 @@ import kotlinx.coroutines.launch
 
 class TenureSelectionViewModel(private val expressRepositoryImpl: ExpressRepositoryImpl) :
     ViewModel() {
+
+    var selectedConvenienceFee: ConvenienceFeesInfo? = null
 
     private val _kfsRequestResult =
         MutableStateFlow<BaseResult<KFSResponse>>(BaseResult.Loading(false))

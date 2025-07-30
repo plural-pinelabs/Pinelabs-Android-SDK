@@ -23,6 +23,7 @@ import com.plural_pinelabs.expresscheckoutsdk.common.Utils
 import com.plural_pinelabs.expresscheckoutsdk.data.model.EMIPaymentModeData
 import com.plural_pinelabs.expresscheckoutsdk.data.model.Issuer
 import com.plural_pinelabs.expresscheckoutsdk.data.model.Tenure
+import com.plural_pinelabs.expresscheckoutsdk.presentation.LandingActivity
 import com.plural_pinelabs.expresscheckoutsdk.presentation.utils.DividerItemDecoration
 
 class EMIFragment : Fragment() {
@@ -52,6 +53,13 @@ class EMIFragment : Fragment() {
         processDataForEMI()
         mapBanKLogo()
         setViews(view)
+        resetOrderSummary()
+    }
+
+    private fun resetOrderSummary() {
+        ExpressSDKObject.setSelectedTenure(null)
+        (requireActivity() as LandingActivity).showHideConvenienceFessMessage(ExpressSDKObject.getFetchData()?.convenienceFeesInfo?.isEmpty() == false)
+
     }
 
     private fun setViews(view: View) {

@@ -79,7 +79,7 @@ class PaymentModeFragment : Fragment() {
         addNewCardText.setOnClickListener {
             findNavController().navigate(R.id.action_paymentModeFragment_to_cardFragment)
         }
-        (requireActivity() as LandingActivity).showHideConvenienceFessMessage(ExpressSDKObject.getFetchData()?.convenienceFeesInfo?.isEmpty() == true)
+        (requireActivity() as LandingActivity).showHideConvenienceFessMessage(ExpressSDKObject.getFetchData()?.convenienceFeesInfo?.isEmpty() == false)
     }
 
     private fun setSavedCardsView() {
@@ -190,9 +190,10 @@ class PaymentModeFragment : Fragment() {
             availablePaymentModes.add(it.paymentModeID.lowercase())
         }
         val filteredPaymentModes = ExpressSDKObject.getFetchData()?.paymentModes?.filter {
+
             val isCard = it.paymentModeId == PaymentModes.CREDIT_DEBIT.paymentModeID
             val hasToken = !ExpressSDKObject.getFetchData()?.customerInfo?.tokens.isNullOrEmpty()
-            availablePaymentModes.contains(it.paymentModeId.lowercase()) &&
+            it.paymentModeData != null && availablePaymentModes.contains(it.paymentModeId.lowercase()) &&
                     !(isCard && hasToken)
         }
         return filteredPaymentModes

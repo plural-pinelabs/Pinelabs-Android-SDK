@@ -20,6 +20,7 @@ import com.plural_pinelabs.expresscheckoutsdk.ExpressSDKObject
 import com.plural_pinelabs.expresscheckoutsdk.R
 import com.plural_pinelabs.expresscheckoutsdk.common.CustomExceptionHandler
 import com.plural_pinelabs.expresscheckoutsdk.common.ItemClickListener
+import com.plural_pinelabs.expresscheckoutsdk.common.PaymentModes
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ConvenienceFeesInfo
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CustomerInfo
@@ -184,25 +185,77 @@ class LandingActivity : AppCompatActivity() {
 
     fun showHideConvenienceFessMessage(
         isShow: Boolean,
-        convenienceFeesInfo: ConvenienceFeesInfo? = null
-    ) {
-        val amount = convenienceFeesInfo?.convenienceFeesApplicableFeeAmount?.amount ?: -1
-        val payableAmount = convenienceFeesInfo?.paymentAmount?.amount ?: -1
+        convenienceFeesInfo: ConvenienceFeesInfo? = null,
+        showDefaultCardMessage: Boolean = false,
+        cardNetwork: String? = null,
+
+        ) {
+        val amount = convenienceFeesInfo?.convenienceFeesApplicableFeeAmount?.amount
+            ?: convenienceFeesInfo?.paymentAmount?.value ?: -1
+        val payableAmount =
+            convenienceFeesInfo?.paymentAmount?.amount ?: convenienceFeesInfo?.paymentAmount?.value
+            ?: -1
         if (payableAmount > 0) {
             ExpressSDKObject.setPayableAmount(payableAmount)
             updateOrderAmount(payableAmount)
-        }else{
-            ExpressSDKObject.setPayableAmount(ExpressSDKObject.getAmount())
-            updateOrderAmount(ExpressSDKObject.getAmount())
+        } else {
+            ExpressSDKObject.setPayableAmount(ExpressSDKObject.getOriginalOrderAmount())
+            updateOrderAmount(ExpressSDKObject.getOriginalOrderAmount())
         }
+        ExpressSDKObject.setConvenienceFee(convenienceFeesInfo?.convenienceFeesAmount?.amount)
+        ExpressSDKObject.setConvenienceFeeGst(convenienceFeesInfo?.convenienceFeesGSTAmount?.amount)
         convenienceFessMessage.visibility = if (isShow) View.VISIBLE else View.GONE
         convenienceFessMessage.text = if (amount > 0) {
-            String.format(
-                getString(R.string.convenience_fees_x_added),
-                Utils.convertToRupeesWithSymobl(this, amount)
-            )
+            when (convenienceFeesInfo?.paymentModeType) {
+                PaymentModes.CREDIT_DEBIT.paymentModeID -> {
+                    getString(
+                        R.string.convenience_fees_x_added_for_x_card_payments,
+                        Utils.convertToRupeesWithSymobl(this, amount),
+                        cardNetwork ?: ""
+                    )
+                }
+
+                PaymentModes.UPI.paymentModeID -> {
+                    getString(
+                        R.string.convenience_fees_x_added_upi,
+                        Utils.convertToRupeesWithSymobl(this, amount)
+                    )
+                }
+
+                PaymentModes.WALLET.paymentModeID -> {
+                    getString(
+                        R.string.convenience_fees_x_added_upi,
+                        Utils.convertToRupeesWithSymobl(this, amount)
+                    )
+                }
+
+                PaymentModes.NET_BANKING.paymentModeID -> {
+                    getString(
+                        R.string.convenience_fees_x_added_nb,
+                        Utils.convertToRupeesWithSymobl(this, amount)
+                    )
+                }
+
+                PaymentModes.EMI.paymentModeID -> {
+                    getString(
+                        R.string.convenience_fees_x_added_upi,
+                        Utils.convertToRupeesWithSymobl(this, amount)
+                    )
+                }
+
+                else -> {
+                    getString(
+                        R.string.convenience_fees_x_added_general,
+                        Utils.convertToRupeesWithSymobl(this, amount)
+                    )
+                }
+            }
         } else {
-            getString(R.string.a_convenience_fee_may_be_added_based_on_your_selected_payment_method)
+            if (showDefaultCardMessage) {
+                getString(R.string.a_convenience_fee_may_be_added_based_on_your_selected_card_network)
+            } else {
+                getString(R.string.a_convenience_fee_may_be_added_based_on_your_selected_payment_method)
+            }
         }
     }
 

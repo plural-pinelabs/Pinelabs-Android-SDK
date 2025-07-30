@@ -199,6 +199,8 @@ import com.plural_pinelabs.expresscheckoutsdk.common.Constants.YES_CORPORATE_TIT
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.YES_TITLE
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.ZOROASTRAIN_BANK_CODE
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.ZOROASTRAIN_TITLE
+import com.plural_pinelabs.expresscheckoutsdk.data.model.ConvenienceFeesData
+import com.plural_pinelabs.expresscheckoutsdk.data.model.ConvenienceFeesInfo
 import com.plural_pinelabs.expresscheckoutsdk.data.model.Issuer
 import com.plural_pinelabs.expresscheckoutsdk.data.model.Palette
 import com.plural_pinelabs.expresscheckoutsdk.data.model.PaymentMode
@@ -365,7 +367,7 @@ internal object Utils {
 
 
     fun formatToIndianNumbering(value: Double): String {
-        val formatter = DecimalFormat("##,##,###.00")
+        val formatter = DecimalFormat("##,##,##0.00")
         return formatter.format(value)
     }
 
@@ -1005,6 +1007,24 @@ internal object Utils {
 
         editText?.background = gradientDrawable
         viewGroup?.background = gradientDrawable
+    }
+
+    fun getConvenienceFeesRequest(selectedFees: ConvenienceFeesInfo): ConvenienceFeesData {
+        val convenienceFeesData = ConvenienceFeesData(
+            convenience_fees_amt_in_paise = selectedFees.convenienceFeesAmount?.amount ?: 0,
+            convenience_fees_fees_gst_amt_in_paise = selectedFees.convenienceFeesGSTAmount?.amount
+                ?: 0,
+            convenience_fees_fees_addition_amt_in_paise = selectedFees.convenienceFeesAdditionalAmount?.amount
+                ?: 0,
+            final_amt_in_paise = selectedFees.paymentAmount?.amount ?: 0,
+            transaction_amount = selectedFees.originalTxnAmount?.amount ?: 0,
+            convenience_fees_maximum_fee_amount = selectedFees.convenienceFeesMaximumFeeAmount?.amount
+                ?: 0,
+            convenience_fees_applicable_fee_amount = selectedFees.convenienceFeesApplicableFeeAmount?.amount
+                ?: 0,
+            currency = selectedFees.paymentAmount?.currency?:"INR"
+        )
+        return convenienceFeesData
     }
 
 

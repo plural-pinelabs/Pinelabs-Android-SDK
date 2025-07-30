@@ -49,6 +49,8 @@ import com.plural_pinelabs.expresscheckoutsdk.common.TenureSelectionViewModelFac
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils.customSorted
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils.markBestValueInPlace
+import com.plural_pinelabs.expresscheckoutsdk.data.model.Amount
+import com.plural_pinelabs.expresscheckoutsdk.data.model.ConvenienceFeesInfo
 import com.plural_pinelabs.expresscheckoutsdk.data.model.DeviceInfo
 import com.plural_pinelabs.expresscheckoutsdk.data.model.EMIPaymentModeData
 import com.plural_pinelabs.expresscheckoutsdk.data.model.EmiData
@@ -57,6 +59,7 @@ import com.plural_pinelabs.expresscheckoutsdk.data.model.Issuer
 import com.plural_pinelabs.expresscheckoutsdk.data.model.OfferDetails
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ProcessPaymentRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.model.Tenure
+import com.plural_pinelabs.expresscheckoutsdk.presentation.LandingActivity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -116,6 +119,7 @@ class TenureSelectionFragment : Fragment() {
         setEMIIssuer()
         setViews(view)
         showListOfTenure()
+        handleConvenienceFees(null)
     }
 
     private fun setEMIIssuer() {
@@ -202,7 +206,9 @@ class TenureSelectionFragment : Fragment() {
     private fun getTenureClickListener(): ItemClickListener<Tenure?> {
         return object : ItemClickListener<Tenure?> {
             override fun onItemClick(position: Int, item: Tenure?) {
+                handleConvenienceFees(item)
                 selectedTenure = item
+                ExpressSDKObject.setSelectedTenure(selectedTenure)
                 emiPayingInMonthsTv.text =
                     String.format(
                         getString(R.string.paying_in_emi_of_x_months),
@@ -594,6 +600,58 @@ class TenureSelectionFragment : Fragment() {
                 // TODO do nothing
             }
         }
+    }
+
+
+    private fun handleConvenienceFees(tenure: Tenure?) {
+        val convenienceFeeBreakdown = tenure?.convenience_fee_breakdown
+        if (convenienceFeeBreakdown == null) {
+            (requireActivity() as LandingActivity).showHideConvenienceFessMessage(false)
+            return
+        }
+        val convenienceFeesInfo = ConvenienceFeesInfo(
+            paymentAmount = Amount(
+                currency = tenure.loan_amount?.currency ?: "INR",
+                amount = tenure.loan_amount?.value ?: 0,
+                value = 0
+            ),
+            convenienceFeesGSTAmount = Amount(
+                currency = convenienceFeeBreakdown.tax_amount?.currency ?: "INR",
+                amount = convenienceFeeBreakdown.tax_amount?.value ?: 0,
+                value = 0
+            ),
+
+            convenienceFeesAmount = Amount(
+                currency = convenienceFeeBreakdown.fee_amount?.currency ?: "INR",
+                amount = convenienceFeeBreakdown.fee_amount?.value ?: 0,
+                value = 0
+            ),
+            convenienceFeesApplicableFeeAmount = Amount(
+                currency = convenienceFeeBreakdown.applicable_fee_amount?.currency ?: "INR",
+                amount = convenienceFeeBreakdown.applicable_fee_amount?.value ?: 0,
+                value = 0
+            ),
+            convenienceFeesMaximumFeeAmount = Amount(
+                currency = convenienceFeeBreakdown.maximum_fee_amount?.currency ?: "INR",
+                amount = convenienceFeeBreakdown.maximum_fee_amount?.value ?: 0,
+                value = 0
+            ),
+            originalTxnAmount = Amount(
+                currency = convenienceFeeBreakdown.fee_calculated_on_amount?.currency ?: "INR",
+                amount = convenienceFeeBreakdown.fee_calculated_on_amount?.value ?: 0,
+                value = 0
+            ),
+            convenienceFeesAdditionalAmount = Amount(
+                currency = convenienceFeeBreakdown.additional_fee_amount?.currency ?: "INR",
+                amount = convenienceFeeBreakdown.additional_fee_amount?.value ?: 0,
+                value = 0
+            ),
+        )
+        viewModel.selectedConvenienceFee = convenienceFeesInfo
+        (requireActivity() as LandingActivity).showHideConvenienceFessMessage(
+            true,
+            viewModel.selectedConvenienceFee
+        )
     }
 
 }
