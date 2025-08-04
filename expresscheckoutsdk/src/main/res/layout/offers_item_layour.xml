@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    android:background="@drawable/ic_offer_bg">
+
+
+    <ImageView
+        android:id="@+id/emi_tag"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:src="@drawable/emi_offer_tag"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="12dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/emi_tag">
+
+
+        <ImageView
+            android:id="@+id/logo"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:background="@drawable/input_field_border"
+            android:importantForAccessibility="no"
+            android:padding="6dp"
+            android:src="@drawable/ic_generic"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/offer_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="6dp"
+            android:fontFamily="sans-serif-medium"
+            android:textColor="@color/black_text_80"
+            android:textFontWeight="700"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toEndOf="@id/logo"
+            app:layout_constraintTop_toTopOf="@id/logo"
+            tools:text="Redeem points on HDFC credit card" />
+
+
+        <TextView
+            android:id="@+id/offers_subtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="4dp"
+            android:fontFamily="sans-serif"
+            android:textColor="@color/black_text_50"
+            android:textFontWeight="500"
+            android:textSize="12sp"
+            app:layout_constraintStart_toEndOf="@id/logo"
+            app:layout_constraintTop_toBottomOf="@id/offer_label"
+            tools:text="Redeem points on HDFC credit card" />
+
+        <View
+            android:id="@+id/dashed_line"
+            android:layout_width="match_parent"
+            android:layout_height="3dp"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/dashed_line"
+            app:layout_constraintTop_toBottomOf="@id/offers_subtitle" />
+
+
+        <TextView
+            android:id="@+id/saving_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:layout_marginEnd="12dp"
+            android:background="@drawable/saving_green_bg"
+            android:ellipsize="end"
+            android:fontFamily="sans-serif"
+            android:gravity="start"
+            android:maxLines="1"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="5dp"
+            android:text="Demo text"
+            android:textColor="@color/green_00722F"
+            android:textFontWeight="700"
+            android:textStyle="bold"
+            app:flow_horizontalAlign="start"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/dashed_line" />
+
+
+        <TextView
+            android:id="@+id/avail_offer_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:background="@drawable/rounded_address_background"
+            android:drawableEnd="@drawable/ic_chevron_white"
+            android:drawablePadding="8dp"
+            android:drawableTint="@color/black_text_80"
+            android:fontFamily="sans-serif-medium"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="8dp"
+            android:text="Avail Offer"
+            android:textColor="@color/black_text_80"
+            android:textFontWeight="600"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/dashed_line" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

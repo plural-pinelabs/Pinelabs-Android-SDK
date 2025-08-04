@@ -19,7 +19,7 @@
     <string name="verify">Verify</string>
     <string name="add_delivery_address">Add delivery address</string>
     <string name="contact_and_delivery_details">Contact and delivery details</string>
-    <string name="save_up_to">Save Up to</string>
+    <string name="save_up_to">Save Up to %s</string>
     <string name="select_a_payment_option">Select a payment option</string>
     <string name="credit_debit_label">Cards</string>
     <string name="net_banking_label">Netbanking</string>
@@ -199,5 +199,9 @@
     <string name="emi_interest">EMI Interest</string>
     <string name="total_emi_cost">Total EMI Cost</string>
     <string name="discount">Discount</string>
+    <string name="coupons_offers">Coupons &amp;Offers</string>
+    <string name="maximize_your_savings_with_exclusive_offers">Maximize your savings with exclusive offers!</string>
+    <string name="instant_discount_on_full_payment">Instant discount on full payment</string>
+    <string name="applicable_on_emitenurelist_emi_tenures">Applicable on %s EMI tenures</string>
 
 </resources>

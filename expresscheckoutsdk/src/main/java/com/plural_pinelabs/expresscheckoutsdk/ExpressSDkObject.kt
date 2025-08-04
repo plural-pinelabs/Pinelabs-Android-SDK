@@ -3,6 +3,7 @@ package com.plural_pinelabs.expresscheckoutsdk
 import android.content.Context
 import com.plural_pinelabs.expresscheckoutsdk.data.model.EMIPaymentModeData
 import com.plural_pinelabs.expresscheckoutsdk.data.model.FetchResponseDTO
+import com.plural_pinelabs.expresscheckoutsdk.data.model.OfferDetail
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ProcessPaymentResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.Tenure
 import java.util.concurrent.atomic.AtomicReference
@@ -20,6 +21,7 @@ internal data class SDKObject(
     var convenienceFee: Int? = null,
     var convenienceFeeGst: Int? = null,
     var selectedTenure: Tenure? = null,
+    var selectedOfferDetail : OfferDetail? = null
 )
 
 internal object ExpressSDKObject {
@@ -133,6 +135,14 @@ internal object ExpressSDKObject {
 
     fun getSelectedTenure(): Tenure? {
         return getSDKObject()?.selectedTenure
+    }
+
+    fun getSelectedOfferDetail(): OfferDetail? {
+        return getSDKObject()?.selectedOfferDetail
+    }
+
+    fun setSelectedOfferDetail(offerDetail: OfferDetail?) {
+        getSDKObject()?.selectedOfferDetail = offerDetail
     }
 }
 

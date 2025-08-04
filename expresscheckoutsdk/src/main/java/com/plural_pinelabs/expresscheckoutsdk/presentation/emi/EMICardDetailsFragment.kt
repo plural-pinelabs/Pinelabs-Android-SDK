@@ -34,6 +34,8 @@ import com.plural_pinelabs.expresscheckoutsdk.common.Constants.BROWSER_ACCEPT_AL
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.BROWSER_USER_AGENT_ANDROID
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.ERROR_KEY
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.ERROR_MESSAGE_KEY
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.LOW_COST_EMI
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.NO_COST_EMI
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.TENURE_ID
 import com.plural_pinelabs.expresscheckoutsdk.common.NetworkHelper
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils
@@ -72,6 +74,7 @@ class EMICardDetailsFragment : Fragment() {
     private lateinit var issuerTitleTv: TextView
     private lateinit var emiPerMonthAmount: TextView
     private lateinit var emiForXMonthTv: TextView
+    private lateinit var emiTypeText: TextView
 
     private var binData: CardBinMetaDataResponse? = null
     private var cardNumber: String = ""
@@ -132,6 +135,16 @@ class EMICardDetailsFragment : Fragment() {
                 selectedTenure = it1.tenures.find { it.tenure_id == tenureId }
             }
         }
+
+        if (ExpressSDKObject.getSelectedOfferDetail() != null && issuerId == null) {
+            val offerDetail = ExpressSDKObject.getSelectedOfferDetail()
+            issuer = offerDetail?.issuer
+            issuer?.let { it1 ->
+                tenureId = "7"
+                selectedTenure = it1.tenures.find { it.tenure_id == tenureId }
+            }
+
+        }
     }
 
     private fun setupViews(view: View) {
@@ -143,6 +156,7 @@ class EMICardDetailsFragment : Fragment() {
         cardHolderErrorText = view.findViewById(R.id.error_message_card_holder_name)
         cardErrorText = view.findViewById(R.id.error_message_card_details)
         backBtn = view.findViewById(R.id.back_button)
+        emiTypeText = view.findViewById(R.id.emi_type_text)
 
         logo = view.findViewById(R.id.logo)
         issuerTitleTv = view.findViewById(R.id.issuer_title)
@@ -163,6 +177,21 @@ class EMICardDetailsFragment : Fragment() {
             findNavController().popBackStack()
         }
         setUpAmount()
+        if (selectedTenure?.emi_type.equals(NO_COST_EMI, true)) {
+            emiTypeText.visibility = View.VISIBLE
+            emiTypeText.text = getString(R.string.no_cost_emi)
+        } else if (selectedTenure?.emi_type.equals(LOW_COST_EMI, true)) {
+            emiTypeText.visibility = View.VISIBLE
+            emiTypeText.text = getString(R.string.low_interest)
+        } else {
+            emiTypeText.visibility = View.GONE
+        }
+        if (tenureId == "7") {
+            emiForXMonthTv.visibility = View.GONE
+            emiTypeText.visibility = View.GONE
+            emiPerMonthAmount.visibility = View.GONE
+
+        }
     }
 
     private fun loadBankLogo() {
@@ -280,6 +309,8 @@ class EMICardDetailsFragment : Fragment() {
                             if (it.data.code.equals("ELIGIBLE", true)) {
                                 // If the offer is eligible, proceed with payment
                                 //enable the payment button
+                                isCardValid = true
+                                hideCardDetailsError()
                             } else {
                                 // If not eligible, show error or handle accordingly
                                 showCardDetailsError("OfferEligibility")
@@ -303,18 +334,10 @@ class EMICardDetailsFragment : Fragment() {
                 } else if (cardNumber.length < 12) {
                     showCardDetailsError("CardNumber")
                 } else {
-                    val cardType = validateCardType(cardNumber)
-                    if (cardType.isNullOrEmpty()) {
-                        showCardDetailsError("CardNumber")
-                    } else {
-                        if (validCard(cardNumber)) {
-                            isCardValid = true
-                            hideCardDetailsError()
-                            createValidateOfferRequest()
-                        } else {
-                            showCardDetailsError("CardNumber")
-                        }
-                    }
+                    isCardValid = true
+                    hideCardDetailsError()
+                    createValidateOfferRequest()
+                    showCardDetailsError("CardNumber")
                 }
             }
         }

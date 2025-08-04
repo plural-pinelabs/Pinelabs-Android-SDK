@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.cardview.widget.CardView
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
@@ -18,6 +19,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.airbnb.lottie.LottieAnimationView
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.gson.Gson
+import com.google.gson.internal.LinkedTreeMap
 import com.plural_pinelabs.expresscheckoutsdk.ExpressSDKObject
 import com.plural_pinelabs.expresscheckoutsdk.R
 import com.plural_pinelabs.expresscheckoutsdk.common.BaseResult
@@ -29,9 +32,11 @@ import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PAY_BY_POINTS_ID
 import com.plural_pinelabs.expresscheckoutsdk.common.ItemClickListener
 import com.plural_pinelabs.expresscheckoutsdk.common.NetworkHelper
 import com.plural_pinelabs.expresscheckoutsdk.common.PaymentModes
+import com.plural_pinelabs.expresscheckoutsdk.common.Utils
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils.showProcessPaymentDialog
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CardTokenData
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CustomerData
+import com.plural_pinelabs.expresscheckoutsdk.data.model.EMIPaymentModeData
 import com.plural_pinelabs.expresscheckoutsdk.data.model.Extra
 import com.plural_pinelabs.expresscheckoutsdk.data.model.PaymentMode
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ProcessPaymentRequest
@@ -39,6 +44,7 @@ import com.plural_pinelabs.expresscheckoutsdk.data.model.ProcessPaymentResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.SavedCardTokens
 import com.plural_pinelabs.expresscheckoutsdk.presentation.LandingActivity
 import com.plural_pinelabs.expresscheckoutsdk.presentation.card.CardFragmentViewModel
+import com.plural_pinelabs.expresscheckoutsdk.presentation.offers.OfferSummaryDialog
 import com.plural_pinelabs.expresscheckoutsdk.presentation.utils.DividerItemDecoration
 import kotlinx.coroutines.launch
 
@@ -51,6 +57,10 @@ class PaymentModeFragment : Fragment() {
     private lateinit var addNewCardText: TextView
     private lateinit var savedCardView: CardView
     private var bottomSheetDialog: BottomSheetDialog? = null
+    private var offerViewLayout: ConstraintLayout? = null
+    private var saveUptoTextView: TextView? = null
+    private lateinit var viewOffersBtn: TextView
+    private var bottomVPASheetDialog: BottomSheetDialog? = null
 
 
     override fun onCreateView(
@@ -73,11 +83,18 @@ class PaymentModeFragment : Fragment() {
         logoAnimation = view.findViewById(R.id.offers_gif)
         addNewCardText = view.findViewById(R.id.add_new_card_btn)
         savedCardView = view.findViewById(R.id.saved_cards_card_view)
+        offerViewLayout = view.findViewById(R.id.offers_parent_layout)
+        saveUptoTextView = view.findViewById(R.id.save_upto_text)
+        viewOffersBtn = view.findViewById(R.id.view_offers_btn)
         initOffersAnimation()
         setPaymentMode()
         setSavedCardsView()
+        getMaxSavings()
         addNewCardText.setOnClickListener {
             findNavController().navigate(R.id.action_paymentModeFragment_to_cardFragment)
+        }
+        viewOffersBtn.setOnClickListener {
+            showOffers()
         }
         (requireActivity() as LandingActivity).showHideConvenienceFessMessage(ExpressSDKObject.getFetchData()?.convenienceFeesInfo?.isEmpty() == false)
     }
@@ -274,4 +291,45 @@ class PaymentModeFragment : Fragment() {
             }
         }
     }
+
+    private fun getMaxSavings() {
+        processDataForEMI()
+        val emiPaymentData = ExpressSDKObject.getEMIPaymentModeData()
+        if (emiPaymentData == null) {
+            //Hide the offer views
+            offerViewLayout?.visibility = View.GONE
+            return
+        }
+        val maxSavings = emiPaymentData.offerDetails?.firstOrNull()?.maxSaving
+        saveUptoTextView?.text = getString(
+            R.string.save_up_to,
+            Utils.convertToRupeesWithSymobl(requireContext(), maxSavings ?: 0)
+        )
+
+    }
+
+    private fun processDataForEMI() {
+        val data = ExpressSDKObject.getFetchData()
+        data?.paymentModes?.filter { paymentMode -> paymentMode.paymentModeId == PaymentModes.EMI.paymentModeID }
+            ?.forEach { paymentMode ->
+                when (val pm = paymentMode.paymentModeData) {
+                    is LinkedTreeMap<*, *> -> {
+                        val emiPaymentModeData = convertMapToJsonObject(pm)
+                        ExpressSDKObject.setEMIPaymentModeData(emiPaymentModeData)
+                    }
+                }
+            }
+    }
+
+    private fun convertMapToJsonObject(yourMap: Map<*, *>): EMIPaymentModeData {
+        val gson = Gson().toJsonTree(yourMap).asJsonObject
+        return Gson().fromJson(gson.toString(), EMIPaymentModeData::class.java)
+    }
+
+    private fun showOffers() {
+        val topFragment = OfferSummaryDialog()
+        topFragment.show(requireActivity().supportFragmentManager, "TopSheetDialogFragment")
+
+    }
+
 }

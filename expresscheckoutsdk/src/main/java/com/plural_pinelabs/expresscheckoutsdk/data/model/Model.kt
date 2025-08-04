@@ -732,8 +732,10 @@ data class OfferDetail(
     val type: String,
     val tenureOffers: List<TenureOffer>,
     val maxSaving: Int,
-    val issuer: Issuer
-) : Parcelable
+    val issuer: Issuer,
+    var isInstantSaving: Boolean = false,
+    var offerTitle: String? = null,
+    ) : Parcelable
 
 
 @Parcelize
@@ -763,7 +765,7 @@ data class TenureOffer(
     val discountAmount: Int,
     val cashbackAmount: Int,
     val offerLabel: String,
-    val FullTenure: Tenure
+    val fullTenure: Tenure,
 ) : Parcelable
 
 @Parcelize

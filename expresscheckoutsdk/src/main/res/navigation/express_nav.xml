@@ -80,6 +80,12 @@
         <action
             android:id="@+id/action_paymentModeFragment_to_successFragment"
             app:destination="@id/successFragment" />
+        <action
+            android:id="@+id/action_paymentModeFragment_to_tenureSelectionFragment"
+            app:destination="@id/tenureSelectionFragment" />
+        <action
+            android:id="@+id/action_paymentModeFragment_to_EMICardDetailsFragment"
+            app:destination="@id/EMICardDetailsFragment" />
     </fragment>
     <fragment
         android:id="@+id/cardFragment"
@@ -285,5 +291,16 @@
         app:destination="@id/retryFragment"
         app:popUpTo="@id/express_nav"
         app:popUpToInclusive="true" />
+    <dialog
+        android:id="@+id/offerSummaryDialog"
+        android:name="com.plural_pinelabs.expresscheckoutsdk.presentation.offers.OfferSummaryDialog"
+        android:label="OfferSummaryDialog" >
+        <action
+            android:id="@+id/action_offerSummaryDialog_to_EMICardDetailsFragment"
+            app:destination="@id/EMICardDetailsFragment" />
+        <action
+            android:id="@+id/action_offerSummaryDialog_to_tenureSelectionFragment"
+            app:destination="@id/tenureSelectionFragment" />
+    </dialog>
 
 </navigation>

@@ -20,14 +20,6 @@ import com.plural_pinelabs.expresscheckoutsdk.data.model.Tenure
 
 class TopSheetDialogFragment : DialogFragment() {
 
-    companion object {
-        private const val ARG_ORDER = "arg_order"
-    }
-
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val dialog = Dialog(requireContext())
@@ -165,5 +157,6 @@ class TopSheetDialogFragment : DialogFragment() {
         } else
             return getString(R.string.cashback)
     }
+
 }
 

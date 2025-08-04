@@ -51,6 +51,7 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
+            android:id="@+id/offers_parent_layout"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:background="@drawable/offers_twin_background"
@@ -74,6 +75,7 @@
                 app:lottie_repeatCount="@integer/material_motion_duration_long_2" />
 
             <TextView
+                android:id="@+id/save_upto_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="12dp"
@@ -88,6 +90,7 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
+                android:id="@+id/view_offers_btn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="top"
