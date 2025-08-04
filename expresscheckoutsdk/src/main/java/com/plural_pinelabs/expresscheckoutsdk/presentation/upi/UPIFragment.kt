@@ -3,6 +3,7 @@ package com.plural_pinelabs.expresscheckoutsdk.presentation.upi
 import UpiAppsAdapter
 import android.content.Intent
 import android.content.pm.ResolveInfo
+import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -173,17 +174,31 @@ class UPIFragment : Fragment() {
         // return listOfUPIPackage // only for testing purposes
     }
 
+    private fun isAppUpiReady(packageName: String): Boolean {
+        var appUpiReady = false
+        val upiIntent = Intent(Intent.ACTION_VIEW, Uri.parse(UPI_INTENT_PREFIX))
+        val pm = requireActivity().packageManager
+        val upiActivities: List<ResolveInfo> = pm.queryIntentActivities(upiIntent, 0)
+        for (a in upiActivities) {
+            if (a.activityInfo.packageName == packageName) appUpiReady = true
+        }
+        return appUpiReady
+    }
+
     private fun getListOfActiveUPIApps(listOfUPIPackage: List<String>): List<String> {
         try { //Keeping a try-catch block to avoid crashes if no UPI apps are installed
-            val upiIntent = Intent(Intent.ACTION_VIEW, UPI_INTENT_PREFIX.toUri())
             val finalUpiAppsList = mutableListOf<String>()
+            val upiIntent = Intent(Intent.ACTION_VIEW, Uri.parse(UPI_INTENT_PREFIX))
             val pm = requireActivity().packageManager
             val upiActivities: List<ResolveInfo> = pm.queryIntentActivities(upiIntent, 0)
             val packageNamesOfAllInstalledApps = mutableListOf<String>()
-            for (app in upiActivities) {
-                packageNamesOfAllInstalledApps.add(app.activityInfo.packageName.lowercase())
-            }
+//            for (app in upiActivities) {
+//                packageNamesOfAllInstalledApps.add(app.activityInfo.packageName.lowercase())
+//            }
             for (app in listOfUPIPackage) {
+                if (isAppUpiReady(app.lowercase())) {
+                    packageNamesOfAllInstalledApps.add(app.lowercase())
+                }
                 if (packageNamesOfAllInstalledApps.contains(app.lowercase())) {
                     finalUpiAppsList.add(app)
                 }

@@ -72,6 +72,7 @@ class PaymentModeFragment : Fragment() {
             this,
             CardFragmentViewModelFactory(NetworkHelper(requireContext()))
         )[CardFragmentViewModel::class.java]
+        ExpressSDKObject.setSelectedOfferDetail(null)
         return inflater.inflate(R.layout.fragment_payment_mode, container, false)
     }
 

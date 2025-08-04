@@ -178,7 +178,7 @@
     <string name="verify_continue">Verify &amp; Continue</string>
     <string name="redirecting_to_website_in_x_sec">Redirecting to website in %s sec</string>
     <string name="close">Close</string>
-    <string name="qty_x">Qty:x</string>
+    <string name="qty_x">Qty:%s</string>
     <string name="add_new">+ Add new</string>
     <string name="select_delivery_address">Select delivery address</string>
     <string name="enter_cvv_to_proceed_with_payment">Enter CVV to proceed with payment</string>

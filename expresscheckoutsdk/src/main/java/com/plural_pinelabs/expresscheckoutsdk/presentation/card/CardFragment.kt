@@ -497,18 +497,34 @@ class CardFragment : Fragment() {
             }
 
             override fun afterTextChanged(s: Editable?) {
-                if (isEditing) return
+
+
+                if (isEditing || s == null) return
                 isEditing = true
 
-                val input = s.toString().replace(Regex("[^\\d]"), "")
-                val formattedInput = when {
-                    input.length <= 2 -> input
-                    input.length <= 4 -> "${input.substring(0, 2)}/${input.substring(2)}"
-                    else -> "${input.substring(0, 2)}/${input.substring(2, 4)}"
+                val originalText = s.toString()
+                val originalCursorPosition = etExpiry.selectionStart
+
+                val digitsOnly = originalText.replace(Regex("[^\\d]"), "")
+                val formatted = when {
+                    digitsOnly.length <= 2 -> digitsOnly
+                    digitsOnly.length <= 4 -> "${digitsOnly.substring(0, 2)}/${digitsOnly.substring(2)}"
+                    else -> "${digitsOnly.substring(0, 2)}/${digitsOnly.substring(2, 4)}"
                 }
 
-                etExpiry.setText(formattedInput)
-                etExpiry.setSelection(formattedInput.length)
+                // Only update if formatting changed
+                if (formatted != originalText) {
+                    etExpiry.setText(formatted)
+
+                    // Calculate new cursor position
+                    val newCursorPosition = when {
+                        originalCursorPosition <= 2 -> originalCursorPosition
+                        originalCursorPosition == 3 -> originalCursorPosition + 1 // account for "/"
+                        else -> originalCursorPosition + (formatted.length - originalText.length)
+                    }
+
+                    etExpiry.setSelection(newCursorPosition.coerceAtMost(formatted.length))
+                }
 
                 isEditing = false
             }

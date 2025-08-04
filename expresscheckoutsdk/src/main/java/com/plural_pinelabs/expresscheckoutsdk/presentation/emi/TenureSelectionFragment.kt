@@ -98,6 +98,7 @@ class TenureSelectionFragment : Fragment() {
     private lateinit var parcelFileDescriptor: ParcelFileDescriptor
 
     private lateinit var viewModel: TenureSelectionViewModel
+    private var isFromOfferDetails: Boolean = false
 
 
     override fun onCreateView(
@@ -124,7 +125,13 @@ class TenureSelectionFragment : Fragment() {
 
     private fun setEMIIssuer() {
         emiPaymentModeData = ExpressSDKObject.getEMIPaymentModeData()
-        selectedIssuerId = arguments?.getString(TENURE_ID)
+        isFromOfferDetails = ExpressSDKObject.getSelectedOfferDetail() != null
+        selectedIssuerId = arguments?.getString(ISSUE_ID)
+        if (isFromOfferDetails) {
+            // If coming from offer details, get the issuer from selected offer detail
+            val selectedOfferDetail = ExpressSDKObject.getSelectedOfferDetail()
+            selectedIssuerId = selectedOfferDetail?.issuerId ?: selectedIssuerId
+        }
         selectedIssuerId?.let {
             emiPaymentModeData?.issuers?.filter {
                 it.id == selectedIssuerId
@@ -193,9 +200,22 @@ class TenureSelectionFragment : Fragment() {
                 findNavController().navigate(R.id.action_tenureSelectionFragment_to_failureFragment)
                 return
             }
-            val filteredList = it.filter { tenure ->
-                tenure.tenure_value != 0 || !tenure.name.contains("No EMI", true)
-            }.customSorted()
+            val filteredList =
+                if (isFromOfferDetails) {
+                    val tenureIds =
+                        ExpressSDKObject.getSelectedOfferDetail()?.tenureOffers?.map { it.tenureId }
+                    it.filter { tenure ->
+                        tenureIds?.contains(tenure.tenure_id) == true && (tenure.tenure_value != 0 || !tenure.name.contains(
+                            "No EMI",
+                            true
+                        ))
+                    }.customSorted()
+
+                } else {
+                    it.filter { tenure ->
+                        tenure.tenure_value != 0 || !tenure.name.contains("No EMI", true)
+                    }.customSorted()
+                }
             val adapter = EMITenureListAdapter(
                 requireContext(), filteredList.markBestValueInPlace(), getTenureClickListener()
             )

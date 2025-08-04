@@ -16,6 +16,7 @@ import com.google.gson.internal.LinkedTreeMap
 import com.plural_pinelabs.expresscheckoutsdk.ExpressSDKObject
 import com.plural_pinelabs.expresscheckoutsdk.R
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.ISSUE_ID
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.TENURE_ID
 import com.plural_pinelabs.expresscheckoutsdk.common.ItemClickListener
 import com.plural_pinelabs.expresscheckoutsdk.common.PaymentModes
@@ -163,7 +164,7 @@ class EMIFragment : Fragment() {
             override fun onItemClick(position: Int, item: Issuer) {
                 // Handle item click
                 val bundle = Bundle().apply {
-                    putString(TENURE_ID, item.id)
+                    putString(ISSUE_ID, item.id)
                 }
                 findNavController().navigate(
                     R.id.action_EMIFragment_to_tenureSelectionFragment,

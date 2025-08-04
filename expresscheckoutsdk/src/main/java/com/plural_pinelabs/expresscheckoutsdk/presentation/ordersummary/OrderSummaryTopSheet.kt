@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewGroup.LayoutParams
 import android.view.Window
 import android.widget.TextView
 import androidx.core.graphics.drawable.toDrawable
@@ -25,10 +26,20 @@ class TopSheetDialogFragment : DialogFragment() {
         val dialog = Dialog(requireContext())
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setContentView(R.layout.order_summary_layout)
-
+        dialog.window?.peekDecorView()
         dialog.window?.apply {
-            setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+            val height = resources.displayMetrics.heightPixels
+            val finalHeight = if ((ExpressSDKObject.getFetchData()?.cartDetails?.cart_items?.size
+                    ?: 0) > 5
+            ) {
+                (height * 0.75).toInt()
+            } else {
+                LayoutParams.WRAP_CONTENT
+            }
+            val desiredHeight = (height * 0.75).toInt()
+            setLayout(ViewGroup.LayoutParams.MATCH_PARENT, finalHeight)
             setGravity(Gravity.TOP)
+
             setBackgroundDrawable(Color.WHITE.toDrawable())
         }
 

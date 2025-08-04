@@ -33,6 +33,7 @@ class RetryFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
+        ExpressSDKObject.setSelectedOfferDetail(null)
         return inflater.inflate(R.layout.fragment_retry, container, false)
     }
 
