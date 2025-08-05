@@ -1,4 +1,4 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -20,9 +20,9 @@
             android:id="@+id/back_button"
             android:layout_width="32dp"
             android:layout_height="32dp"
+            android:clickable="true"
             android:importantForAccessibility="no"
             android:padding="8dp"
-            android:clickable="true"
             android:src="@drawable/ic_back_arrow"
             app:tint="@color/black_text_80" />
 
@@ -140,9 +140,12 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <ScrollView
+        android:id="@+id/card_details_scroll_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="16dp">
+        android:layout_height="0dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintBottom_toTopOf="@id/footer"
+        app:layout_constraintTop_toBottomOf="@id/selected_emi_issuer">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -284,18 +287,88 @@
                 android:textFontWeight="500"
                 android:visibility="gone" />
 
-            <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/continue_btn"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:background="@drawable/primary_button_background"
-                android:gravity="center"
-                android:minHeight="48dp"
-                android:text="@string/continue_text"
-                android:textColor="@color/white" />
+            <!--            <androidx.appcompat.widget.AppCompatButton-->
+            <!--                android:id="@+id/continue_btn"-->
+            <!--                android:layout_width="match_parent"-->
+            <!--                android:layout_height="wrap_content"-->
+            <!--                android:layout_marginTop="24dp"-->
+            <!--                android:background="@drawable/primary_button_background"-->
+            <!--                android:gravity="center"-->
+            <!--                android:minHeight="48dp"-->
+            <!--                android:text="@string/continue_text"-->
+            <!--                android:textColor="@color/white" />-->
         </LinearLayout>
     </ScrollView>
 
+    <LinearLayout
+        android:id="@+id/footer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:background="@color/white"
+        android:orientation="vertical"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent">
 
-</LinearLayout>
+        <TextView
+            android:id="@+id/save_info_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:background="@drawable/confetti_saving_bg"
+            android:drawableStart="@drawable/ic_success_offer_saving"
+            android:gravity="center"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="8dp"
+            android:text="@string/you_re_saving_x_on_this_order" />
+
+        <LinearLayout
+            android:id="@+id/paying_info_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="16dp">
+
+            <TextView
+                android:id="@+id/emi_info_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:fontFamily="sans-serif"
+                android:fontWeight="500"
+                android:text="@string/paying_in_emi_of_x_months"
+                android:textColor="@color/black_text_50"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/emi_details_cta"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:fontFamily="sans-serif-medium"
+                android:fontWeight="600"
+                android:gravity="center_horizontal"
+                android:text="@string/emi_details"
+                android:textColor="@color/black_text_80"
+                android:textSize="14sp" />
+
+
+        </LinearLayout>
+
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/continue_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="12dp"
+            android:background="@drawable/primary_button_background"
+            android:gravity="center"
+            android:minHeight="48dp"
+            android:text="@string/continue_text"
+            android:textColor="@color/white" />
+
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

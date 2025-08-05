@@ -82,6 +82,7 @@ class TenureSelectionFragment : Fragment() {
     private lateinit var continueBtn: Button
     private lateinit var footerLayout: LinearLayout
     private lateinit var saveInfoText: TextView
+    private lateinit var viewEMIDetails: TextView
 
     private var selectedIssuerId: String? = null
     private var issuer: Issuer? = null
@@ -152,6 +153,7 @@ class TenureSelectionFragment : Fragment() {
         continueBtn = view.findViewById(R.id.continue_btn)
         footerLayout = view.findViewById(R.id.footer)
         saveInfoText = view.findViewById(R.id.save_info_text)
+        viewEMIDetails = view.findViewById(R.id.emi_details_cta)
         loadBankLogo()
         continueBtn.setOnClickListener {
             handleContinueButtonClick()
@@ -159,6 +161,7 @@ class TenureSelectionFragment : Fragment() {
         goBackButton.setOnClickListener {
             findNavController().popBackStack()
         }
+
 
         selectedBanKTitle.text = Utils.getTitleForEMI(requireContext(), issuer)
     }
@@ -217,7 +220,7 @@ class TenureSelectionFragment : Fragment() {
                     }.customSorted()
                 }
             val adapter = EMITenureListAdapter(
-                requireContext(), filteredList.markBestValueInPlace(), getTenureClickListener()
+                requireContext(), filteredList.markBestValueInPlace(selectedIssuerId), getTenureClickListener()
             )
             tenureListRecyclerView.adapter = adapter
         }

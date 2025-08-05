@@ -31,6 +31,7 @@ import com.clevertap.android.sdk.CleverTapAPI
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.plural_pinelabs.expresscheckoutsdk.BuildConfig
+import com.plural_pinelabs.expresscheckoutsdk.ExpressSDKObject
 import com.plural_pinelabs.expresscheckoutsdk.R
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.ALLAHABAD_BANK_CODE
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.ALLAHABAD_TITLE
@@ -129,7 +130,6 @@ import com.plural_pinelabs.expresscheckoutsdk.common.Constants.LAXMI_VILAS_BANK_
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.LAXMI_VILAS_BANK_RETAIL_CODE
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.LAXMI_VILAS_RETAIL_TITLE
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.LAXMI_VILAS_TITLE
-import com.plural_pinelabs.expresscheckoutsdk.common.Constants.LOW_COST_EMI
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.MAHARASHTRA_BANK_CODE
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.MAHARASHTRA_TITLE
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.MEHSANA_URBAN_BANK_CODE
@@ -137,7 +137,6 @@ import com.plural_pinelabs.expresscheckoutsdk.common.Constants.MEHSANA_URBAN_TIT
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.MOBILE_REGEX
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.NORTH_EAST_BANK_CODE
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.NORTH_EAST_TITLE
-import com.plural_pinelabs.expresscheckoutsdk.common.Constants.NO_COST_EMI
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.ORIENTAL_BANK_CODE
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.ORIENTAL_TITLE
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.OS
@@ -912,40 +911,38 @@ internal object Utils {
         )
     }
 
-    fun getMaxDiscountTenurePerIssuer(issuers: List<Issuer>): HashMap<String, Tenure> {
-        val result = HashMap<String, Tenure>()
-
+    fun getMaxDiscountTenurePerIssuer(issuers: List<Issuer>) {
         for (issuer in issuers) {
             val maxTenure = issuer.tenures
                 .filter { (it.total_discount_amount?.value != null || it.total_subvention_amount?.value != null) && (it.tenure_id != "7") }
                 .maxByOrNull {
-                    it.total_discount_amount?.value ?: it.total_subvention_amount?.value ?: 0
+                    (it.total_discount_amount?.value ?:0)+( it.total_subvention_amount?.value ?: 0)
                 }
-
-            if (maxTenure != null) {
-                result[issuer.id] = maxTenure
-            }
+            issuer.maxDiscountAmount = ((maxTenure?.total_discount_amount?.value
+                ?: 0) + (maxTenure?.total_subvention_amount?.value ?: 0)) ?: 0
         }
-
-        return result
     }
 
 
-    fun List<Tenure>.markBestValueInPlace(): List<Tenure> {
-        this
-            .groupBy { it.emi_type }
-            .forEach { (_, tenures) ->
-                val bestTenure = tenures.maxByOrNull { tenure ->
-                    (tenure.total_discount_amount?.value ?: tenure.total_subvention_amount?.value
-                    ?: 0.0).toDouble()
-                }
-                if (bestTenure?.emi_type.equals(NO_COST_EMI, true)) {
-                    bestTenure?.isRecommended = true
-                } else if (bestTenure?.emi_type.equals(LOW_COST_EMI, true)) {
-                    bestTenure?.isBestValue = true
-                }
-            }
+    fun List<Tenure>.markBestValueInPlace(selectedIssuerId: String?): List<Tenure> {
+        val offerDetails = ExpressSDKObject.getEMIPaymentModeData()?.offerDetails
+        val offerIssuer = offerDetails?.find { it.issuerId == selectedIssuerId }
+        val tenureOffers = offerIssuer?.tenureOffers
+
+        this.forEach { tenure ->
+            tenure.isRecommended = false
+            tenure.isBestValue = false
+        }
+
+        tenureOffers?.getOrNull(0)?.let { recommendedTenureId ->
+            this.find { it.tenure_id == recommendedTenureId.tenureId }?.isRecommended = true
+        }
+
+        tenureOffers?.getOrNull(1)?.let { bestValueTenureId ->
+            this.find { it.tenure_id == bestValueTenureId.tenureId }?.isBestValue = true
+        }
         return this
+
     }
 
     fun handleCTAEnableDisable(context: Context, isEnabled: Boolean, button: Button) {
@@ -1022,7 +1019,7 @@ internal object Utils {
                 ?: 0,
             convenience_fees_applicable_fee_amount = selectedFees.convenienceFeesApplicableFeeAmount?.amount
                 ?: 0,
-            currency = selectedFees.paymentAmount?.currency?:"INR"
+            currency = selectedFees.paymentAmount?.currency ?: "INR"
         )
         return convenienceFeesData
     }

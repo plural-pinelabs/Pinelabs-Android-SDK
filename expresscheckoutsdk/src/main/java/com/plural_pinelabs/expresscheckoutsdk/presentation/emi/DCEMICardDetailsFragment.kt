@@ -53,6 +53,7 @@ import com.plural_pinelabs.expresscheckoutsdk.data.model.ProcessPaymentRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ProcessPaymentResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.Tenure
 import com.plural_pinelabs.expresscheckoutsdk.presentation.card.CardFragmentViewModel
+import com.plural_pinelabs.expresscheckoutsdk.presentation.ordersummary.TopSheetDialogFragment
 import kotlinx.coroutines.launch
 import java.util.Locale
 
@@ -70,6 +71,8 @@ class DCEMICardDetailsFragment : Fragment() {
     private lateinit var emiForXMonthTv: TextView
     private lateinit var saveInfoText: TextView
     private lateinit var emiPayingTenureText: TextView
+    private lateinit var viewEMIDetails: TextView
+
 
     private var binData: CardBinMetaDataResponse? = null
     private var cardNumber: String = ""
@@ -144,6 +147,7 @@ class DCEMICardDetailsFragment : Fragment() {
         emiForXMonthTv = view.findViewById(R.id.for_x_month_tv)
         saveInfoText = view.findViewById(R.id.save_info_text)
         emiPayingTenureText = view.findViewById(R.id.emi_info_text)
+        viewEMIDetails = view.findViewById(R.id.emi_details_cta)
         loadBankLogo()
         issuerTitleTv.text = Utils.getTitleForEMI(requireContext(), issuer)
         emiPerMonthAmount.text =
@@ -171,6 +175,11 @@ class DCEMICardDetailsFragment : Fragment() {
 
         backBtn.setOnClickListener {
             findNavController().popBackStack()
+        }
+
+        viewEMIDetails.setOnClickListener {
+            val topFragment = TopSheetDialogFragment()
+            topFragment.show(requireActivity().supportFragmentManager, "TopSheetDialogFragment")
         }
         setUpAmount()
     }

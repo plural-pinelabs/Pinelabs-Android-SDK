@@ -162,7 +162,7 @@
     <string name="amount_emi_per_month">%s </string>
     <string name="amount_emi_per_month_label">/month</string>
     <string name="for_x_months">for %s months</string>
-    <string name="emi_details"><u>EMI Details</u></string>
+    <string name="emi_details"><u>View EMI Details</u></string>
     <string name="pay_emi_x_per_month">Pay %s /month</string>
     <string name="emi_details_key_fact_statement">EMI Details (Key Fact Statement)</string>
     <string name="english">English</string>

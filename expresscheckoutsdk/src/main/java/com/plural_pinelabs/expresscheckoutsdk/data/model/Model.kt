@@ -635,7 +635,8 @@ data class Issuer(
     val issuer_type: String,
     val priority: Int,
     val tenures: List<Tenure>,
-    val issuer_data: IssuerData? = null
+    val issuer_data: IssuerData? = null,
+    var maxDiscountAmount: Int? = null,
 ) : Parcelable
 
 @Parcelize

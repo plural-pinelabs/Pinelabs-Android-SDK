@@ -17,7 +17,6 @@ import com.plural_pinelabs.expresscheckoutsdk.ExpressSDKObject
 import com.plural_pinelabs.expresscheckoutsdk.R
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.ISSUE_ID
-import com.plural_pinelabs.expresscheckoutsdk.common.Constants.TENURE_ID
 import com.plural_pinelabs.expresscheckoutsdk.common.ItemClickListener
 import com.plural_pinelabs.expresscheckoutsdk.common.PaymentModes
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils
@@ -93,15 +92,15 @@ class EMIFragment : Fragment() {
     }
 
     private fun showEMIList(listOfCCBank: List<Issuer>) {
-        val maxTenureMap = Utils.getMaxDiscountTenurePerIssuer(listOfCCBank)
+        Utils.getMaxDiscountTenurePerIssuer(listOfCCBank)
+       val list =  listOfCCBank.sortedByDescending { it.maxDiscountAmount }
         val adapter = EMIBankRecyclerViewAdapter(
             requireContext(),
-            listOfCCBank,
+            list,
             getItemClickListener(),
             bankLogoMap,
             bankNameKeyList,
             banKTitleToCodeMap,
-            maxTenureMap
         )
         bankListRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         bankListRecyclerView.addItemDecoration(

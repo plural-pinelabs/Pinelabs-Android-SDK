@@ -18,7 +18,6 @@ import com.plural_pinelabs.expresscheckoutsdk.common.Constants.BASE_IMAGES
 import com.plural_pinelabs.expresscheckoutsdk.common.ItemClickListener
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils
 import com.plural_pinelabs.expresscheckoutsdk.data.model.Issuer
-import com.plural_pinelabs.expresscheckoutsdk.data.model.Tenure
 
 class EMIBankRecyclerViewAdapter(
     private val context: Context,
@@ -27,7 +26,6 @@ class EMIBankRecyclerViewAdapter(
     private val bankLogoMap: HashMap<String, String>,
     private val bankNameKeyList: List<String>,
     private val banKTitleToCodeMap: HashMap<String, String>,
-    private val maxTenureMap: HashMap<String, Tenure>
 ) : RecyclerView.Adapter<EMIBankRecyclerViewAdapter.ItemViewHolder>() {
 
 
@@ -51,12 +49,14 @@ class EMIBankRecyclerViewAdapter(
             val saveAmountTv: TextView = itemView.findViewById(R.id.saving_text_value)
 
 
-            val maxDiscount: String = maxTenureMap[item.id]?.let { tenure ->
-                val discount: Int = tenure.total_discount_amount?.value ?: 0
-                val subvention: Int = tenure.total_subvention_amount?.value ?: 0
-                val total = discount + subvention
-                Utils.convertToRupeesWithSymobl(itemView.context, total)
-            } ?: "error"
+            val maxDiscount = if ((item.maxDiscountAmount ?: 0) > 0) {
+                Utils.convertToRupeesWithSymobl(
+                    context,
+                    item.maxDiscountAmount ?: 0,
+                )
+            } else {
+                "error"
+            }
 
 
             saveLayout.visibility = View.GONE
