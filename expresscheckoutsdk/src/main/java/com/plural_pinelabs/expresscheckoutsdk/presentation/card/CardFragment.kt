@@ -42,6 +42,7 @@ import com.plural_pinelabs.expresscheckoutsdk.common.Utils.cardTypes
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils.showProcessPaymentDialog
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CardBinMetaDataResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CardData
+import com.plural_pinelabs.expresscheckoutsdk.data.model.CardMetaData
 import com.plural_pinelabs.expresscheckoutsdk.data.model.DeviceInfo
 import com.plural_pinelabs.expresscheckoutsdk.data.model.Extra
 import com.plural_pinelabs.expresscheckoutsdk.data.model.FetchResponseDTO
@@ -273,46 +274,7 @@ class CardFragment : Fragment() {
                                     it.card_payment_details[0].card_network
                                 )
                                 isNativeOTP = it.card_payment_details[0].is_native_otp_supported
-                                viewModel.selectedConvenienceFee =
-                                    viewModel.convenienceFeesInfo?.filter { fees ->
-                                        fees.networkType.equals(
-                                            it.card_payment_details[0].card_network,
-                                            true
-                                        )
-                                    }?.getOrNull(0)
-
-                                viewModel.selectedConvenienceFee = viewModel.convenienceFeesInfo
-                                    ?.filter { fees ->
-                                        fees.networkType.equals(
-                                            it.card_payment_details[0].card_network,
-                                            ignoreCase = true
-                                        ) ||
-                                                fees.networkType.equals(
-                                                    "DEFAULT",
-                                                    ignoreCase = true
-                                                )
-                                    }
-                                    ?.let { filteredFees ->
-                                        // Try to find exact cardType match
-                                        filteredFees.find { fee ->
-                                            fee.cardType.equals(
-                                                it.card_payment_details[0].card_type,
-                                                ignoreCase = true
-                                            )
-                                        } ?: filteredFees.find { fee ->
-                                            fee.cardType.equals("DEFAULT", ignoreCase = true)
-                                        }
-                                    }
-
-
-
-                                (requireActivity() as LandingActivity).showHideConvenienceFessMessage(
-                                    viewModel.selectedConvenienceFee != null,
-                                    viewModel.selectedConvenienceFee,
-                                    false,
-                                    it.card_payment_details[0].card_network
-                                )
-                                setUpAmount()
+                                processConvenienceFees(it)
                                 // TODO Procss the data for DCC
                                 Log.d("Success", " Meta Data fetched successfully")
 
@@ -374,13 +336,9 @@ class CardFragment : Fragment() {
                     if (cardType.isNullOrEmpty()) {
                         showCardDetailsError("CardNumber")
                     } else {
-                        if (validCard(cardNumber)) {
-                            isCardValid = true
-                            hideCardDetailsError()
-                            enableDisableContinueBtn(true)
-                        } else {
-                            showCardDetailsError("CardNumber")
-                        }
+                        isCardValid = true
+                        hideCardDetailsError()
+                        enableDisableContinueBtn(true)
                     }
                 }
             }
@@ -508,7 +466,12 @@ class CardFragment : Fragment() {
                 val digitsOnly = originalText.replace(Regex("[^\\d]"), "")
                 val formatted = when {
                     digitsOnly.length <= 2 -> digitsOnly
-                    digitsOnly.length <= 4 -> "${digitsOnly.substring(0, 2)}/${digitsOnly.substring(2)}"
+                    digitsOnly.length <= 4 -> "${digitsOnly.substring(0, 2)}/${
+                        digitsOnly.substring(
+                            2
+                        )
+                    }"
+
                     else -> "${digitsOnly.substring(0, 2)}/${digitsOnly.substring(2, 4)}"
                 }
 
@@ -596,23 +559,6 @@ class CardFragment : Fragment() {
         }
     }
 
-    private fun validCard(cardNumber: String): Boolean {
-        // Luhn Algorithm to validate the card number
-        var sum = 0
-        var alternate = false
-        for (i in cardNumber.length - 1 downTo 0) {
-            var n = cardNumber[i].digitToInt()
-            if (alternate) {
-                n *= 2
-                if (n > 9) {
-                    n -= 9
-                }
-            }
-            sum += n
-            alternate = !alternate
-        }
-        return sum % 10 == 0
-    }
 
     private fun validateCardType(cardNumber: String): String? {
         for ((cardType, regex) in cardTypes) {
@@ -790,6 +736,11 @@ class CardFragment : Fragment() {
         )
         val selectedFees = viewModel.selectedConvenienceFee
         val convenienceFeesData = selectedFees?.let { Utils.getConvenienceFeesRequest(it) }
+        val cardMetaData: CardMetaData = CardMetaData(
+            binData?.card_payment_details?.get(0)?.card_network,
+            binData?.card_payment_details?.get(0)?.card_type
+        )
+
 
         val cardDataExtra =
             Extra(
@@ -825,7 +776,8 @@ class CardFragment : Fragment() {
                 null,
                 cardDataExtra,
                 null,
-                convenienceFeesData
+                convenienceFeesData,
+                card_meta_data = if (convenienceFeesData != null) cardMetaData else null,
             )
         return processPaymentRequest
     }
@@ -929,6 +881,52 @@ class CardFragment : Fragment() {
         (requireActivity() as LandingActivity).showHideConvenienceFessMessage(
             true,
             showDefaultCardMessage = true
+        )
+        setUpAmount()
+    }
+
+
+    private fun processConvenienceFees(it: CardBinMetaDataResponse) {
+        val cardNetwork = it.card_payment_details[0].card_network
+        val cardType = it.card_payment_details[0].card_type
+        viewModel.selectedConvenienceFee =
+            viewModel.convenienceFeesInfo?.filter { fees ->
+                fees.networkType.equals(
+                    cardNetwork,
+                    true
+                )
+            }?.getOrNull(0)
+
+        viewModel.selectedConvenienceFee = viewModel.convenienceFeesInfo
+            ?.filter { fees ->
+                fees.networkType.equals(
+                    cardNetwork,
+                    ignoreCase = true
+                ) ||
+                        fees.networkType.equals(
+                            "DEFAULT",
+                            ignoreCase = true
+                        )
+            }
+            ?.let { filteredFees ->
+                // Try to find exact cardType match
+                filteredFees.find { fee ->
+                    fee.networkType.equals(
+                        cardNetwork,
+                        ignoreCase = true
+                    )
+                } ?: filteredFees.find { fee ->
+                    fee.cardType.equals("DEFAULT", ignoreCase = true)
+                }
+            }
+
+
+
+        (requireActivity() as LandingActivity).showHideConvenienceFessMessage(
+            viewModel.selectedConvenienceFee != null,
+            viewModel.selectedConvenienceFee,
+            false,
+            it.card_payment_details[0].card_network
         )
         setUpAmount()
     }

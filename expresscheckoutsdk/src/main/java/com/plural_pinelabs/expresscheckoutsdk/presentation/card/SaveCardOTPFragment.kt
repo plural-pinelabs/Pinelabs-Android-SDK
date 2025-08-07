@@ -20,6 +20,7 @@ import com.plural_pinelabs.expresscheckoutsdk.common.OtpInputView
 import com.plural_pinelabs.expresscheckoutsdk.common.SaveCardOTPFragmentViewModelFactory
 import com.plural_pinelabs.expresscheckoutsdk.common.TimerManager
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils
+import com.plural_pinelabs.expresscheckoutsdk.data.model.CustomerInfo
 import com.plural_pinelabs.expresscheckoutsdk.data.model.OTPRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.model.UpdateOrderDetails
 import kotlinx.coroutines.launch
@@ -31,6 +32,7 @@ class SaveCardOTPFragment : Fragment() {
     private lateinit var resendAction: TextView
     private lateinit var skipSaveCardActionView: TextView
     private lateinit var customerSendOtpDescription: TextView
+    private lateinit var errorTv: TextView
     private var otpId: String? = null
     private var last4DigitsCard: String? = null
 
@@ -72,6 +74,7 @@ class SaveCardOTPFragment : Fragment() {
         resendAction = view.findViewById(R.id.resend_otp_action)
         skipSaveCardActionView = view.findViewById(R.id.skip_card_saved_otp)
         customerSendOtpDescription = view.findViewById(R.id.customer_send_otp_description)
+        errorTv = view.findViewById(R.id.error_view)
         view.findViewById<ImageView>(R.id.back_button).setOnClickListener {
             findNavController().popBackStack()
         }
@@ -86,15 +89,15 @@ class SaveCardOTPFragment : Fragment() {
             if (otp.isNotEmpty() && otp.length == 6) {
                 val customerInfo = ExpressSDKObject.getFetchData()?.customerInfo
                 if (customerInfo != null) {
-                    customerInfo.email_id = customerInfo.emailId
-                    customerInfo.mobile_number = customerInfo.mobileNumber
-                    customerInfo.country_code = customerInfo.countryCode
-                    customerInfo.is_edit_customer_details_allowed =
-                        customerInfo.isEditCustomerDetailsAllowed
-                    customerInfo.first_name = customerInfo.firstName
-                    customerInfo.last_name = customerInfo.lastName
+//                    customerInfo.email_id = customerInfo.emailId
+//                    customerInfo.mobile_number = customerInfo.mobileNumber
+//                    customerInfo.country_code = customerInfo.countryCode
+//                    customerInfo.is_edit_customer_details_allowed =
+//                        customerInfo.isEditCustomerDetailsAllowed
+//                    customerInfo.first_name = customerInfo.firstName
+//                    customerInfo.last_name = customerInfo.lastName
 
-                    val updateOrderDetails = UpdateOrderDetails(customerInfo)
+                    val updateOrderDetails = UpdateOrderDetails(CustomerInfo(customerId =customerInfo.customer_id?:customerInfo.customerId ))
                     val otpRequest = OTPRequest(
                         null,
                         otp,
@@ -160,8 +163,13 @@ class SaveCardOTPFragment : Fragment() {
                     }
 
                     is BaseResult.Success -> {
-                        bottomSheetDialog?.dismiss()
-                        passResultBackForSuccessFailure(true)
+                        if (result.data.status.equals("NOT_VALIDATED", true)) {
+                            bottomSheetDialog?.dismiss()
+                            errorTv.visibility = View.VISIBLE
+                        } else {
+                            errorTv.visibility = View.GONE
+                            passResultBackForSuccessFailure(true)
+                        }
                         // Handle success
                     }
 

@@ -60,6 +60,7 @@ import com.plural_pinelabs.expresscheckoutsdk.data.model.OfferDetails
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ProcessPaymentRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.model.Tenure
 import com.plural_pinelabs.expresscheckoutsdk.presentation.LandingActivity
+import com.plural_pinelabs.expresscheckoutsdk.presentation.ordersummary.TopSheetDialogFragment
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -161,7 +162,10 @@ class TenureSelectionFragment : Fragment() {
         goBackButton.setOnClickListener {
             findNavController().popBackStack()
         }
-
+        viewEMIDetails.setOnClickListener {
+            val topFragment = TopSheetDialogFragment()
+            topFragment.show(requireActivity().supportFragmentManager, "TopSheetDialogFragment")
+        }
 
         selectedBanKTitle.text = Utils.getTitleForEMI(requireContext(), issuer)
     }

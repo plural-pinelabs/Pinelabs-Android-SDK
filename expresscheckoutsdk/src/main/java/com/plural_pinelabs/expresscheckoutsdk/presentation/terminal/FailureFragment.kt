@@ -2,6 +2,7 @@ package com.plural_pinelabs.expresscheckoutsdk.presentation.terminal
 
 import android.os.Bundle
 import android.text.Html
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,6 +11,7 @@ import androidx.fragment.app.Fragment
 import com.plural_pinelabs.expresscheckoutsdk.R
 import com.plural_pinelabs.expresscheckoutsdk.common.TimerManager
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils
+import com.plural_pinelabs.expresscheckoutsdk.common.Utils.MTAG
 
 
 class FailureFragment : Fragment() {
@@ -26,6 +28,7 @@ class FailureFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val timer = TimerManager
+        Log.i(MTAG, "inside failure fragment")
         timer.startTimer(5000)
         timer.timeLeft.observe(viewLifecycleOwner, { timeLeft ->
             if (timeLeft == 0L) {

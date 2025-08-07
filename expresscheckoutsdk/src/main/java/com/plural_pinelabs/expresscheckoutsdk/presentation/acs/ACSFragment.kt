@@ -29,6 +29,7 @@ import com.plural_pinelabs.expresscheckoutsdk.common.Constants
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.BFF_RESPONSE_HANDLER_ENDPOINT
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.IMAGE_LOGO
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PROCESSED_ATTEMPTED
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PROCESSED_CREATED
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PROCESSED_FAILED
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PROCESSED_PENDING
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PROCESSED_STATUS
@@ -102,7 +103,7 @@ internal class ACSFragment : Fragment() {
                         is BaseResult.Success<TransactionStatusResponse> -> {
                             val status = it.data.data.status
                             when (status) {
-                                PROCESSED_PENDING -> {
+                                PROCESSED_PENDING , PROCESSED_CREATED-> {
                                     // Do nothing, we will keep polling for the transaction status
                                 }
 

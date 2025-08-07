@@ -125,7 +125,7 @@
                         android:background="@drawable/input_field_bottom_right_border"
                         android:fontFamily="sans-serif-medium"
                         android:hint="@string/cvv"
-                        android:inputType="number"
+                        android:inputType="numberPassword"
                         android:maxLength="4"
                         android:maxLines="1"
                         android:padding="15dp"

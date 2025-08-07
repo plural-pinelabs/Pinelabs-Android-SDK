@@ -182,6 +182,7 @@ data class ProcessPaymentRequest(
     val txn_data: UpiTransactionData? = null,
     val convenience_fee_data: ConvenienceFeesData? = null,
     val emi_data: EmiData? = null,
+    val card_meta_data: CardMetaData? = null,
 ) : Parcelable
 
 @Parcelize
@@ -736,7 +737,7 @@ data class OfferDetail(
     val issuer: Issuer,
     var isInstantSaving: Boolean = false,
     var offerTitle: String? = null,
-    ) : Parcelable
+) : Parcelable
 
 
 @Parcelize
@@ -827,5 +828,12 @@ data class ConvenienceFeesInfo(
     val cardType: String? = null,
     val feeType: String? = null
 ) : Parcelable
+
+
+@Parcelize
+data class CardMetaData(
+    val scheme_name: String? = null,
+    val card_type: String? = null,
+    ) : Parcelable
 
 

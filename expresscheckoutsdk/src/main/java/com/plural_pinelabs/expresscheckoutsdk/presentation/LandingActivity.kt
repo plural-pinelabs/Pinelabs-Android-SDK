@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
+import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -22,6 +23,7 @@ import com.plural_pinelabs.expresscheckoutsdk.common.CustomExceptionHandler
 import com.plural_pinelabs.expresscheckoutsdk.common.ItemClickListener
 import com.plural_pinelabs.expresscheckoutsdk.common.PaymentModes
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils
+import com.plural_pinelabs.expresscheckoutsdk.common.Utils.MTAG
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ConvenienceFeesInfo
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CustomerInfo
 import com.plural_pinelabs.expresscheckoutsdk.data.model.FetchResponseDTO
@@ -49,6 +51,7 @@ class LandingActivity : AppCompatActivity() {
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        Log.i(MTAG, "insie oncreate")
         setContentView(R.layout.activity_landing)
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -202,7 +205,10 @@ class LandingActivity : AppCompatActivity() {
             ExpressSDKObject.setPayableAmount(ExpressSDKObject.getOriginalOrderAmount())
             updateOrderAmount(ExpressSDKObject.getOriginalOrderAmount())
         }
-        ExpressSDKObject.setConvenienceFee(convenienceFeesInfo?.convenienceFeesAmount?.amount)
+        ExpressSDKObject.setConvenienceFee(
+            (convenienceFeesInfo?.convenienceFeesAmount?.amount
+                ?: 0) + (convenienceFeesInfo?.convenienceFeesAdditionalAmount?.amount ?: 0)
+        )
         ExpressSDKObject.setConvenienceFeeGst(convenienceFeesInfo?.convenienceFeesGSTAmount?.amount)
         convenienceFessMessage.visibility = if (isShow) View.VISIBLE else View.GONE
         convenienceFessMessage.text = if (amount > 0) {

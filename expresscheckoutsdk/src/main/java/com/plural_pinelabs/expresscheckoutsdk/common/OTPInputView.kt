@@ -1,5 +1,6 @@
 package com.plural_pinelabs.expresscheckoutsdk.common
 
+import android.content.ClipboardManager
 import android.content.Context
 import android.graphics.Color
 import android.graphics.Typeface
@@ -65,13 +66,35 @@ class OtpInputView @JvmOverloads constructor(
 
     private fun setupEditTexts() {
         for (i in 0 until otpDigits) {
-            val editText = EditText(context).apply {
+            val editText = object : androidx.appcompat.widget.AppCompatEditText(context) {
+                override fun onTextContextMenuItem(id: Int): Boolean {
+                    if (id == android.R.id.paste) {
+                        val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as? ClipboardManager
+                        val pasteData = clipboard?.primaryClip?.getItemAt(0)?.text?.toString()?.trim()
+                        if (!pasteData.isNullOrEmpty()) {
+                            for (j in 0 until minOf(pasteData.length, otpDigits)) {
+                                otpEditTexts[j].setText(pasteData[j].toString())
+                            }
+                            if (pasteData.length < otpDigits) {
+                                otpEditTexts[minOf(pasteData.length, otpDigits - 1)].requestFocus()
+                            } else {
+                                otpEditTexts.last().requestFocus()
+                                hideKeyboard()
+                            }
+                            return true // Consume the paste event
+                        }
+                    }
+                    return super.onTextContextMenuItem(id)
+                }
+            }
+
+             editText.apply {
                 layoutParams = LayoutParams(
                     LayoutParams.WRAP_CONTENT, // Width will be calculated in onMeasure
                     LayoutParams.WRAP_CONTENT // Height will be calculated in onMeasure
                 )
                 gravity = Gravity.CENTER
-                filters = arrayOf(InputFilter.LengthFilter(1))
+                //filters = arrayOf(InputFilter.LengthFilter(1))
 
                 // Apply properties read from custom attributes
                 inputType = InputType.TYPE_CLASS_NUMBER
@@ -113,25 +136,37 @@ class OtpInputView @JvmOverloads constructor(
                     }
 
                     override fun afterTextChanged(s: Editable?) {
-                        if (s?.length == 1) {
-                            // Move focus to the next EditText
+                        if (s != null && s.length > 1) {
+                            // Paste handling (already discussed)
+                            for (j in 0 until minOf(s.length, otpDigits)) {
+                                otpEditTexts[j].removeTextChangedListener(this)
+                                otpEditTexts[j].setText(s[j].toString())
+                                otpEditTexts[j].addTextChangedListener(this)
+                            }
+                            if (s.length < otpDigits) {
+                                otpEditTexts[s.length].requestFocus()
+                            } else {
+                                otpEditTexts.last().requestFocus()
+                                hideKeyboard()
+                            }
+                        } else if (s?.length == 1) {
                             if (i < otpDigits - 1) {
                                 otpEditTexts[i + 1].requestFocus()
                             } else {
-                                // Last digit entered, potentially hide keyboard
-                                clearFocus() // Clear focus from the last EditText
+                                clearFocus()
                                 hideKeyboard()
-                                // Optionally trigger a completion listener here
-                                // otpCompleteListener?.invoke(getOtp())
                             }
                         } else if (s?.length == 0) {
-                            // Backspace in an empty box, move focus to the previous EditText
+                            // Move focus back when character is deleted
                             if (i > 0) {
                                 otpEditTexts[i - 1].requestFocus()
-                                // Optionally clear the previous box if needed, though TextWatcher handles this
+                                otpEditTexts[i - 1].setSelection(otpEditTexts[i - 1].text.length)
                             }
                         }
+                        filters = arrayOf(InputFilter.LengthFilter(1))
+
                     }
+
                 })
 
                 // Handle backspace key press for moving back
@@ -152,6 +187,8 @@ class OtpInputView @JvmOverloads constructor(
                 }
 
                 // Handle paste action
+
+
                 customSelectionActionModeCallback = object : android.view.ActionMode.Callback {
                     override fun onCreateActionMode(
                         mode: android.view.ActionMode?,
@@ -345,4 +382,5 @@ class OtpInputView @JvmOverloads constructor(
            }
        }
      */
+
 }

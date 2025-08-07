@@ -337,7 +337,6 @@ class EMICardDetailsFragment : Fragment() {
                     isCardValid = true
                     hideCardDetailsError()
                     createValidateOfferRequest()
-                    showCardDetailsError("CardNumber")
                 }
             }
         }

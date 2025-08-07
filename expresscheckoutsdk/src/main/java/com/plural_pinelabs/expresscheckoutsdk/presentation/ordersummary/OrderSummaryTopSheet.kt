@@ -139,10 +139,18 @@ class TopSheetDialogFragment : DialogFragment() {
         }
         if (convenienceFees.second.isNotEmpty() && tenure?.total_subvention_amount?.value != null && tenure.total_subvention_amount.value > 0)
             valuesMap.add(cashback)
-        totalAmountValue.text = Utils.convertToRupeesWithSymobl(
-            requireContext(),
-            ExpressSDKObject.getPayableAmount()
-        )
+
+        if (ExpressSDKObject.getSelectedTenure() != null) {
+            totalAmountValue.text = Utils.convertToRupeesWithSymobl(
+                requireContext(),
+                ExpressSDKObject.getSelectedTenure()?.total_emi_amount?.value
+                    ?: ExpressSDKObject.getPayableAmount()
+            )
+        } else
+            totalAmountValue.text = Utils.convertToRupeesWithSymobl(
+                requireContext(),
+                ExpressSDKObject.getPayableAmount()
+            )
 
 
         val subtotalAdapter = SubtotalRVAdapter(valuesMap, index)

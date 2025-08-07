@@ -21,7 +21,7 @@
 
     <TextView
         android:id="@+id/product_name"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="12dp"
         android:ellipsize="end"
@@ -30,6 +30,7 @@
         android:textColor="@color/black_text_80"
         android:textFontWeight="500"
         android:textSize="14sp"
+        app:layout_constraintEnd_toStartOf="@id/product_price_value"
         app:layout_constraintStart_toEndOf="@id/product_image"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="Product Name" />

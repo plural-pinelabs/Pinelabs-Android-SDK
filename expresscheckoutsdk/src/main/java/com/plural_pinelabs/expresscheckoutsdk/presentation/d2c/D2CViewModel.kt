@@ -63,7 +63,7 @@ class D2CViewModel(
 
     fun createInactiveUser(token: String?, request: CustomerInfo?) =
         viewModelScope.launch(Dispatchers.IO) {
-            expressRepositoryImpl.createInactiveUser(token, request).collect {
+            commonRepositoryImpl.createInactiveUser(token, request).collect {
                 _createInactiveUserResult.value = it
             }
         }

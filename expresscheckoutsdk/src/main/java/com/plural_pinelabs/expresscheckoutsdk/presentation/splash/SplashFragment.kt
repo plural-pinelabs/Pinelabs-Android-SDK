@@ -102,6 +102,7 @@ class SplashFragment : Fragment() {
                             // Han
                             // dle error
                             result.errorCode.let { exception ->
+                                Log.d("Error", "Error fetching data: $exception")
                                 findNavController().navigate(R.id.action_splashFragment_to_failureFragment)
                                 // Log the error or show a message to the user
                                 Log.e("Error", exception)
@@ -126,7 +127,7 @@ class SplashFragment : Fragment() {
                                 } else
                                 // TODO UNCOMMENT NAVIGATION TO LANDING AND REMOVE THIS
                                     findNavController().navigate(R.id.action_splashFragment_to_paymentModeFragment)
-                                //  findNavController().navigate(R.id.action_splashFragment_to_landingFragment)
+                                //  findNavController().navigate(R.id.action_splashFragment_to_phoneNumberFragment)
                             }
                         }
 

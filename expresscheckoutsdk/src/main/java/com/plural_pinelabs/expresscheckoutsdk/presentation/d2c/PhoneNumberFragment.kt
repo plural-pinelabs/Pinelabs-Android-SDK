@@ -103,6 +103,7 @@ class PhoneNumberFragment : Fragment() {
                         }
 
                         is BaseResult.Success -> {
+                            //RESULT IS SUCCESS
                             viewModel.otpId = result.data.otpId
                             bottomSheetDialog?.dismiss()
                             findNavController().navigate(R.id.action_phoneNumberFragment_to_verifyOTPFragment)
@@ -183,9 +184,8 @@ class PhoneNumberFragment : Fragment() {
             }
 
             override fun afterTextChanged(s: Editable?) {
-                isPhoneNumberValid = !(s?.let {
-                    it.length == 10 && Utils.isValidPhoneNumber(it.toString())
-                } ?: false)
+                isPhoneNumberValid = s.toString()
+                    .isNotNullAndBlank() && s.toString().length == 10 && Utils.isValidPhoneNumber(s.toString())
                 continueBtn.isEnabled = isPhoneNumberValid
                 Utils.showRemoveErrorBackground(
                     requireContext(),
@@ -195,7 +195,7 @@ class PhoneNumberFragment : Fragment() {
                     phoneNumberEt.hasFocus(),
                     viewGroup = phoneNumberParentLayout
                 )
-                Utils.handleCTAEnableDisable(requireContext(), !isPhoneNumberValid, continueBtn)
+                Utils.handleCTAEnableDisable(requireContext(), isPhoneNumberValid, continueBtn)
             }
         })
 
@@ -218,7 +218,7 @@ class PhoneNumberFragment : Fragment() {
                     false,
                     viewGroup = phoneNumberParentLayout
                 )
-                Utils.handleCTAEnableDisable(requireContext(), !isPhoneNumberValid, continueBtn)
+                Utils.handleCTAEnableDisable(requireContext(), isPhoneNumberValid, continueBtn)
 
             }
         }
@@ -226,10 +226,10 @@ class PhoneNumberFragment : Fragment() {
 
     private fun setClickListeners() {
         continueBtn.setOnClickListener {
-            if (isPhoneNumberValid) {
+            if (!isPhoneNumberValid) {
                 return@setOnClickListener
             }
-            if (emailEt.text.isNotEmpty() && !isEmailValid) {
+            if (emailEt.text.isNotEmpty() && isEmailValid) {
                 Utils.showRemoveErrorBackground(
                     requireContext(),
                     null,
@@ -246,10 +246,11 @@ class PhoneNumberFragment : Fragment() {
             viewModel.email = emailEt.text.toString()
             val customerInfo = CustomerInfo(
                 mobileNumber = viewModel.phoneNumber,
-                countryCode = "+91", // Assuming +91 as default country code since we are not using a country picker here for now
+                countryCode = "+91",
+                emailId = emailEt.text.toString() // Assuming +91 as default country code since we are not using a country picker here for now
             )
-            //  viewModel.createInactiveUser(token = ExpressSDKObject.getToken(), customerInfo)
-            findNavController().navigate(R.id.action_phoneNumberFragment_to_verifyOTPFragment)
+            viewModel.createInactiveUser(ExpressSDKObject.getToken(), customerInfo)
+            //  findNavController().navigate(R.id.action_phoneNumberFragment_to_verifyOTPFragment)
         }
     }
 
@@ -262,8 +263,12 @@ class PhoneNumberFragment : Fragment() {
         phoneNumberParentLayout = view.findViewById(R.id.phone_parent_layout)
         emailParentLayout = view.findViewById(R.id.email_et_layout)
         val existingPhoneNumber = ExpressSDKObject.getPhoneNumber()
+        val email = ExpressSDKObject.getFetchData()?.customerInfo?.emailId
         if (existingPhoneNumber.isNotNullAndBlank()) {
             phoneNumberEt.text = Editable.Factory.getInstance().newEditable(existingPhoneNumber)
+        }
+        if (email.isNotNullAndBlank()) {
+            emailEt.text = Editable.Factory.getInstance().newEditable(email)
         }
     }
 

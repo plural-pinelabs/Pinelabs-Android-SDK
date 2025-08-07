@@ -121,7 +121,7 @@ class ExpressRepositoryImpl(
         request: CustomerInfo?
     ): Flow<BaseResult<CustomerInfo>> {
         return toResultFlow(networkHelper = networkHelper) {
-            (apiService as ExpressApiService).createInactive(token, request)
+            (apiService as CommonApiService).createInactive(token, request)
         }
     }
 
