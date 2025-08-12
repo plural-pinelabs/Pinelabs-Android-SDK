@@ -11,6 +11,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -55,6 +56,7 @@ import com.plural_pinelabs.expresscheckoutsdk.data.model.ProcessPaymentRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ProcessPaymentResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.Tenure
 import com.plural_pinelabs.expresscheckoutsdk.presentation.card.CardFragmentViewModel
+import com.plural_pinelabs.expresscheckoutsdk.presentation.ordersummary.TopSheetDialogFragment
 import kotlinx.coroutines.launch
 import java.util.Calendar
 import java.util.Locale
@@ -75,6 +77,11 @@ class EMICardDetailsFragment : Fragment() {
     private lateinit var emiPerMonthAmount: TextView
     private lateinit var emiForXMonthTv: TextView
     private lateinit var emiTypeText: TextView
+    lateinit var footerLayout: LinearLayout
+    private lateinit var saveInfoText: TextView
+    private lateinit var viewEMIDetails: TextView
+    private lateinit var emiPayingTenureText: TextView
+
 
     private var binData: CardBinMetaDataResponse? = null
     private var cardNumber: String = ""
@@ -117,6 +124,7 @@ class EMICardDetailsFragment : Fragment() {
         setupCardHolderNameValidation(cardHolderText)
         setupCVVValidation(cvvEditText)
         setupExpiryValidation(expiryEditText)
+        updateFooter()
     }
 
     private fun setEMIIssuer() {
@@ -157,6 +165,11 @@ class EMICardDetailsFragment : Fragment() {
         cardErrorText = view.findViewById(R.id.error_message_card_details)
         backBtn = view.findViewById(R.id.back_button)
         emiTypeText = view.findViewById(R.id.emi_type_text)
+        footerLayout = view.findViewById(R.id.footer)
+        saveInfoText = view.findViewById(R.id.save_info_text)
+        viewEMIDetails = view.findViewById(R.id.emi_details_cta)
+        emiPayingTenureText = view.findViewById(R.id.emi_info_text)
+
 
         logo = view.findViewById(R.id.logo)
         issuerTitleTv = view.findViewById(R.id.issuer_title)
@@ -225,9 +238,11 @@ class EMICardDetailsFragment : Fragment() {
 
     private fun setUpAmount() {
         payBtn.text = getString(
-            R.string.pay_amount_text,
-            getString(R.string.rupee_symbol),
-            Utils.convertInRupees(ExpressSDKObject.getAmount())
+            R.string.pay_emi_x_per_month,
+            Utils.convertToRupeesWithSymobl(
+                requireContext(),
+                selectedTenure?.monthly_emi_amount?.value
+            )
         )
         payBtn.setOnClickListener {
             validateAllFields()
@@ -728,6 +743,29 @@ class EMICardDetailsFragment : Fragment() {
         bankLogoMap = Utils.getBankLogoHashMap()
         bankNameKeyList = Utils.getListOfBanKTitle()
         banKTitleToCodeMap = Utils.bankTitleAndCodeMapper()
+    }
+
+    private fun updateFooter() {
+        val totalSaving = (selectedTenure?.total_discount_amount?.value
+            ?: 0) + (selectedTenure?.total_subvention_amount?.value ?: 0)
+        if (totalSaving != 0) {
+            val amount = Utils.convertInRupees(totalSaving)
+            saveInfoText.text = String.format(
+                getString(R.string.you_re_saving_x_on_this_order), amount
+            )
+        } else {
+            saveInfoText.visibility = View.GONE
+
+        }
+        emiPayingTenureText.text =
+            String.format(
+                getString(R.string.paying_in_emi_of_x_months),
+                selectedTenure?.tenure_value.toString()
+            )
+        viewEMIDetails.setOnClickListener {
+            val topFragment = TopSheetDialogFragment()
+            topFragment.show(requireActivity().supportFragmentManager, "TopSheetDialogFragment")
+        }
     }
 
 

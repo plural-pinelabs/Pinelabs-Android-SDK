@@ -55,6 +55,7 @@ class TopSheetDialogFragment : DialogFragment() {
         val closeButton: View = root.findViewById(R.id.order_close_icon)
         val totalAmountLabel: TextView = root.findViewById(R.id.total_amount_label)
         val totalAmountValue: TextView = root.findViewById(R.id.total_amount_value)
+        val processingFeeLabel: TextView = root.findViewById(R.id.processing_gst_info)
 
         closeButton.setOnClickListener {
             dismiss()
@@ -151,7 +152,13 @@ class TopSheetDialogFragment : DialogFragment() {
                 requireContext(),
                 ExpressSDKObject.getPayableAmount()
             )
-
+        if ((tenure?.processing_fee_details?.amount?.value ?: 0) > 0) {
+            processingFeeLabel.text = String.format(getString(R.string.processing_fee_info), Utils.convertToRupeesWithSymobl(
+                requireContext(),
+                tenure?.processing_fee_details?.amount?.value ?: 0
+            ),"")
+            processingFeeLabel.visibility = View.VISIBLE
+        }
 
         val subtotalAdapter = SubtotalRVAdapter(valuesMap, index)
         subtotalRecyclerView.layoutManager =

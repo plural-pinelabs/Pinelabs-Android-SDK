@@ -20,21 +20,10 @@ interface ExpressApiService : ApiService {
         @Body request: ExpressAddress
     ): Response<ExpressAddressResponse>
 
-    @POST("customer/create-inactive")
-    suspend fun createInactive(
-        @Query(
-            "token",
-            encoded = true
-        ) token: String?, @Body request: CustomerInfo?
-    ): Response<CustomerInfo>
-
-    @POST("customer/otp/send")
-    suspend fun sendOTPCustomer(
-        @Query(
-            "token",
-            encoded = true
-        ) token: String?, @Body request: OTPRequest?
-    ): Response<SavedCardResponse>
-
+    @POST("graphql")
+    suspend   fun addCustomerAddresses(
+        @Header("Authorization") authHeader: String?,
+        @Body request: ExpressAddress
+    ): Response<ExpressAddressResponse>
 
 }

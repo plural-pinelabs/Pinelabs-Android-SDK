@@ -10,13 +10,14 @@ data class FetchResponseDTO(
     val merchantInfo: MerchantInfo? = null,
     val paymentData: PaymentData? = null,
     val paymentModes: List<PaymentMode>? = null,
-    var merchantBrandingData: MerchantBranding? = null,
+    var merchantBrandingData: BrandConfig? = null,
     var dccData: DccData? = null,
     val customerInfo: CustomerInfo?,
     val shippingAddress: Address,
     val billingAddress: Address,
     val cartDetails: CartDetails? = null,
-    val convenienceFeesInfo: List<ConvenienceFeesInfo>? = null
+    val convenienceFeesInfo: List<ConvenienceFeesInfo>? = null,
+    val merchantMetadata: MerchantMetadata? = null,
 )
 
 @Parcelize
@@ -124,11 +125,11 @@ data class Wallet(
 
 data class issuerDataList(val bankName: String?, val merchantPaymentCode: String?)
 
-data class MerchantBranding(val logo: Logo?, val brandTheme: BrandTheme?, var palette: Palette?)
+@Parcelize
+data class Logo(val imageSize: String, val imageContent: String) : Parcelable
 
-data class Logo(val imageSize: String, val imageContent: String)
-
-data class BrandTheme(val color: String)
+@Parcelize
+data class BrandTheme(val color: String) : Parcelable
 
 
 data class RecyclerViewPaymentOptionData(
@@ -167,7 +168,8 @@ data class CustomerInfo(
 
 data class CustomerInfoResponse(
     val status: String?,
-    val customerInfo: CustomerInfo?
+    val customerInfo: CustomerInfo?,
+    val customerToken: String? = null,
 )
 
 @Parcelize
@@ -409,7 +411,11 @@ data class PurchaseDetails(
 @Parcelize
 data class MerchantMetadata(
     val key1: String,
-    val key2: String
+    val key2: String,
+    val express_checkout_enabled: String? = null,
+    val express_checkout_allowed_action: String? = null
+
+
 ) : Parcelable
 
 
@@ -592,13 +598,17 @@ data class Palette(
 
 @Parcelize
 data class ExpressAddress(
+    val operationName: String? = null,
     val query: String,
     val variables: Variables,
 ) : Parcelable
 
+
 @Parcelize
 data class Variables(
-    val customerId: String
+    val customerToken: String?=null,
+    val customerId: String? = null,
+    val addresses: List<Address>? = null,
 ) : Parcelable
 
 
@@ -616,9 +626,16 @@ data class Data(
 @Parcelize
 data class CustomerAddresses(
     val success: Boolean,
-    val message: String
-
+    val message: String,
+    val data: AddressData,
+    val error: String? = null
 ) : Parcelable
+
+@Parcelize
+data class AddressData(
+    val addresses: List<Address>
+) : Parcelable
+
 
 //EMI data classes
 
@@ -834,6 +851,29 @@ data class ConvenienceFeesInfo(
 data class CardMetaData(
     val scheme_name: String? = null,
     val card_type: String? = null,
-    ) : Parcelable
+) : Parcelable
+
+
+@Parcelize
+data class BrandConfig(
+    val logo: Logo,
+    val brandTheme: BrandTheme,
+    val theme: String,
+    val brandName: String,
+    val font: String,
+    val expressCheckoutSettings: ExpressCheckoutSettings
+) : Parcelable
+
+@Parcelize
+data class ExpressCheckoutSettings(
+    val checkoutCollectMobile: Boolean,
+    val checkoutCollectAddress: Boolean,
+    val prefillCustomerDetails: Boolean,
+    val showRecommendations: Boolean,
+    val showUpsell: Boolean,
+    val showCrossSell: Boolean,
+    val enableEDD: Boolean,
+    val enableLogisticsPush: Boolean
+) : Parcelable
 
 

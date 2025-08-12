@@ -77,7 +77,7 @@ class D2CViewModel(
 
     fun validateUpdateOrderDetails(token: String?, otpRequest: OTPRequest) {
         viewModelScope.launch(Dispatchers.IO) {
-            expressRepositoryImpl.validateUpdateOrder(
+            commonRepositoryImpl.validateUpdateOrder(
                 token = token,
                 otpRequest
             )
@@ -87,23 +87,48 @@ class D2CViewModel(
         }
     }
 
-    fun getAddressList() {
+    fun getAddressList(customerToken: String?) {
         viewModelScope.launch(Dispatchers.IO) {
             expressRepositoryImpl.fetchAddress(
                 token = ExpressSDKObject.getToken(),
-                getAddressObject()
+                getAddressObject(customerToken)
             ).collect {
                 _addressResponse.value = it
             }
         }
     }
 
-    private fun getAddressObject(): ExpressAddress {
+    fun saveAddress(customerId: String?,address: Address?) {
+        viewModelScope.launch(Dispatchers.IO) {
+            expressRepositoryImpl.addCustomerAddresses(
+                token = ExpressSDKObject.getToken(),
+                getAddCustomerAddressObject(customerId,address)
+            ).collect {
+                _addressResponse.value = it
+            }
+        }
+    }
+
+    private fun getAddressObject(customerToken: String?): ExpressAddress {
         val query =
             "query GetCustomerAddresses(\$customerId: String!) { getCustomerAddresses(customerId: \$customerId) { success message data { addresses { full_name address1 address2 address3 pincode city state country address_type address_category } } error } }"
-        val variables = Variables(ExpressSDKObject.getFetchData()?.customerInfo?.customerId ?: "")
-        val expressAddress = ExpressAddress(query, variables)
+        val variables = Variables(customerToken ?: "")
+        val expressAddress = ExpressAddress(null, query, variables)
         return expressAddress
+    }
+
+
+    private fun getAddCustomerAddressObject(
+        customerId: String? = null,
+        address: Address?
+    ): ExpressAddress {
+        val query =
+            "mutation AddCustomerAddresses(\$customerId: String!, \$addresses: [CustomerAddressInput]!) { addCustomerAddresses(customerId: \$customerId, addresses: \$addresses) { success message data { addresses { full_name address1 city state country address_type address_category } } error } }"
+        val addressList: ArrayList<Address> = arrayListOf()
+        address?.let { addressList.add(it) }
+
+        val variables = Variables(customerId = customerId, addresses = addressList)
+        return ExpressAddress(null, query, variables)
     }
 
 }

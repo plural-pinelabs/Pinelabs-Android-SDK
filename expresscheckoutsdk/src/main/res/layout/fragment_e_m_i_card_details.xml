@@ -312,14 +312,14 @@
 
         <TextView
             android:id="@+id/save_info_text"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
+            android:paddingStart="2dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:background="@drawable/confetti_saving_bg"
             android:drawableStart="@drawable/ic_success_offer_saving"
             android:gravity="center"
-            android:paddingHorizontal="16dp"
-            android:paddingVertical="8dp"
+           android:paddingVertical="8dp"
             android:text="@string/you_re_saving_x_on_this_order" />
 
         <LinearLayout
@@ -327,7 +327,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:padding="16dp">
+            android:paddingVertical="16dp">
 
             <TextView
                 android:id="@+id/emi_info_text"

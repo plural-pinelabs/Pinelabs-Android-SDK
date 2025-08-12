@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/order_summary_scroll_view"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:fillViewport="true"
     android:maxHeight="600dp">
@@ -92,7 +93,8 @@
             app:layout_constraintTop_toBottomOf="@id/subtotal_recycler_view" />
 
 
-        <LinearLayout xmlns:tools="http://schemas.android.com/tools"
+        <LinearLayout
+            android:id="@+id/total_amount_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginVertical="8dp"
@@ -133,6 +135,22 @@
                 tools:text="Total Amount" />
 
         </LinearLayout>
+
+
+        <TextView
+            android:id="@+id/processing_gst_info"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:drawableStart="@drawable/ic_info_icon"
+            android:drawablePadding="8dp"
+            android:fontFamily="sans-serif"
+            android:text="@string/x_proccessing_gst_will_be_applied"
+            android:textColor="@color/black_text_50"
+            android:textFontWeight="500"
+            android:textSize="12sp"
+            android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@id/total_amount_layout" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

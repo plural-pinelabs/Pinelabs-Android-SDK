@@ -203,5 +203,6 @@
     <string name="maximize_your_savings_with_exclusive_offers">Maximize your savings with exclusive offers!</string>
     <string name="instant_discount_on_full_payment">Instant discount on full payment</string>
     <string name="applicable_on_emitenurelist_emi_tenures">Applicable on %s EMI tenures</string>
+    <string name="x_proccessing_gst_will_be_applied">%s processing fee + GST will be charged by %s bank.</string>
 
 </resources>

@@ -4,7 +4,7 @@ internal object Constants {
     const val MOBILE_REGEX =
         "^[+]?\\d{1,4}[\\s-]?\\(?\\d{1,4}\\)?[\\s-]?\\d{1,4}[\\s-]?\\d{1,4}$"
     const val EMAIL_REGEX = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$"
-    const val BASE_URL_UAT = "api-staging.pluralonline.com"
+    const val BASE_URL_UAT = "pluraluat.v2.pinepg.in"
     const val BASE_URL_QA = "pluralqa.pinepg.in"
     const val BASE_URL_EXPRESS_DEV = "nxt-express-checkout-svc-dev.v2.pinepg.in"
     const val BASE_URL_PROD = "api.pluralonline.com"

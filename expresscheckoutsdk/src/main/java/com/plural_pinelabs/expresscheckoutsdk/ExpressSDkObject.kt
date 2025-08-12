@@ -1,6 +1,7 @@
 package com.plural_pinelabs.expresscheckoutsdk
 
 import android.content.Context
+import com.plural_pinelabs.expresscheckoutsdk.data.model.Address
 import com.plural_pinelabs.expresscheckoutsdk.data.model.EMIPaymentModeData
 import com.plural_pinelabs.expresscheckoutsdk.data.model.FetchResponseDTO
 import com.plural_pinelabs.expresscheckoutsdk.data.model.OfferDetail
@@ -21,7 +22,8 @@ internal data class SDKObject(
     var convenienceFee: Int? = null,
     var convenienceFeeGst: Int? = null,
     var selectedTenure: Tenure? = null,
-    var selectedOfferDetail : OfferDetail? = null
+    var selectedOfferDetail: OfferDetail? = null,
+    var addressList: List<Address>? = null,
 )
 
 internal object ExpressSDKObject {
@@ -129,6 +131,7 @@ internal object ExpressSDKObject {
     fun getConvenienceFeeGst(): Int? {
         return getSDKObject()?.convenienceFeeGst
     }
+
     fun setSelectedTenure(tenure: Tenure?) {
         getSDKObject()?.selectedTenure = tenure
     }
@@ -143,6 +146,14 @@ internal object ExpressSDKObject {
 
     fun setSelectedOfferDetail(offerDetail: OfferDetail?) {
         getSDKObject()?.selectedOfferDetail = offerDetail
+    }
+
+    fun getAddressList(): List<Address>? {
+        return getSDKObject()?.addressList
+    }
+
+    fun setAddressList(addressList: List<Address>?) {
+        getSDKObject()?.addressList = addressList
     }
 }
 

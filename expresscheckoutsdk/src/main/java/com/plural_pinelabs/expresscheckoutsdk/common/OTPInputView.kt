@@ -80,6 +80,7 @@ class OtpInputView @JvmOverloads constructor(
                             } else {
                                 otpEditTexts.last().requestFocus()
                                 hideKeyboard()
+                                otpCompleteListener?.invoke("")
                             }
                             return true // Consume the paste event
                         }
@@ -148,6 +149,7 @@ class OtpInputView @JvmOverloads constructor(
                             } else {
                                 otpEditTexts.last().requestFocus()
                                 hideKeyboard()
+                                otpCompleteListener?.invoke(s.toString())
                             }
                         } else if (s?.length == 1) {
                             if (i < otpDigits - 1) {
@@ -155,6 +157,7 @@ class OtpInputView @JvmOverloads constructor(
                             } else {
                                 clearFocus()
                                 hideKeyboard()
+                                otpCompleteListener?.invoke(s.toString())
                             }
                         } else if (s?.length == 0) {
                             // Move focus back when character is deleted
@@ -239,6 +242,7 @@ class OtpInputView @JvmOverloads constructor(
                         otpEditTexts.last().requestFocus()
                     }
                     hideKeyboard()
+                    otpCompleteListener?.invoke("")
                 }
             }
         }

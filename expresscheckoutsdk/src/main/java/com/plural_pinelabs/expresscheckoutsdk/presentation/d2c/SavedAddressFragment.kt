@@ -4,17 +4,21 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.plural_pinelabs.expresscheckoutsdk.R
 import com.plural_pinelabs.expresscheckoutsdk.common.BaseResult
 import com.plural_pinelabs.expresscheckoutsdk.common.D2CViewModelFactory
+import com.plural_pinelabs.expresscheckoutsdk.common.ItemClickListener
 import com.plural_pinelabs.expresscheckoutsdk.common.NetworkHelper
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils.showProcessPaymentDialog
+import com.plural_pinelabs.expresscheckoutsdk.data.model.Address
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ExpressAddressResponse
 import kotlinx.coroutines.launch
 
@@ -25,6 +29,10 @@ class SavedAddressFragment : Fragment() {
         D2CViewModelFactory(NetworkHelper(requireContext()))
     }
     private var bottomSheetDialog: BottomSheetDialog? = null
+
+    private lateinit var addNewBtn: TextView
+    private lateinit var recyclerview: androidx.recyclerview.widget.RecyclerView
+    private lateinit var continueBtn: TextView
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -38,7 +46,6 @@ class SavedAddressFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setViews(view)
         observeViewModel()
-        fetchAddresses()
     }
 
     private fun observeViewModel() {
@@ -67,11 +74,21 @@ class SavedAddressFragment : Fragment() {
     }
 
     private fun setViews(view: View) {
+        addNewBtn = view.findViewById(R.id.add_new_btn)
+        recyclerview = view.findViewById(R.id.address_list_rv)
+        continueBtn = view.findViewById(R.id.continue_btn)
+        recyclerview.layoutManager = LinearLayoutManager(requireContext())
 
     }
 
-    private fun fetchAddresses() {
-        viewModel.getAddressList()
+    private fun getItemClickListener() = object : ItemClickListener<Address> {
+        override fun onItemClick(position: Int, item: Address) {
+            // handle item click
+
+            //add customer info to order details
+        }
+
+
     }
 
 }

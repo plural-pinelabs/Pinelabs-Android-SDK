@@ -77,4 +77,9 @@ interface ExpressRepository {
         token: String?,
         request: OTPRequest?
     ): Flow<BaseResult<CustomerInfoResponse>>
+
+    suspend fun addCustomerAddresses(
+        token: String?,
+        request: ExpressAddress
+    ): Flow<BaseResult<ExpressAddressResponse>>
 }

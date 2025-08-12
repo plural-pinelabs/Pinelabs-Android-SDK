@@ -13,6 +13,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.airbnb.lottie.LottieAnimationView
+import com.clevertap.android.sdk.isNotNullAndBlank
 import com.plural_pinelabs.expresscheckoutsdk.ExpressSDKObject
 import com.plural_pinelabs.expresscheckoutsdk.R
 import com.plural_pinelabs.expresscheckoutsdk.common.BaseResult
@@ -21,6 +22,7 @@ import com.plural_pinelabs.expresscheckoutsdk.common.SplashViewModelFactory
 import com.plural_pinelabs.expresscheckoutsdk.data.model.FetchResponseDTO
 import com.plural_pinelabs.expresscheckoutsdk.presentation.LandingActivity
 import kotlinx.coroutines.launch
+import okio.internal.commonAsUtf8ToByteArray
 
 class SplashFragment : Fragment() {
     private var isDataFetched = false
@@ -117,17 +119,18 @@ class SplashFragment : Fragment() {
                             result.data.let { it ->
                                 // Process the data
                                 ExpressSDKObject.setFetchData(it)
-                                Log.d("Success", "Data fetched successfully")
-                                // TODO Finalize the condition for the d2c flow
+//                                Log.d("Success", "Data fetched successfully")
+//                                // TODO Finalize the condition for the d2c flow
                                 (activity as? LandingActivity)?.updateValueForHeaderLayout(it)
-                                if (it.customerInfo?.customerId.isNullOrEmpty()) {
-                                    // no customer id new user
-                                  //  findNavController().navigate(R.id.action_splashFragment_to_phoneNumberFragment)
-                                    findNavController().navigate(R.id.action_splashFragment_to_paymentModeFragment)
-                                } else
-                                // TODO UNCOMMENT NAVIGATION TO LANDING AND REMOVE THIS
-                                    findNavController().navigate(R.id.action_splashFragment_to_paymentModeFragment)
-                                //  findNavController().navigate(R.id.action_splashFragment_to_phoneNumberFragment)
+//                                if (it.customerInfo?.customerId.isNullOrEmpty()) {
+//                                    // no customer id new user
+//                                    //  findNavController().navigate(R.id.action_splashFragment_to_phoneNumberFragment)
+                                 //   findNavController().navigate(R.id.action_splashFragment_to_paymentModeFragment)
+//                                } else
+//                                // TODO UNCOMMENT NAVIGATION TO LANDING AND REMOVE THIS
+//                                    findNavController().navigate(R.id.action_splashFragment_to_paymentModeFragment)
+//                                //    findNavController().navigate(R.id.action_splashFragment_to_phoneNumberFragment)
+                            navD2C()
                             }
                         }
 
@@ -139,6 +142,31 @@ class SplashFragment : Fragment() {
                     }
                 }
             }
+        }
+    }
+
+    private fun navD2C() {
+        val mobileNo = ExpressSDKObject.getFetchData()?.customerInfo?.mobileNo
+        val address = ExpressSDKObject.getFetchData()?.shippingAddress
+        val addressCollectionFlag =
+            ExpressSDKObject.getFetchData()?.merchantMetadata?.express_checkout_allowed_action?.contains("checkoutCollectAddress")
+        val mobileCollectionFlag =
+            ExpressSDKObject.getFetchData()?.merchantMetadata?.express_checkout_allowed_action?.contains("checkoutCollectMobile")
+
+        if (address != null && mobileNo.isNotNullAndBlank()) {
+            // navigate to payment
+            //TODO Uncomment below line to navigate to payment mode fragment
+          //  findNavController().navigate(R.id.action_splashFragment_to_paymentModeFragment)
+            findNavController().navigate(R.id.action_splashFragment_to_phoneNumberFragment)
+        } else if (address == null && addressCollectionFlag == true) {
+            findNavController().navigate(R.id.action_splashFragment_to_phoneNumberFragment)
+            // navigate to phone
+        } else if (mobileNo.isNullOrBlank() && mobileCollectionFlag == true) {
+            // navigate to phone
+            findNavController().navigate(R.id.action_splashFragment_to_phoneNumberFragment)
+        } else {
+            findNavController().navigate(R.id.action_splashFragment_to_paymentModeFragment)
+            // navigate to payment
         }
     }
 

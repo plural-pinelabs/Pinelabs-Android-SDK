@@ -22,7 +22,10 @@ import com.plural_pinelabs.expresscheckoutsdk.common.NetworkHelper
 import com.plural_pinelabs.expresscheckoutsdk.common.OtpInputView
 import com.plural_pinelabs.expresscheckoutsdk.common.TimerManager
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils
+import com.plural_pinelabs.expresscheckoutsdk.common.Utils.showProcessPaymentDialog
+import com.plural_pinelabs.expresscheckoutsdk.data.model.CustomerInfo
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CustomerInfoResponse
+import com.plural_pinelabs.expresscheckoutsdk.data.model.ExpressAddressResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.OTPRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.model.UpdateOrderDetails
 import kotlinx.coroutines.launch
@@ -35,7 +38,6 @@ class VerifyOTPFragment : Fragment() {
     private lateinit var verifyOtpBtn: Button
     private lateinit var resendTimer: TimerManager
     private var bottomSheetDialog: BottomSheetDialog? = null
-    private var isOtpVerified: Boolean = false
 
     private val viewModel: D2CViewModel by activityViewModels {
         D2CViewModelFactory(NetworkHelper(requireContext()))
@@ -62,20 +64,16 @@ class VerifyOTPFragment : Fragment() {
         verifyOtpBtn = view.findViewById(R.id.verify_otp_btn)
         setPhoneNumber()
         startResendOtpTimer()
-        handleVerifyOtpButton()
         handleClickListener()
         otpInputView.setOtpCompleteListener {
             if (otpInputView.getOtp().length >= 5) {
                 // Handle OTP input completion
-                isOtpVerified = true
                 Utils.handleCTAEnableDisable(requireContext(), true, verifyOtpBtn)
             }
         }
     }
 
-    private fun handleVerifyOtpButton() {
 
-    }
 
     private fun handleClickListener() {
         resentOTPTv.setOnClickListener {
@@ -88,17 +86,19 @@ class VerifyOTPFragment : Fragment() {
         }
 
         verifyOtpBtn.setOnClickListener {
-            // TODO verify otp
-            findNavController().navigate(R.id.action_verifyOTPFragment_to_newAddressFormFragment)
-            return@setOnClickListener
             val otp = otpInputView.getOtp()
-            val token = ExpressSDKObject.getToken()
             val otpId = viewModel.otpId ?: ""
-            val customerId = viewModel.customerInfo?.customerId ?: ""
-            val customerInfo = ExpressSDKObject.getFetchData()?.customerInfo
-            customerInfo?.mobile_number = ExpressSDKObject.getPhoneNumber()
-            customerInfo?.customer_id = customerId
-            customerInfo?.country_code = viewModel.countryCode // harcoded for now
+            val customerObj = ExpressSDKObject.getFetchData()?.customerInfo
+            val customerId =
+                viewModel.customerInfo?.customerId ?: viewModel.customerInfo?.customer_id ?: ""
+            val customerInfo = CustomerInfo()
+            val emailId = customerObj?.emailId ?: customerObj?.email_id
+            ?: ""// TODO pass the user enter email if avvailable
+            customerInfo.mobile_number = ExpressSDKObject.getPhoneNumber()
+            customerInfo.customer_id = customerId
+            customerInfo.emailId = emailId
+            customerInfo.is_edit_customer_details_allowed = true
+            customerInfo.countryCode = viewModel.countryCode // harcoded for now
             val updateOrderDetails = UpdateOrderDetails(
                 customerInfo
             )
@@ -156,7 +156,7 @@ class VerifyOTPFragment : Fragment() {
                         }
 
                         is BaseResult.Success<CustomerInfoResponse> -> {
-                            //TODO handle success flow
+                            viewModel.getAddressList(result.data.customerToken)
                         }
 
                         is BaseResult.Loading -> {
@@ -165,5 +165,43 @@ class VerifyOTPFragment : Fragment() {
                 }
             }
         }
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED)
+            {
+                viewModel.addressResponse.collect {
+                    when (it) {
+                        is BaseResult.Error -> {
+                            //TODO handle failure
+                            bottomSheetDialog?.dismiss()
+                        }
+
+                        is BaseResult.Loading -> {
+                            if (it.isLoading)
+                                bottomSheetDialog = showProcessPaymentDialog(requireContext())
+                        }
+
+                        is BaseResult.Success<ExpressAddressResponse?> -> {
+                            //Fetching address list
+                            val list = it.data?.data?.getCustomerAddresses?.data?.addresses
+                            ExpressSDKObject.setAddressList(list)
+                            if (list.isNullOrEmpty() && ExpressSDKObject.getFetchData()?.shippingAddress?.address1 != null) {
+                                val addressList = ExpressSDKObject.getAddressList()
+                                val shippingAddress =
+                                    ExpressSDKObject.getFetchData()?.shippingAddress
+                                val updatedList = addressList?.toMutableList() ?: mutableListOf()
+                                shippingAddress?.let { it1 -> updatedList.add(0, it1) }
+                                findNavController().navigate(R.id.action_verifyOTPFragment_to_savedAddressFragment)
+                            } else {
+                                findNavController().navigate(R.id.action_verifyOTPFragment_to_newAddressFormFragment)
+                                //navigate
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
     }
+
 }

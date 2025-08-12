@@ -157,13 +157,17 @@ class DCEMICardDetailsFragment : Fragment() {
             )
         emiForXMonthTv.text =
             String.format(getString(R.string.for_x_months), selectedTenure?.tenure_value.toString())
-        val saving = selectedTenure?.total_discount_amount?.value
-
-        saveInfoText.text =
-            String.format(
-                getString(R.string.you_re_saving_x_on_this_order), Utils.convertInRupees(saving)
-
+        val totalSaving = (selectedTenure?.total_discount_amount?.value
+            ?: 0) + (selectedTenure?.total_subvention_amount?.value ?: 0)
+        if (totalSaving != 0) {
+            val amount = Utils.convertInRupees(totalSaving)
+            saveInfoText.text = String.format(
+                getString(R.string.you_re_saving_x_on_this_order), amount
             )
+        } else {
+            saveInfoText.visibility = View.GONE
+
+        }
 
         emiPayingTenureText.text =
             String.format(
@@ -215,9 +219,11 @@ class DCEMICardDetailsFragment : Fragment() {
 
     private fun setUpAmount() {
         payBtn.text = getString(
-            R.string.pay_amount_text,
-            getString(R.string.rupee_symbol),
-            Utils.convertInRupees(ExpressSDKObject.getAmount())
+            R.string.pay_emi_x_per_month,
+            Utils.convertToRupeesWithSymobl(
+                requireContext(),
+                selectedTenure?.monthly_emi_amount?.value
+            )
         )
         payBtn.setOnClickListener {
             validateAllFields()

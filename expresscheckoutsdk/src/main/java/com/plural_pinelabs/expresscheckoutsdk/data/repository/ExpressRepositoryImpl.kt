@@ -116,6 +116,15 @@ class ExpressRepositoryImpl(
         }
     }
 
+    override suspend fun addCustomerAddresses(
+        token: String?,
+        request: ExpressAddress
+    ): Flow<BaseResult<ExpressAddressResponse>> {
+        return toResultFlow(networkHelper = networkHelper) {
+            (apiService as ExpressApiService).addCustomerAddresses("Bearer ${token?.trim()}", request)
+        }
+    }
+
     override suspend fun createInactiveUser(
         token: String?,
         request: CustomerInfo?

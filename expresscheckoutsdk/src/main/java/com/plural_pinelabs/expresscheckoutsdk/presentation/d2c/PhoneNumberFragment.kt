@@ -83,7 +83,7 @@ class PhoneNumberFragment : Fragment() {
                         }
 
                         is BaseResult.Success<CustomerInfo?> -> {
-                            val customerId = it.data?.customerId
+                            val customerId = it.data?.customer_id
                             viewModel.customerInfo = it.data
                             val otpRequest = OTPRequest(customerId = customerId)
                             viewModel.sendOtp(
@@ -184,18 +184,7 @@ class PhoneNumberFragment : Fragment() {
             }
 
             override fun afterTextChanged(s: Editable?) {
-                isPhoneNumberValid = s.toString()
-                    .isNotNullAndBlank() && s.toString().length == 10 && Utils.isValidPhoneNumber(s.toString())
-                continueBtn.isEnabled = isPhoneNumberValid
-                Utils.showRemoveErrorBackground(
-                    requireContext(),
-                    null,
-                    R.drawable.input_field_border,
-                    isPhoneNumberValid,
-                    phoneNumberEt.hasFocus(),
-                    viewGroup = phoneNumberParentLayout
-                )
-                Utils.handleCTAEnableDisable(requireContext(), isPhoneNumberValid, continueBtn)
+               onNumberChange(s)
             }
         })
 
@@ -214,7 +203,7 @@ class PhoneNumberFragment : Fragment() {
                     requireContext(),
                     null,
                     R.drawable.input_field_border,
-                    isPhoneNumberValid,
+                    !isPhoneNumberValid,
                     false,
                     viewGroup = phoneNumberParentLayout
                 )
@@ -242,11 +231,11 @@ class PhoneNumberFragment : Fragment() {
             }
             ExpressSDKObject.setPhoneNumber(phoneNumberEt.text.toString())
             viewModel.phoneNumber = phoneNumberEt.text.toString()
-            viewModel.countryCode = "+91"
+            viewModel.countryCode = "91"
             viewModel.email = emailEt.text.toString()
             val customerInfo = CustomerInfo(
                 mobileNumber = viewModel.phoneNumber,
-                countryCode = "+91",
+                countryCode = "91",
                 emailId = emailEt.text.toString() // Assuming +91 as default country code since we are not using a country picker here for now
             )
             viewModel.createInactiveUser(ExpressSDKObject.getToken(), customerInfo)
@@ -262,14 +251,31 @@ class PhoneNumberFragment : Fragment() {
         continueBtn = view.findViewById(R.id.continue_btn)
         phoneNumberParentLayout = view.findViewById(R.id.phone_parent_layout)
         emailParentLayout = view.findViewById(R.id.email_et_layout)
-        val existingPhoneNumber = ExpressSDKObject.getPhoneNumber()
+        val existingPhoneNumber = ExpressSDKObject.getFetchData()?.customerInfo?.mobileNo
         val email = ExpressSDKObject.getFetchData()?.customerInfo?.emailId
         if (existingPhoneNumber.isNotNullAndBlank()) {
             phoneNumberEt.text = Editable.Factory.getInstance().newEditable(existingPhoneNumber)
+            onNumberChange(phoneNumberEt.text)
         }
         if (email.isNotNullAndBlank()) {
             emailEt.text = Editable.Factory.getInstance().newEditable(email)
         }
+
+    }
+
+    private fun onNumberChange(s: Editable?) {
+        isPhoneNumberValid = s.toString()
+            .isNotNullAndBlank() && s.toString().length == 10 && Utils.isValidPhoneNumber(s.toString())
+        continueBtn.isEnabled = isPhoneNumberValid
+        Utils.showRemoveErrorBackground(
+            requireContext(),
+            null,
+            R.drawable.input_field_border,
+            !isPhoneNumberValid,
+            phoneNumberEt.hasFocus(),
+            viewGroup = phoneNumberParentLayout
+        )
+        Utils.handleCTAEnableDisable(requireContext(), isPhoneNumberValid, continueBtn)
     }
 
 }
