@@ -189,7 +189,7 @@ class PhoneNumberFragment : Fragment() {
         })
 
         phoneNumberEt.setOnFocusChangeListener { _, hasFocus ->
-            if (hasFocus) {
+           if (hasFocus) {
                 Utils.showRemoveErrorBackground(
                     requireContext(),
                     null,
@@ -229,7 +229,13 @@ class PhoneNumberFragment : Fragment() {
                 )
                 return@setOnClickListener
             }
+
             ExpressSDKObject.setPhoneNumber(phoneNumberEt.text.toString())
+            if ((ExpressSDKObject.getFetchData()?.customerInfo?.customerToken) != null
+            ) {
+                  findNavController().navigate(R.id.action_phoneNumberFragment_to_verifyOTPFragment)
+            }
+            else{
             viewModel.phoneNumber = phoneNumberEt.text.toString()
             viewModel.countryCode = "91"
             viewModel.email = emailEt.text.toString()
@@ -238,8 +244,8 @@ class PhoneNumberFragment : Fragment() {
                 countryCode = "91",
                 emailId = emailEt.text.toString() // Assuming +91 as default country code since we are not using a country picker here for now
             )
-            viewModel.createInactiveUser(ExpressSDKObject.getToken(), customerInfo)
-            //  findNavController().navigate(R.id.action_phoneNumberFragment_to_verifyOTPFragment)
+                viewModel.createInactiveUser(ExpressSDKObject.getToken(), customerInfo)
+            }
         }
     }
 

@@ -1,5 +1,7 @@
 package com.plural_pinelabs.expresscheckoutsdk.data.fetch
 
+import com.plural_pinelabs.expresscheckoutsdk.data.model.Address
+import com.plural_pinelabs.expresscheckoutsdk.data.model.AddressResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CardBinMetaDataRequestList
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CardBinMetaDataResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CustomerInfo
@@ -112,6 +114,16 @@ interface CommonApiService : ApiService {
         @Query("token", encoded = true) token: String?,
         @Body request: ProcessPaymentRequest?
     ): Response<KFSResponse>
+
+
+    @POST("update/address")
+    suspend fun updateAddress(
+        @Query("token", encoded = true) token: String?,
+        @Body request: Address?
+    ): Response<AddressResponse>
+
+
+
 
 }
 

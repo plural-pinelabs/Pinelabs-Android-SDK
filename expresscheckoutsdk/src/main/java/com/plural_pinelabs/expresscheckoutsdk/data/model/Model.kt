@@ -51,12 +51,19 @@ data class Currency(
 
 @Parcelize
 data class Address(
-    val address1: String?,
-    val address2: String?,
-    val pincode: String?,
-    val city: String?,
-    val state: String?,
-    val country: String?
+    val id: String? = null,
+    val customer_id: String? = null,
+    val full_name: String,
+    val address1: String,
+    val address2: String,
+    val address3: String? = null,
+    val pincode: String,
+    val city: String,
+    val state: String,
+    val country: String,
+    val address_type: String,
+    val address_category: String
+
 ) : Parcelable
 
 data class FetchError(
@@ -141,6 +148,8 @@ data class RecyclerViewPaymentOptionData(
 @Parcelize
 // New data class to hold customer information
 data class CustomerInfo(
+    val lastUsedPaymode: LastUsedPaymode? = null,
+    val shipping_address: Address? = null,
     val customerId: String? = null,
     var customer_id: String? = null,
     val firstName: String? = null,
@@ -163,7 +172,8 @@ data class CustomerInfo(
     var billingAddress: Address? = null,
     val status: String? = null,
     val created_at: String? = null,
-    val updated_at: String? = null
+    val updated_at: String? = null,
+    var customerToken: String? = null
 ) : Parcelable
 
 data class CustomerInfoResponse(
@@ -606,9 +616,10 @@ data class ExpressAddress(
 
 @Parcelize
 data class Variables(
-    val customerToken: String?=null,
+    val customerToken: String? = null,
     val customerId: String? = null,
     val addresses: List<Address>? = null,
+    val addressId: String? = null,
 ) : Parcelable
 
 
@@ -620,7 +631,7 @@ data class ExpressAddressResponse(
 
 @Parcelize
 data class Data(
-    val getCustomerAddresses: CustomerAddresses
+    val getCustomerAddressesByMobile: CustomerAddresses
 ) : Parcelable
 
 @Parcelize
@@ -875,5 +886,36 @@ data class ExpressCheckoutSettings(
     val enableEDD: Boolean,
     val enableLogisticsPush: Boolean
 ) : Parcelable
+
+
+@Parcelize
+data class AddressResponse(
+    val status: String,
+    val message: String,
+    val data: CustomerData
+) : Parcelable
+
+@Parcelize
+data class CustomerInfoData(
+    val customerInfo: CustomerInfo
+) : Parcelable
+
+
+@Parcelize
+data class LastUsedPaymode(
+    val upi: Upi,
+    val card: Card
+) : Parcelable
+
+@Parcelize
+data class Upi(
+    val lastUsedVPAs: List<String>
+) : Parcelable
+
+@Parcelize
+data class Card(
+    val lastUsedCard: List<String>
+) : Parcelable
+
 
 

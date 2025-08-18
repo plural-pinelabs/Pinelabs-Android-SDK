@@ -2,15 +2,25 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:layout_marginVertical="8dp"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="16dp">
+    android:id="@+id/saved_address_item_parent"
+    android:background="@drawable/input_field_border"
+    android:padding="8dp">
 
     <TextView
+        android:id="@+id/address_type"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@drawable/rectangle_denser_bg"
-        android:padding="6dp"
+        android:fontFamily="sans-serif"
+        android:paddingHorizontal="12dp"
+        android:paddingVertical="6dp"
+        android:textColor="@color/black_text"
+        android:textFontWeight="700"
+        android:textSize="12sp"
+        android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="Home" />
@@ -19,10 +29,58 @@
         android:id="@+id/edit_address_icon"
         android:layout_width="24dp"
         android:layout_height="24dp"
+        android:layout_marginEnd="8dp"
         android:src="@drawable/ic_edit"
+        app:layout_constraintEnd_toStartOf="@id/delete_address_icon"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/delete_address_icon"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:src="@drawable/ic_trash"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <TextView
+        android:id="@+id/first_name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:fontFamily="sans-serif-medium"
+        android:textColor="@color/black_text_80"
+        android:textFontWeight="500"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toStartOf="@id/edit_address_icon"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/address_type" />
+
+    <TextView
+        android:id="@+id/address_line_1"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:fontFamily="sans-serif-medium"
+        android:textColor="@color/black_text_80"
+        android:textFontWeight="500"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toStartOf="@id/edit_address_icon"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/first_name" />
+
+    <TextView
+        android:id="@+id/city_pincode"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:layout_marginBottom="8dp"
+        android:fontFamily="sans-serif-medium"
+        android:textColor="@color/black_text_80"
+        android:textFontWeight="500"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toStartOf="@id/edit_address_icon"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/address_line_1" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

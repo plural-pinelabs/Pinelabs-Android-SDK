@@ -13,6 +13,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import com.clevertap.android.sdk.isNotNullAndBlank
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.plural_pinelabs.expresscheckoutsdk.ExpressSDKObject
 import com.plural_pinelabs.expresscheckoutsdk.R
@@ -38,6 +39,8 @@ class VerifyOTPFragment : Fragment() {
     private lateinit var verifyOtpBtn: Button
     private lateinit var resendTimer: TimerManager
     private var bottomSheetDialog: BottomSheetDialog? = null
+    private var isCustomerTokenAvailable: Boolean = false
+
 
     private val viewModel: D2CViewModel by activityViewModels {
         D2CViewModelFactory(NetworkHelper(requireContext()))
@@ -52,9 +55,18 @@ class VerifyOTPFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setView(view)
         observeViewModel()
-        startResendOtpTimer()
+        isCustomerTokenAvailable =
+            ExpressSDKObject.getFetchData()?.customerInfo?.customerToken.isNotNullAndBlank()
+        if (isCustomerTokenAvailable) {
+            bottomSheetDialog = showProcessPaymentDialog(requireContext())
+            ExpressSDKObject.setCustomerId(ExpressSDKObject.getFetchData()?.customerInfo?.customerId)
+            ExpressSDKObject.setCustomerToken(ExpressSDKObject.getFetchData()?.customerInfo?.customerToken)
+            viewModel.getAddressList(ExpressSDKObject.getCustomerToken())
+        } else {
+            setView(view)
+            startResendOtpTimer()
+        }
     }
 
     private fun setView(view: View) {
@@ -72,7 +84,6 @@ class VerifyOTPFragment : Fragment() {
             }
         }
     }
-
 
 
     private fun handleClickListener() {
@@ -149,17 +160,26 @@ class VerifyOTPFragment : Fragment() {
                 viewModel.submitOTPResult.collect { result ->
                     when (result) {
                         is BaseResult.Error -> {
+                            bottomSheetDialog?.dismiss()
                             result.errorCode.let { exception ->
                                 Log.e("Error", exception)
+
                             }
 
                         }
 
                         is BaseResult.Success<CustomerInfoResponse> -> {
+                            val id = result.data.customerInfo?.customer_id
+                                ?: result.data.customerInfo?.customerId
+                                ?: ExpressSDKObject.getFetchData()?.customerInfo?.customerId
+                            ExpressSDKObject.setCustomerId(id)
+                            ExpressSDKObject.setCustomerToken(result.data.customerToken)
                             viewModel.getAddressList(result.data.customerToken)
                         }
 
                         is BaseResult.Loading -> {
+                            if (result.isLoading)
+                                bottomSheetDialog = showProcessPaymentDialog(requireContext())
                         }
                     }
                 }
@@ -177,20 +197,22 @@ class VerifyOTPFragment : Fragment() {
                         }
 
                         is BaseResult.Loading -> {
-                            if (it.isLoading)
-                                bottomSheetDialog = showProcessPaymentDialog(requireContext())
+
                         }
 
                         is BaseResult.Success<ExpressAddressResponse?> -> {
+                            bottomSheetDialog?.dismiss()
                             //Fetching address list
-                            val list = it.data?.data?.getCustomerAddresses?.data?.addresses
-                            ExpressSDKObject.setAddressList(list)
-                            if (list.isNullOrEmpty() && ExpressSDKObject.getFetchData()?.shippingAddress?.address1 != null) {
-                                val addressList = ExpressSDKObject.getAddressList()
-                                val shippingAddress =
-                                    ExpressSDKObject.getFetchData()?.shippingAddress
-                                val updatedList = addressList?.toMutableList() ?: mutableListOf()
-                                shippingAddress?.let { it1 -> updatedList.add(0, it1) }
+                            val list = it.data?.data?.getCustomerAddressesByMobile?.data?.addresses
+                            if (!list.isNullOrEmpty()) {
+
+                                val updatedList = list.toMutableList() ?: mutableListOf()
+                                if (ExpressSDKObject.getFetchData()?.shippingAddress?.address1 != null) {
+                                    val shippingAddress =
+                                        ExpressSDKObject.getFetchData()?.shippingAddress
+                                    shippingAddress?.let { it1 -> updatedList.add(0, it1) }
+                                }
+                                ExpressSDKObject.setAddressList(updatedList)
                                 findNavController().navigate(R.id.action_verifyOTPFragment_to_savedAddressFragment)
                             } else {
                                 findNavController().navigate(R.id.action_verifyOTPFragment_to_newAddressFormFragment)

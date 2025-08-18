@@ -16,10 +16,19 @@ import android.widget.RadioGroup
 import android.widget.TextView
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
-import androidx.navigation.fragment.findNavController
+import androidx.fragment.app.activityViewModels
+import com.plural_pinelabs.expresscheckoutsdk.ExpressSDKObject
 import com.plural_pinelabs.expresscheckoutsdk.R
+import com.plural_pinelabs.expresscheckoutsdk.common.D2CViewModelFactory
+import com.plural_pinelabs.expresscheckoutsdk.common.NetworkHelper
+import com.plural_pinelabs.expresscheckoutsdk.data.model.Address
 
 class NewAddressFormFragment : Fragment() {
+
+    private val viewModel: D2CViewModel by activityViewModels {
+        D2CViewModelFactory(NetworkHelper(requireContext()))
+    }
+
     private lateinit var fullNameEt: EditText
     private lateinit var pinCodeEt: EditText
     private lateinit var cityEt: EditText
@@ -30,6 +39,7 @@ class NewAddressFormFragment : Fragment() {
     private lateinit var addressType: RadioGroup
     private lateinit var saveBtn: Button
     private var selectedAddressType: String = "Home" // Default value
+    private var isEditMode: Boolean = false // Flag to check if it's in edit mode
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -41,9 +51,28 @@ class NewAddressFormFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        //  setViews(view)
-
-        findNavController().navigate(R.id.action_newAddressFormFragment_to_paymentModeFragment)
+        val bundle = arguments
+        if (bundle != null) {
+            isEditMode = bundle.getBoolean("isEditAddress", false)
+        }
+        setViews(view)
+        if (isEditMode) {
+            val existingAddress = ExpressSDKObject.getSelectedAddress()
+            // Populate the fields with existing address data if in edit mode
+            // For example, you can set the text of EditTexts with existing address values
+            fullNameEt.setText(existingAddress?.full_name)
+            pinCodeEt.setText(existingAddress?.pincode)
+            cityEt.setText(existingAddress?.city)
+            stateEt.setText(existingAddress?.state)
+            addressLine1Et.setText(existingAddress?.address1)
+            addressLine2Et.setText(existingAddress?.address2)
+            when (existingAddress?.address_type) {
+                "Home" -> addressType.check(R.id.home_radio_button)
+                "Work" -> addressType.check(R.id.work_radio_button)
+                "Other" -> addressType.check(R.id.other_radio_button)
+                else -> addressType.check(R.id.home_radio_button) // Default to Home if no match
+            }
+        }
     }
 
 
@@ -117,23 +146,25 @@ class NewAddressFormFragment : Fragment() {
         setSaveAddressHyperLinkForTerms()
         setFocusChangeListeners()
         saveBtn.setOnClickListener {
-            // Validate fields and save address
             if (isAllFieldValid()) {
-                //    val request = getSaveAddressRequest()
-
-                // Proceed with saving the address
-                // You can call a method in your ViewModel to handle the save operation
-                // viewModel.saveAddress(...)
+                val address = Address(
+                    full_name = fullNameEt.text.toString().trim(),
+                    pincode = pinCodeEt.text.toString().trim(),
+                    city = cityEt.text.toString().trim(),
+                    state = stateEt.text.toString().trim(),
+                    address1 = addressLine1Et.text.toString().trim(),
+                    address2 = addressLine2Et.text.toString().trim(),
+                    address_type = selectedAddressType,
+                    address_category = "D2C",
+                    country = "India",
+                )
+                viewModel.saveAddress(address)
             } else {
                 // Show error message
             }
         }
     }
 
-//    private fun getSaveAddressRequest(): Any {
-//
-//
-//    }
 
     private fun setFocusChangeListeners() {
         fullNameEt.setOnFocusChangeListener { _, hasFocus ->

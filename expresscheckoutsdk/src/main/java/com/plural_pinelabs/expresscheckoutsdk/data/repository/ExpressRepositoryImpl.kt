@@ -6,6 +6,8 @@ import com.plural_pinelabs.expresscheckoutsdk.common.toResultFlow
 import com.plural_pinelabs.expresscheckoutsdk.data.fetch.CommonApiService
 import com.plural_pinelabs.expresscheckoutsdk.data.fetch.ExpressApiService
 import com.plural_pinelabs.expresscheckoutsdk.data.fetch.FetchApiService
+import com.plural_pinelabs.expresscheckoutsdk.data.model.Address
+import com.plural_pinelabs.expresscheckoutsdk.data.model.AddressResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CardBinMetaDataRequestList
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CardBinMetaDataResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CustomerInfo
@@ -107,12 +109,12 @@ class ExpressRepositoryImpl(
         }
     }
 
-    override suspend fun fetchAddress(
+    override suspend fun graphQl(
         token: String?,
         request: ExpressAddress
     ): Flow<BaseResult<ExpressAddressResponse>> {
         return toResultFlow(networkHelper = networkHelper) {
-            (apiService as ExpressApiService).fetchAddress("Bearer ${token?.trim()}", request)
+            (apiService as ExpressApiService).graphQl("Bearer ${token?.trim()}", request)
         }
     }
 
@@ -158,6 +160,15 @@ class ExpressRepositoryImpl(
     ): Flow<BaseResult<CustomerInfoResponse>> {
         return toResultFlow(networkHelper = networkHelper) {
             (apiService as CommonApiService).validateUpdateOrder(token, request)
+        }
+    }
+
+    override suspend fun getUpdateAddress(
+        token: String?,
+        request: Address?
+    ): Flow<BaseResult<AddressResponse>> {
+        return toResultFlow(networkHelper = networkHelper) {
+            (apiService as CommonApiService).updateAddress(token, request)
         }
     }
 }

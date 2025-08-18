@@ -5,7 +5,8 @@ import com.google.gson.GsonBuilder
 import com.plural_pinelabs.expresscheckoutsdk.BuildConfig
 import com.plural_pinelabs.expresscheckoutsdk.ExpressSDKObject
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.BASE_CHECKOUTBFF
-import com.plural_pinelabs.expresscheckoutsdk.common.Constants.BASE_URL_EXPRESS_DEV
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.BASE_URL_EXPRESS_PROD
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.BASE_URL_EXPRESS_UAT
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.BASE_URL_PROD
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.BASE_URL_QA
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.BASE_URL_UAT
@@ -46,7 +47,7 @@ object RetrofitBuilder {
     private fun getRetrofitForExpressCheckout(): Retrofit {
         //TODO update the prod url of the express checout and dev to UAT
         val baseUrl =
-            if (ExpressSDKObject.isSandBoxMode()) BASE_URL_EXPRESS_DEV else BASE_URL_EXPRESS_DEV
+            if (ExpressSDKObject.isSandBoxMode()) BASE_URL_EXPRESS_UAT else BASE_URL_EXPRESS_PROD
         return Retrofit.Builder()
             .baseUrl(HTTPS + baseUrl)
             .addConverterFactory(GsonConverterFactory.create())

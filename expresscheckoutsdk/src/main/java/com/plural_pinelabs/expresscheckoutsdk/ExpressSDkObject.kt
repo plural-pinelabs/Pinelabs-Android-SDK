@@ -24,6 +24,9 @@ internal data class SDKObject(
     var selectedTenure: Tenure? = null,
     var selectedOfferDetail: OfferDetail? = null,
     var addressList: List<Address>? = null,
+    var selectedAddress: Address? = null,
+    var customerId:String? = null,
+    var customerToken: String? = null
 )
 
 internal object ExpressSDKObject {
@@ -154,6 +157,28 @@ internal object ExpressSDKObject {
 
     fun setAddressList(addressList: List<Address>?) {
         getSDKObject()?.addressList = addressList
+    }
+
+    fun getSelectedAddress(): Address? {
+        return getSDKObject()?.selectedAddress
+    }
+    fun setSelectedAddress(address: Address?) {
+        getSDKObject()?.selectedAddress = address
+    }
+
+    fun getCustomerId(): String? {
+        return getSDKObject()?.customerId
+    }
+    fun setCustomerId(customerId: String?) {
+        getSDKObject()?.customerId = customerId
+    }
+
+    fun getCustomerToken(): String? {
+        return getSDKObject()?.customerToken
+    }
+
+    fun setCustomerToken(customerToken: String?) {
+        getSDKObject()?.customerToken = customerToken
     }
 }
 

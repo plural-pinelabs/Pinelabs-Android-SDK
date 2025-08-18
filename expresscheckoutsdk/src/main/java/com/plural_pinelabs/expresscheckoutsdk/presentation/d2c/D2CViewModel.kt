@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.plural_pinelabs.expresscheckoutsdk.ExpressSDKObject
 import com.plural_pinelabs.expresscheckoutsdk.common.BaseResult
 import com.plural_pinelabs.expresscheckoutsdk.data.model.Address
+import com.plural_pinelabs.expresscheckoutsdk.data.model.AddressResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CustomerInfo
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CustomerInfoResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ExpressAddress
@@ -42,6 +43,23 @@ class D2CViewModel(
         MutableStateFlow<BaseResult<ExpressAddressResponse>>(BaseResult.Loading(false))
     val addressResponse: StateFlow<BaseResult<ExpressAddressResponse>> = _addressResponse
 
+    private val _addressFetchResponse =
+        MutableStateFlow<BaseResult<ExpressAddressResponse>>(BaseResult.Loading(false))
+    val addressFetchResponse: StateFlow<BaseResult<ExpressAddressResponse>> = _addressFetchResponse
+
+    private val _addressDeleteResponse =
+        MutableStateFlow<BaseResult<ExpressAddressResponse>>(BaseResult.Loading(false))
+    val addressDeleteResponse: StateFlow<BaseResult<ExpressAddressResponse>> =
+        _addressDeleteResponse
+
+    private val _addressSaveResponse =
+        MutableStateFlow<BaseResult<ExpressAddressResponse>>(BaseResult.Loading(false))
+    val addressSaveResponse: StateFlow<BaseResult<ExpressAddressResponse>> = _addressDeleteResponse
+
+    private val _updateAddressResponse =
+        MutableStateFlow<BaseResult<AddressResponse>>(BaseResult.Loading(false))
+    private val updateAddressResponse: StateFlow<BaseResult<AddressResponse>> =
+        _updateAddressResponse
 
     var phoneNumber: String? = null
     var email: String? = null
@@ -59,6 +77,17 @@ class D2CViewModel(
         isOtpVerified = false
         addressList = null
         selectedAddress = null
+    }
+
+    fun updateAddress(address: Address?) {
+        viewModelScope.launch(Dispatchers.IO) {
+            commonRepositoryImpl.getUpdateAddress(
+                token = ExpressSDKObject.getToken(),
+                address
+            ).collect {
+                _updateAddressResponse.value = it
+            }
+        }
     }
 
     fun createInactiveUser(token: String?, request: CustomerInfo?) =
@@ -89,7 +118,7 @@ class D2CViewModel(
 
     fun getAddressList(customerToken: String?) {
         viewModelScope.launch(Dispatchers.IO) {
-            expressRepositoryImpl.fetchAddress(
+            expressRepositoryImpl.graphQl(
                 token = ExpressSDKObject.getToken(),
                 getAddressObject(customerToken)
             ).collect {
@@ -98,37 +127,72 @@ class D2CViewModel(
         }
     }
 
-    fun saveAddress(customerId: String?,address: Address?) {
+    fun getUpdatedAddressList(customerToken: String?) {
         viewModelScope.launch(Dispatchers.IO) {
-            expressRepositoryImpl.addCustomerAddresses(
+            expressRepositoryImpl.graphQl(
                 token = ExpressSDKObject.getToken(),
-                getAddCustomerAddressObject(customerId,address)
+                getAddressObject(customerToken)
             ).collect {
-                _addressResponse.value = it
+                _addressFetchResponse.value = it
             }
         }
     }
 
-    private fun getAddressObject(customerToken: String?): ExpressAddress {
-        val query =
-            "query GetCustomerAddresses(\$customerId: String!) { getCustomerAddresses(customerId: \$customerId) { success message data { addresses { full_name address1 address2 address3 pincode city state country address_type address_category } } error } }"
-        val variables = Variables(customerToken ?: "")
-        val expressAddress = ExpressAddress(null, query, variables)
-        return expressAddress
+    fun saveAddress(address: Address?) {
+        viewModelScope.launch(Dispatchers.IO) {
+            expressRepositoryImpl.graphQl(
+                token = ExpressSDKObject.getToken(),
+                getSaveAddressObject(address)
+            ).collect {
+                _addressSaveResponse.value = it
+            }
+        }
     }
 
 
-    private fun getAddCustomerAddressObject(
-        customerId: String? = null,
-        address: Address?
-    ): ExpressAddress {
-        val query =
-            "mutation AddCustomerAddresses(\$customerId: String!, \$addresses: [CustomerAddressInput]!) { addCustomerAddresses(customerId: \$customerId, addresses: \$addresses) { success message data { addresses { full_name address1 city state country address_type address_category } } error } }"
-        val addressList: ArrayList<Address> = arrayListOf()
-        address?.let { addressList.add(it) }
+    fun deleteAddress(address: Address?) {
+        viewModelScope.launch(Dispatchers.IO) {
+            expressRepositoryImpl.graphQl(
+                token = ExpressSDKObject.getToken(),
+                getDeleteAddressObject(address)
+            ).collect {
+                _addressDeleteResponse.value = it
+            }
+        }
+    }
 
-        val variables = Variables(customerId = customerId, addresses = addressList)
-        return ExpressAddress(null, query, variables)
+    private fun getDeleteAddressObject(address: Address?): ExpressAddress {
+
+        val deleteCustomerAddressMutation =
+            "mutation DeleteCustomerAddress(\$customerId: String!, \$addressId: String!) { deleteCustomerAddress(customerId: \$customerId, addressId: \$addressId) { success message error } }"
+        val variables =
+            Variables(customerId = ExpressSDKObject.getCustomerId(), addressId = address?.id)
+        val expressAddress =
+            ExpressAddress("DeleteCustomerAddress", deleteCustomerAddressMutation, variables)
+        return expressAddress
+    }
+
+    private fun getSaveAddressObject(address: Address?): ExpressAddress {
+
+        val addCustomerAddressesMutation =
+            "mutation AddCustomerAddresses(\$customerId: String!, \$addresses: [CustomerAddressInput]!) { addCustomerAddresses(customerId: \$customerId, addresses: \$addresses) { success message data { addresses { customer_id full_name address1 address2 address3 pincode city state country address_type address_category } } error } }"
+        val addresses: ArrayList<Address> = arrayListOf()
+        if (address != null) {
+            addresses.add(address)
+        }
+        val variables =
+            Variables(customerId = ExpressSDKObject.getCustomerId(), addresses = addresses)
+        val expressAddress =
+            ExpressAddress("AddCustomerAddresses", addCustomerAddressesMutation, variables)
+        return expressAddress
+    }
+
+    private fun getAddressObject(customerToken: String?): ExpressAddress {
+        val query = "\n" +
+                "query GetCustomerAddressesByMobile(\$customerToken: String!, \$merchantId: String) { getCustomerAddressesByMobile(customerToken: \$customerToken, merchantId: \$merchantId) { success message data { addresses { id customer_id full_name address1 address2 address3 pincode city state country address_type address_category } } error } }"
+        val variables = Variables(customerToken ?: "")
+        val expressAddress = ExpressAddress(null, query, variables)
+        return expressAddress
     }
 
 }

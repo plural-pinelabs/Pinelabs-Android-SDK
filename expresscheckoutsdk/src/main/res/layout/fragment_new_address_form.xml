@@ -37,11 +37,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:inputType="text"
             android:autofillHints="name"
             android:background="@drawable/input_field_border"
             android:fontFamily="sans-serif"
             android:hint="@string/enter_full_name"
+            android:inputType="text"
             android:padding="15dp"
             android:textColorHint="@color/black_text_30"
             android:textSize="14sp" />
@@ -64,7 +64,6 @@
             android:orientation="vertical">
 
             <EditText
-                android:inputType="number"
                 android:id="@+id/pin_code_edit_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -72,6 +71,7 @@
                 android:background="@drawable/input_field_top_border"
                 android:fontFamily="sans-serif-medium"
                 android:hint="@string/enter_pincode"
+                android:inputType="number"
                 android:padding="15dp"
                 android:textColorHint="@color/black_text_30"
                 android:textSize="14sp" />
@@ -88,7 +88,6 @@
                 android:orientation="horizontal">
 
                 <EditText
-                    android:inputType="text"
                     android:id="@+id/city_edit_text"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -96,6 +95,7 @@
                     android:background="@drawable/input_field_bottom_left_border"
                     android:fontFamily="sans-serif-medium"
                     android:hint="@string/city"
+                    android:inputType="text"
                     android:padding="15dp"
                     android:textColorHint="@color/black_text_30"
                     android:textSize="14sp" />
@@ -108,7 +108,6 @@
                     android:visibility="gone" />
 
                 <EditText
-                    android:inputType="text"
                     android:id="@+id/state_edit_text"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -116,6 +115,7 @@
                     android:background="@drawable/input_field_bottom_right_border"
                     android:fontFamily="sans-serif-medium"
                     android:hint="@string/state"
+                    android:inputType="text"
                     android:padding="15dp"
                     android:textColorHint="@color/black_text_30"
                     android:textSize="14sp" />
@@ -144,7 +144,6 @@
             android:orientation="vertical">
 
             <EditText
-                android:inputType="textPostalAddress"
                 android:id="@+id/address_line_1_edit_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -152,6 +151,7 @@
                 android:background="@android:color/transparent"
                 android:fontFamily="sans-serif-medium"
                 android:hint="@string/house_apartment_no_building_name"
+                android:inputType="textPostalAddress"
                 android:textColorHint="@color/black_text_30"
                 android:textSize="14sp" />
 
@@ -161,7 +161,6 @@
                 android:background="@color/black_text_12" />
 
             <EditText
-                android:inputType="textPostalAddress"
                 android:id="@+id/address_line_2_edit_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -169,6 +168,7 @@
                 android:background="@android:color/transparent"
                 android:fontFamily="sans-serif-medium"
                 android:hint="@string/street_name_locality"
+                android:inputType="textPostalAddress"
                 android:textColorHint="@color/black_text_30"
                 android:textSize="14sp" />
 
@@ -187,12 +187,12 @@
                 android:id="@+id/save_address_checkbox"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
-                android:buttonTint="@null"
-                android:checked="false"
-                app:buttonTint= "@null"
                 android:layout_margin="8dp"
                 android:background="@null"
                 android:button="@drawable/checkbox_state"
+                android:buttonTint="@null"
+                android:checked="false"
+                app:buttonTint="@null"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -281,7 +281,8 @@
             android:text="@string/delivery_method"
             android:textColor="@color/black_text_80"
             android:textFontWeight="500"
-            android:textSize="12sp" />
+            android:textSize="12sp"
+            android:visibility="gone" />
 
         <TextView
             android:id="@+id/delivery_method_info_text"
@@ -294,7 +295,8 @@
             android:padding="15dp"
             android:text="@string/enter_pin_code_to_view_available_delivery_methods"
             android:textColor="@color/black_text_50"
-            android:textSize="12sp" />
+            android:textSize="12sp"
+            android:visibility="gone" />
 
 
         <LinearLayout
@@ -303,7 +305,8 @@
             android:layout_marginTop="12dp"
             android:background="@drawable/input_field_border"
             android:minHeight="50dp"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:visibility="gone">
 
 
             <androidx.constraintlayout.widget.ConstraintLayout

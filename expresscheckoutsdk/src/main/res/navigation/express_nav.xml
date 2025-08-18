@@ -29,6 +29,9 @@
         <action
             android:id="@+id/action_phoneNumberFragment_to_verifyOTPFragment"
             app:destination="@id/verifyOTPFragment" />
+        <action
+            android:id="@+id/action_phoneNumberFragment_to_savedAddressFragment"
+            app:destination="@id/savedAddressFragment" />
     </fragment>
     <fragment
         android:id="@+id/verifyOTPFragment"
