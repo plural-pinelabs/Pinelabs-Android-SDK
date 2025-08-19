@@ -4,6 +4,7 @@ import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.plural_pinelabs.expresscheckoutsdk.BuildConfig
 import com.plural_pinelabs.expresscheckoutsdk.ExpressSDKObject
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.BASE_CHECKOUT
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.BASE_CHECKOUTBFF
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.BASE_URL_EXPRESS_PROD
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.BASE_URL_EXPRESS_UAT
@@ -43,6 +44,16 @@ object RetrofitBuilder {
             .build()
     }
 
+    private fun getRetrofitForCheckout(): Retrofit {
+        val baseUrl = if (ExpressSDKObject.isSandBoxMode()) BASE_URL_UAT else BASE_URL_PROD
+        return Retrofit.Builder()
+            .baseUrl(HTTPS + baseUrl + BASE_CHECKOUT)
+            .addConverterFactory(GsonConverterFactory.create())
+            .addConverterFactory(GsonConverterFactory.create(gson))
+            .client(clientBuilder.build())
+            .build()
+    }
+
 
     private fun getRetrofitForExpressCheckout(): Retrofit {
         //TODO update the prod url of the express checout and dev to UAT
@@ -60,6 +71,8 @@ object RetrofitBuilder {
     val commonApiService: CommonApiService = getRetrofit().create(CommonApiService::class.java)
     val expressApiService: ExpressApiService =
         getRetrofitForExpressCheckout().create(ExpressApiService::class.java)
+    val checkoutApiService: CommonApiService =
+        getRetrofitForCheckout().create(CommonApiService::class.java)
 
     private fun createBuilder(): OkHttpClient.Builder {
 

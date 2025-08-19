@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:b="@drawable/ic_bg"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingHorizontal="16dp"
+    android:paddingTop="24dp"
+    android:paddingBottom="16dp">
+
+    <ImageView
+        android:id="@+id/bank_logo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Bank Name Logo"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/offer_type"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="sans-serif"
+        android:textColor="@color/white"
+        android:textFontWeight="500"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="No Cost emi" />
+
+
+    <LinearLayout
+        android:id="@+id/values_ll"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        android:orientation="horizontal"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/bank_logo">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/emi_discount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/white_80"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/emi_discount_value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:textColor="@color/green_66EC9D"
+                tools:text="5000" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/bank_offer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/white_80"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/bank_offer_value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:textColor="@color/green_66EC9D"
+                tools:text="5000" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/total_payable"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/total_payable"
+                android:textColor="@color/white_80"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/total_payable_value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:fontFamily="sans-serif-medium"
+                android:textColor="@color/white"
+                android:textFontWeight="700"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                tools:text="5000" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/emi_per_month_value"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:fontFamily="sans-serif-medium"
+        android:textColor="@color/white"
+        android:textFontWeight="600"
+        android:textSize="18sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/values_ll" />
+
+    <TextView
+        android:id="@+id/emi_per_x_month"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:fontFamily="sans-serif-medium"
+        android:text="@string/for_x_months"
+        android:textColor="@color/white_50"
+        android:textFontWeight="600"
+        android:textSize="12sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/values_ll"
+        tools:text="For x months" />
+
+    <TextView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="18dp"
+        android:layout_marginTop="12dp"
+        android:background="@drawable/ic_rounded_button_border"
+        android:drawableEnd="@drawable/ic_chevron_white"
+        android:drawablePadding="8dp"
+        android:drawableTint="@color/black_text_80"
+        android:paddingVertical="12dp"
+        android:paddingStart="24dp"
+        android:paddingEnd="16dp"
+        android:text="Continue to pay"
+        app:flow_horizontalAlign="end"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/emi_per_month_value"
+        app:layout_constraintTop_toBottomOf="@id/values_ll" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

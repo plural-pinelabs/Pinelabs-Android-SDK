@@ -14,12 +14,14 @@
         android:orientation="vertical">
 
         <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/contact_and_delivery_details_collapsed_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:background="@drawable/rounded_address_background"
             android:orientation="horizontal"
-            android:padding="16dp">
+            android:padding="16dp"
+            android:visibility="gone">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -47,11 +49,149 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:ignore="UseAppTint" />
+
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/contact_and_delivery_details_expanded_layout"
             android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:background="@drawable/rounded_address_background"
+            android:orientation="horizontal"
+            android:padding="16dp">
+
+            <TextView
+                android:id="@+id/contact_details_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif"
+                android:letterSpacing="0.1"
+                android:text="@string/contact_details"
+                android:textAllCaps="true"
+                android:textFontWeight="700"
+                android:textSize="12sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageView
+                android:id="@+id/edit_contact_icon"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:foregroundGravity="center_vertical"
+                android:importantForAccessibility="no"
+                android:padding="2dp"
+                android:src="@drawable/ic_edit"
+                android:tint="@color/black_text_50"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:ignore="UseAppTint" />
+
+            <TextView
+                android:id="@+id/contact_details"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:ellipsize="end"
+                android:textFontWeight="500"
+                android:maxLines="1"
+                android:textSize="14sp"
+                android:fontFamily="sans-serif-medium"
+                android:textColor="@color/black_text_80"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/contact_details_title" />
+
+            <TextView
+                android:textColor="@color/black_text_80"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:drawableStart="@drawable/ic_verified"
+                android:fontFamily="sans-serif-medium"
+                android:text="@string/verified_user"
+                android:textFontWeight="600"
+                android:textSize="12sp"
+                android:id="@+id/verified_user_text"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/contact_details" />
+
+            <View
+                android:id="@+id/divider_line"
+                android:background="@color/black_text_8"
+                android:layout_marginTop="20dp"
+                app:layout_constraintTop_toBottomOf="@id/verified_user_text"
+                android:layout_width="match_parent"
+                android:layout_height="1dp" />
+
+            <TextView
+                android:id="@+id/delivery_details_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif"
+                android:letterSpacing="0.1"
+                android:text="@string/delivery_address"
+                android:textAllCaps="true"
+                android:layout_marginTop="24dp"
+                android:textFontWeight="700"
+                android:textSize="12sp"
+                app:layout_constraintTop_toBottomOf="@id/divider_line"
+                app:layout_constraintStart_toStartOf="parent"
+                />
+
+            <ImageView
+                android:id="@+id/edit_delivery_icon"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginTop="20dp"
+                android:foregroundGravity="center_vertical"
+                android:importantForAccessibility="no"
+                android:padding="2dp"
+                android:src="@drawable/ic_edit"
+                android:tint="@color/black_text_50"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/divider_line"
+                tools:ignore="UseAppTint" />
+
+
+            <TextView
+                android:id="@+id/address_type"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/rectangle_denser_bg"
+                android:fontFamily="sans-serif"
+                android:paddingHorizontal="12dp"
+                android:layout_marginTop="20dp"
+                android:paddingVertical="6dp"
+                android:textColor="@color/black_text"
+                android:textFontWeight="700"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/delivery_details_title"
+                tools:text="Home" />
+
+
+            <TextView
+                android:id="@+id/delivery_details"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:ellipsize="end"
+                android:textFontWeight="500"
+                android:textSize="14sp"
+                android:maxLines="1"
+                android:fontFamily="sans-serif-medium"
+                android:textColor="@color/black_text_80"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/address_type" />
+
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/offers_parent_layout"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:background="@drawable/offers_twin_background"

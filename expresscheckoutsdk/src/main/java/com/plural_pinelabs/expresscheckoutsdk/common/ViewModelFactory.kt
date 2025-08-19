@@ -151,7 +151,11 @@ class D2CViewModelFactory(private val networkHelper: NetworkHelper) :
             ExpressRepositoryImpl(
                 RetrofitBuilder.commonApiService,
                 networkHelper = networkHelper
-            )
+            ),
+            ExpressRepositoryImpl(
+                RetrofitBuilder.checkoutApiService,
+                networkHelper = networkHelper
+            ),
         ) as T
     }
 }

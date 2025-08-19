@@ -13,6 +13,7 @@ internal object Constants {
     const val BASE_IMAGES = "https://d1xlp3rxzdtgvz.cloudfront.net/bank-icons/bank-logos/"
     const val HTTPS = "https://"
     const val BASE_CHECKOUTBFF = "/api/v3/checkout-bff/"
+    const val BASE_CHECKOUT = "/api/v3/checkout/"
 
     const val TIMEOUT: Long = 60
 

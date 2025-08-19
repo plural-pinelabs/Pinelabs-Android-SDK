@@ -12,7 +12,7 @@ data class FetchResponseDTO(
     val paymentModes: List<PaymentMode>? = null,
     var merchantBrandingData: BrandConfig? = null,
     var dccData: DccData? = null,
-    val customerInfo: CustomerInfo?,
+    var customerInfo: CustomerInfo?,
     val shippingAddress: Address,
     val billingAddress: Address,
     val cartDetails: CartDetails? = null,
@@ -53,16 +53,16 @@ data class Currency(
 data class Address(
     val id: String? = null,
     val customer_id: String? = null,
-    val full_name: String,
-    val address1: String,
-    val address2: String,
+    val full_name: String? = null,
+    val address1: String? = null,
+    val address2: String? = null,
     val address3: String? = null,
-    val pincode: String,
-    val city: String,
-    val state: String,
-    val country: String,
-    val address_type: String,
-    val address_category: String
+    val pincode: String? = null,
+    val city: String? = null,
+    val state: String? = null,
+    val country: String? = null,
+    val address_type: String? = null,
+    val address_category: String? = null
 
 ) : Parcelable
 
@@ -244,6 +244,7 @@ data class CardTokenData(
 
 @Parcelize
 data class CustomerData(
+    val customerInfo:CustomerInfo? =null,
     val mobileNo: String?,
     val emailId: String?
 ) : Parcelable
@@ -918,4 +919,9 @@ data class Card(
 ) : Parcelable
 
 
+@Parcelize
+data class AddressRequest
+    (
+    val address: Address? = null,
+) : Parcelable
 

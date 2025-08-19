@@ -17,17 +17,29 @@ import android.widget.TextView
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.findNavController
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.plural_pinelabs.expresscheckoutsdk.ExpressSDKObject
 import com.plural_pinelabs.expresscheckoutsdk.R
+import com.plural_pinelabs.expresscheckoutsdk.common.BaseResult
 import com.plural_pinelabs.expresscheckoutsdk.common.D2CViewModelFactory
 import com.plural_pinelabs.expresscheckoutsdk.common.NetworkHelper
+import com.plural_pinelabs.expresscheckoutsdk.common.Utils.showProcessPaymentDialog
 import com.plural_pinelabs.expresscheckoutsdk.data.model.Address
+import com.plural_pinelabs.expresscheckoutsdk.data.model.AddressResponse
+import com.plural_pinelabs.expresscheckoutsdk.data.model.ExpressAddressResponse
+import kotlinx.coroutines.launch
 
 class NewAddressFormFragment : Fragment() {
 
     private val viewModel: D2CViewModel by activityViewModels {
         D2CViewModelFactory(NetworkHelper(requireContext()))
     }
+    private var bottomSheetDialog: BottomSheetDialog? = null
+
 
     private lateinit var fullNameEt: EditText
     private lateinit var pinCodeEt: EditText
@@ -56,10 +68,9 @@ class NewAddressFormFragment : Fragment() {
             isEditMode = bundle.getBoolean("isEditAddress", false)
         }
         setViews(view)
+        observeViewModel()
         if (isEditMode) {
             val existingAddress = ExpressSDKObject.getSelectedAddress()
-            // Populate the fields with existing address data if in edit mode
-            // For example, you can set the text of EditTexts with existing address values
             fullNameEt.setText(existingAddress?.full_name)
             pinCodeEt.setText(existingAddress?.pincode)
             cityEt.setText(existingAddress?.city)
@@ -71,6 +82,55 @@ class NewAddressFormFragment : Fragment() {
                 "Work" -> addressType.check(R.id.work_radio_button)
                 "Other" -> addressType.check(R.id.other_radio_button)
                 else -> addressType.check(R.id.home_radio_button) // Default to Home if no match
+            }
+        }
+    }
+
+    private fun observeViewModel() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED)
+            {
+                viewModel.addressSaveResponse.collect {
+                    when (it) {
+                        is BaseResult.Error -> {
+                            //TODO handle failure
+                               bottomSheetDialog?.dismiss()
+                        }
+
+                        is BaseResult.Loading -> {
+                            if (it.isLoading)
+                                bottomSheetDialog = showProcessPaymentDialog(requireContext())
+
+                        }
+
+                        is BaseResult.Success<ExpressAddressResponse?> -> {
+                            viewModel.updateAddress(ExpressSDKObject.getSelectedAddress())
+                        }
+                    }
+                }
+            }
+        }
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED)
+            {
+                viewModel.updateAddressResponse.collect {
+                    when (it) {
+                        is BaseResult.Error -> {
+                            bottomSheetDialog?.dismiss()
+                        }
+
+                        is BaseResult.Loading -> {
+                        }
+
+                        is BaseResult.Success<AddressResponse?> -> {
+                            ExpressSDKObject.getFetchData()?.customerInfo = it.data?.data?.customerInfo
+                            findNavController().navigate(
+                                R.id.action_newAddressFormFragment_to_paymentModeFragment
+                            )
+                        }
+                    }
+                }
             }
         }
     }
@@ -158,6 +218,7 @@ class NewAddressFormFragment : Fragment() {
                     address_category = "D2C",
                     country = "India",
                 )
+                ExpressSDKObject.setSelectedAddress(address)
                 viewModel.saveAddress(address)
             } else {
                 // Show error message
@@ -212,6 +273,7 @@ class NewAddressFormFragment : Fragment() {
     }
 
     private fun isAllFieldValid(): Boolean {
+
         return fullNameEt.text.isNotEmpty() &&
                 pinCodeEt.text.isNotEmpty() &&
                 cityEt.text.isNotEmpty() &&

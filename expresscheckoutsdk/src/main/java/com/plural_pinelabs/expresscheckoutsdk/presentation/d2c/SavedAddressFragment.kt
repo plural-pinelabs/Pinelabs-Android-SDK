@@ -23,6 +23,7 @@ import com.plural_pinelabs.expresscheckoutsdk.common.NetworkHelper
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils.handleCTAEnableDisable
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils.showProcessPaymentDialog
 import com.plural_pinelabs.expresscheckoutsdk.data.model.Address
+import com.plural_pinelabs.expresscheckoutsdk.data.model.AddressResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ExpressAddressResponse
 import kotlinx.coroutines.launch
 
@@ -113,6 +114,29 @@ class SavedAddressFragment : Fragment() {
                 }
             }
         }
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED)
+            {
+                viewModel.updateAddressResponse.collect {
+                    when (it) {
+                        is BaseResult.Error -> {
+                            bottomSheetDialog?.dismiss()
+                        }
+
+                        is BaseResult.Loading -> {
+                            }
+
+                        is BaseResult.Success<AddressResponse?> -> {
+                            ExpressSDKObject.getFetchData()?.customerInfo = it.data?.data?.customerInfo
+                            findNavController().navigate(
+                                R.id.action_savedAddressFragment_to_paymentModeFragment
+                            )
+                        }
+                    }
+                }
+            }
+        }
     }
 
     private fun setViews(view: View) {
@@ -150,9 +174,10 @@ class SavedAddressFragment : Fragment() {
             when (position) {
                 0 -> {
                     //item is selected enable continue button
+                    val newAddress= Address(customer_id = item?.customer_id,id=item?.id)
                     handleCTAEnableDisable(requireContext(), true, continueBtn)
                     ExpressSDKObject.setSelectedAddress(address = item)
-                  viewModel.updateAddress(ExpressSDKObject.getSelectedAddress())
+                  viewModel.updateAddress(item)
                 }
 
                 1 -> {

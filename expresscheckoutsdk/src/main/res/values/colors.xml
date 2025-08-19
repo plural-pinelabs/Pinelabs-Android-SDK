@@ -4,6 +4,8 @@
     <color name="colorPrimary">#003323</color>
     <color name="colorSecondary">#003323</color>
     <color name="white">#FFFFFF</color>
+    <color name="white_80">#CCFFFFFF</color>
+    <color name="white_50">#80FFFFFF</color>
     <color name="screen_background">#FFFFFF</color>
     <color name="button_disabled_EAEDF0">#EAEDF0</color>
     <color name="text_disabled_C0C9D2">#C0C9D2</color>
@@ -42,5 +44,6 @@
     <color name="green_3320D39C">#3320D39C</color>
     <color name="green_1F20D39C">#1F20D39C</color>
     <color name="green_009E54">#009E54</color>
+    <color name="green_66EC9D">#66EC9D</color>
 
 </resources>

@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.plural_pinelabs.expresscheckoutsdk.ExpressSDKObject
 import com.plural_pinelabs.expresscheckoutsdk.common.BaseResult
 import com.plural_pinelabs.expresscheckoutsdk.data.model.Address
+import com.plural_pinelabs.expresscheckoutsdk.data.model.AddressRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.model.AddressResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CustomerInfo
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CustomerInfoResponse
@@ -21,7 +22,8 @@ import kotlinx.coroutines.launch
 
 class D2CViewModel(
     private val expressRepositoryImpl: ExpressRepositoryImpl,
-    private val commonRepositoryImpl: ExpressRepositoryImpl
+    private val commonRepositoryImpl: ExpressRepositoryImpl,
+    private val checkoutRepositoryImpl: ExpressRepositoryImpl
 ) : ViewModel() {
 
 
@@ -58,7 +60,7 @@ class D2CViewModel(
 
     private val _updateAddressResponse =
         MutableStateFlow<BaseResult<AddressResponse>>(BaseResult.Loading(false))
-    private val updateAddressResponse: StateFlow<BaseResult<AddressResponse>> =
+     val updateAddressResponse: StateFlow<BaseResult<AddressResponse>> =
         _updateAddressResponse
 
     var phoneNumber: String? = null
@@ -81,9 +83,9 @@ class D2CViewModel(
 
     fun updateAddress(address: Address?) {
         viewModelScope.launch(Dispatchers.IO) {
-            commonRepositoryImpl.getUpdateAddress(
+            checkoutRepositoryImpl.getUpdateAddress(
                 token = ExpressSDKObject.getToken(),
-                address
+                AddressRequest(address)
             ).collect {
                 _updateAddressResponse.value = it
             }

@@ -2,6 +2,7 @@ package com.plural_pinelabs.expresscheckoutsdk.domain.repository
 
 import com.plural_pinelabs.expresscheckoutsdk.common.BaseResult
 import com.plural_pinelabs.expresscheckoutsdk.data.model.Address
+import com.plural_pinelabs.expresscheckoutsdk.data.model.AddressRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.model.AddressResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CardBinMetaDataRequestList
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CardBinMetaDataResponse
@@ -87,6 +88,6 @@ interface ExpressRepository {
 
     suspend fun getUpdateAddress(
         token: String?,
-        request: Address?
+        request: AddressRequest?
     ): Flow<BaseResult<AddressResponse>>
 }

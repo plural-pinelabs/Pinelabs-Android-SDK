@@ -7,6 +7,7 @@ import com.plural_pinelabs.expresscheckoutsdk.data.fetch.CommonApiService
 import com.plural_pinelabs.expresscheckoutsdk.data.fetch.ExpressApiService
 import com.plural_pinelabs.expresscheckoutsdk.data.fetch.FetchApiService
 import com.plural_pinelabs.expresscheckoutsdk.data.model.Address
+import com.plural_pinelabs.expresscheckoutsdk.data.model.AddressRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.model.AddressResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CardBinMetaDataRequestList
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CardBinMetaDataResponse
@@ -165,7 +166,7 @@ class ExpressRepositoryImpl(
 
     override suspend fun getUpdateAddress(
         token: String?,
-        request: Address?
+        request: AddressRequest?
     ): Flow<BaseResult<AddressResponse>> {
         return toResultFlow(networkHelper = networkHelper) {
             (apiService as CommonApiService).updateAddress(token, request)

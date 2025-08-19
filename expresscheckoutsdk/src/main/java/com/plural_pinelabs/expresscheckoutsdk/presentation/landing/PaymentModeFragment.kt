@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -60,7 +61,16 @@ class PaymentModeFragment : Fragment() {
     private var offerViewLayout: ConstraintLayout? = null
     private var saveUptoTextView: TextView? = null
     private lateinit var viewOffersBtn: TextView
-    private var bottomVPASheetDialog: BottomSheetDialog? = null
+
+    private lateinit var contactDeliveryCollapsedLayout: ConstraintLayout
+    private lateinit var contactDeliveryExpandedLayout: ConstraintLayout
+    private lateinit var contactDetailsTitle: TextView
+    private lateinit var contactDetailsValue: TextView
+    private lateinit var deliveryDetailsTitle: TextView
+    private lateinit var deliveryDetailsValue: TextView
+    private lateinit var contactEditIcon: ImageView
+    private lateinit var deliveryEditIcon: ImageView
+    private lateinit var addresType:TextView
 
 
     override fun onCreateView(
@@ -78,15 +88,8 @@ class PaymentModeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        paymentModeRecyclerView = view.findViewById(R.id.payment_option_list)
-        savedCardRecyclerView = view.findViewById(R.id.saved_cards_list)
-        savedCardsHeading = view.findViewById(R.id.saved_cards_title)
-        logoAnimation = view.findViewById(R.id.offers_gif)
-        addNewCardText = view.findViewById(R.id.add_new_card_btn)
-        savedCardView = view.findViewById(R.id.saved_cards_card_view)
-        offerViewLayout = view.findViewById(R.id.offers_parent_layout)
-        saveUptoTextView = view.findViewById(R.id.save_upto_text)
-        viewOffersBtn = view.findViewById(R.id.view_offers_btn)
+        setViews(view)
+        setContactAndDeliveryDetails()
         initOffersAnimation()
         setPaymentMode()
         setSavedCardsView()
@@ -98,6 +101,61 @@ class PaymentModeFragment : Fragment() {
             showOffers()
         }
         (requireActivity() as LandingActivity).showHideConvenienceFessMessage(ExpressSDKObject.getFetchData()?.convenienceFeesInfo?.isEmpty() == false)
+    }
+
+    private fun setContactAndDeliveryDetails() {
+        contactDeliveryCollapsedLayout.visibility = View.VISIBLE
+        contactDeliveryExpandedLayout.visibility = View.GONE
+        val a: String? = ExpressSDKObject.getFetchData()?.customerInfo?.mobileNo
+        val b: String? = ExpressSDKObject.getFetchData()?.customerInfo?.emailId
+
+        val result = listOfNotNull(a, b).joinToString(" | ")
+
+        contactDetailsValue.text = result
+        val address = ExpressSDKObject.getSelectedAddress()?: ExpressSDKObject.getFetchData()?.customerInfo?.shippingAddress?: ExpressSDKObject.getFetchData()?.customerInfo?.shipping_address
+        if (address == null||address.address1.isNullOrEmpty()) {
+            deliveryDetailsTitle.visibility=View.GONE
+            deliveryDetailsValue.visibility=View.GONE
+            deliveryEditIcon.visibility=View.GONE
+        }
+        val deliveryAddress = listOfNotNull(address?.full_name,address?.address1,address?.address2, address?.city, address?.state, address?.country, address?.pincode).joinToString(", ")
+        deliveryDetailsValue.text = deliveryAddress
+        addresType.text = address?.address_type ?: getString(R.string.home)
+
+        contactEditIcon.setOnClickListener {
+            findNavController().navigate(R.id.action_paymentModeFragment_to_phoneNumberFragment)
+        }
+        deliveryEditIcon.setOnClickListener {
+            findNavController().navigate(R.id.action_paymentModeFragment_to_savedAddressFragment)
+        }
+        contactDeliveryCollapsedLayout.setOnClickListener {
+            contactDeliveryCollapsedLayout.visibility = View.GONE
+            contactDeliveryExpandedLayout.visibility = View.VISIBLE
+        }
+    }
+
+    private fun setViews(view: View) {
+        paymentModeRecyclerView = view.findViewById(R.id.payment_option_list)
+        savedCardRecyclerView = view.findViewById(R.id.saved_cards_list)
+        savedCardsHeading = view.findViewById(R.id.saved_cards_title)
+        logoAnimation = view.findViewById(R.id.offers_gif)
+        addNewCardText = view.findViewById(R.id.add_new_card_btn)
+        savedCardView = view.findViewById(R.id.saved_cards_card_view)
+        offerViewLayout = view.findViewById(R.id.offers_parent_layout)
+        saveUptoTextView = view.findViewById(R.id.save_upto_text)
+        viewOffersBtn = view.findViewById(R.id.view_offers_btn)
+
+        contactDeliveryCollapsedLayout =
+            view.findViewById(R.id.contact_and_delivery_details_collapsed_layout)
+        contactDeliveryExpandedLayout =
+            view.findViewById(R.id.contact_and_delivery_details_expanded_layout)
+        contactDetailsTitle = view.findViewById(R.id.contact_details_title)
+        contactDetailsValue = view.findViewById(R.id.contact_details)
+        deliveryDetailsTitle = view.findViewById(R.id.delivery_details_title)
+        deliveryDetailsValue = view.findViewById(R.id.delivery_details)
+        contactEditIcon = view.findViewById(R.id.edit_contact_icon)
+        deliveryEditIcon = view.findViewById(R.id.edit_delivery_icon)
+        addresType = view.findViewById(R.id.address_type)
     }
 
     private fun setSavedCardsView() {
