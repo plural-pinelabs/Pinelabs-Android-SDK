@@ -189,6 +189,12 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
+        <include
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_marginVertical="24dp"
+            layout="@layout/recommended_card_item_layout" />
+
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/offers_parent_layout"
             android:layout_width="match_parent"

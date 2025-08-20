@@ -207,5 +207,7 @@
     <string name="contact_details">Contact details</string>
     <string name="verified_user">Verified User</string>
     <string name="delivery_address">delivery address</string>
+    <string name="emi_discount">EMI Discount</string>
+    <string name="bank_offer">Bank Offer</string>
 
 </resources>

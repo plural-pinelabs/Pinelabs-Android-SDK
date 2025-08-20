@@ -1,6 +1,8 @@
 package com.plural_pinelabs.expresscheckoutsdk.presentation.landing
 
+import BankColors
 import android.content.Context
+import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -70,8 +72,16 @@ class PaymentModeFragment : Fragment() {
     private lateinit var deliveryDetailsValue: TextView
     private lateinit var contactEditIcon: ImageView
     private lateinit var deliveryEditIcon: ImageView
-    private lateinit var addresType:TextView
+    private lateinit var addresType: TextView
 
+    private lateinit var recommendedParentLayout: ConstraintLayout
+    private lateinit var bankLogoName: TextView
+    private lateinit var offerType: TextView
+    private lateinit var emiDiscount: TextView
+    private lateinit var bankOffer: TextView
+    private lateinit var perMonthEmi: TextView
+    private lateinit var emiDuration: TextView
+    private lateinit var totalPayable: TextView
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -89,11 +99,13 @@ class PaymentModeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setViews(view)
+        getMaxSavings()
+        getBestOfferRecommended()
+
         setContactAndDeliveryDetails()
         initOffersAnimation()
         setPaymentMode()
         setSavedCardsView()
-        getMaxSavings()
         addNewCardText.setOnClickListener {
             findNavController().navigate(R.id.action_paymentModeFragment_to_cardFragment)
         }
@@ -112,13 +124,23 @@ class PaymentModeFragment : Fragment() {
         val result = listOfNotNull(a, b).joinToString(" | ")
 
         contactDetailsValue.text = result
-        val address = ExpressSDKObject.getSelectedAddress()?: ExpressSDKObject.getFetchData()?.customerInfo?.shippingAddress?: ExpressSDKObject.getFetchData()?.customerInfo?.shipping_address
-        if (address == null||address.address1.isNullOrEmpty()) {
-            deliveryDetailsTitle.visibility=View.GONE
-            deliveryDetailsValue.visibility=View.GONE
-            deliveryEditIcon.visibility=View.GONE
+        val address = ExpressSDKObject.getSelectedAddress()
+            ?: ExpressSDKObject.getFetchData()?.customerInfo?.shippingAddress
+            ?: ExpressSDKObject.getFetchData()?.customerInfo?.shipping_address
+        if (address == null || address.address1.isNullOrEmpty()) {
+            deliveryDetailsTitle.visibility = View.GONE
+            deliveryDetailsValue.visibility = View.GONE
+            deliveryEditIcon.visibility = View.GONE
         }
-        val deliveryAddress = listOfNotNull(address?.full_name,address?.address1,address?.address2, address?.city, address?.state, address?.country, address?.pincode).joinToString(", ")
+        val deliveryAddress = listOfNotNull(
+            address?.full_name,
+            address?.address1,
+            address?.address2,
+            address?.city,
+            address?.state,
+            address?.country,
+            address?.pincode
+        ).joinToString(", ")
         deliveryDetailsValue.text = deliveryAddress
         addresType.text = address?.address_type ?: getString(R.string.home)
 
@@ -144,6 +166,25 @@ class PaymentModeFragment : Fragment() {
         offerViewLayout = view.findViewById(R.id.offers_parent_layout)
         saveUptoTextView = view.findViewById(R.id.save_upto_text)
         viewOffersBtn = view.findViewById(R.id.view_offers_btn)
+
+        recommendedParentLayout = view.findViewById(R.id.parent_recommended_card_item_cl)
+        bankLogoName = view.findViewById(R.id.bank_logo)
+        offerType = view.findViewById(R.id.offer_type)
+        emiDiscount = view.findViewById(R.id.emi_discount_value)
+        bankOffer = view.findViewById(R.id.bank_offer_value)
+        totalPayable = view.findViewById(R.id.total_payable_value)
+        perMonthEmi = view.findViewById(R.id.emi_per_month_value)
+        emiDuration = view.findViewById(R.id.emi_per_x_month)
+
+
+        val spec = BankColors.getGradientColors("HDFC")
+
+        val gradientDrawable = GradientDrawable(
+            GradientDrawable.Orientation.LEFT_RIGHT,
+            spec.colors.toIntArray()
+        )
+        recommendedParentLayout.background = gradientDrawable
+
 
         contactDeliveryCollapsedLayout =
             view.findViewById(R.id.contact_and_delivery_details_collapsed_layout)
@@ -364,7 +405,6 @@ class PaymentModeFragment : Fragment() {
             R.string.save_up_to,
             Utils.convertToRupeesWithSymobl(requireContext(), maxSavings ?: 0)
         )
-
     }
 
     private fun processDataForEMI() {
@@ -388,6 +428,36 @@ class PaymentModeFragment : Fragment() {
     private fun showOffers() {
         val topFragment = OfferSummaryDialog()
         topFragment.show(requireActivity().supportFragmentManager, "TopSheetDialogFragment")
+
+    }
+
+    fun getBestOfferRecommended() {
+        val item = ExpressSDKObject.getEMIPaymentModeData()?.offerDetails?.firstOrNull()
+        if (item != null) {
+            bankLogoName.text = item.issuer.name.toString()
+            offerType.text = item.tenureOffers.firstOrNull()?.emiType?.toString()
+            emiDiscount.text = Utils.convertToRupeesWithSymobl(
+                requireContext(),
+                item.tenureOffers.firstOrNull()?.discountAmount ?: 0
+            )
+            bankOffer.text = Utils.convertToRupeesWithSymobl(
+                requireContext(),
+                item.tenureOffers.firstOrNull()?.cashbackAmount ?: 0
+            )
+            perMonthEmi.text = Utils.convertToRupeesWithSymobl(
+                requireContext(),
+                item.tenureOffers.firstOrNull()?.fullTenure?.monthly_emi_amount?.amount ?: 0
+            )
+            emiDuration.text = String.format(
+                requireContext().getString(R.string.for_x_months),
+                item.tenureOffers.firstOrNull()?.fullTenure?.tenure_value.toString()
+            )
+            totalPayable.text = Utils.convertToRupeesWithSymobl(
+                requireContext(),
+                item.tenureOffers.firstOrNull()?.fullTenure?.loan_amount?.amount ?: 0
+            )
+
+        }
 
     }
 
