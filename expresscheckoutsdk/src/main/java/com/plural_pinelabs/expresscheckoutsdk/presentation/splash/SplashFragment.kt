@@ -154,10 +154,8 @@ class SplashFragment : Fragment() {
             ExpressSDKObject.getFetchData()?.merchantMetadata?.express_checkout_allowed_action?.contains("checkoutCollectMobile")
 
         if (address != null && mobileNo.isNotNullAndBlank()) {
-            // navigate to payment
-            //TODO Uncomment below line to navigate to payment mode fragment
-          //  findNavController().navigate(R.id.action_splashFragment_to_paymentModeFragment)
-            findNavController().navigate(R.id.action_splashFragment_to_phoneNumberFragment)
+            ExpressSDKObject.setSelectedAddress(ExpressSDKObject.getFetchData()?.shippingAddress)
+            findNavController().navigate(R.id.action_splashFragment_to_paymentModeFragment)
         } else if (address == null && addressCollectionFlag == true) {
             findNavController().navigate(R.id.action_splashFragment_to_phoneNumberFragment)
             // navigate to phone

@@ -27,6 +27,8 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.gson.Gson
+import com.google.gson.internal.LinkedTreeMap
 import com.plural_pinelabs.expresscheckoutsdk.ExpressSDKObject
 import com.plural_pinelabs.expresscheckoutsdk.ExpressSDKObject.getAmount
 import com.plural_pinelabs.expresscheckoutsdk.ExpressSDKObject.getCurrency
@@ -52,6 +54,7 @@ import com.plural_pinelabs.expresscheckoutsdk.common.UPIViewModelFactory
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils.showProcessPaymentDialog
 import com.plural_pinelabs.expresscheckoutsdk.data.model.Extra
+import com.plural_pinelabs.expresscheckoutsdk.data.model.PaymentModeData
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ProcessPaymentRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ProcessPaymentResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.TransactionStatusResponse
@@ -134,6 +137,13 @@ class UPIFragment : Fragment() {
             findNavController().popBackStack()
         }
 
+        val upiPaymentMode = getUPiFLowsList().joinToString(",")
+        if (!upiPaymentMode.contains("Intent", true)) {
+            upiAppsRv.visibility = View.GONE
+            payByAnyUPIButton.visibility = View.GONE
+        }
+        if (!upiPaymentMode.contains("Collect", true))
+            upiIdEt.visibility = View.GONE
     }
 
     private fun setUpPayByUPIApps() {
@@ -145,10 +155,8 @@ class UPIFragment : Fragment() {
             upiAppsRv.adapter = UpiAppsAdapter(installedUPIApps, getItemClickListenerForUPIApp())
 
         } else {
-            payByAnyUPIButton.visibility = View.GONE
             upiAppsRv.visibility = View.GONE
         }
-
     }
 
     private fun getItemClickListenerForUPIApp(): ItemClickListener<String> {
@@ -479,6 +487,26 @@ class UPIFragment : Fragment() {
             )
         }
 
+    }
+
+    private fun convertMapToJsonObject(yourMap: Map<*, *>): PaymentModeData {
+        val gson = Gson().toJsonTree(yourMap).asJsonObject
+        return Gson().fromJson(gson.toString(), PaymentModeData::class.java)
+
+    }
+
+    private fun getUPiFLowsList(): List<String> {
+        val data = ExpressSDKObject.getFetchData()
+        data?.paymentModes?.filter { paymentMode -> paymentMode.paymentModeId == PaymentModes.UPI.paymentModeID }
+            ?.forEach { paymentMode ->
+                when (val pm = paymentMode.paymentModeData) {
+                    is LinkedTreeMap<*, *> -> {
+                        val paymentModeData = convertMapToJsonObject(pm)
+                        return paymentModeData.upi_flows ?: emptyList()
+                    }
+                }
+            }
+        return emptyList()
     }
 
 }

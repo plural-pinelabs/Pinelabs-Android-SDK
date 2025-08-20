@@ -198,9 +198,9 @@ class NewAddressFormFragment : Fragment() {
         view.findViewById<RadioButton>(R.id.home_radio_button).isChecked = true // Default selection
         addressType.setOnCheckedChangeListener { _, checkedId ->
             when (checkedId) {
-                R.id.home_radio_button -> selectedAddressType = "Home"
-                R.id.work_radio_button -> selectedAddressType = "Work"
-                R.id.other_radio_button -> selectedAddressType = "Other"
+                R.id.home_radio_button -> selectedAddressType = "HOME"
+                R.id.work_radio_button -> selectedAddressType = "WORK"
+                R.id.other_radio_button -> selectedAddressType = "OTHER"
             }
         }
         setSaveAddressHyperLinkForTerms()

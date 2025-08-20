@@ -244,7 +244,7 @@ data class CardTokenData(
 
 @Parcelize
 data class CustomerData(
-    val customerInfo:CustomerInfo? =null,
+    val customerInfo: CustomerInfo? = null,
     val mobileNo: String?,
     val emailId: String?
 ) : Parcelable
@@ -924,4 +924,5 @@ data class AddressRequest
     (
     val address: Address? = null,
 ) : Parcelable
+
 
