@@ -124,6 +124,7 @@ class NewAddressFormFragment : Fragment() {
                         }
 
                         is BaseResult.Success<AddressResponse?> -> {
+                            bottomSheetDialog?.dismiss()
                             ExpressSDKObject.getFetchData()?.customerInfo = it.data?.data?.customerInfo
                             findNavController().navigate(
                                 R.id.action_newAddressFormFragment_to_paymentModeFragment
@@ -198,9 +199,9 @@ class NewAddressFormFragment : Fragment() {
         view.findViewById<RadioButton>(R.id.home_radio_button).isChecked = true // Default selection
         addressType.setOnCheckedChangeListener { _, checkedId ->
             when (checkedId) {
-                R.id.home_radio_button -> selectedAddressType = "HOME"
-                R.id.work_radio_button -> selectedAddressType = "WORK"
-                R.id.other_radio_button -> selectedAddressType = "OTHER"
+                R.id.home_radio_button -> selectedAddressType = "Home"
+                R.id.work_radio_button -> selectedAddressType = "Work"
+                R.id.other_radio_button -> selectedAddressType = "Other"
             }
         }
         setSaveAddressHyperLinkForTerms()
@@ -214,8 +215,8 @@ class NewAddressFormFragment : Fragment() {
                     state = stateEt.text.toString().trim(),
                     address1 = addressLine1Et.text.toString().trim(),
                     address2 = addressLine2Et.text.toString().trim(),
-                    address_type = selectedAddressType,
-                    address_category = "D2C",
+                    address_type = selectedAddressType.uppercase(),
+                    address_category = "SHIPPING",
                     country = "India",
                 )
                 ExpressSDKObject.setSelectedAddress(address)

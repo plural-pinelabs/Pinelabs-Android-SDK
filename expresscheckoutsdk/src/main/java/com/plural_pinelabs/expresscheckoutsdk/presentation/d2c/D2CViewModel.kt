@@ -56,7 +56,7 @@ class D2CViewModel(
 
     private val _addressSaveResponse =
         MutableStateFlow<BaseResult<ExpressAddressResponse>>(BaseResult.Loading(false))
-    val addressSaveResponse: StateFlow<BaseResult<ExpressAddressResponse>> = _addressDeleteResponse
+    val addressSaveResponse: StateFlow<BaseResult<ExpressAddressResponse>> = _addressSaveResponse
 
     private val _updateAddressResponse =
         MutableStateFlow<BaseResult<AddressResponse>>(BaseResult.Loading(false))
