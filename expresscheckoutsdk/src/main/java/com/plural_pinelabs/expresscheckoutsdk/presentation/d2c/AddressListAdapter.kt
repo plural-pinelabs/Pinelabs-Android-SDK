@@ -34,7 +34,7 @@ class AddressListAdapter(
             val address = itemView.findViewById<TextView>(R.id.address_line_1)
             val city = itemView.findViewById<TextView>(R.id.city_pincode)
             val delete = itemView.findViewById<ImageView>(R.id.delete_address_icon)
-            addressType.text = item.address_type
+            addressType.text = item.address_type?:"Other"
 
             // Apply selection UI based on selectedPosition
             if (position == selectedPosition) {

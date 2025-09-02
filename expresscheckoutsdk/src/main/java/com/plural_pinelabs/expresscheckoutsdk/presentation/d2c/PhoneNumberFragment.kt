@@ -229,13 +229,13 @@ class PhoneNumberFragment : Fragment() {
                 )
                 return@setOnClickListener
             }
-
+            viewModel.phoneNumber = phoneNumberEt.text.toString()
             ExpressSDKObject.setPhoneNumber(phoneNumberEt.text.toString())
-            if ((ExpressSDKObject.getFetchData()?.customerInfo?.customerToken) != null
+            if ((ExpressSDKObject.getFetchData()?.customerInfo?.customerToken) != null && phoneNumberEt.text.toString() == ExpressSDKObject.getFetchData()
+                    ?.customerInfo?.mobileNo
             ) {
                 findNavController().navigate(R.id.action_phoneNumberFragment_to_verifyOTPFragment)
             } else {
-                viewModel.phoneNumber = phoneNumberEt.text.toString()
                 viewModel.countryCode = "91"
                 viewModel.email = emailEt.text.toString()
                 val customerInfo = CustomerInfo(

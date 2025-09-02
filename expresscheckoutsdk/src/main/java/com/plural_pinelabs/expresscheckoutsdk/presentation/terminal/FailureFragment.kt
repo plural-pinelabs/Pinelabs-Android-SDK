@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import com.plural_pinelabs.expresscheckoutsdk.ExpressSDKObject
 import com.plural_pinelabs.expresscheckoutsdk.R
 import com.plural_pinelabs.expresscheckoutsdk.common.TimerManager
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils
@@ -32,6 +33,12 @@ class FailureFragment : Fragment() {
         timer.startTimer(5000)
         timer.timeLeft.observe(viewLifecycleOwner, { timeLeft ->
             if (timeLeft == 0L) {
+                ExpressSDKObject.getCallback()?.onError(
+                    "1000",
+                    "Failure",
+                    ""
+                ) // Replace with actual success data if needed
+                requireActivity().finish()
                 requireActivity().finish() // Close the activity or navigate to another screen
                 // Handle timer finish, e.g., navigate to another fragment or activity
                 // For example: findNavController().navigate(R.id.action_failureFragment_to_nextFragment)

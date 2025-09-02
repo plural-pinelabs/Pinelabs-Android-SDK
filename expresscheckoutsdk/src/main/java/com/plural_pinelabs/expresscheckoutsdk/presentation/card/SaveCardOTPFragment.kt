@@ -78,7 +78,7 @@ class SaveCardOTPFragment : Fragment() {
         view.findViewById<ImageView>(R.id.back_button).setOnClickListener {
             findNavController().popBackStack()
         }
-        customerSendOtpDescription.text = String.format(
+        customerSendOtpDescription.text ="+91"+ String.format(
             getString(R.string.save_card_verify_msg),
             ExpressSDKObject.getFetchData()?.customerInfo?.mobileNo ?: "your number",
             last4DigitsCard?.toInt() ?: 0
@@ -89,13 +89,6 @@ class SaveCardOTPFragment : Fragment() {
             if (otp.isNotEmpty() && otp.length == 6) {
                 val customerInfo = ExpressSDKObject.getFetchData()?.customerInfo
                 if (customerInfo != null) {
-//                    customerInfo.email_id = customerInfo.emailId
-//                    customerInfo.mobile_number = customerInfo.mobileNumber
-//                    customerInfo.country_code = customerInfo.countryCode
-//                    customerInfo.is_edit_customer_details_allowed =
-//                        customerInfo.isEditCustomerDetailsAllowed
-//                    customerInfo.first_name = customerInfo.firstName
-//                    customerInfo.last_name = customerInfo.lastName
 
                     val updateOrderDetails = UpdateOrderDetails(CustomerInfo(customerId =customerInfo.customer_id?:customerInfo.customerId ))
                     val otpRequest = OTPRequest(

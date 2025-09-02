@@ -14,7 +14,6 @@ import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.RecyclerView
 import com.plural_pinelabs.expresscheckoutsdk.ExpressSDKObject
 import com.plural_pinelabs.expresscheckoutsdk.R
-import com.plural_pinelabs.expresscheckoutsdk.common.Constants.NO_COST_EMI
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils
 import com.plural_pinelabs.expresscheckoutsdk.data.model.Tenure
 
@@ -153,10 +152,12 @@ class TopSheetDialogFragment : DialogFragment() {
                 ExpressSDKObject.getPayableAmount()
             )
         if ((tenure?.processing_fee_details?.amount?.value ?: 0) > 0) {
-            processingFeeLabel.text = String.format(getString(R.string.processing_fee_info), Utils.convertToRupeesWithSymobl(
-                requireContext(),
-                tenure?.processing_fee_details?.amount?.value ?: 0
-            ),"")
+            processingFeeLabel.text = String.format(
+                getString(R.string.processing_fee_info), Utils.convertToRupeesWithSymobl(
+                    requireContext(),
+                    tenure?.processing_fee_details?.amount?.value ?: 0
+                ), ""
+            )
             processingFeeLabel.visibility = View.VISIBLE
         }
 
@@ -167,21 +168,51 @@ class TopSheetDialogFragment : DialogFragment() {
     }
 
     private fun getDiscountLabel(tenure: Tenure?): String {
-        return if (tenure != null && tenure.tenure_value == 7) { // INSTANT CASHBACK/DISCOUNT
-            getString(R.string.no_cost_discount)
-        } else
-            return getString(R.string.discount)
+        val selected = tenure
+        var message = if (
+            selected?.details?.getOrNull(0)?.subvention?.offer_type == "LOW_COST" &&
+            selected.details[0].subvention?.subvention_type == "POST"
+        ) getString(R.string.emi_discount_message)
+        else if (
+            selected?.details?.getOrNull(0)?.subvention?.offer_type == "LOW_COST" &&
+            selected.details[0].subvention?.subvention_type == "INSTANT"
+        ) getString(R.string.instant_discount)
+        else if (
+            selected?.details?.getOrNull(0)?.subvention?.offer_type == "NO_COST" &&
+            selected.details[0].subvention?.subvention_type != "POST"
+        ) getString(R.string.no_cost_discount)
+        else getString(R.string.discount)
+        if (
+            selected?.discount?.discount_type == "INSTANT" &&
+            selected.discount.amount?.value != null
+        ) {
+            message = "Instant Discount"
+        }
+
+        return message
     }
 
     private fun getCashbackLabel(tenure: Tenure?): String {
-        return if (tenure != null && tenure.emi_type.equals(
-                NO_COST_EMI,
-                true
-            )
-        ) { // INSTANT CASHBACK/DISCOUNT
-            getString(R.string.no_cost_discount)
-        } else
-            return getString(R.string.cashback)
+
+        val selected = tenure
+// Cashback calculation
+
+        //if discount type is DEFERRED and amount is not null  then its deferred discount
+        val discountValue: Int = if (selected?.discount?.discount_type == "DEFERRED")
+            selected.discount.amount?.value ?: 0 else 0
+
+        //if subvention offer type is NO_COST and subvention type is POST then its no cost emi discount
+        val subventionValue = if (
+            selected?.details?.getOrNull(0)?.subvention?.offer_type == "NO_COST" &&
+            selected.details[0].subvention?.subvention_type == "POST"
+        ) selected.total_subvention_amount?.value ?: 0 else 0
+
+        //if total subvention amount is not null and offer type is LOW_COST then its emi discount
+        val totalCashback = discountValue + subventionValue
+        if (totalCashback > 0) {
+            return "Cashback"
+        }
+        return ""
     }
 
 }

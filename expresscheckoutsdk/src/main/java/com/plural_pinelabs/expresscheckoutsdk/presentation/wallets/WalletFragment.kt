@@ -78,7 +78,7 @@ class WalletFragment : Fragment() {
                             bundle.putString(ERROR_MESSAGE_KEY, it.errorMessage)
                             bottomSheetDialog?.dismiss()
                             findNavController().navigate(
-                                R.id.action_cardFragment_to_failureFragment, bundle
+                                R.id.action_walletFragment_to_retryFragment, bundle
                             )
                         }
 

@@ -128,9 +128,9 @@ class SplashFragment : Fragment() {
                                  //   findNavController().navigate(R.id.action_splashFragment_to_paymentModeFragment)
 //                                } else
 //                                // TODO UNCOMMENT NAVIGATION TO LANDING AND REMOVE THIS
-//                                    findNavController().navigate(R.id.action_splashFragment_to_paymentModeFragment)
-//                                //    findNavController().navigate(R.id.action_splashFragment_to_phoneNumberFragment)
-                            navD2C()
+                                //    findNavController().navigate(R.id.action_splashFragment_to_paymentModeFragment)
+                                //    findNavController().navigate(R.id.action_splashFragment_to_phoneNumberFragment)
+                           navD2C()
                             }
                         }
 

@@ -722,7 +722,7 @@ data class ProductDetail(
 @Parcelize
 data class Discount(
     val discount_type: String,
-    val percentage: Int,
+    val percentage: Double,
     val amount: Amount? = null,
     val max_amount: Amount? = null
 ) : Parcelable
@@ -736,7 +736,7 @@ data class Amount(
 
 @Parcelize
 data class ProcessingFeeDetails(
-    val percentage: Int? = null,
+    val percentage: Double? = null,
     val amount: Amount? = null
 ) : Parcelable
 

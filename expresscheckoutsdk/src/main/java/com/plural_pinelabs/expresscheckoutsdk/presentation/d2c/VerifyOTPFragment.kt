@@ -58,7 +58,8 @@ class VerifyOTPFragment : Fragment() {
         observeViewModel()
         isCustomerTokenAvailable =
             ExpressSDKObject.getFetchData()?.customerInfo?.customerToken.isNotNullAndBlank()
-        if (isCustomerTokenAvailable) {
+        val isNumberChanged = (ExpressSDKObject.getFetchData()?.customerInfo?.mobileNo) != viewModel.phoneNumber
+        if (!isNumberChanged && isCustomerTokenAvailable) {
             bottomSheetDialog = showProcessPaymentDialog(requireContext())
             ExpressSDKObject.setCustomerId(ExpressSDKObject.getFetchData()?.customerInfo?.customerId)
             ExpressSDKObject.setCustomerToken(ExpressSDKObject.getFetchData()?.customerInfo?.customerToken)

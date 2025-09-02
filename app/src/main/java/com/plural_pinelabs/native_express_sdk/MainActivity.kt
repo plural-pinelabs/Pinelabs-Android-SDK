@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Button
 import android.widget.EditText
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -39,6 +40,11 @@ class MainActivity : AppCompatActivity() {
                         errorMessage: String?,
                         errorDescription: String?
                     ) {
+                        Toast.makeText(
+                            this@MainActivity,
+                            "Error: $errorCode, $errorMessage, $errorDescription",
+                            Toast.LENGTH_LONG
+                        ).show()
                         Log.e("ExpressSDK", "Error: $errorCode, $errorMessage, $errorDescription")
                     }
 
@@ -47,6 +53,11 @@ class MainActivity : AppCompatActivity() {
                         responseMessage: String?,
                         responseDescription: String?
                     ) {
+                        Toast.makeText(
+                            this@MainActivity,
+                            "Success: $responseCode, $responseMessage, $responseDescription",
+                            Toast.LENGTH_LONG
+                        ).show()
                         Log.i(
                             "ExpressSDK",
                             "Success: $responseCode, $responseMessage, $responseDescription"
@@ -58,6 +69,11 @@ class MainActivity : AppCompatActivity() {
                         responseMessage: String?,
                         responseDescription: String?
                     ) {
+                        Toast.makeText(
+                            this@MainActivity,
+                            "Cancelled: $responseCode, $responseMessage, $responseDescription",
+                            Toast.LENGTH_LONG
+                        ).show()
                         Log.d(
                             "ExpressSDK",
                             "Cancelled: $responseCode, $responseMessage, $responseDescription"

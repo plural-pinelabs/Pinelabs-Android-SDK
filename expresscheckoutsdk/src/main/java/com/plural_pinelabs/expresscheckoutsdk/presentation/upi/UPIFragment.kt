@@ -142,8 +142,8 @@ class UPIFragment : Fragment() {
             upiAppsRv.visibility = View.GONE
             payByAnyUPIButton.visibility = View.GONE
         }
-        if (!upiPaymentMode.contains("Collect", true))
-            upiIdEt.visibility = View.GONE
+      //  if (!upiPaymentMode.contains("Collect", true))
+         //   upiIdEt.visibility = View.GONE
     }
 
     private fun setUpPayByUPIApps() {

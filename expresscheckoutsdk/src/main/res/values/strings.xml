@@ -192,7 +192,7 @@
     <string name="subtotal">Subtotal</string>
     <string name="convenience_fee">Convenience Fee</string>
     <string name="convenience_fee_gst">GST on Convenience Fee </string>
-    <string name="no_cost_discount">No Cost Discount</string>
+    <string name="no_cost_discount">No Cost EMI Discount</string>
     <string name="cashback">Cashback</string>
     <string name="processing_fee_info">%s processing fee + GST will be charged by %s bank.</string>
     <string name="total_amount">Total Amount</string>
@@ -209,5 +209,7 @@
     <string name="delivery_address">delivery address</string>
     <string name="emi_discount">EMI Discount</string>
     <string name="bank_offer">Bank Offer</string>
+    <string name="emi_discount_message">EMI Discount</string>
+    <string name="instant_discount">Instant Discount</string>
 
 </resources>

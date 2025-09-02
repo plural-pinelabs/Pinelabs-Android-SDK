@@ -177,7 +177,6 @@ class SavedAddressFragment : Fragment() {
                     val newAddress= Address(customer_id = item?.customer_id,id=item?.id)
                     handleCTAEnableDisable(requireContext(), true, continueBtn)
                     ExpressSDKObject.setSelectedAddress(address = item)
-                  viewModel.updateAddress(item)
                 }
 
                 1 -> {

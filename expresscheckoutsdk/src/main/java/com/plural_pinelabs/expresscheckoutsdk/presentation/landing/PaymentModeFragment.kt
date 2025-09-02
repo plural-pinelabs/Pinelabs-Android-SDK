@@ -100,7 +100,7 @@ class PaymentModeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setViews(view)
         getMaxSavings()
-        getBestOfferRecommended()
+     //   getBestOfferRecommended()
 
         setContactAndDeliveryDetails()
         initOffersAnimation()
@@ -434,6 +434,7 @@ class PaymentModeFragment : Fragment() {
     fun getBestOfferRecommended() {
         val item = ExpressSDKObject.getEMIPaymentModeData()?.offerDetails?.firstOrNull()
         if (item != null) {
+            //TODO this could be null handle that case
             bankLogoName.text = item.issuer.name.toString()
             offerType.text = item.tenureOffers.firstOrNull()?.emiType?.toString()
             emiDiscount.text = Utils.convertToRupeesWithSymobl(
