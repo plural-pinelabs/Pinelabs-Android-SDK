@@ -71,7 +71,7 @@ class TopSheetDialogFragment : DialogFragment() {
                 androidx.recyclerview.widget.LinearLayoutManager(requireContext())
             productsRecyclerView.adapter = productAdapter
         }
-        val valuesMap: ArrayList<Pair<String, String>> = arrayListOf()
+        val valuesMap: ArrayList<Pair<String, Any?>> = arrayListOf()
         val subtotal =
             Pair(
                 getString(R.string.subtotal),
@@ -97,20 +97,6 @@ class TopSheetDialogFragment : DialogFragment() {
                 )
             )
         val tenure = ExpressSDKObject.getSelectedTenure()
-        val discount = Pair(
-            getDiscountLabel(tenure),
-            Utils.convertToRupeesWithSymobl(
-                requireContext(),
-                tenure?.total_discount_amount?.value
-            )
-        )
-        val cashback = Pair(
-            getCashbackLabel(tenure),
-            Utils.convertToRupeesWithSymobl(
-                requireContext(),
-                tenure?.total_subvention_amount?.value
-            )
-        )
         val emiInterest = Pair(
             getString(R.string.emi_interest),
             Utils.convertToRupeesWithSymobl(
@@ -118,6 +104,7 @@ class TopSheetDialogFragment : DialogFragment() {
                 tenure?.interest_amount?.value
             )
         )
+        var listOfPairs = getMapPairs(tenure)
 
         if (ExpressSDKObject.getSelectedTenure() != null) {
             totalAmountLabel.text = getString(R.string.total_emi_cost)
@@ -133,13 +120,8 @@ class TopSheetDialogFragment : DialogFragment() {
             valuesMap.add(convenienceFees)
         if (convenienceFees.second.isNotEmpty() && ExpressSDKObject.getConvenienceFeeGst() != null && ExpressSDKObject.getConvenienceFeeGst()!! > 0)
             valuesMap.add(convenienceFeesGST)
-        if (convenienceFees.second.isNotEmpty() && tenure?.total_discount_amount?.value != null && tenure.total_discount_amount.value > 0) {
-            valuesMap.add(discount)
-            index = valuesMap.size - 1
-        }
-        if (convenienceFees.second.isNotEmpty() && tenure?.total_subvention_amount?.value != null && tenure.total_subvention_amount.value > 0)
-            valuesMap.add(cashback)
-
+        index = valuesMap.size
+        valuesMap.addAll(listOfPairs)
         if (ExpressSDKObject.getSelectedTenure() != null) {
             totalAmountValue.text = Utils.convertToRupeesWithSymobl(
                 requireContext(),
@@ -167,52 +149,72 @@ class TopSheetDialogFragment : DialogFragment() {
         subtotalRecyclerView.adapter = subtotalAdapter
     }
 
-    private fun getDiscountLabel(tenure: Tenure?): String {
-        val selected = tenure
-        var message = if (
-            selected?.details?.getOrNull(0)?.subvention?.offer_type == "LOW_COST" &&
-            selected.details[0].subvention?.subvention_type == "POST"
-        ) getString(R.string.emi_discount_message)
-        else if (
-            selected?.details?.getOrNull(0)?.subvention?.offer_type == "LOW_COST" &&
-            selected.details[0].subvention?.subvention_type == "INSTANT"
-        ) getString(R.string.instant_discount)
-        else if (
-            selected?.details?.getOrNull(0)?.subvention?.offer_type == "NO_COST" &&
-            selected.details[0].subvention?.subvention_type != "POST"
-        ) getString(R.string.no_cost_discount)
-        else getString(R.string.discount)
-        if (
-            selected?.discount?.discount_type == "INSTANT" &&
-            selected.discount.amount?.value != null
-        ) {
-            message = "Instant Discount"
-        }
+    private fun getMapPairs(tenure: Tenure?): List<Pair<String, Any?>> {
 
-        return message
-    }
+        val discountValue = if (tenure?.discount?.discount_type == "DEFERRED")
+            tenure.discount.amount?.value ?: 0 else 0
 
-    private fun getCashbackLabel(tenure: Tenure?): String {
-
-        val selected = tenure
-// Cashback calculation
-
-        //if discount type is DEFERRED and amount is not null  then its deferred discount
-        val discountValue: Int = if (selected?.discount?.discount_type == "DEFERRED")
-            selected.discount.amount?.value ?: 0 else 0
-
-        //if subvention offer type is NO_COST and subvention type is POST then its no cost emi discount
         val subventionValue = if (
-            selected?.details?.getOrNull(0)?.subvention?.offer_type == "NO_COST" &&
-            selected.details[0].subvention?.subvention_type == "POST"
-        ) selected.total_subvention_amount?.value ?: 0 else 0
+            tenure?.details?.getOrNull(0)?.subvention?.offer_type == "NO_COST" &&
+            tenure.details[0].subvention?.subvention_type == "POST"
+        ) tenure.total_subvention_amount?.value ?: 0 else 0
 
-        //if total subvention amount is not null and offer type is LOW_COST then its emi discount
         val totalCashback = discountValue + subventionValue
-        if (totalCashback > 0) {
-            return "Cashback"
-        }
-        return ""
+
+        val emiDetails =
+            listOfNotNull(
+                // Conditional discounts
+                if (
+                    tenure?.details?.getOrNull(0)?.subvention?.offer_type == "LOW_COST" &&
+                    tenure.details[0].subvention?.subvention_type == "POST"
+                ) Pair(
+                    "EMI Discount",
+                    Utils.convertToRupeesWithSymobl(
+                        requireContext(),
+                        tenure.total_subvention_amount?.value
+                    )
+                ) else null,
+
+                if (
+                    tenure?.details?.getOrNull(0)?.subvention?.offer_type == "LOW_COST" &&
+                    tenure.details[0].subvention?.subvention_type == "INSTANT"
+                ) Pair(
+                    "Instant Discount",
+                    Utils.convertToRupeesWithSymobl(
+                        requireContext(),
+                        tenure.total_subvention_amount?.value
+                    )
+                ) else null,
+
+                if (
+                    tenure?.details?.getOrNull(0)?.subvention?.offer_type == "NO_COST" &&
+                    tenure.details[0].subvention?.subvention_type != "POST"
+                ) Pair(
+                    "No Cost EMI Discount",
+                    Utils.convertToRupeesWithSymobl(
+                        requireContext(),
+                        tenure.total_subvention_amount?.value
+                    )
+                ) else null,
+                // Instant discount override
+                if (
+                    tenure?.discount?.discount_type == "INSTANT" &&
+                    tenure.discount.amount?.value != null
+                ) Pair(
+                    "Instant Discount",
+                    Utils.convertToRupeesWithSymobl(
+                        requireContext(),
+                        tenure.discount.amount.value
+                    )
+                ) else null,
+
+                if (totalCashback > 0) Pair(
+                    "Cashback",
+                    Utils.convertToRupeesWithSymobl(requireContext(), totalCashback)
+                ) else null
+            )
+        return emiDetails
+// Dispatch or update state
     }
 
 }

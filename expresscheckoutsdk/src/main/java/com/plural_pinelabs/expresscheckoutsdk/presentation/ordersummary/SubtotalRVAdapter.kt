@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.plural_pinelabs.expresscheckoutsdk.R
 
 class SubtotalRVAdapter(
-    private val list: List<Pair<String, String>>,
+    private val list: List<Pair<String, Any?>>,
     private val index: Int,
 ) : RecyclerView.Adapter<SubtotalRVAdapter.ItemViewHolder>() {
 
@@ -16,11 +16,11 @@ class SubtotalRVAdapter(
     inner class ItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
         @SuppressLint("StringFormatInvalid", "SetTextI18n")
-        fun setItem(item: Pair<String, String>, position: Int) {
+        fun setItem(item: Pair<String, Any?>, position: Int) {
             val titleTv = itemView.findViewById<android.widget.TextView>(R.id.label)
             val valueTv = itemView.findViewById<android.widget.TextView>(R.id.value)
             titleTv.text = item.first
-            valueTv.text = item.second
+            valueTv.text = item.second?.toString()
             if (position >= index && index != -1) {
                 valueTv.text = "-${item.second}"
                 valueTv.setTextColor(itemView.context.getColor(R.color.green_009E54))
