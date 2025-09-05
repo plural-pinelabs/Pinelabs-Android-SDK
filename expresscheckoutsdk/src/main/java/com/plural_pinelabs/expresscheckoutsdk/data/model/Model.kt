@@ -761,9 +761,9 @@ data class OfferDetail(
     val issuerId: String,
     val name: String,
     val type: String,
-    val tenureOffers: List<TenureOffer>,
+    val tenureOffers: List<TenureOffer>?=null,
     val maxSaving: Int,
-    val issuer: Issuer,
+    val issuer: Issuer?=null,
     var isInstantSaving: Boolean = false,
     var offerTitle: String? = null,
 ) : Parcelable

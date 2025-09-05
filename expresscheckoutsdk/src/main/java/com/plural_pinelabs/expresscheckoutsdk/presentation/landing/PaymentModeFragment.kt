@@ -29,6 +29,8 @@ import com.plural_pinelabs.expresscheckoutsdk.R
 import com.plural_pinelabs.expresscheckoutsdk.common.BaseResult
 import com.plural_pinelabs.expresscheckoutsdk.common.CardFragmentViewModelFactory
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.EMI_CC_TYPE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.EMI_DC_TYPE
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.ERROR_KEY
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.ERROR_MESSAGE_KEY
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PAY_BY_POINTS_ID
@@ -82,6 +84,7 @@ class PaymentModeFragment : Fragment() {
     private lateinit var perMonthEmi: TextView
     private lateinit var emiDuration: TextView
     private lateinit var totalPayable: TextView
+    private lateinit var actionBtn:TextView
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -100,7 +103,7 @@ class PaymentModeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setViews(view)
         getMaxSavings()
-     //   getBestOfferRecommended()
+        getBestOfferRecommended()
 
         setContactAndDeliveryDetails()
         initOffersAnimation()
@@ -175,6 +178,7 @@ class PaymentModeFragment : Fragment() {
         totalPayable = view.findViewById(R.id.total_payable_value)
         perMonthEmi = view.findViewById(R.id.emi_per_month_value)
         emiDuration = view.findViewById(R.id.emi_per_x_month)
+        actionBtn = view.findViewById(R.id.action_btn)
 
 
         val spec = BankColors.getGradientColors("HDFC")
@@ -431,35 +435,60 @@ class PaymentModeFragment : Fragment() {
 
     }
 
-    fun getBestOfferRecommended() {
+    private fun getBestOfferRecommended() {
         val item = ExpressSDKObject.getEMIPaymentModeData()?.offerDetails?.firstOrNull()
         if (item != null) {
             //TODO this could be null handle that case
-            bankLogoName.text = item.issuer.name.toString()
-            offerType.text = item.tenureOffers.firstOrNull()?.emiType?.toString()
+            bankLogoName.text = item.issuer?.display_name
+            offerType.text = getEMITypeLabel(item.tenureOffers?.firstOrNull()?.emiType)
             emiDiscount.text = Utils.convertToRupeesWithSymobl(
                 requireContext(),
-                item.tenureOffers.firstOrNull()?.discountAmount ?: 0
+                item.tenureOffers?.firstOrNull()?.discountAmount ?: 0
             )
             bankOffer.text = Utils.convertToRupeesWithSymobl(
                 requireContext(),
-                item.tenureOffers.firstOrNull()?.cashbackAmount ?: 0
+                item.tenureOffers?.firstOrNull()?.cashbackAmount ?: 0
             )
+            val fullTenure = item.tenureOffers?.firstOrNull()?.fullTenure?: ExpressSDKObject.getEMIPaymentModeData()?.issuers?.find { it.id==item.issuerId }?.tenures?.find { it.tenure_id==item.tenureOffers?.firstOrNull()?.tenureId }
             perMonthEmi.text = Utils.convertToRupeesWithSymobl(
                 requireContext(),
-                item.tenureOffers.firstOrNull()?.fullTenure?.monthly_emi_amount?.amount ?: 0
+                fullTenure?.monthly_emi_amount?.value ?: 0
             )
             emiDuration.text = String.format(
                 requireContext().getString(R.string.for_x_months),
-                item.tenureOffers.firstOrNull()?.fullTenure?.tenure_value.toString()
+                fullTenure?.tenure_value.toString()
             )
             totalPayable.text = Utils.convertToRupeesWithSymobl(
                 requireContext(),
-                item.tenureOffers.firstOrNull()?.fullTenure?.loan_amount?.amount ?: 0
+                fullTenure?.loan_amount?.value ?: 0
             )
+            handleRecommendedOptionClick()
+        } else
+            recommendedParentLayout.visibility = View.GONE
+    }
 
+    private fun getEMITypeLabel(emiType: String?): String {
+        return when (emiType) {
+            "NO_COST" -> getString(R.string.no_cost_emi)
+            "LOW_COST" -> getString(R.string.low_interest)
+            else ->  ""
         }
+    }
 
+    private fun handleRecommendedOptionClick() {
+        actionBtn.setOnClickListener {
+            val offerDetails = ExpressSDKObject.getEMIPaymentModeData()?.offerDetails?.firstOrNull()
+            ExpressSDKObject.setSelectedOfferDetail(offerDetails)
+            val issuer = ExpressSDKObject.getEMIPaymentModeData()?.issuers?.find { it.id==offerDetails?.issuerId }
+            val tenure = issuer?.tenures?.find { it.tenure_id==offerDetails?.tenureOffers?.firstOrNull()?.tenureId }
+            val bundle = Bundle()
+            bundle.putString("issuerId",offerDetails?.issuerId)
+            bundle.putString("tenureId",tenure?.tenure_id)
+            if (offerDetails?.type?.equals(EMI_DC_TYPE,true)==true)
+            findNavController().navigate(R.id.action_paymentModeFragment_to_EMICardDetailsFragment,bundle)
+            else
+                findNavController().navigate(R.id.action_paymentModeFragment_to_DCEMICardDetailsFragment,bundle)
+        }
     }
 
 }

@@ -81,7 +81,7 @@ class OfferSummaryDialog : DialogFragment() {
             offerDetail.offerTitle =
                 Utils.getTitleForEMI(requireContext(), offerDetail.issuer) + " EMI"
             offersList.add(offerDetail)
-            val cashbackTenure = offerDetail.tenureOffers.find { it.tenureId == "7" }
+            val cashbackTenure = offerDetail.tenureOffers?.find { it.tenureId == "7" }
             if (cashbackTenure != null) {
                 val cashBackOfferDetail = offerDetail.copy()
                 cashBackOfferDetail.offerTitle =
@@ -93,7 +93,7 @@ class OfferSummaryDialog : DialogFragment() {
         return offersList.sortedByDescending { offerDetail ->
             val saving =
                 if (offerDetail.isInstantSaving) {
-                    offerDetail.tenureOffers.find { it.tenureId == "7" }?.let {
+                    offerDetail.tenureOffers?.find { it.tenureId == "7" }?.let {
                         it.discountAmount + it.cashbackAmount
                     } ?: 0
                 } else {

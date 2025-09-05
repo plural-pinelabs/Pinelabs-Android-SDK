@@ -53,10 +53,10 @@
                 android:orientation="vertical">
 
                 <TextView
-                    android:text="@string/emi_discount"
                     android:id="@+id/emi_discount"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:text="@string/emi_discount"
                     android:textColor="@color/white_80"
                     android:textSize="12sp" />
 
@@ -74,13 +74,14 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:gravity="center"
                 android:orientation="vertical">
 
                 <TextView
-                    android:text="@string/bank_offer"
                     android:id="@+id/bank_offer"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:text="@string/bank_offer"
                     android:textColor="@color/white_80"
                     android:textSize="12sp" />
 
@@ -97,7 +98,9 @@
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center"
                 android:layout_weight="1"
+                android:gravity="center"
                 android:orientation="vertical">
 
                 <TextView
@@ -139,21 +142,22 @@
             android:id="@+id/emi_per_x_month"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="2dp"
             android:fontFamily="sans-serif-medium"
             android:text="@string/for_x_months"
             android:textColor="@color/white_50"
             android:textFontWeight="600"
             android:textSize="12sp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/values_ll"
+            app:layout_constraintTop_toBottomOf="@id/emi_per_month_value"
             tools:text="For x months" />
 
         <TextView
+            android:id="@+id/action_btn"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="18dp"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="24dp"
             android:background="@drawable/input_field_border"
             android:drawableEnd="@drawable/ic_chevron_white"
             android:drawablePadding="8dp"

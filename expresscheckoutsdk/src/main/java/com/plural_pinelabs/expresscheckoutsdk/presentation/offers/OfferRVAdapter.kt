@@ -41,7 +41,7 @@ class OfferRVAdapter(
                 context.getString(R.string.instant_discount_on_full_payment)
             } else {
                 val emiTenureList =
-                    item.tenureOffers.filter { it.tenureId!="7" }.sortedBy { it.tenureId }.joinToString(separator = ",") { it.fullTenure.tenure_value.toString() } ?: ""
+                    item.tenureOffers?.filter { it.tenureId!="7" }?.sortedBy { it.tenureId }?.joinToString(separator = ",") { it.fullTenure.tenure_value.toString() } ?: ""
                 String.format(
                     context.getString(R.string.applicable_on_emitenurelist_emi_tenures),
                     emiTenureList
@@ -49,7 +49,7 @@ class OfferRVAdapter(
             }
             val maxSavings = if (item.isInstantSaving) {
                 emiTag.visibility = View.GONE
-                val tenure = item.tenureOffers.find { it.tenureId == "7" }
+                val tenure = item.tenureOffers?.find { it.tenureId == "7" }
                 val savings: Int =
                     tenure?.let { tenure.discountAmount.plus(tenure.cashbackAmount) } ?: 0
                 savings

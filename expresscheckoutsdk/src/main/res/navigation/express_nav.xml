@@ -95,6 +95,12 @@
         <action
             android:id="@+id/action_paymentModeFragment_to_savedAddressFragment"
             app:destination="@id/savedAddressFragment" />
+        <action
+            android:id="@+id/action_paymentModeFragment_to_EMICardDetailsFragment2"
+            app:destination="@id/EMICardDetailsFragment" />
+        <action
+            android:id="@+id/action_paymentModeFragment_to_DCEMICardDetailsFragment"
+            app:destination="@id/DCEMICardDetailsFragment" />
     </fragment>
     <fragment
         android:id="@+id/cardFragment"
