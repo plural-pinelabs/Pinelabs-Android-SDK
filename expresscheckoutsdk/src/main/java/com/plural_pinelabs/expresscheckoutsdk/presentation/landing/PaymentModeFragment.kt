@@ -7,8 +7,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.CheckBox
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.cardview.widget.CardView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
@@ -29,7 +32,6 @@ import com.plural_pinelabs.expresscheckoutsdk.R
 import com.plural_pinelabs.expresscheckoutsdk.common.BaseResult
 import com.plural_pinelabs.expresscheckoutsdk.common.CardFragmentViewModelFactory
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants
-import com.plural_pinelabs.expresscheckoutsdk.common.Constants.EMI_CC_TYPE
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.EMI_DC_TYPE
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.ERROR_KEY
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.ERROR_MESSAGE_KEY
@@ -76,7 +78,11 @@ class PaymentModeFragment : Fragment() {
     private lateinit var deliveryEditIcon: ImageView
     private lateinit var addresType: TextView
 
+    private lateinit var recommendedOptionLabel: TextView
     private lateinit var recommendedParentLayout: ConstraintLayout
+    private lateinit var recommendedSavedCardParentLayout: LinearLayout
+    private lateinit var recommendedUPIVPAParentLayout: LinearLayout
+    private lateinit var recommendedUPIVPATextview: TextView
     private lateinit var bankLogoName: TextView
     private lateinit var offerType: TextView
     private lateinit var emiDiscount: TextView
@@ -84,7 +90,9 @@ class PaymentModeFragment : Fragment() {
     private lateinit var perMonthEmi: TextView
     private lateinit var emiDuration: TextView
     private lateinit var totalPayable: TextView
-    private lateinit var actionBtn:TextView
+    private lateinit var actionBtn: TextView
+    private lateinit var upiVPACheck: CheckBox
+    private lateinit var payByUPIVPABtn: TextView
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -103,7 +111,7 @@ class PaymentModeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setViews(view)
         getMaxSavings()
-        getBestOfferRecommended()
+        handleRecommendationOptions()
 
         setContactAndDeliveryDetails()
         initOffersAnimation()
@@ -170,6 +178,9 @@ class PaymentModeFragment : Fragment() {
         saveUptoTextView = view.findViewById(R.id.save_upto_text)
         viewOffersBtn = view.findViewById(R.id.view_offers_btn)
 
+        recommendedOptionLabel = view.findViewById(R.id.recommended_option_title)
+        recommendedSavedCardParentLayout = view.findViewById(R.id.saved_card_cvv_parent_layout)
+        recommendedUPIVPAParentLayout = view.findViewById(R.id.upi_vpa_parent_layout)
         recommendedParentLayout = view.findViewById(R.id.parent_recommended_card_item_cl)
         bankLogoName = view.findViewById(R.id.bank_logo)
         offerType = view.findViewById(R.id.offer_type)
@@ -179,16 +190,9 @@ class PaymentModeFragment : Fragment() {
         perMonthEmi = view.findViewById(R.id.emi_per_month_value)
         emiDuration = view.findViewById(R.id.emi_per_x_month)
         actionBtn = view.findViewById(R.id.action_btn)
-
-
-        val spec = BankColors.getGradientColors("HDFC")
-
-        val gradientDrawable = GradientDrawable(
-            GradientDrawable.Orientation.LEFT_RIGHT,
-            spec.colors.toIntArray()
-        )
-        recommendedParentLayout.background = gradientDrawable
-
+        recommendedUPIVPATextview = view.findViewById(R.id.upi_vpa)
+        upiVPACheck = view.findViewById(R.id.upi_vpa_check)
+        payByUPIVPABtn = view.findViewById(R.id.pay_by_upi_vpa)
 
         contactDeliveryCollapsedLayout =
             view.findViewById(R.id.contact_and_delivery_details_collapsed_layout)
@@ -438,6 +442,14 @@ class PaymentModeFragment : Fragment() {
     private fun getBestOfferRecommended() {
         val item = ExpressSDKObject.getEMIPaymentModeData()?.offerDetails?.firstOrNull()
         if (item != null) {
+            val spec = BankColors.getGradientColors(item.issuer?.display_name)
+
+            val gradientDrawable = GradientDrawable(
+                GradientDrawable.Orientation.LEFT_RIGHT,
+                spec.colors.toIntArray()
+            )
+            recommendedParentLayout.background = gradientDrawable
+
             //TODO this could be null handle that case
             bankLogoName.text = item.issuer?.display_name
             offerType.text = getEMITypeLabel(item.tenureOffers?.firstOrNull()?.emiType)
@@ -449,7 +461,8 @@ class PaymentModeFragment : Fragment() {
                 requireContext(),
                 item.tenureOffers?.firstOrNull()?.cashbackAmount ?: 0
             )
-            val fullTenure = item.tenureOffers?.firstOrNull()?.fullTenure?: ExpressSDKObject.getEMIPaymentModeData()?.issuers?.find { it.id==item.issuerId }?.tenures?.find { it.tenure_id==item.tenureOffers?.firstOrNull()?.tenureId }
+            val fullTenure = item.tenureOffers?.firstOrNull()?.fullTenure
+                ?: ExpressSDKObject.getEMIPaymentModeData()?.issuers?.find { it.id == item.issuerId }?.tenures?.find { it.tenure_id == item.tenureOffers?.firstOrNull()?.tenureId }
             perMonthEmi.text = Utils.convertToRupeesWithSymobl(
                 requireContext(),
                 fullTenure?.monthly_emi_amount?.value ?: 0
@@ -471,7 +484,7 @@ class PaymentModeFragment : Fragment() {
         return when (emiType) {
             "NO_COST" -> getString(R.string.no_cost_emi)
             "LOW_COST" -> getString(R.string.low_interest)
-            else ->  ""
+            else -> ""
         }
     }
 
@@ -479,16 +492,98 @@ class PaymentModeFragment : Fragment() {
         actionBtn.setOnClickListener {
             val offerDetails = ExpressSDKObject.getEMIPaymentModeData()?.offerDetails?.firstOrNull()
             ExpressSDKObject.setSelectedOfferDetail(offerDetails)
-            val issuer = ExpressSDKObject.getEMIPaymentModeData()?.issuers?.find { it.id==offerDetails?.issuerId }
-            val tenure = issuer?.tenures?.find { it.tenure_id==offerDetails?.tenureOffers?.firstOrNull()?.tenureId }
+            val issuer =
+                ExpressSDKObject.getEMIPaymentModeData()?.issuers?.find { it.id == offerDetails?.issuerId }
+            val tenure =
+                issuer?.tenures?.find { it.tenure_id == offerDetails?.tenureOffers?.firstOrNull()?.tenureId }
             val bundle = Bundle()
-            bundle.putString("issuerId",offerDetails?.issuerId)
-            bundle.putString("tenureId",tenure?.tenure_id)
-            if (offerDetails?.type?.equals(EMI_DC_TYPE,true)==true)
-            findNavController().navigate(R.id.action_paymentModeFragment_to_EMICardDetailsFragment,bundle)
+            bundle.putString("issuerId", offerDetails?.issuerId)
+            bundle.putString("tenureId", tenure?.tenure_id)
+            if (offerDetails?.type?.equals(EMI_DC_TYPE, true) == true)
+                findNavController().navigate(
+                    R.id.action_paymentModeFragment_to_EMICardDetailsFragment,
+                    bundle
+                )
             else
-                findNavController().navigate(R.id.action_paymentModeFragment_to_DCEMICardDetailsFragment,bundle)
+                findNavController().navigate(
+                    R.id.action_paymentModeFragment_to_DCEMICardDetailsFragment,
+                    bundle
+                )
         }
+    }
+
+    private fun handleRecommendationOptions() {
+        recommendedOptionLabel.visibility = View.GONE
+        recommendedUPIVPAParentLayout.visibility = View.GONE
+        recommendedParentLayout.visibility = View.GONE
+        recommendedSavedCardParentLayout.visibility = View.GONE
+
+        val lastPaymentMode = ExpressSDKObject.getFetchData()?.customerInfo?.lastUsedPaymode
+        val lastPayModeUsed = lastPaymentMode?.lastTransactionPaymentMode
+        if (lastPaymentMode == null) {
+            // do not show any paymodes
+            // do nothing
+            return
+        } else if (lastPayModeUsed.isNullOrEmpty()) {
+            // show last used method
+            recommendedOptionLabel.visibility = View.VISIBLE
+            recommendedParentLayout.visibility = View.VISIBLE
+
+            getBestOfferRecommended()
+        } else if (lastPayModeUsed.equals("REWARD", true) || lastPayModeUsed.contains(
+                "CARD",
+                true
+            )
+        ) {
+            //handle for card
+            recommendedOptionLabel.visibility = View.VISIBLE
+            val isSavedCardsAvailable =
+                ExpressSDKObject.getFetchData()?.customerInfo?.tokens?.filter {
+                    it?.cardData?.last4Digit == lastPaymentMode.card.lastUsedCard.firstOrNull()?.cardLast4?.takeLast(
+                        4
+                    )
+                }
+            if (isSavedCardsAvailable != null) {
+                //show saved card view
+            } else {
+                // now check for if its in offerdetails
+                val offerDetails = ExpressSDKObject.getEMIPaymentModeData()?.offerDetails
+
+            }
+            //if we want to show the cards lets first check if there are any saved cards and
+
+
+        } else if (lastPayModeUsed.contains("UPI", true)) {
+            //handle for UPI
+            recommendedUPIVPAParentLayout.visibility = View.VISIBLE
+            val upiId = lastPaymentMode.upi.lastUsedVPAs.firstOrNull()
+            if (!upiId.isNullOrEmpty()) {
+                recommendedUPIVPAParentLayout.visibility = View.VISIBLE
+                recommendedUPIVPATextview.text = upiId
+                upiVPACheck.setOnCheckedChangeListener { buttonView, isChecked ->
+                    recommendedUPIVPAParentLayout.background = AppCompatResources.getDrawable(
+                        requireContext(),
+                        if (isChecked) R.color.dense_background else R.drawable.input_field_border
+                    )
+                    payByUPIVPABtn.visibility = if (isChecked) View.VISIBLE else View.GONE
+                    payByUPIVPABtn.isClickable = isChecked
+                    payByUPIVPABtn.setOnClickListener {
+                        // pass upi id to upifragment and run the process payment
+                        val bundle = Bundle()
+                        bundle.putString("RECOMMENDED_ACTION_UPI", upiId)
+                        findNavController().navigate(
+                            R.id.action_paymentModeFragment_to_UPIFragment,
+                            bundle
+                        )
+                    }
+                }
+
+
+            }
+
+
+        }
+
     }
 
 }

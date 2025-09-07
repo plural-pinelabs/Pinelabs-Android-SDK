@@ -905,7 +905,9 @@ data class CustomerInfoData(
 @Parcelize
 data class LastUsedPaymode(
     val upi: Upi,
-    val card: Card
+    val card: Card,
+    val lastTransactionPaymentMode: String?
+
 ) : Parcelable
 
 @Parcelize
@@ -915,8 +917,17 @@ data class Upi(
 
 @Parcelize
 data class Card(
-    val lastUsedCard: List<String>
+    val lastUsedCard: List<CardDetail>
 ) : Parcelable
+
+@Parcelize
+data class CardDetail(
+    val cardBin: String,
+    val cardLast4: String,
+    val cardType: String,
+    val cardNetwork: String
+): Parcelable
+
 
 
 @Parcelize

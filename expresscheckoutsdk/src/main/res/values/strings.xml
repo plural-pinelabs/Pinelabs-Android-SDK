@@ -211,5 +211,6 @@
     <string name="bank_offer">Bank Offer</string>
     <string name="emi_discount_message">EMI Discount</string>
     <string name="instant_discount">Instant Discount</string>
+    <string name="recommended_payment_option">Recommended Payment Option</string>
 
 </resources>

@@ -26,6 +26,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.clevertap.android.sdk.isNotNullAndBlank
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.gson.Gson
 import com.google.gson.internal.LinkedTreeMap
@@ -78,6 +79,7 @@ class UPIFragment : Fragment() {
     private var bottomVPASheetDialog: BottomSheetDialog? = null
     private var bottomTimerSheetDialog: BottomSheetDialog? = null
     private var selectUPIPackage: String? = null
+    private var recommnededActionUPI: String? = null
 
 
     private lateinit var transactionLauncher: ActivityResultLauncher<Intent>
@@ -96,6 +98,9 @@ class UPIFragment : Fragment() {
             viewModel.startCountDownTimer()
             viewModel.startPolling()
         }
+
+        recommnededActionUPI = arguments?.getString("RECOMMENDED_ACTION_UPI",null)
+
     }
 
 
@@ -118,6 +123,15 @@ class UPIFragment : Fragment() {
         setupUPIIdValidation()
         observeViewModel()
         handleConvenienceFees()
+        handleRecommendedAction()
+    }
+
+    private fun handleRecommendedAction() {
+        if (recommnededActionUPI.isNotNullAndBlank()){
+            //upi id passed set it  to vpa
+             upiIdEt.text= Editable.Factory.getInstance().newEditable(recommnededActionUPI)
+            payAction(recommnededActionUPI, UPI_COLLECT)
+        }
     }
 
     private fun setViews(view: View) {

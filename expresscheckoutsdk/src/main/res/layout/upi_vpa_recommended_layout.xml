@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/upi_vpa_parent_layout"
+    android:background="@drawable/input_field_border"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp">
+
+        <ImageView
+            android:id="@+id/card_icon"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:background="@drawable/input_field_border"
+            android:padding="4dp"
+            android:src="@drawable/ic_upi"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/upi_vpa"
+            style="bold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="12dp"
+            android:ellipsize="end"
+            android:fontFamily="sans-serif-medium"
+            android:maxWidth="200dp"
+            android:maxLines="1"
+            android:textColor="@color/black_text_80"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@id/card_icon"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="1234567890@hdfc" />
+
+
+        <androidx.appcompat.widget.AppCompatCheckBox
+            android:id="@+id/upi_vpa_check"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_gravity="center_vertical|end"
+            android:background="@null"
+            android:button="@drawable/circle_checkbox_state"
+            android:buttonTint="@null"
+            app:buttonTint="@null"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/pay_by_upi_vpa"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="12dp"
+        android:background="@drawable/primary_button_background"
+        android:gravity="center"
+        android:minHeight="48dp"
+        android:text="@string/continue_text"
+        android:textColor="@color/white"
+        android:visibility="gone" />
+
+</LinearLayout>

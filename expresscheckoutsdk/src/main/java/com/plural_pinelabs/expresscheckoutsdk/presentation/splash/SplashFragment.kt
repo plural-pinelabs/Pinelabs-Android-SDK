@@ -153,7 +153,7 @@ class SplashFragment : Fragment() {
         val mobileCollectionFlag =
             ExpressSDKObject.getFetchData()?.merchantMetadata?.express_checkout_allowed_action?.contains("checkoutCollectMobile")
 
-        if (address?.id != null && mobileNo.isNotNullAndBlank()) {
+        if (address?.address1 != null && mobileNo.isNotNullAndBlank()) {
             ExpressSDKObject.setSelectedAddress(ExpressSDKObject.getFetchData()?.shippingAddress)
             findNavController().navigate(R.id.action_splashFragment_to_paymentModeFragment)
         } else if (address?.id == null && addressCollectionFlag == true) {
