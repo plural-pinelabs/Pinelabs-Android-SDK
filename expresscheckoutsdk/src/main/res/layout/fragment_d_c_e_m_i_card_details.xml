@@ -344,6 +344,7 @@
             android:layout_marginBottom="12dp"
             android:background="@drawable/primary_button_background"
             android:gravity="center"
+            android:textAllCaps="false"
             android:minHeight="48dp"
             android:text="@string/continue_text"
             android:textColor="@color/white" />

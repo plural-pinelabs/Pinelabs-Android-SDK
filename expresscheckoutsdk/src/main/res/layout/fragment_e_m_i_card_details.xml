@@ -365,6 +365,7 @@
             android:background="@drawable/primary_button_background"
             android:gravity="center"
             android:minHeight="48dp"
+            android:textAllCaps="false"
             android:text="@string/continue_text"
             android:textColor="@color/white" />
 

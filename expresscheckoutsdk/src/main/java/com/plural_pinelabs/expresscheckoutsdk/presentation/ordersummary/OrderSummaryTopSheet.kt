@@ -63,7 +63,6 @@ class TopSheetDialogFragment : DialogFragment() {
         val cartItems = data?.cartDetails?.cart_items
         if (cartItems.isNullOrEmpty()) {
             productsRecyclerView.visibility = View.GONE
-            subtotalRecyclerView.visibility = View.GONE
         } else {
             subTotalDivider.visibility = View.VISIBLE
             val productAdapter = ProductRVAdapter(requireContext(), cartItems)

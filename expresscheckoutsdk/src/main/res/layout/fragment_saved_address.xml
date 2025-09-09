@@ -57,7 +57,7 @@
         android:background="@drawable/primary_button_background"
         android:gravity="center"
         android:minHeight="48dp"
-        android:text="@string/continue_text"
+        android:text="@string/continue_to_pay"
         android:textColor="@color/white"
         app:layout_constraintBottom_toBottomOf="parent" />
 

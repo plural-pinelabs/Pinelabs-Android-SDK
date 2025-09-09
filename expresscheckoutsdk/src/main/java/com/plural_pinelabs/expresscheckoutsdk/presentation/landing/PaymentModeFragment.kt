@@ -94,6 +94,12 @@ class PaymentModeFragment : Fragment() {
     private lateinit var upiVPACheck: CheckBox
     private lateinit var payByUPIVPABtn: TextView
 
+    private lateinit var recommendedSavedCardIcon: ImageView
+    private lateinit var recommendedSavedCardText: TextView
+    private lateinit var recommendedSavedCardLast4: TextView
+    private lateinit var recommendedSavedCardCheckBox: CheckBox
+
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -205,6 +211,11 @@ class PaymentModeFragment : Fragment() {
         contactEditIcon = view.findViewById(R.id.edit_contact_icon)
         deliveryEditIcon = view.findViewById(R.id.edit_delivery_icon)
         addresType = view.findViewById(R.id.address_type)
+
+        recommendedSavedCardIcon = view.findViewById(R.id.card_icon)
+        recommendedSavedCardText = view.findViewById(R.id.card_issuer_name)
+        recommendedSavedCardLast4 = view.findViewById(R.id.card_last_4_digits)
+        recommendedSavedCardCheckBox = view.findViewById(R.id.cvv_less_selection)
     }
 
     private fun setSavedCardsView() {
@@ -499,7 +510,7 @@ class PaymentModeFragment : Fragment() {
             val bundle = Bundle()
             bundle.putString("issuerId", offerDetails?.issuerId)
             bundle.putString("tenureId", tenure?.tenure_id)
-            if (offerDetails?.type?.equals(EMI_DC_TYPE, true) == true)
+            if (offerDetails?.type?.equals(EMI_DC_TYPE, true) == false)
                 findNavController().navigate(
                     R.id.action_paymentModeFragment_to_EMICardDetailsFragment,
                     bundle
@@ -524,16 +535,17 @@ class PaymentModeFragment : Fragment() {
             // do not show any paymodes
             // do nothing
             return
-        } else if (lastPayModeUsed.isNullOrEmpty()) {
+        }
+        else if (lastPayModeUsed.isNullOrEmpty()) {
             // show last used method
             recommendedOptionLabel.visibility = View.VISIBLE
             recommendedParentLayout.visibility = View.VISIBLE
-
             getBestOfferRecommended()
-        } else if (lastPayModeUsed.equals("REWARD", true) || lastPayModeUsed.contains(
+        }
+        else if (lastPayModeUsed.equals("REWARD", true) || lastPayModeUsed.contains(
                 "CARD",
                 true
-            )
+            ) && (!lastPaymentMode.card.lastUsedCard.firstOrNull()?.cardLast4.isNullOrEmpty())
         ) {
             //handle for card
             recommendedOptionLabel.visibility = View.VISIBLE
@@ -543,11 +555,41 @@ class PaymentModeFragment : Fragment() {
                         4
                     )
                 }
-            if (isSavedCardsAvailable != null) {
+            if (!isSavedCardsAvailable.isNullOrEmpty()) {
                 //show saved card view
+                recommendedSavedCardParentLayout.visibility = View.VISIBLE
+                recommendedSavedCardText.text =
+                    isSavedCardsAvailable.firstOrNull()?.cardData?.issuerName
+                recommendedSavedCardLast4.text =
+                    isSavedCardsAvailable.firstOrNull()?.cardData?.last4Digit
+                recommendedSavedCardCheckBox.setOnCheckedChangeListener { buttonView, isChecked ->
+                    recommendedSavedCardParentLayout.background = AppCompatResources.getDrawable(
+                        requireContext(),
+                        if (isChecked) R.color.dense_background else R.drawable.input_field_border
+                    )
+                    actionBtn.visibility = if (isChecked) View.VISIBLE else View.GONE
+                    actionBtn.isClickable = isChecked
+                    actionBtn.text = getString(
+                        R.string.pay_amount_text, getString(R.string.rupee_symbol),
+                        Utils.convertInRupees(ExpressSDKObject.getAmount())
+                    )
+                    actionBtn.setOnClickListener {
+                        // process payment with saved card
+                        observeViewModel()
+                        val createProcessPaymentRequest =
+                            createProcessPaymentRequest(isSavedCardsAvailable.first())
+                        viewModel.processPayment(
+                            token = ExpressSDKObject.getToken(),
+                            paymentData = createProcessPaymentRequest
+                        )
+                    }
+                }
             } else {
                 // now check for if its in offerdetails
                 val offerDetails = ExpressSDKObject.getEMIPaymentModeData()?.offerDetails
+                recommendedParentLayout.visibility = View.VISIBLE
+                handleRecommendedOptionClick()
+                getBestOfferRecommended()
 
             }
             //if we want to show the cards lets first check if there are any saved cards and

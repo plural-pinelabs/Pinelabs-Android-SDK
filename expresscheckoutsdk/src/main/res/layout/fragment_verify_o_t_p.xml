@@ -50,6 +50,18 @@
             app:otpTextColor="@android:color/black"
             app:otpTextSize="24sp"
             app:otpTextStyle="bold" />
+        <TextView
+            android:id="@+id/invalid_otp_error_tv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:drawableStart="@drawable/ic_error_icon"
+            android:drawablePadding="8dp"
+            android:fontFamily="sans-serif"
+            android:text="@string/incorrect_otp_please_try_again"
+            android:textColor="@color/error_DD4D42"
+            android:textFontWeight="500"
+            android:visibility="gone" />
 
         <TextView
             android:id="@+id/resend_otp_tv"

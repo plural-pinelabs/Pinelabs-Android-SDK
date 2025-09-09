@@ -8,7 +8,7 @@ internal object Constants {
     const val BASE_URL_QA = "pluralqa.pinepg.in"
     const val BASE_URL_EXPRESS_UAT = "pluraluat.v2.pinepg.in/graphql/"
     const val BASE_URL_EXPRESS_PROD = "api.pluralpay.in/graphql/"
-    const val BASE_URL_PROD = "api.pluralonline.com"
+    const val BASE_URL_PROD = "api.pluralpay.in"
     const val BASE_ANIMATION = "https://d1xlp3rxzdtgvz.cloudfront.net/loaderAnimation/"
     const val BASE_IMAGES = "https://d1xlp3rxzdtgvz.cloudfront.net/bank-icons/bank-logos/"
     const val HTTPS = "https://"

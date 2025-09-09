@@ -212,5 +212,8 @@
     <string name="emi_discount_message">EMI Discount</string>
     <string name="instant_discount">Instant Discount</string>
     <string name="recommended_payment_option">Recommended Payment Option</string>
+    <string name="incorrect_otp_please_try_again">Incorrect OTP. Please try again.</string>
+    <string name="continue_to_pay">Continue to Pay</string>
+
 
 </resources>

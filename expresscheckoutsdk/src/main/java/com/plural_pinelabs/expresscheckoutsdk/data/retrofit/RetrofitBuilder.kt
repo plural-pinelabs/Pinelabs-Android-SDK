@@ -78,8 +78,8 @@ object RetrofitBuilder {
 
         val sha256QA = String(Base64.getDecoder().decode(BuildConfig.SHA256_QA))
         val sha256UAT = String(Base64.getDecoder().decode(BuildConfig.SHA256_UAT))
-        val sha256PROD = String(Base64.getDecoder().decode(BuildConfig.SHA256_PROD))
-
+       // val sha256PROD = String(Base64.getDecoder().decode(BuildConfig.SHA256_PROD))
+        val sha256PROD = "sha256/"+BuildConfig.SHA256_PROD
         val certificatePinner_QA = CertificatePinner.Builder()
             .add(BASE_URL_QA, sha256QA)
             .build()
