@@ -197,4 +197,12 @@ class D2CViewModel(
         return expressAddress
     }
 
+    fun resetCreateInactiveResult(){
+        _createInactiveUserResult.value = BaseResult.Loading(false)
+    }
+
+    fun resetSendOtpResult(){
+        _sendOTPResult.value = BaseResult.Loading(false)
+    }
+
 }

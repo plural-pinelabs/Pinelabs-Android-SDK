@@ -11,6 +11,7 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
@@ -38,6 +39,8 @@ class PhoneNumberFragment : Fragment() {
     private lateinit var continueBtn: Button
     private lateinit var phoneNumberParentLayout: LinearLayout
     private lateinit var emailParentLayout: LinearLayout
+    private lateinit var emailInfoIcon: ImageView
+    private lateinit var emailInfoText: ImageView
 
     private var isPhoneNumberValid: Boolean = false
     private var isEmailValid: Boolean = false
@@ -64,6 +67,7 @@ class PhoneNumberFragment : Fragment() {
         setUpPHoneNumberValidation()
         setUpEmailValidation()
         observeViewModel()
+        onNumberChange(phoneNumberEt.text)
     }
 
     private fun observeViewModel() {
@@ -90,6 +94,7 @@ class PhoneNumberFragment : Fragment() {
                                 token = ExpressSDKObject.getToken(),
                                 request = otpRequest
                             )
+                            viewModel.resetCreateInactiveResult()
                         }
                     }
                 }
@@ -107,7 +112,7 @@ class PhoneNumberFragment : Fragment() {
                             viewModel.otpId = result.data.otpId
                             bottomSheetDialog?.dismiss()
                             findNavController().navigate(R.id.action_phoneNumberFragment_to_verifyOTPFragment)
-
+                            viewModel.resetSendOtpResult()
                         }
 
                         is BaseResult.Error -> {
@@ -256,6 +261,8 @@ class PhoneNumberFragment : Fragment() {
         continueBtn = view.findViewById(R.id.continue_btn)
         phoneNumberParentLayout = view.findViewById(R.id.phone_parent_layout)
         emailParentLayout = view.findViewById(R.id.email_et_layout)
+        emailInfoIcon = view.findViewById(R.id.email_info_icon_inside)
+        emailInfoText = view.findViewById(R.id.email_info_icon)
         val existingPhoneNumber = ExpressSDKObject.getFetchData()?.customerInfo?.mobileNo
         val email = ExpressSDKObject.getFetchData()?.customerInfo?.emailId
         if (existingPhoneNumber.isNotNullAndBlank()) {
@@ -264,6 +271,17 @@ class PhoneNumberFragment : Fragment() {
         }
         if (email.isNotNullAndBlank()) {
             emailEt.text = Editable.Factory.getInstance().newEditable(email)
+        }
+
+        emailInfoIcon.setOnClickListener {
+            if (emailInfoText.isVisible) {
+                emailInfoText.visibility = View.GONE
+            } else {
+                emailInfoText.visibility = View.VISIBLE
+            }
+        }
+        emailInfoText.setOnClickListener {
+            emailInfoText.visibility = View.GONE
         }
 
     }

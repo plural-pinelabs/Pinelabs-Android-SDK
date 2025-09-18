@@ -149,6 +149,21 @@ class PaymentModeFragment : Fragment() {
             deliveryDetailsValue.visibility = View.GONE
             deliveryEditIcon.visibility = View.GONE
         }
+
+        if (ExpressSDKObject.getFetchData()?.merchantMetadata?.express_checkout_allowed_action?.contains(
+                "checkoutCollectAddress"
+            ) == false
+        ) {
+            deliveryEditIcon.visibility = View.GONE
+        }
+
+        if (ExpressSDKObject.getFetchData()?.merchantMetadata?.express_checkout_allowed_action?.contains(
+                "checkoutCollectMobile"
+            ) == false
+        ) {
+            contactEditIcon.visibility = View.GONE
+        }
+
         val deliveryAddress = listOfNotNull(
             address?.full_name,
             address?.address1,
@@ -419,7 +434,13 @@ class PaymentModeFragment : Fragment() {
             offerViewLayout?.visibility = View.GONE
             return
         }
+
         val maxSavings = emiPaymentData.offerDetails?.firstOrNull()?.maxSaving
+        if (maxSavings==null || maxSavings <= 0) {
+            //Hide the offer views
+            offerViewLayout?.visibility = View.GONE
+            return
+        }
         saveUptoTextView?.text = getString(
             R.string.save_up_to,
             Utils.convertToRupeesWithSymobl(requireContext(), maxSavings ?: 0)
@@ -427,6 +448,7 @@ class PaymentModeFragment : Fragment() {
     }
 
     private fun processDataForEMI() {
+
         val data = ExpressSDKObject.getFetchData()
         data?.paymentModes?.filter { paymentMode -> paymentMode.paymentModeId == PaymentModes.EMI.paymentModeID }
             ?.forEach { paymentMode ->
@@ -535,14 +557,12 @@ class PaymentModeFragment : Fragment() {
             // do not show any paymodes
             // do nothing
             return
-        }
-        else if (lastPayModeUsed.isNullOrEmpty()) {
+        } else if (lastPayModeUsed.isNullOrEmpty()) {
             // show last used method
             recommendedOptionLabel.visibility = View.VISIBLE
             recommendedParentLayout.visibility = View.VISIBLE
             getBestOfferRecommended()
-        }
-        else if (lastPayModeUsed.equals("REWARD", true) || lastPayModeUsed.contains(
+        } else if (lastPayModeUsed.equals("REWARD", true) || lastPayModeUsed.contains(
                 "CARD",
                 true
             ) && (!lastPaymentMode.card.lastUsedCard.firstOrNull()?.cardLast4.isNullOrEmpty())

@@ -174,6 +174,11 @@ class VerifyOTPFragment : Fragment() {
                         }
 
                         is BaseResult.Success<CustomerInfoResponse> -> {
+                            if(result.data.status.equals("NOT_VALIDATED",true)){
+                                incorrectOtpError.visibility = View.VISIBLE
+                                bottomSheetDialog?.dismiss()
+                                return@collect
+                            }
                             val id = result.data.customerInfo?.customer_id
                                 ?: result.data.customerInfo?.customerId
                                 ?: ExpressSDKObject.getFetchData()?.customerInfo?.customerId
@@ -215,6 +220,7 @@ class VerifyOTPFragment : Fragment() {
                                 if (ExpressSDKObject.getFetchData()?.shippingAddress?.address1 != null) {
                                     val shippingAddress =
                                         ExpressSDKObject.getFetchData()?.shippingAddress
+                                    shippingAddress?.canDelete = false
                                     shippingAddress?.let { it1 -> updatedList.add(0, it1) }
                                 }
                                 ExpressSDKObject.setAddressList(updatedList)

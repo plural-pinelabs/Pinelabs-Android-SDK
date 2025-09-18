@@ -62,7 +62,8 @@ data class Address(
     val state: String? = null,
     val country: String? = null,
     val address_type: String? = null,
-    val address_category: String? = null
+    val address_category: String? = null,
+    var canDelete: Boolean = true
 
 ) : Parcelable
 
@@ -761,9 +762,9 @@ data class OfferDetail(
     val issuerId: String,
     val name: String,
     val type: String,
-    val tenureOffers: List<TenureOffer>?=null,
+    val tenureOffers: List<TenureOffer>? = null,
     val maxSaving: Int,
-    val issuer: Issuer?=null,
+    val issuer: Issuer? = null,
     var isInstantSaving: Boolean = false,
     var offerTitle: String? = null,
 ) : Parcelable
@@ -926,8 +927,7 @@ data class CardDetail(
     val cardLast4: String,
     val cardType: String,
     val cardNetwork: String
-): Parcelable
-
+) : Parcelable
 
 
 @Parcelize

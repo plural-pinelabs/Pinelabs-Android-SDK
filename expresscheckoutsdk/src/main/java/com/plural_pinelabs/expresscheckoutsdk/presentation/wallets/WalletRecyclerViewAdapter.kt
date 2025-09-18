@@ -14,7 +14,7 @@ import com.plural_pinelabs.expresscheckoutsdk.data.model.WalletBank
 
 class WalletRecyclerViewAdapter(
     private val walletList: List<WalletBank>,
-    private val walletSelectionCallback: ItemClickListener<WalletBank>?
+    private val walletSelectionCallback: ItemClickListener<WalletBank>?,
 ) :
     RecyclerView.Adapter<WalletRecyclerViewAdapter.WalletViewHolder>() {
 

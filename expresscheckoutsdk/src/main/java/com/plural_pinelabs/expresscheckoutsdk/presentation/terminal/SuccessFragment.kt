@@ -190,6 +190,11 @@ class SuccessFragment : Fragment() {
                 } ?: ""
                 cardNameView.text = issuerName
                 cardLast4DigitsText.text = paymentData.payment_option?.card_data?.last4_digit ?: ""
+                if (cardLast4DigitsText.text.isNullOrBlank()) {
+                    cardLast4DigitsText.visibility = View.GONE
+                } else {
+                    cardLast4DigitsText.visibility = View.VISIBLE
+                }
                 paymentIcon.setImageResource(R.drawable.ic_cards_colured_icon)
                 cardDotsView.visibility = View.VISIBLE
                 cardsDivider.visibility = View.VISIBLE

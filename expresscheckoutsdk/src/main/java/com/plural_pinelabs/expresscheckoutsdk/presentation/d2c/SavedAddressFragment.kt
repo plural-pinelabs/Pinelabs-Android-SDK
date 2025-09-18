@@ -76,6 +76,7 @@ class SavedAddressFragment : Fragment() {
                                 if (ExpressSDKObject.getFetchData()?.shippingAddress?.address1 != null) {
                                     val shippingAddress =
                                         ExpressSDKObject.getFetchData()?.shippingAddress
+                                    shippingAddress?.canDelete = false
                                     shippingAddress?.let { it1 -> updatedList.add(0, it1) }
                                 }
                                 ExpressSDKObject.setAddressList(updatedList)
@@ -125,10 +126,11 @@ class SavedAddressFragment : Fragment() {
                         }
 
                         is BaseResult.Loading -> {
-                            }
+                        }
 
                         is BaseResult.Success<AddressResponse?> -> {
-                            ExpressSDKObject.getFetchData()?.customerInfo = it.data?.data?.customerInfo
+                            ExpressSDKObject.getFetchData()?.customerInfo =
+                                it.data?.data?.customerInfo
                             findNavController().navigate(
                                 R.id.action_savedAddressFragment_to_paymentModeFragment
                             )
@@ -163,7 +165,8 @@ class SavedAddressFragment : Fragment() {
         addNewBtn.setOnClickListener {
             // Navigate to new address form
             findNavController().navigate(
-                R.id.action_savedAddressFragment_to_newAddressFormFragment,)
+                R.id.action_savedAddressFragment_to_newAddressFormFragment,
+            )
         }
 
     }
@@ -174,7 +177,7 @@ class SavedAddressFragment : Fragment() {
             when (position) {
                 0 -> {
                     //item is selected enable continue button
-                    val newAddress= Address(customer_id = item?.customer_id,id=item?.id)
+                    val newAddress = Address(customer_id = item?.customer_id, id = item?.id)
                     handleCTAEnableDisable(requireContext(), true, continueBtn)
                     ExpressSDKObject.setSelectedAddress(address = item)
                 }

@@ -165,13 +165,14 @@ class WalletFragment : Fragment() {
         walletList: List<Wallet>?,
     ): List<WalletBank> {
         val finalWalletBankList = mutableListOf<WalletBank>()
+        val walletNameHashMap: HashMap<String, String> = getWalletHashMap()
         val localImageHashMap: HashMap<String, Int> = getLocalWalletHashMap()
         walletList?.forEachIndexed() { _, wallet ->
             val walletLogo =
                 if (localImageHashMap.contains(wallet.merchantPaymentCode)) localImageHashMap[wallet.merchantPaymentCode] else R.drawable.ic_generic_wallet
             val walletBank = WalletBank(
                 wallet.merchantPaymentCode,
-                wallet.bankName,
+                walletNameHashMap.getOrDefault(wallet.merchantPaymentCode,wallet.bankName),
                 walletLogo ?: R.drawable.ic_generic_wallet
             )
             finalWalletBankList.add(walletBank)
@@ -186,9 +187,29 @@ class WalletFragment : Fragment() {
         hashMap["FRW"] = R.drawable.wallet_freecharge
         hashMap["PZ2"] = R.drawable.wallet_payzapp
         hashMap["YBW"] = R.drawable.wallet_yes_bank
-        hashMap["Paytm"] = R.drawable.wallet_paytm
+        hashMap["PT2"] = R.drawable.wallet_paytm
         hashMap["Mobiwik"] = R.drawable.wallet_mobikwik
         hashMap["JIO"] = R.drawable.wallet_jio_money
+        hashMap["OLA"] = R.drawable.wallet_ola_money
+        hashMap["AMZ"] = R.drawable.wallet_amazon_pay
+        return hashMap
+    }
+
+    private fun getWalletHashMap(): HashMap<String, String> {
+        val hashMap: java.util.HashMap<String, String> = hashMapOf()
+        hashMap["PHW"] = "PhonePe"
+        hashMap["ATL"] = "Airtel Money"
+        hashMap["FRW"] = "Freecharge"
+        hashMap["PZ2"] = "PayZapp"
+        hashMap["YBW"] = "Yes Bank"
+        hashMap["PT2"] = "Paytm"
+        hashMap["Mobiwik"] = "Mobikwik"
+        hashMap["JIO"] = "Reliance Jio Money"
+        hashMap["OLA"] = "Ola money"
+        hashMap["AMZ"] = "Amazon Pay"
+        hashMap["ICC"] ="ICC Cash Card"
+        hashMap["ITZ"] ="ITZ Cash Card"
+
         return hashMap
     }
 

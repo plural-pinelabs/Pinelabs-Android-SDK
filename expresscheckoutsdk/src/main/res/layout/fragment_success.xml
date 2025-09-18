@@ -54,6 +54,7 @@
 
 
         <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/savings_tex"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
@@ -61,6 +62,7 @@
             android:drawableStart="@drawable/ic_success_offer_saving"
             android:drawablePadding="4dp"
             android:fontFamily="sans-serif"
+            android:visibility="gone"
             android:letterSpacing="0.02"
             android:text="@string/you_re_saving_500_on_this_order"
             android:textAlignment="center"
@@ -195,9 +197,9 @@
             android:layout_gravity="center_horizontal"
             android:layout_marginHorizontal="16dp"
             android:layout_marginVertical="16dp"
+
             android:background="@drawable/input_field_border"
             android:orientation="vertical"
-            android:padding="8dp"
             android:paddingHorizontal="16dp"
             android:paddingVertical="20dp">
 
@@ -206,7 +208,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="4dp"
                 android:fontFamily="sans-serif"
                 android:text="@string/paid_using"
                 android:textColor="@color/black_text_80"
@@ -221,7 +223,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="12dp"
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="4dp"
                 android:layout_marginEnd="16dp"
                 android:fontFamily="sans-serif"
                 android:gravity="end"
@@ -274,6 +276,7 @@
                     android:src="@drawable/saved_card_dots" />
 
                 <TextView
+                    android:visibility="gone"
                     android:id="@+id/card_number"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -354,7 +357,6 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="12dp"
-
                 android:layout_marginTop="20dp"
                 android:layout_marginEnd="16dp"
                 android:layout_marginBottom="20dp"

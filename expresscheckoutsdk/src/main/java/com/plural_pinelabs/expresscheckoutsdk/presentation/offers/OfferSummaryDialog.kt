@@ -23,6 +23,11 @@ import com.plural_pinelabs.expresscheckoutsdk.data.model.OfferDetail
 
 class OfferSummaryDialog : DialogFragment() {
 
+    private lateinit var bankLogoMap: HashMap<String, String>
+    private lateinit var banKTitleToCodeMap: HashMap<String, String>
+    private lateinit var bankNameKeyList: List<String>
+
+
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val dialog = Dialog(requireContext())
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
@@ -51,9 +56,14 @@ class OfferSummaryDialog : DialogFragment() {
         closeIcon.setOnClickListener {
             dismiss()
         }
+        mapBanKLogo()
 
         offerRecyclerView.layoutManager = LinearLayoutManager(requireContext())
-        val adapter = OfferRVAdapter(requireContext(), getListOfTenure(), getItemListener())
+        val adapter = OfferRVAdapter(
+            requireContext(), getListOfTenure(), getItemListener(), bankLogoMap,
+            bankNameKeyList,
+            banKTitleToCodeMap,
+        )
         offerRecyclerView.adapter = adapter
     }
 
@@ -102,6 +112,13 @@ class OfferSummaryDialog : DialogFragment() {
             saving
         }.let { ArrayList(it) }
 
+    }
+
+
+    private fun mapBanKLogo() {
+        bankLogoMap = Utils.getBankLogoHashMap()
+        bankNameKeyList = Utils.getListOfBanKTitle()
+        banKTitleToCodeMap = Utils.bankTitleAndCodeMapper()
     }
 
 

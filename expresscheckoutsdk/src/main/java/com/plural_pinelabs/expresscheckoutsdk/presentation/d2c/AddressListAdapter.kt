@@ -63,6 +63,7 @@ class AddressListAdapter(
             name.text = item.full_name
             address.text = "${item.address1}, ${item.address2},  ${item.address3}".trim()
             city.text = "${item.city}, ${item.state}, ${item.pincode}".trim()
+            delete.visibility = if (item.canDelete) View.VISIBLE else View.GONE
         }
 
     }
