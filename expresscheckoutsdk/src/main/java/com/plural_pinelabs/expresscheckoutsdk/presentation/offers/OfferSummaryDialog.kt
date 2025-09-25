@@ -1,14 +1,17 @@
 package com.plural_pinelabs.expresscheckoutsdk.presentation.offers
 
+import android.annotation.SuppressLint
 import android.app.Dialog
 import android.content.res.Resources
 import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
 import android.widget.ImageView
+import android.widget.TextView
 import androidx.core.graphics.drawable.toDrawable
 import androidx.fragment.app.DialogFragment
 import androidx.navigation.fragment.findNavController
@@ -26,6 +29,9 @@ class OfferSummaryDialog : DialogFragment() {
     private lateinit var bankLogoMap: HashMap<String, String>
     private lateinit var banKTitleToCodeMap: HashMap<String, String>
     private lateinit var bankNameKeyList: List<String>
+    private lateinit var allTv: TextView
+    private lateinit var creditTv: TextView
+    private lateinit var debitTv: TextView
 
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -49,22 +55,76 @@ class OfferSummaryDialog : DialogFragment() {
         return dialog
     }
 
+    @SuppressLint("SetTextI18n")
     private fun setupUI(view: View) {
 
         val offerRecyclerView = view.findViewById<RecyclerView>(R.id.offers_recycler_view)
         val closeIcon = view.findViewById<ImageView>(R.id.x_icon)
+        allTv = view.findViewById(R.id.all_filter_chip)
+        creditTv = view.findViewById(R.id.credit_filter_chip)
+        debitTv = view.findViewById(R.id.debit_filter_chip)
+        mapBanKLogo()
+
+
+        val filters = listOf(allTv, creditTv, debitTv)
+
+        // Set default selection
+        allTv.isSelected = true
+        filterData("", offerRecyclerView)
+        val offerList = getListOfTenure("")
+        allTv.text = "All (${offerList.size})"
+        if (offerList.count { it.type.contains("CC_bank", true) } == 0) {
+            creditTv.visibility = View.GONE
+        }
+        if (offerList.count { it.type.contains("DC_Bank", true) } == 0) {
+            debitTv.visibility = View.GONE
+        }
+        creditTv.text = "Credit Cards (${offerList.count { it.type.contains("CC_bank", true) }})"
+        debitTv.text = "Debit Cards (${offerList.count { it.type.contains("DC_Bank", true) }})"
+
+        filters.forEach { view ->
+            view.setOnClickListener {
+                filters.forEach { it.isSelected = false }
+                view.isSelected = true
+
+                when (view.id) {
+                    R.id.all_filter_chip -> {
+                        filterData("", offerRecyclerView)
+                        allTv.isSelected = true
+                        //   allTv.setBackgroundResource(R.drawable.input_field_border)
+                    }
+
+                    R.id.credit_filter_chip -> {
+                        filterData("CC_bank", offerRecyclerView)
+                        creditTv.isSelected = true
+                    }
+
+                    R.id.debit_filter_chip -> {
+                        filterData("DC_Bank", offerRecyclerView)
+                        debitTv.isSelected = true
+                    }
+                }
+            }
+        }
+
+
         closeIcon.setOnClickListener {
             dismiss()
         }
-        mapBanKLogo()
+    }
+
+
+    private fun filterData(type: String, offerRecyclerView: RecyclerView) {
+        Log.d("Filter", "Filtering for: $type")
 
         offerRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         val adapter = OfferRVAdapter(
-            requireContext(), getListOfTenure(), getItemListener(), bankLogoMap,
+            requireContext(), getListOfTenure(type), getItemListener(), bankLogoMap,
             bankNameKeyList,
             banKTitleToCodeMap,
         )
         offerRecyclerView.adapter = adapter
+        // Your filtering logic here
     }
 
     private fun getItemListener(): ItemClickListener<OfferDetail> {
@@ -84,10 +144,15 @@ class OfferSummaryDialog : DialogFragment() {
     }
 
 
-    private fun getListOfTenure(): ArrayList<OfferDetail> {
+    private fun getListOfTenure(type: String): ArrayList<OfferDetail> {
         val emiPaymentModeData = ExpressSDKObject.getEMIPaymentModeData()
         val offersList: ArrayList<OfferDetail> = arrayListOf()
-        emiPaymentModeData?.offerDetails?.forEach { offerDetail ->
+        val offerDetails = if (type.isEmpty()) {
+            emiPaymentModeData?.offerDetails
+        } else {
+            emiPaymentModeData?.offerDetails?.filter { it.type.contains(type, true) }
+        }
+        offerDetails?.forEach { offerDetail ->
             offerDetail.offerTitle =
                 Utils.getTitleForEMI(requireContext(), offerDetail.issuer) + " EMI"
             offersList.add(offerDetail)

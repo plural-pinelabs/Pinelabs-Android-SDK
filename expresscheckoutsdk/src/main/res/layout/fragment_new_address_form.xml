@@ -47,6 +47,19 @@
             android:textSize="14sp" />
 
         <TextView
+            android:id="@+id/full_name_error"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:drawableStart="@drawable/ic_error_icon"
+            android:drawablePadding="8dp"
+            android:fontFamily="sans-serif"
+            android:text="@string/address_error_full_name_required"
+            android:textColor="@color/error_DD4D42"
+            android:textFontWeight="500"
+            android:visibility="gone" />
+
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
@@ -124,6 +137,19 @@
 
         </LinearLayout>
 
+        <TextView
+            android:id="@+id/pincode_error_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:drawableStart="@drawable/ic_error_icon"
+            android:drawablePadding="8dp"
+            android:fontFamily="sans-serif"
+            android:text="@string/address_error_pincode_required"
+            android:textColor="@color/error_DD4D42"
+            android:textFontWeight="500"
+            android:visibility="gone" />
+
 
         <TextView
             android:layout_width="match_parent"
@@ -174,6 +200,19 @@
 
 
         </LinearLayout>
+
+        <TextView
+            android:id="@+id/street_error_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:drawableStart="@drawable/ic_error_icon"
+            android:drawablePadding="8dp"
+            android:fontFamily="sans-serif"
+            android:text="@string/address_error_address_1_required"
+            android:textColor="@color/error_DD4D42"
+            android:textFontWeight="500"
+            android:visibility="gone" />
 
 
         <androidx.constraintlayout.widget.ConstraintLayout

@@ -32,10 +32,22 @@ import com.plural_pinelabs.expresscheckoutsdk.R
 import com.plural_pinelabs.expresscheckoutsdk.common.BaseResult
 import com.plural_pinelabs.expresscheckoutsdk.common.CardFragmentViewModelFactory
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.AXIS_TITLE
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.EMI_DC_TYPE
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.ERROR_KEY
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.ERROR_MESSAGE_KEY
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.HDFC_TITLE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.ICICI_TITLE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.INDIAN_TITLE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.INDUSIND_TITLE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.ISSUE_ID
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.KOTAK_TITLE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.MAHARASHTRA_TITLE
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PAY_BY_POINTS_ID
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.SBI_TITLE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.STANDARD_CHARTERED_TITLE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.TENURE_ID
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.YES_TITLE
 import com.plural_pinelabs.expresscheckoutsdk.common.ItemClickListener
 import com.plural_pinelabs.expresscheckoutsdk.common.NetworkHelper
 import com.plural_pinelabs.expresscheckoutsdk.common.PaymentModes
@@ -45,6 +57,7 @@ import com.plural_pinelabs.expresscheckoutsdk.data.model.CardTokenData
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CustomerData
 import com.plural_pinelabs.expresscheckoutsdk.data.model.EMIPaymentModeData
 import com.plural_pinelabs.expresscheckoutsdk.data.model.Extra
+import com.plural_pinelabs.expresscheckoutsdk.data.model.OfferDetail
 import com.plural_pinelabs.expresscheckoutsdk.data.model.PaymentMode
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ProcessPaymentRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ProcessPaymentResponse
@@ -68,6 +81,10 @@ class PaymentModeFragment : Fragment() {
     private var saveUptoTextView: TextView? = null
     private lateinit var viewOffersBtn: TextView
 
+    private lateinit var bankLogoMap: HashMap<String, String>
+    private lateinit var banKTitleToCodeMap: HashMap<String, String>
+    private lateinit var bankNameKeyList: List<String>
+
     private lateinit var contactDeliveryCollapsedLayout: ConstraintLayout
     private lateinit var contactDeliveryExpandedLayout: ConstraintLayout
     private lateinit var contactDetailsTitle: TextView
@@ -83,7 +100,7 @@ class PaymentModeFragment : Fragment() {
     private lateinit var recommendedSavedCardParentLayout: LinearLayout
     private lateinit var recommendedUPIVPAParentLayout: LinearLayout
     private lateinit var recommendedUPIVPATextview: TextView
-    private lateinit var bankLogoName: TextView
+    private lateinit var bankLogoName: ImageView
     private lateinit var offerType: TextView
     private lateinit var emiDiscount: TextView
     private lateinit var bankOffer: TextView
@@ -116,6 +133,7 @@ class PaymentModeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setViews(view)
+        mapBanKLogo()
         getMaxSavings()
         handleRecommendationOptions()
 
@@ -436,7 +454,7 @@ class PaymentModeFragment : Fragment() {
         }
 
         val maxSavings = emiPaymentData.offerDetails?.firstOrNull()?.maxSaving
-        if (maxSavings==null || maxSavings <= 0) {
+        if (maxSavings == null || maxSavings <= 0) {
             //Hide the offer views
             offerViewLayout?.visibility = View.GONE
             return
@@ -472,8 +490,9 @@ class PaymentModeFragment : Fragment() {
 
     }
 
-    private fun getBestOfferRecommended() {
-        val item = ExpressSDKObject.getEMIPaymentModeData()?.offerDetails?.firstOrNull()
+    private fun getBestOfferRecommended(offerDetails: List<OfferDetail>?) {
+        val item = offerDetails?.firstOrNull()
+            ?: ExpressSDKObject.getEMIPaymentModeData()?.offerDetails?.firstOrNull()
         if (item != null) {
             val spec = BankColors.getGradientColors(item.issuer?.display_name)
 
@@ -484,7 +503,7 @@ class PaymentModeFragment : Fragment() {
             recommendedParentLayout.background = gradientDrawable
 
             //TODO this could be null handle that case
-            bankLogoName.text = item.issuer?.display_name
+            getBankLogo(item.name)?.let { bankLogoName.setImageResource(it) }
             offerType.text = getEMITypeLabel(item.tenureOffers?.firstOrNull()?.emiType)
             emiDiscount.text = Utils.convertToRupeesWithSymobl(
                 requireContext(),
@@ -500,6 +519,10 @@ class PaymentModeFragment : Fragment() {
                 requireContext(),
                 fullTenure?.monthly_emi_amount?.value ?: 0
             )
+            if (item.tenureOffers?.firstOrNull()?.tenureId == "7") {
+                emiDuration.visibility = View.GONE
+                totalPayable.visibility = View.GONE
+            }
             emiDuration.text = String.format(
                 requireContext().getString(R.string.for_x_months),
                 fullTenure?.tenure_value.toString()
@@ -507,7 +530,7 @@ class PaymentModeFragment : Fragment() {
             totalPayable.text = Utils.convertToRupeesWithSymobl(
                 requireContext(),
                 fullTenure?.loan_amount?.value ?: 0
-            )
+            ) + "/month"
             handleRecommendedOptionClick()
         } else
             recommendedParentLayout.visibility = View.GONE
@@ -530,8 +553,8 @@ class PaymentModeFragment : Fragment() {
             val tenure =
                 issuer?.tenures?.find { it.tenure_id == offerDetails?.tenureOffers?.firstOrNull()?.tenureId }
             val bundle = Bundle()
-            bundle.putString("issuerId", offerDetails?.issuerId)
-            bundle.putString("tenureId", tenure?.tenure_id)
+            bundle.putString(ISSUE_ID, offerDetails?.issuerId)
+            bundle.putString(TENURE_ID, tenure?.tenure_id)
             if (offerDetails?.type?.equals(EMI_DC_TYPE, true) == false)
                 findNavController().navigate(
                     R.id.action_paymentModeFragment_to_EMICardDetailsFragment,
@@ -561,7 +584,7 @@ class PaymentModeFragment : Fragment() {
             // show last used method
             recommendedOptionLabel.visibility = View.VISIBLE
             recommendedParentLayout.visibility = View.VISIBLE
-            getBestOfferRecommended()
+            getBestOfferRecommended(null)
         } else if (lastPayModeUsed.equals("REWARD", true) || lastPayModeUsed.contains(
                 "CARD",
                 true
@@ -606,10 +629,11 @@ class PaymentModeFragment : Fragment() {
                 }
             } else {
                 // now check for if its in offerdetails
-                val offerDetails = ExpressSDKObject.getEMIPaymentModeData()?.offerDetails
+                val offerDetails =
+                    ExpressSDKObject.getFetchData()?.customerInfo?.lastUsedPaymode?.card?.lastUsedCard?.firstOrNull()?.emiData?.offerDetails
                 recommendedParentLayout.visibility = View.VISIBLE
                 handleRecommendedOptionClick()
-                getBestOfferRecommended()
+                getBestOfferRecommended(offerDetails)
 
             }
             //if we want to show the cards lets first check if there are any saved cards and
@@ -647,5 +671,45 @@ class PaymentModeFragment : Fragment() {
         }
 
     }
+
+
+    private fun mapBanKLogo() {
+        bankLogoMap = Utils.getBankLogoHashMap()
+        bankNameKeyList = Utils.getListOfBanKTitle()
+        banKTitleToCodeMap = Utils.bankTitleAndCodeMapper()
+    }
+
+
+    private fun primaryBanksLogo(): HashMap<String, Int> {
+        val hashMap: HashMap<String, Int> = hashMapOf(
+            AXIS_TITLE to R.drawable.ic_axis_bank,
+            HDFC_TITLE to R.drawable.ic_hdfc_bank,
+            ICICI_TITLE to R.drawable.ic_icici_bank,
+            INDIAN_TITLE to R.drawable.ic_indian_overseas_bank,
+            YES_TITLE to R.drawable.ic_yes_bank,
+            KOTAK_TITLE to R.drawable.ic_kotak_bank,
+            MAHARASHTRA_TITLE to R.drawable.ic_maharashtra_bank,
+            INDUSIND_TITLE to R.drawable.ic_indusind_bank,
+            STANDARD_CHARTERED_TITLE to R.drawable.ic_standard_chartered_bank,
+            SBI_TITLE to R.drawable.ic_sbi,
+        )
+        return hashMap
+    }
+
+
+    // Step 2: Function to extract the first word from full bank name
+    fun getFirstWord(name: String): String {
+        return name.trim().split("\\s+".toRegex()).firstOrNull() ?: ""
+    }
+
+    // Step 3: Function to find the logo based on full bank name
+    fun getBankLogo(fullBankName: String): Int? {
+        val firstWord = getFirstWord(fullBankName)
+        val bankLogos = primaryBanksLogo()
+        return bankLogos.entries.firstOrNull {
+            it.key.equals(firstWord, ignoreCase = true)
+        }?.value
+    }
+
 
 }

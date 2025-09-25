@@ -50,6 +50,9 @@ class NewAddressFormFragment : Fragment() {
     private lateinit var addressSaveDescriptionHyperLink: TextView
     private lateinit var addressType: RadioGroup
     private lateinit var saveBtn: Button
+    private lateinit var fullNameError: TextView
+    private lateinit var pinCodeError: TextView
+    private lateinit var streetError: TextView
     private var selectedAddressType: String = "Home" // Default value
     private var isEditMode: Boolean = false // Flag to check if it's in edit mode
 
@@ -94,7 +97,7 @@ class NewAddressFormFragment : Fragment() {
                     when (it) {
                         is BaseResult.Error -> {
                             //TODO handle failure
-                               bottomSheetDialog?.dismiss()
+                            bottomSheetDialog?.dismiss()
                         }
 
                         is BaseResult.Loading -> {
@@ -125,7 +128,8 @@ class NewAddressFormFragment : Fragment() {
 
                         is BaseResult.Success<AddressResponse?> -> {
                             bottomSheetDialog?.dismiss()
-                            ExpressSDKObject.getFetchData()?.customerInfo = it.data?.data?.customerInfo
+                            ExpressSDKObject.getFetchData()?.customerInfo =
+                                it.data?.data?.customerInfo
                             findNavController().navigate(
                                 R.id.action_newAddressFormFragment_to_paymentModeFragment
                             )
@@ -196,6 +200,9 @@ class NewAddressFormFragment : Fragment() {
         addressLine2Et = view.findViewById(R.id.address_line_2_edit_text)
         addressType = view.findViewById(R.id.address_type_radio_group)
         saveBtn = view.findViewById(R.id.continue_btn)
+        fullNameError = view.findViewById(R.id.full_name_error)
+        pinCodeError = view.findViewById(R.id.pincode_error_text)
+        streetError = view.findViewById(R.id.street_error_text)
         view.findViewById<RadioButton>(R.id.home_radio_button).isChecked = true // Default selection
         addressType.setOnCheckedChangeListener { _, checkedId ->
             when (checkedId) {
@@ -231,56 +238,68 @@ class NewAddressFormFragment : Fragment() {
     private fun setFocusChangeListeners() {
         fullNameEt.setOnFocusChangeListener { _, hasFocus ->
             if (hasFocus) {
-                fullNameEt.error = null
-            } else if (fullNameEt.text.isEmpty()) {
+                fullNameError.visibility = View.GONE
+            } else if (fullNameEt.text.isEmpty() || fullNameEt.text.length < 3) {
+                fullNameError.visibility = View.VISIBLE
                 //show error
             }
         }
         pinCodeEt.setOnFocusChangeListener { _, hasFocus ->
             if (hasFocus) {
-                pinCodeEt.error = null
-            } else if (pinCodeEt.text.isEmpty()) {
+                pinCodeError.visibility = View.GONE
+            } else if (pinCodeEt.text.isEmpty() || pinCodeEt.text.length < 6) {
                 //show error
+                pinCodeError.visibility = View.VISIBLE
+                pinCodeError.text = getString(R.string.address_error_pincode_required)
             }
         }
         cityEt.setOnFocusChangeListener { _, hasFocus ->
             if (hasFocus) {
-                cityEt.error = null
-            } else if (cityEt.text.isEmpty()) {
+                pinCodeError.visibility = View.GONE
+            } else if (cityEt.text.isEmpty() || cityEt.text.length < 3) {
+                pinCodeError.visibility = View.VISIBLE
+                pinCodeError.text = getString(R.string.address_error_city_required)
                 //show error
             }
         }
         stateEt.setOnFocusChangeListener { _, hasFocus ->
             if (hasFocus) {
-                stateEt.error = null
-            } else if (stateEt.text.isEmpty()) {
+                pinCodeError.visibility = View.GONE
+            } else if (stateEt.text.isEmpty() || stateEt.text.length < 3) {
                 //show error
+                pinCodeError.visibility = View.VISIBLE
+                pinCodeError.text = getString(R.string.address_error_state_required)
+
             }
         }
         addressLine1Et.setOnFocusChangeListener { _, hasFocus ->
             if (hasFocus) {
-                addressLine1Et.error = null
-            } else if (addressLine1Et.text.isEmpty()) {
+                streetError.visibility = View.GONE
+            } else if (addressLine1Et.text.isEmpty() || addressLine1Et.text.length < 3) {
+                streetError.visibility = View.VISIBLE
+                streetError.text = getString(R.string.address_error_address_1_required)
                 //show error
             }
         }
         addressLine2Et.setOnFocusChangeListener { _, hasFocus ->
             if (hasFocus) {
-                addressLine2Et.error = null
-            } else if (addressLine2Et.text.isEmpty()) {
+                streetError.visibility = View.GONE
+            } else if (addressLine2Et.text.isEmpty() || addressLine2Et.text.length < 3) {
                 //show error
+                streetError.visibility = View.VISIBLE
+                streetError.text = getString(R.string.address_error_address_2_error)
             }
         }
     }
 
     private fun isAllFieldValid(): Boolean {
 
-        return fullNameEt.text.isNotEmpty() &&
-                pinCodeEt.text.isNotEmpty() &&
-                cityEt.text.isNotEmpty() &&
-                stateEt.text.isNotEmpty() &&
-                addressLine1Et.text.isNotEmpty() &&
-                addressLine2Et.text.isNotEmpty()
+        return fullNameEt.text.isNotEmpty() && fullNameEt.text.length >= 3 &&
+                pinCodeEt.text.isNotEmpty() && pinCodeEt.text.length == 6 &&
+                cityEt.text.isNotEmpty() && cityEt.text.length >= 3 &&
+                stateEt.text.isNotEmpty() && stateEt.text.length >= 3 &&
+                addressLine1Et.text.isNotEmpty() && addressLine1Et.text.length >= 3 &&
+                addressLine2Et.text.isNotEmpty() && addressLine2Et.text.length >= 3
 
     }
 

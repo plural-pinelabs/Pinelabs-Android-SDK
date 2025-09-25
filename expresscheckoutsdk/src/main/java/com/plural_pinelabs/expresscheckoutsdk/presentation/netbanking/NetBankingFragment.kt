@@ -28,6 +28,7 @@ import com.plural_pinelabs.expresscheckoutsdk.ExpressSDKObject
 import com.plural_pinelabs.expresscheckoutsdk.R
 import com.plural_pinelabs.expresscheckoutsdk.common.BaseResult
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.BASE_IMAGES
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.DEFAULT_BANK_CODE
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.ERROR_KEY
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.ERROR_MESSAGE_KEY
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.NET_BANKING
@@ -41,6 +42,8 @@ import com.plural_pinelabs.expresscheckoutsdk.common.Utils
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils.getBankLogoHashMap
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils.showProcessPaymentBottomSheetDialog
 import com.plural_pinelabs.expresscheckoutsdk.data.model.AcquirerWisePaymentData
+import com.plural_pinelabs.expresscheckoutsdk.data.model.ConvenienceFeesData
+import com.plural_pinelabs.expresscheckoutsdk.data.model.ConvenienceFeesInfo
 import com.plural_pinelabs.expresscheckoutsdk.data.model.DeviceInfo
 import com.plural_pinelabs.expresscheckoutsdk.data.model.Extra
 import com.plural_pinelabs.expresscheckoutsdk.data.model.NetBank
@@ -67,6 +70,7 @@ class NetBankingFragment : Fragment() {
     private var bottomSheetDialog: BottomSheetDialog? = null
     private var imageLoader: ImageLoader? = null
     private lateinit var viewModel: NetBankingViewModel
+    private var convenienceFeesData: ConvenienceFeesInfo? = null
 
 
     override fun onCreateView(
@@ -152,8 +156,8 @@ class NetBankingFragment : Fragment() {
         val bankCodeHashMap = getBankLogoHashMap()
         preLoadBankLogos(bankCodeHashMap)
         issuerDataList?.forEach { item ->
-            if (!hashSet.contains(item.merchantPaymentCode) && bankCodeHashMap.containsKey(item.merchantPaymentCode)) {
-                var image: String? = bankCodeHashMap[item.merchantPaymentCode]
+            if (!hashSet.contains(item.merchantPaymentCode) ) {
+                var image: String? = bankCodeHashMap[item.merchantPaymentCode]?: bankCodeHashMap[DEFAULT_BANK_CODE]
                 image?.let {
                     image = BASE_IMAGES + it
                 }
@@ -171,8 +175,8 @@ class NetBankingFragment : Fragment() {
         acquirerWisePaymentData?.forEach { item ->
             val nbbl = item.isNbbl
             item.PaymentOption.forEach {
-                if (!hashSet.contains(it.merchantPaymentCode) && bankCodeHashMap.containsKey(it.merchantPaymentCode)) {
-                    val image: String? = bankCodeHashMap[it.merchantPaymentCode]
+                if (!hashSet.contains(it.merchantPaymentCode)) {
+                    val image: String? = bankCodeHashMap[it.merchantPaymentCode]?: bankCodeHashMap[DEFAULT_BANK_CODE]
                     val bank = NetBank(
                         it.merchantPaymentCode,
                         it.Name,
@@ -182,7 +186,7 @@ class NetBankingFragment : Fragment() {
                     finalList.add(bank)
                     it.merchantPaymentCode?.let { it1 -> hashSet.add(it1) }
                 } else {
-                    finalList.single() { bank -> bank.bankCode == it.merchantPaymentCode }.isNBBLBank =
+                    finalList.singleOrNull { bank -> bank.bankCode == it.merchantPaymentCode }?.isNBBLBank =
                         nbbl
                 }
             }
@@ -343,8 +347,8 @@ class NetBankingFragment : Fragment() {
 
         val paymentMode = arrayListOf(NET_BANKING)
         val netBankingData = NetBankingData(payCode)
-        //val convenienceFeesData = ConvenienceFeesData(131040, 23785, 1100, 655925, 500000, 99999999, 155925, "INR")
-        val deviceInfo = DeviceInfo(
+       val convenienceFeesDataObj = convenienceFeesData?.let { Utils.getConvenienceFeesRequest(it) }
+           val deviceInfo = DeviceInfo(
             DeviceType.MOBILE.name,
             "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
             null, null, null, null, null, null,
@@ -373,7 +377,7 @@ class NetBankingFragment : Fragment() {
                 netBankingData,
                 extras,
                 null,
-                null
+                convenienceFeesDataObj
             )
         return processPaymentRequest;
     }
@@ -394,6 +398,7 @@ class NetBankingFragment : Fragment() {
                 true,
                 convenienceFeesInfo[0]
             )
+            convenienceFeesData = convenienceFeesInfo[0]
         }
 
     }

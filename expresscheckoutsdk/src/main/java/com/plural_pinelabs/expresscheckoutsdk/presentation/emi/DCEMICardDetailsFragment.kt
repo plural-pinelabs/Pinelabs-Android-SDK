@@ -246,9 +246,11 @@ class DCEMICardDetailsFragment : Fragment() {
                         is BaseResult.Success<CardBinMetaDataResponse> -> {
                             result.data.let { it ->
                                 binData = it
-                                setCardBrandIcon(
-                                    cardEditText, it.card_payment_details[0].card_network
-                                )
+                                if (it.card_payment_details.isNotEmpty()) {
+                                    setCardBrandIcon(
+                                        cardEditText, it.card_payment_details[0].card_network
+                                    )
+                                }
                                 Log.d(MTAG, " Meta Data fetched successfully")
                             }
                         }

@@ -911,8 +911,8 @@ class CardFragment : Fragment() {
             ?.let { filteredFees ->
                 // Try to find exact cardType match
                 filteredFees.find { fee ->
-                    fee.networkType.equals(
-                        cardNetwork,
+                    fee.cardType.equals(
+                        cardType,
                         ignoreCase = true
                     )
                 } ?: filteredFees.find { fee ->

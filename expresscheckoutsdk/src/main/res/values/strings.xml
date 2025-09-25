@@ -214,6 +214,15 @@
     <string name="recommended_payment_option">Recommended Payment Option</string>
     <string name="incorrect_otp_please_try_again">Incorrect OTP. Please try again.</string>
     <string name="continue_to_pay">Continue to Pay</string>
+    <string name="address_error_full_name_required">Full Name is required</string>
+    <string name="address_error_full_name_error">Full Name should contain only alphabets and spaces.</string>
+    <string name="address_error_pincode_required">Pincode is required</string>
+    <string name="address_error_city_required">City is required</string>
+    <string name="address_error_state_required">State is required</string>
+    <string name="address_error_pincode_error">Enter a valid 6-digit pincode</string>
+    <string name="address_error_address_1_required">House/Apartment No. is required</string>
+    <string name="address_error_address_2_error">Street Name is required</string>
+    <string name="address_error_address_type_error">Please select a valid address type.</string>
 
 
 </resources>

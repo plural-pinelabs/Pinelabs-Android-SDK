@@ -108,14 +108,17 @@ internal class ACSFragment : Fragment() {
                                 }
 
                                 PROCESSED_STATUS -> {
+                                    viewModel.stopPolling()
                                     findNavController().navigate(R.id.action_ACSFragment_to_successFragment)
                                 }
 
                                 PROCESSED_ATTEMPTED -> {
+                                    viewModel.stopPolling()
                                      findNavController().navigate(R.id.action_ACSFragment_to_successFragment)
                                 }
 
                                 PROCESSED_FAILED -> {
+                                    viewModel.stopPolling()
                                     findNavController().navigate(R.id.action_ACSFragment_to_failureFragment)
                                 }
                             }
@@ -168,7 +171,8 @@ internal class ACSFragment : Fragment() {
                 if (url?.contains(BFF_RESPONSE_HANDLER_ENDPOINT, ignoreCase = true) == true) {
                     webAcs.visibility = View.GONE
                     constrainSuccess.visibility = View.VISIBLE
-                    viewModel.getTransactionStatus(ExpressSDKObject.getToken())
+                   // viewModel.getTransactionStatus(ExpressSDKObject.getToken())
+                    viewModel.startPolling()
 
                 }
             }
@@ -189,6 +193,9 @@ internal class ACSFragment : Fragment() {
             viewModel.getTransactionStatus(ExpressSDKObject.getToken())
         }
     }
+
+
+
 
 
 }

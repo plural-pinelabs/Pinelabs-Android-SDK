@@ -926,7 +926,8 @@ data class CardDetail(
     val cardBin: String,
     val cardLast4: String,
     val cardType: String,
-    val cardNetwork: String
+    val cardNetwork: String,
+    val emiData: EMIPaymentModeData,
 ) : Parcelable
 
 

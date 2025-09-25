@@ -3,8 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/offer_summary_parent_layout"
     android:layout_width="match_parent"
-    android:background="@color/white"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/white">
 
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -47,13 +47,13 @@
             android:layout_height="20dp"
             android:layout_gravity="center"
             android:layout_margin="15dp"
-            android:padding="2dp"
             android:background="@drawable/circle_background"
             android:backgroundTint="@color/black_text_30"
+            android:padding="2dp"
             android:src="@drawable/ic_cancel_close"
-            app:tint="@color/black_text_50"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="@color/black_text_50" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <TextView
@@ -83,6 +83,68 @@
         app:layout_constraintStart_toEndOf="@id/payment_offer_label"
         app:layout_constraintTop_toTopOf="@id/payment_offer_label" />
 
+    <HorizontalScrollView
+        android:id="@+id/filter_chip_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:scrollbars="none"
+        app:layout_constraintTop_toBottomOf="@id/payment_offer_label">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+
+            <TextView
+                android:id="@+id/all_filter_chip"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:background="@drawable/chip_selector"
+                android:fontFamily="sans-serif"
+
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="12dp"
+                android:text="all(10)"
+                android:textColor="@color/black_text"
+                android:textFontWeight="600"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/credit_filter_chip"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:background="@drawable/chip_selector"
+                android:fontFamily="sans-serif"
+
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="12dp"
+                android:text="Credit Card(10)"
+                android:textColor="@color/black_text"
+                android:textFontWeight="600"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/debit_filter_chip"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:background="@drawable/chip_selector"
+                android:fontFamily="sans-serif"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="12dp"
+                android:text="Debit Card(10)"
+                android:textColor="@color/black_text"
+                android:textFontWeight="600"
+                android:textSize="14sp" />
+
+
+        </LinearLayout>
+
+    </HorizontalScrollView>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/offers_recycler_view"
@@ -91,7 +153,7 @@
         android:layout_marginTop="12dp"
         android:clipToPadding="false"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/payment_offer_label">
+        app:layout_constraintTop_toBottomOf="@id/filter_chip_container">
 
     </androidx.recyclerview.widget.RecyclerView>
 

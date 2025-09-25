@@ -14,7 +14,7 @@ android {
         applicationId = "com.plural_pinelabs.native_express_sdk"
         minSdk = 26
         targetSdk = 35
-        versionCode = 13
+        versionCode = 17
         versionName = "1.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -49,8 +49,8 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     implementation(project(":ExpressCheckoutSdk"))
-    implementation(platform("com.google.firebase:firebase-bom:33.15.0"))
-    implementation("com.google.firebase:firebase-analytics")
-    implementation("com.google.firebase:firebase-crashlytics")
+    //implementation(platform("com.google.firebase:firebase-bom:33.15.0"))
+   // implementation("com.google.firebase:firebase-analytics")
+   // implementation("com.google.firebase:firebase-crashlytics")
 
 }

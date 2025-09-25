@@ -154,7 +154,9 @@ class TopSheetDialogFragment : DialogFragment() {
             tenure.discount.amount?.value ?: 0 else 0
 
         val subventionValue = if (
-            tenure?.details?.getOrNull(0)?.subvention?.offer_type == "NO_COST" &&
+            (tenure?.details?.getOrNull(0)?.subvention?.offer_type == "NO_COST" || tenure?.details?.getOrNull(
+                0
+            )?.subvention?.offer_type == "LOW_COST") &&
             tenure.details[0].subvention?.subvention_type == "POST"
         ) tenure.total_subvention_amount?.value ?: 0 else 0
 
@@ -163,7 +165,11 @@ class TopSheetDialogFragment : DialogFragment() {
         val emiDetails =
             listOfNotNull(
                 // Conditional discounts
-                if (
+
+                if (totalCashback > 0) Pair(
+                    "Cashback",
+                    Utils.convertToRupeesWithSymobl(requireContext(), totalCashback)
+                ) else if (
                     tenure?.details?.getOrNull(0)?.subvention?.offer_type == "LOW_COST" &&
                     tenure.details[0].subvention?.subvention_type == "POST"
                 ) Pair(
@@ -173,17 +179,17 @@ class TopSheetDialogFragment : DialogFragment() {
                         tenure.total_subvention_amount?.value
                     )
                 ) else null,
-
                 if (
                     tenure?.details?.getOrNull(0)?.subvention?.offer_type == "LOW_COST" &&
                     tenure.details[0].subvention?.subvention_type == "INSTANT"
                 ) Pair(
-                    "Instant Discount",
+                    "Discount on EMI",
                     Utils.convertToRupeesWithSymobl(
                         requireContext(),
                         tenure.total_subvention_amount?.value
                     )
                 ) else null,
+
 
                 if (
                     tenure?.details?.getOrNull(0)?.subvention?.offer_type == "NO_COST" &&
@@ -207,11 +213,8 @@ class TopSheetDialogFragment : DialogFragment() {
                     )
                 ) else null,
 
-                if (totalCashback > 0) Pair(
-                    "Cashback",
-                    Utils.convertToRupeesWithSymobl(requireContext(), totalCashback)
-                ) else null
-            )
+
+                )
         return emiDetails
 // Dispatch or update state
     }
