@@ -23,6 +23,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.plural_pinelabs.expresscheckoutsdk.ExpressSDKObject
 import com.plural_pinelabs.expresscheckoutsdk.R
 import com.plural_pinelabs.expresscheckoutsdk.common.BaseResult
+import com.plural_pinelabs.expresscheckoutsdk.common.CleverTapUtil
 import com.plural_pinelabs.expresscheckoutsdk.common.D2CViewModelFactory
 import com.plural_pinelabs.expresscheckoutsdk.common.NetworkHelper
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils
@@ -213,6 +214,14 @@ class PhoneNumberFragment : Fragment() {
                     viewGroup = phoneNumberParentLayout
                 )
                 Utils.handleCTAEnableDisable(requireContext(), isPhoneNumberValid, continueBtn)
+                if (!phoneNumberEt.text.isNullOrBlank()) {
+                    CleverTapUtil.sdkMobileEntered(
+                        CleverTapUtil.getInstance(requireContext()),
+                        ExpressSDKObject.getFetchData(),
+                        isPhoneNumberValid,
+                        false
+                    )
+                }
 
             }
         }
@@ -249,6 +258,12 @@ class PhoneNumberFragment : Fragment() {
                     emailId = emailEt.text.toString() // Assuming +91 as default country code since we are not using a country picker here for now
                 )
                 viewModel.createInactiveUser(ExpressSDKObject.getToken(), customerInfo)
+                CleverTapUtil.sdkMobileChanged(
+                    CleverTapUtil.getInstance(requireContext()),
+                    ExpressSDKObject.getFetchData(),
+                    true,
+                    false
+                )
             }
         }
     }

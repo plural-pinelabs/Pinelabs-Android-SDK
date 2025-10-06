@@ -14,7 +14,7 @@ android {
         applicationId = "com.plural_pinelabs.native_express_sdk"
         minSdk = 26
         targetSdk = 35
-        versionCode = 17
+        versionCode = 19
         versionName = "1.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"

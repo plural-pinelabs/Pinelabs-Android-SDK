@@ -31,6 +31,7 @@ import com.plural_pinelabs.expresscheckoutsdk.ExpressSDKObject
 import com.plural_pinelabs.expresscheckoutsdk.R
 import com.plural_pinelabs.expresscheckoutsdk.common.BaseResult
 import com.plural_pinelabs.expresscheckoutsdk.common.CardFragmentViewModelFactory
+import com.plural_pinelabs.expresscheckoutsdk.common.CleverTapUtil
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.AXIS_TITLE
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.EMI_DC_TYPE
@@ -148,6 +149,29 @@ class PaymentModeFragment : Fragment() {
             showOffers()
         }
         (requireActivity() as LandingActivity).showHideConvenienceFessMessage(ExpressSDKObject.getFetchData()?.convenienceFeesInfo?.isEmpty() == false)
+        CleverTapUtil.sdkPaymentModeView(
+            CleverTapUtil.getInstance(requireContext()),
+            ExpressSDKObject.getFetchData(),
+            getPaymentModeArray(),
+            ExpressSDKObject.getFetchData()?.customerInfo?.lastUsedPaymode?.lastTransactionPaymentMode
+                ?: "",
+            false
+        )
+    }
+
+    private fun getPaymentModeArray(): String {
+        val paymentModes = getPaymentModes()
+        val paymentModeArray = arrayListOf<String>()
+        paymentModes?.forEach {
+            paymentModeArray.add(it.paymentModeId)
+        }
+        val joinedString = paymentModeArray.joinToString(
+            separator = ", ",
+            prefix = "",
+            postfix = ""
+        )
+
+        return joinedString
     }
 
     private fun setContactAndDeliveryDetails() {
@@ -282,6 +306,17 @@ class PaymentModeFragment : Fragment() {
                     token = ExpressSDKObject.getToken(),
                     paymentData = createProcessPaymentRequest
                 )
+                CleverTapUtil.sdkPaymentModeSelected(
+                    CleverTapUtil.getInstance(requireContext()),
+                    ExpressSDKObject.getFetchData(),
+                    getPaymentModeArray(),
+                    false,
+                    "",
+                    "",
+                    "",
+                    true
+
+                )
             }
         }
     }
@@ -375,6 +410,19 @@ class PaymentModeFragment : Fragment() {
     private fun getPaymentModeSelectionCallback(context: Context): ItemClickListener<PaymentMode>? {
         return object : ItemClickListener<PaymentMode> {
             override fun onItemClick(position: Int, item: PaymentMode) {
+                CleverTapUtil.sdkPaymentModeSelected(
+                    CleverTapUtil.getInstance(requireContext()),
+                    ExpressSDKObject.getFetchData(),
+                    item.paymentModeId,
+                    false,
+                    "",
+                    "",
+                    "",
+
+
+                    false
+
+                )
                 when (item.paymentModeId) {
                     PaymentModes.CREDIT_DEBIT.paymentModeID -> {
                         findNavController().navigate(R.id.action_paymentModeFragment_to_cardFragment)
@@ -546,6 +594,17 @@ class PaymentModeFragment : Fragment() {
 
     private fun handleRecommendedOptionClick() {
         actionBtn.setOnClickListener {
+            CleverTapUtil.sdkPaymentModeSelected(
+                CleverTapUtil.getInstance(requireContext()),
+                ExpressSDKObject.getFetchData(),
+                getPaymentModeArray(),
+                true,
+                "",
+                "",
+                "",
+                false
+
+            )
             val offerDetails = ExpressSDKObject.getEMIPaymentModeData()?.offerDetails?.firstOrNull()
             ExpressSDKObject.setSelectedOfferDetail(offerDetails)
             val issuer =

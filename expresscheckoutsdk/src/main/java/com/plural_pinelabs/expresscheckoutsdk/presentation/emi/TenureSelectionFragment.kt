@@ -35,6 +35,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.plural_pinelabs.expresscheckoutsdk.ExpressSDKObject
 import com.plural_pinelabs.expresscheckoutsdk.R
 import com.plural_pinelabs.expresscheckoutsdk.common.BaseResult
+import com.plural_pinelabs.expresscheckoutsdk.common.CleverTapUtil
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.BASE_IMAGES
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.BROWSER_ACCEPT_ALL
@@ -224,7 +225,9 @@ class TenureSelectionFragment : Fragment() {
                     }.customSorted()
                 }
             val adapter = EMITenureListAdapter(
-                requireContext(), filteredList.markBestValueInPlace(selectedIssuerId), getTenureClickListener()
+                requireContext(),
+                filteredList.markBestValueInPlace(selectedIssuerId),
+                getTenureClickListener()
             )
             tenureListRecyclerView.adapter = adapter
         }
@@ -279,6 +282,16 @@ class TenureSelectionFragment : Fragment() {
                 bundle
             )
         }
+
+        CleverTapUtil.emiOptionSelected(
+            CleverTapUtil.getInstance(requireContext()),
+            ExpressSDKObject.getFetchData(),
+            selectedTenure?.tenure_value.toString(),
+            selectedTenure?.interest_rate_percentage.toString(),
+            selectedTenure?.subvention?.subvention_type ?: "",
+            selectedTenure?.monthly_emi_amount?.amount.toString(),
+            false
+        )
     }
 
     private fun mapBanKLogo() {

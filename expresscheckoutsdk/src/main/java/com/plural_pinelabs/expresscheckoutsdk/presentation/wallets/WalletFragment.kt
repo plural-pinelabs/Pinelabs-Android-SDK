@@ -20,6 +20,7 @@ import com.google.gson.reflect.TypeToken
 import com.plural_pinelabs.expresscheckoutsdk.ExpressSDKObject
 import com.plural_pinelabs.expresscheckoutsdk.R
 import com.plural_pinelabs.expresscheckoutsdk.common.BaseResult
+import com.plural_pinelabs.expresscheckoutsdk.common.CleverTapUtil
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.ERROR_KEY
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.ERROR_MESSAGE_KEY
@@ -140,6 +141,14 @@ class WalletFragment : Fragment() {
                     item.bankCode, ExpressSDKObject.getAmount(), ExpressSDKObject.getCurrency()
                 )
                 viewModel.processPayment(ExpressSDKObject.getToken(), processPaymentRequest)
+                CleverTapUtil.sdkCheckoutContinueClicked(
+                    CleverTapUtil.getInstance(requireContext()),
+                    ExpressSDKObject.getFetchData(),
+                    PaymentModes.NET_BANKING.paymentModeName.toString(),
+                    Utils.getCartValue(),
+                    "not known",
+                    "${item.bankName} ${item.bankCode}"
+                )
             }
         }
     }

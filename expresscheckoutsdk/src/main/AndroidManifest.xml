@@ -8,19 +8,16 @@
     <application
         android:allowBackup="false">
 
-        <meta-data
-            android:name="CLEVERTAP_IDENTIFIER"
-            android:value="Identity,Phone" />
+<!--        <meta-data-->
+<!--            android:name="CLEVERTAP_IDENTIFIER"-->
+<!--            android:value="Identity,Phone" />-->
 
         <meta-data
             android:name="CLEVERTAP_ACCOUNT_ID"
-            android:value="TEST-Z69-W6Z-9Z6Z" />
+            android:value="844-WR5-847Z" />
         <meta-data
             android:name="CLEVERTAP_TOKEN"
-            android:value="TEST-160-c61" />
-        <meta-data
-            android:name="CLEVERTAP_USE_GOOGLE_AD_ID"
-            android:value="1" />
+            android:value="520-44b" />
 
         <activity
             android:windowSoftInputMode="adjustResize"
@@ -40,6 +37,4 @@
         <package android:name="in.org.npci.upiapp" />
         <package android:name="com.dreamplug.androidapp" />
     </queries>
-
-
 </manifest>

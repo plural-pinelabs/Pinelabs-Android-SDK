@@ -28,6 +28,7 @@ import com.plural_pinelabs.expresscheckoutsdk.ExpressSDKObject
 import com.plural_pinelabs.expresscheckoutsdk.R
 import com.plural_pinelabs.expresscheckoutsdk.common.BaseResult
 import com.plural_pinelabs.expresscheckoutsdk.common.CardFragmentViewModelFactory
+import com.plural_pinelabs.expresscheckoutsdk.common.CleverTapUtil
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.BASE_IMAGES
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.BROWSER_ACCEPT_ALL
@@ -227,6 +228,16 @@ class DCEMICardDetailsFragment : Fragment() {
         )
         payBtn.setOnClickListener {
             validateAllFields()
+            val offerDetails = ExpressSDKObject.getSelectedOfferDetail()
+            val offerTenure = offerDetails?.tenureOffers?.find { it.tenureId == tenureId }
+            CleverTapUtil.sdkCheckoutContinueClicked(
+                CleverTapUtil.getInstance(requireContext()),
+                ExpressSDKObject.getFetchData(),
+                "Credit Card EMI",
+                Utils.getCartValue(),
+                offerTenure?.offerLabel ?: "",
+                payBtn.text.toString()
+            )
         }
     }
 

@@ -17,8 +17,11 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.navigation.findNavController
+import com.clevertap.android.sdk.ActivityLifecycleCallback
+import com.clevertap.android.sdk.CleverTapAPI
 import com.plural_pinelabs.expresscheckoutsdk.ExpressSDKObject
 import com.plural_pinelabs.expresscheckoutsdk.R
+import com.plural_pinelabs.expresscheckoutsdk.common.CleverTapUtil
 import com.plural_pinelabs.expresscheckoutsdk.common.CustomExceptionHandler
 import com.plural_pinelabs.expresscheckoutsdk.common.ItemClickListener
 import com.plural_pinelabs.expresscheckoutsdk.common.PaymentModes
@@ -62,6 +65,9 @@ class LandingActivity : AppCompatActivity() {
         window.decorView.setBackgroundColor(getResources().getColor(R.color.screen_background));
         setView()
         initExceptionHandler()
+        ActivityLifecycleCallback.register(this.application)
+        var cleverTapDefaultInstance: CleverTapAPI? =
+            CleverTapAPI.getDefaultInstance(applicationContext)
     }
 
     private fun initExceptionHandler() {
@@ -105,6 +111,15 @@ class LandingActivity : AppCompatActivity() {
                     if (item) {
                         val navHostController = findNavController(R.id.nav_host_fragment_container)
                         navHostController.navigate(R.id.failureFragment)
+                        CleverTapUtil.sdkTransactionAbandoned(
+                            CleverTapUtil.getInstance(applicationContext),
+                            ExpressSDKObject.getFetchData(),
+                            System.currentTimeMillis().toString(),
+                            "",
+                            "",
+                            Utils.createSDKData(applicationContext).toString(),
+                            ""
+                        )
                     }
                 }
 
@@ -120,6 +135,7 @@ class LandingActivity : AppCompatActivity() {
 
     fun updateValueForHeaderLayout(fetchResponse: FetchResponseDTO?) {
         fetchResponse?.let { fetchData ->
+            CleverTapUtil.updateCleverTapUserProfile(applicationContext, fetchData)
             showHideHeaderLayout(true)
             fetchData.customerInfo?.let { customerInfo ->
                 strikeAmount.visibility = View.GONE
@@ -280,5 +296,6 @@ class LandingActivity : AppCompatActivity() {
         )
         originalAmount.setText(spannable, TextView.BufferType.SPANNABLE)
     }
+
 
 }

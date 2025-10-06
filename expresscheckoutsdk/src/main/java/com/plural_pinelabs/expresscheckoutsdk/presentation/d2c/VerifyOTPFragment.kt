@@ -18,6 +18,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.plural_pinelabs.expresscheckoutsdk.ExpressSDKObject
 import com.plural_pinelabs.expresscheckoutsdk.R
 import com.plural_pinelabs.expresscheckoutsdk.common.BaseResult
+import com.plural_pinelabs.expresscheckoutsdk.common.CleverTapUtil
 import com.plural_pinelabs.expresscheckoutsdk.common.D2CViewModelFactory
 import com.plural_pinelabs.expresscheckoutsdk.common.NetworkHelper
 import com.plural_pinelabs.expresscheckoutsdk.common.OtpInputView
@@ -101,6 +102,15 @@ class VerifyOTPFragment : Fragment() {
                 ExpressSDKObject.getToken(),
                 otpRequest
             )
+
+            CleverTapUtil.sdkOTPEntered(
+                CleverTapUtil.getInstance(requireContext()),
+                ExpressSDKObject.getFetchData(),
+                otpInputView.getOtp().toString(),
+                true,
+                false,
+                false
+            )
         }
 
         verifyOtpBtn.setOnClickListener {
@@ -171,10 +181,18 @@ class VerifyOTPFragment : Fragment() {
                             result.errorCode.let { exception ->
                                 Log.e("Error", exception)
                             }
+                            CleverTapUtil.sdkOTPEntered(
+                                CleverTapUtil.getInstance(requireContext()),
+                                ExpressSDKObject.getFetchData(),
+                                otpInputView.getOtp().toString(),
+                                false,
+                                true,
+                                false
+                            )
                         }
 
                         is BaseResult.Success<CustomerInfoResponse> -> {
-                            if(result.data.status.equals("NOT_VALIDATED",true)){
+                            if (result.data.status.equals("NOT_VALIDATED", true)) {
                                 incorrectOtpError.visibility = View.VISIBLE
                                 bottomSheetDialog?.dismiss()
                                 return@collect
@@ -185,6 +203,14 @@ class VerifyOTPFragment : Fragment() {
                             ExpressSDKObject.setCustomerId(id)
                             ExpressSDKObject.setCustomerToken(result.data.customerToken)
                             viewModel.getAddressList(result.data.customerToken)
+                            CleverTapUtil.sdkOTPEntered(
+                                CleverTapUtil.getInstance(requireContext()),
+                                ExpressSDKObject.getFetchData(),
+                                otpInputView.getOtp().toString(),
+                                false,
+                                false,
+                                true
+                            )
                         }
 
                         is BaseResult.Loading -> {

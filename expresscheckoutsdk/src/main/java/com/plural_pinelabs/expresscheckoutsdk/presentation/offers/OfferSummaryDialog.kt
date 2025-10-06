@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.plural_pinelabs.expresscheckoutsdk.ExpressSDKObject
 import com.plural_pinelabs.expresscheckoutsdk.R
+import com.plural_pinelabs.expresscheckoutsdk.common.CleverTapUtil
 import com.plural_pinelabs.expresscheckoutsdk.common.ItemClickListener
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils
 import com.plural_pinelabs.expresscheckoutsdk.data.model.OfferDetail
@@ -139,6 +140,16 @@ class OfferSummaryDialog : DialogFragment() {
                 } else {
                     findNavController().navigate(R.id.action_paymentModeFragment_to_tenureSelectionFragment)
                 }
+                CleverTapUtil.sdkOfferApplied(
+                    CleverTapUtil.getInstance(requireContext()),
+                    ExpressSDKObject.getFetchData(),
+                    item.name,
+                    item.type,
+                    item.tenureOffers?.firstOrNull()?.offers?.firstOrNull()?.discount?.value.toString(),
+                    false,
+                    item.offerTitle ?: "",
+                    "offer_summary ${item.isInstantSaving}"
+                )
             }
         }
     }

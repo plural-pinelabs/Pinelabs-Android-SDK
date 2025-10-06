@@ -21,6 +21,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.plural_pinelabs.expresscheckoutsdk.ExpressSDKObject
 import com.plural_pinelabs.expresscheckoutsdk.R
 import com.plural_pinelabs.expresscheckoutsdk.common.BaseResult
+import com.plural_pinelabs.expresscheckoutsdk.common.CleverTapUtil
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.NET_BANKING
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PAYMENT_REFERENCE_TYPE_CARD
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PROCESSED_ATTEMPTED
@@ -211,8 +212,17 @@ class SuccessFragment : Fragment() {
                 paymentIcon.setImageResource(R.drawable.ic_generic)
                 cardNameView.text = paymentData.payment_method
             }
-
-
+            CleverTapUtil.sdkTransactionSuccessful(
+                CleverTapUtil.getInstance(requireContext()),
+                ExpressSDKObject.getFetchData(),
+                paymentData.payment_method.toString(),
+                Utils.getCartValue(),
+                orderSummary.type,
+                paymentData.payment_amount.value.toString() ?: "",
+                "",
+                "",
+                false
+            )
         }
         successParentLayout.visibility = View.VISIBLE
     }

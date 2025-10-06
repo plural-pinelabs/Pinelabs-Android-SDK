@@ -25,6 +25,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.plural_pinelabs.expresscheckoutsdk.ExpressSDKObject
 import com.plural_pinelabs.expresscheckoutsdk.R
 import com.plural_pinelabs.expresscheckoutsdk.common.BaseResult
+import com.plural_pinelabs.expresscheckoutsdk.common.CleverTapUtil
 import com.plural_pinelabs.expresscheckoutsdk.common.D2CViewModelFactory
 import com.plural_pinelabs.expresscheckoutsdk.common.NetworkHelper
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils.showProcessPaymentDialog
@@ -228,12 +229,26 @@ class NewAddressFormFragment : Fragment() {
                 )
                 ExpressSDKObject.setSelectedAddress(address)
                 viewModel.saveAddress(address)
-            } else {
-                // Show error message
+                if (!isEditMode) {
+                    CleverTapUtil.sdkAddressEntered(
+                        CleverTapUtil.getInstance(requireContext()),
+                        ExpressSDKObject.getFetchData(),
+                        false,
+                        address.pincode,
+                        address.city,
+                        address.state
+                    )
+                } else {
+                    CleverTapUtil.sdkAddressChanged(
+                        CleverTapUtil.getInstance(requireContext()),
+                        ExpressSDKObject.getFetchData(),
+                        false,
+                        arrayOf("City,state,pincode,address1,address2"),
+                    )
+                }
             }
         }
     }
-
 
     private fun setFocusChangeListeners() {
         fullNameEt.setOnFocusChangeListener { _, hasFocus ->

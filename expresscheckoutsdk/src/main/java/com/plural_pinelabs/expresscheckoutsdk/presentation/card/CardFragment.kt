@@ -29,6 +29,7 @@ import com.plural_pinelabs.expresscheckoutsdk.ExpressSDKObject
 import com.plural_pinelabs.expresscheckoutsdk.R
 import com.plural_pinelabs.expresscheckoutsdk.common.BaseResult
 import com.plural_pinelabs.expresscheckoutsdk.common.CardFragmentViewModelFactory
+import com.plural_pinelabs.expresscheckoutsdk.common.CleverTapUtil
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.BROWSER_ACCEPT_ALL
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.BROWSER_USER_AGENT_ANDROID
@@ -221,6 +222,14 @@ class CardFragment : Fragment() {
         )
         payBtn.setOnClickListener {
             validateAllFields()
+            CleverTapUtil.sdkCheckoutContinueClicked(
+                CleverTapUtil.getInstance(requireContext()),
+                ExpressSDKObject.getFetchData(),
+                PaymentModes.CREDIT_DEBIT.paymentModeName.toString(),
+                Utils.getCartValue(),
+                "not known",
+                payBtn.text.toString()
+            )
         }
     }
 
@@ -340,6 +349,15 @@ class CardFragment : Fragment() {
                         hideCardDetailsError()
                         enableDisableContinueBtn(true)
                     }
+                }
+                if (cardNumber.isNotEmpty()) {
+                    CleverTapUtil.cardNumberEntered(
+                        CleverTapUtil.getInstance(requireContext()),
+                        ExpressSDKObject.getFetchData(),
+                        binData?.card_payment_details?.firstOrNull()?.card_type ?: "",
+                        binData?.card_payment_details?.firstOrNull()?.card_network ?: "",
+                        isCardValid
+                    )
                 }
             }
         }
@@ -554,6 +572,15 @@ class CardFragment : Fragment() {
                         R.drawable.input_field_bottom_right_border,
                         false
                     )
+
+                    if (cvv.isNotEmpty()) {
+                        CleverTapUtil.cvvEntered(
+                            CleverTapUtil.getInstance(requireContext()),
+                            ExpressSDKObject.getFetchData(),
+                            binData?.card_payment_details?.firstOrNull()?.card_issuer ?: "",
+                            isCVVValid
+                        )
+                    }
                 }
             }
         }

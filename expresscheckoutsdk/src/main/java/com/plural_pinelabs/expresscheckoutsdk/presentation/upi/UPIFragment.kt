@@ -35,6 +35,7 @@ import com.plural_pinelabs.expresscheckoutsdk.ExpressSDKObject.getAmount
 import com.plural_pinelabs.expresscheckoutsdk.ExpressSDKObject.getCurrency
 import com.plural_pinelabs.expresscheckoutsdk.R
 import com.plural_pinelabs.expresscheckoutsdk.common.BaseResult
+import com.plural_pinelabs.expresscheckoutsdk.common.CleverTapUtil
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.BHIM_UPI
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.CRED_UPI
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.GPAY
@@ -313,6 +314,14 @@ class UPIFragment : Fragment() {
                 convenienceFeesData
             )
         initProcessPayment(processPaymentRequest)
+        CleverTapUtil.sdkCheckoutContinueClicked(
+            CleverTapUtil.getInstance(requireContext()),
+            ExpressSDKObject.getFetchData(),
+            PaymentModes.UPI.paymentModeName.toString(),
+            Utils.getCartValue(),
+            "not known",
+            verifyContinueButton.text.toString()
+        )
     }
 
     private fun initProcessPayment(processPaymentRequest: ProcessPaymentRequest) {

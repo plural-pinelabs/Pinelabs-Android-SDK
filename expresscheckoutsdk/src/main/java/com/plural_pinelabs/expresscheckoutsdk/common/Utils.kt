@@ -916,7 +916,8 @@ internal object Utils {
             val maxTenure = issuer.tenures
                 .filter { (it.total_discount_amount?.value != null || it.total_subvention_amount?.value != null) && (it.tenure_id != "7") }
                 .maxByOrNull {
-                    (it.total_discount_amount?.value ?:0)+( it.total_subvention_amount?.value ?: 0)
+                    (it.total_discount_amount?.value ?: 0) + (it.total_subvention_amount?.value
+                        ?: 0)
                 }
             issuer.maxDiscountAmount = ((maxTenure?.total_discount_amount?.value
                 ?: 0) + (maxTenure?.total_subvention_amount?.value ?: 0)) ?: 0
@@ -1022,6 +1023,23 @@ internal object Utils {
             currency = selectedFees.paymentAmount?.currency ?: "INR"
         )
         return convenienceFeesData
+    }
+
+
+    fun getCartItems(): String {
+        val cartItems = ExpressSDKObject.getFetchData()?.cartDetails?.cart_items
+        val cartArrayList: ArrayList<String> = arrayListOf()
+        cartItems?.forEach {
+            cartArrayList.add(it.item_description ?: "")
+        }
+
+        return cartArrayList.joinToString(separator = ", ", prefix = "", postfix = "")
+    }
+
+    fun getCartValue(): String {
+        val cartValue =
+            ExpressSDKObject.getFetchData()?.paymentData?.originalTxnAmount?.amount.toString()
+        return cartValue
     }
 
 
