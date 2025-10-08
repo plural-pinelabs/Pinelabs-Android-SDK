@@ -8,6 +8,7 @@ import com.plural_pinelabs.expresscheckoutsdk.data.model.CustomerInfo
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CustomerInfoResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.KFSResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.LogRequest
+import com.plural_pinelabs.expresscheckoutsdk.data.model.LogResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.OTPRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.model.OTPResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.OfferEligibilityResponse
@@ -128,7 +129,7 @@ interface CommonApiService : ApiService {
     suspend fun log(
         @Query("token", encoded = true) token: String?,
         @Body request: LogRequest?
-    ): Response<String>
+    ): Response<LogResponse>
 
 
 }

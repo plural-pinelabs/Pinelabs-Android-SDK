@@ -956,5 +956,10 @@ data class LogRequest(
     val logs: List<LogData>
 )
 
+data class  LogResponse(
+    val status: String,
+    val message: String
+)
+
 
 

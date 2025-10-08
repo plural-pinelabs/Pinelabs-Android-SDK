@@ -44,9 +44,29 @@ class CustomExceptionHandler(
                         NetworkHelper(applicationContext)
                     )
                     val logs = Utils.getUnSyncedErrors(applicationContext)
-                    repo.logData(
+                  val result =  repo.logData(
                         ExpressSDKObject.getToken(), LogRequest(logs)
                     )
+                    result.collect {
+                        when (it) {
+                            is BaseResult.Success -> {
+                                if (it.data.status.equals( "success", ignoreCase = true))
+                                Utils.clearLogs(applicationContext)
+                                Log.i("ExpressLibrary", "Crash logs reported successfully")
+                            }
+
+                            is BaseResult.Error -> {
+                                Log.e(
+                                    "ExpressLibrary",
+                                    "Failed to report crash logs: ${it.errorDescription}"
+                                )
+                            }
+
+                            is BaseResult.Loading -> {
+                                // No action needed for loading state here
+                            }
+                        }
+                    }
                 }
             }
         } catch (e: Exception) {

@@ -13,6 +13,7 @@ import com.plural_pinelabs.expresscheckoutsdk.data.model.ExpressAddressResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.FetchResponseDTO
 import com.plural_pinelabs.expresscheckoutsdk.data.model.KFSResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.LogRequest
+import com.plural_pinelabs.expresscheckoutsdk.data.model.LogResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.OTPRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.model.OTPResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.OfferEligibilityResponse
@@ -95,5 +96,5 @@ interface ExpressRepository {
     suspend fun logData(
         token: String?,
         request: LogRequest?,
-    ): Flow<BaseResult<Any>>
+    ): Flow<BaseResult<LogResponse>>
 }

@@ -18,6 +18,7 @@ import com.plural_pinelabs.expresscheckoutsdk.data.model.ExpressAddressResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.FetchResponseDTO
 import com.plural_pinelabs.expresscheckoutsdk.data.model.KFSResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.LogRequest
+import com.plural_pinelabs.expresscheckoutsdk.data.model.LogResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.OTPRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.model.OTPResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.OfferEligibilityResponse
@@ -174,7 +175,7 @@ class ExpressRepositoryImpl(
         }
     }
 
-    override suspend fun logData(token: String?, request: LogRequest?): Flow<BaseResult<Any>> {
+    override suspend fun logData(token: String?, request: LogRequest?): Flow<BaseResult<LogResponse>> {
         return toResultFlow(networkHelper = networkHelper) {
             (apiService as CommonApiService).log(token, request)
         }

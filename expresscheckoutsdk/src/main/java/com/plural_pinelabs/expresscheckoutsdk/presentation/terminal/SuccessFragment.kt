@@ -4,6 +4,7 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -36,6 +37,7 @@ import com.plural_pinelabs.expresscheckoutsdk.common.SuccessViewModelFactory
 import com.plural_pinelabs.expresscheckoutsdk.common.TimerManager
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils.formatToReadableDate
+import com.plural_pinelabs.expresscheckoutsdk.data.model.LogResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.TransactionStatusResponse
 import com.plural_pinelabs.expresscheckoutsdk.logger.SdkLogger
 import com.plural_pinelabs.expresscheckoutsdk.presentation.LandingActivity
@@ -180,6 +182,35 @@ class SuccessFragment : Fragment() {
                 }
             }
         }
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.logsResult.collect {
+                    when (it) {
+                        is BaseResult.Error -> {
+                            Log.e("SuccessFragment", "Error logging data: ${it.errorDescription}")
+                        }
+
+                        is BaseResult.Loading -> {
+                            if (bottomSheetDialog?.isShowing == false && it.isLoading) bottomSheetDialog =
+                                Utils.showProcessPaymentDialog(requireContext())
+                        }
+
+                        is BaseResult.Success<LogResponse> -> {
+                            bottomSheetDialog?.dismiss()
+                            if (it.data.status.equals("success", true)) {
+                                Utils.clearLogs(requireContext())
+                                Log.i("SuccessFragment", "Logs reported successfully")
+                            } else {
+                                Log.e("SuccessFragment", "Failed to report logs: ${it.data.message}")
+                            }
+
+                        }
+                    }
+                }
+            }
+        }
+
 
     }
 

@@ -7,6 +7,7 @@ import com.plural_pinelabs.expresscheckoutsdk.common.BaseResult
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils.MTAG
 import com.plural_pinelabs.expresscheckoutsdk.data.model.LogData
 import com.plural_pinelabs.expresscheckoutsdk.data.model.LogRequest
+import com.plural_pinelabs.expresscheckoutsdk.data.model.LogResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.TransactionStatusResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.repository.ExpressRepositoryImpl
 import kotlinx.coroutines.Dispatchers
@@ -22,6 +23,13 @@ class SuccessViewModel(private val expressRepositoryImpl: ExpressRepositoryImpl)
         MutableStateFlow<BaseResult<TransactionStatusResponse>>(BaseResult.Loading(false))
     val transactionStatusResult: StateFlow<BaseResult<TransactionStatusResponse>> =
         _transactionStatusResult
+
+    private val _logsResult =
+        MutableStateFlow<BaseResult<LogResponse>>(BaseResult.Loading(false))
+    val logsResult: StateFlow<BaseResult<LogResponse>> =
+        _logsResult
+
+
 
     fun getTransactionStatus(token: String?) {
         if (!isTransactionStatusAPiCalled) {
@@ -39,7 +47,7 @@ class SuccessViewModel(private val expressRepositoryImpl: ExpressRepositoryImpl)
             val logRequest = LogRequest(logs)
             expressRepositoryImpl.logData(token, logRequest).collect {
                 // No need to handle response
-                Log.d(MTAG, "logData: $it")
+                _logsResult.value = it
             }
         }
     }

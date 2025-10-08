@@ -1034,6 +1034,12 @@ internal object Utils {
         return logDataList
     }
 
+    fun clearLogs(context: Context) {
+        val db = DBLogger.getInstance(context).writableDatabase
+        db.delete("logs", null, null)
+        db.close()
+    }
+
 
 
 

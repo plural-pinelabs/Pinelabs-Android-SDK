@@ -21,17 +21,24 @@ import com.clevertap.android.sdk.ActivityLifecycleCallback
 import com.clevertap.android.sdk.CleverTapAPI
 import com.plural_pinelabs.expresscheckoutsdk.ExpressSDKObject
 import com.plural_pinelabs.expresscheckoutsdk.R
+import com.plural_pinelabs.expresscheckoutsdk.common.BaseResult
 import com.plural_pinelabs.expresscheckoutsdk.common.CleverTapUtil
 import com.plural_pinelabs.expresscheckoutsdk.common.CustomExceptionHandler
 import com.plural_pinelabs.expresscheckoutsdk.common.ItemClickListener
+import com.plural_pinelabs.expresscheckoutsdk.common.NetworkHelper
 import com.plural_pinelabs.expresscheckoutsdk.common.PaymentModes
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils.MTAG
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ConvenienceFeesInfo
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CustomerInfo
 import com.plural_pinelabs.expresscheckoutsdk.data.model.FetchResponseDTO
+import com.plural_pinelabs.expresscheckoutsdk.data.model.LogRequest
+import com.plural_pinelabs.expresscheckoutsdk.data.repository.ExpressRepositoryImpl
+import com.plural_pinelabs.expresscheckoutsdk.data.retrofit.RetrofitBuilder
 import com.plural_pinelabs.expresscheckoutsdk.logger.SdkLogger
 import com.plural_pinelabs.expresscheckoutsdk.presentation.ordersummary.TopSheetDialogFragment
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withTimeout
 
 class LandingActivity : AppCompatActivity() {
     private lateinit var merchantLogoCard: CardView
@@ -83,7 +90,7 @@ class LandingActivity : AppCompatActivity() {
         val currentHandler = Thread.getDefaultUncaughtExceptionHandler()
         if (currentHandler !is CustomExceptionHandler) {
             Thread.setDefaultUncaughtExceptionHandler(
-                CustomExceptionHandler(applicationContext,currentHandler)
+                CustomExceptionHandler(applicationContext, currentHandler)
             )
         }
     }
@@ -142,8 +149,6 @@ class LandingActivity : AppCompatActivity() {
                             "INFO",
                             "SDK"
                         )
-                        val navHostController = findNavController(R.id.nav_host_fragment_container)
-                        navHostController.navigate(R.id.failureFragment)
                         CleverTapUtil.sdkTransactionAbandoned(
                             CleverTapUtil.getInstance(applicationContext),
                             ExpressSDKObject.getFetchData(),
@@ -153,6 +158,54 @@ class LandingActivity : AppCompatActivity() {
                             Utils.createSDKData(applicationContext).toString(),
                             ""
                         )
+                        try {
+                            runBlocking {
+                                withTimeout(3000) { // Optional: timeout to avoid hanging
+                                    val repo = ExpressRepositoryImpl(
+                                        RetrofitBuilder.fetchApiService,
+                                        NetworkHelper(applicationContext)
+                                    )
+                                    val logs = Utils.getUnSyncedErrors(applicationContext)
+                                    val result = repo.logData(
+                                        ExpressSDKObject.getToken(), LogRequest(logs)
+                                    )
+                                    result.collect {
+                                        when (it) {
+                                            is BaseResult.Success -> {
+                                                if (it.data.status.equals(
+                                                        "success",
+                                                        ignoreCase = true
+                                                    )
+                                                )
+                                                    Utils.clearLogs(applicationContext)
+                                                Log.i(
+                                                    "ExpressLibrary",
+                                                    "Crash logs reported successfully"
+                                                )
+                                            }
+
+                                            is BaseResult.Error -> {
+                                                Log.e(
+                                                    "ExpressLibrary",
+                                                    "Failed to report crash logs: ${it.errorDescription}"
+                                                )
+                                            }
+
+                                            is BaseResult.Loading -> {
+                                                // No action needed for loading state here
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        } catch (e: Exception) {
+                            Log.e("ExpressLibrary", "Failed to report crash", e)
+                        } finally {
+                            val navHostController =
+                                findNavController(R.id.nav_host_fragment_container)
+                            navHostController.navigate(R.id.failureFragment)
+                            // If you want to let the app crash after logging:
+                        }
                     }
                 }
 
