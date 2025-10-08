@@ -25,7 +25,6 @@ internal object Constants {
     const val EMI_ID = "EMI"
     const val DEBIT_EMI_ID = "DEBIT_EMI"
 
-
     const val CARD_NUMBER_CHUNK = 4
     const val PAYMENT_REFERENCE_TYPE_CARD = "CARD"
 

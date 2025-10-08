@@ -56,28 +56,28 @@ inline fun <reified T> toResultFlow(
             emit(BaseResult.Error(ErrorCode.INTERNET_NOT_AVAILABLE.code))
         }
     }.catch { e ->
-            Log.e("Toresultflow", "Caught exception: ${e.message}")
-            when (e) {
-                is java.net.SocketTimeoutException -> {
-                    emit(
-                        BaseResult.Error(
-                            ErrorCode.UNKNOWN_PAYMENT_ERROR.code,
-                            "Request timed out. Please try again.",
-                            e.stackTraceToString()
-                        )
+        Log.e("Toresultflow", "Caught exception: ${e.message}")
+        when (e) {
+            is java.net.SocketTimeoutException -> {
+                emit(
+                    BaseResult.Error(
+                        ErrorCode.UNKNOWN_PAYMENT_ERROR.code,
+                        "Request timed out. Please try again.",
+                        e.stackTraceToString()
                     )
-                }
-
-                else -> {
-                    emit(
-                        BaseResult.Error(
-                            ErrorCode.EXCEPTION_THROWN.code,
-                            e.message,
-                            e.stackTraceToString()
-                        )
-                    )
-                }
+                )
             }
-        }.flowOn(Dispatchers.IO)
+
+            else -> {
+                emit(
+                    BaseResult.Error(
+                        ErrorCode.EXCEPTION_THROWN.code,
+                        e.message,
+                        e.stackTraceToString()
+                    )
+                )
+            }
+        }
+    }.flowOn(Dispatchers.IO)
 }
 

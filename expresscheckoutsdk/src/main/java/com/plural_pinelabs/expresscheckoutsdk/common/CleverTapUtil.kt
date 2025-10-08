@@ -521,5 +521,22 @@ object CleverTapUtil {
         }
     }
 
-
+    fun sdkCrashed(
+        cleverTapAPI: CleverTapAPI?,
+        fetchResponse: FetchResponseDTO?,
+        errorCode: String,
+        errorMessage: String,
+        stackTrace: String
+    ) {
+        fetchResponse?.let {
+            val customerInfoData = fetchResponse.customerInfo
+            val sdkCrashedData: Map<String, Any?> = mapOf(
+                PARAM_CUSTOMER_ID to customerInfoData?.customer_id,
+                PARAM_ERROR_CODE to errorCode,
+                "Error Message" to errorMessage,
+                "Stack Trace" to stackTrace
+            )
+            cleverTapAPI?.pushEvent("SDK_Crashed", sdkCrashedData)
+        }
+    }
 }

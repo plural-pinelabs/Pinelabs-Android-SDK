@@ -1,6 +1,7 @@
 package com.plural_pinelabs.expresscheckoutsdk.common
 
 import android.app.Activity
+import android.content.ContentValues
 import android.content.Context
 import android.content.res.Resources
 import android.graphics.Bitmap
@@ -27,9 +28,9 @@ import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toDrawable
 import androidx.core.graphics.toColorInt
 import com.airbnb.lottie.LottieAnimationView
-import com.clevertap.android.sdk.CleverTapAPI
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.gson.Gson
 import com.plural_pinelabs.expresscheckoutsdk.BuildConfig
 import com.plural_pinelabs.expresscheckoutsdk.ExpressSDKObject
 import com.plural_pinelabs.expresscheckoutsdk.R
@@ -201,11 +202,13 @@ import com.plural_pinelabs.expresscheckoutsdk.common.Constants.ZOROASTRAIN_TITLE
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ConvenienceFeesData
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ConvenienceFeesInfo
 import com.plural_pinelabs.expresscheckoutsdk.data.model.Issuer
+import com.plural_pinelabs.expresscheckoutsdk.data.model.LogData
 import com.plural_pinelabs.expresscheckoutsdk.data.model.Palette
 import com.plural_pinelabs.expresscheckoutsdk.data.model.PaymentMode
 import com.plural_pinelabs.expresscheckoutsdk.data.model.RecyclerViewPaymentOptionData
 import com.plural_pinelabs.expresscheckoutsdk.data.model.SDKData
 import com.plural_pinelabs.expresscheckoutsdk.data.model.Tenure
+import com.plural_pinelabs.expresscheckoutsdk.logger.DBLogger
 import java.net.Inet4Address
 import java.net.NetworkInterface
 import java.net.SocketException
@@ -268,32 +271,6 @@ internal object Utils {
         return pincode.matches(postalCodeRegex)
     }
 
-    fun buttonBackground(context: Context, palette: Palette?): Drawable {
-
-        val stateListDrawable = StateListDrawable()
-
-        // Create different drawables for different states
-        val pressedDrawable = GradientDrawable().apply {
-            if (palette?.C900.isNullOrEmpty()) {
-                color = AppCompatResources.getColorStateList(context, R.color.colorPrimary)
-            } else {
-                palette?.C900?.toColorInt()?.let { setColor(it) }
-            }
-
-
-            cornerRadius = 16f // Normal corner radius
-        }
-
-        // Add states to the StateListDrawable
-        stateListDrawable.addState(intArrayOf(android.R.attr.state_enabled), pressedDrawable)
-        stateListDrawable.addState(intArrayOf(), pressedDrawable) // Default state
-
-        return stateListDrawable
-    }
-
-    fun cleverTapLog() {
-        CleverTapAPI.setDebugLevel(CleverTapAPI.LogLevel.OFF)
-    }
 
     fun mapPaymentModes(paymentMode: PaymentMode): RecyclerViewPaymentOptionData {
 
@@ -387,32 +364,12 @@ internal object Utils {
         return formatToIndianNumbering(amountInPaisa.toDouble() / 100)
     }
 
-    fun convertToPaisa(amountInRupees: Double): Double {
-        return amountInRupees * 100
-    }
 
     fun roundToDecimal(amount: Double): String {
         val df = DecimalFormat("0.00")
         return df.format(amount)
     }
 
-    fun transformAmount(ratio: Int, amountInPaisa: Int?): String {
-        if (ratio > 1) {
-            val divideBy = "10".toDouble().pow(ratio.toDouble())
-            return amountInPaisa?.div(divideBy).toString()
-        } else
-            return amountInPaisa.toString()
-    }
-
-    fun convertTransformation(ratio: Int, amount: Double?): String {
-        if (ratio > 1) {
-            val multiply = "10".toDouble().pow(ratio.toDouble())
-            val value = amount?.times(multiply)
-            return roundToDecimal(value ?: 0.0)
-        } else {
-            return amount.toString()
-        }
-    }
 
     fun getTimeOffset(): Int {
         // Get the default time zone of the device
@@ -892,7 +849,7 @@ internal object Utils {
     //Custom sort extension for list of tenure type so that we can sort in the order of nocost > low cost > standard
     // and each group sorted by the tenure value among itself
     fun List<Tenure>.customSorted(): List<Tenure> {
-        return return this.sortedBy { it.tenure_value }
+        return this.sortedBy { it.tenure_value }
     }
 
     fun getTitleForEMI(context: Context, issuer: Issuer?): String {
@@ -1041,6 +998,43 @@ internal object Utils {
             ExpressSDKObject.getFetchData()?.paymentData?.originalTxnAmount?.amount.toString()
         return cartValue
     }
+
+
+    fun insertLog(context: Context, logData: String, timestamp: Long) {
+        val db = DBLogger.getInstance(context).writableDatabase
+        val values = ContentValues().apply {
+            put("json", logData)
+            put("timestamp", timestamp)
+        }
+        db.insert("logs", null, values)
+    }
+
+    fun getUnSyncedErrors(context: Context): List<LogData> {
+        val db = DBLogger.getInstance(context).readableDatabase
+        val twentyMinutesAgo = System.currentTimeMillis() - 20 * 60 * 1000
+
+        val cursor = db.query(
+            "logs",
+            arrayOf("json"),
+            "synced = 0 AND timestamp >= ?",
+            arrayOf(twentyMinutesAgo.toString()),
+            null, null, null
+        )
+
+        val logDataList = mutableListOf<LogData>()
+        val gson = Gson()
+
+        while (cursor.moveToNext()) {
+            val json = cursor.getString(cursor.getColumnIndexOrThrow("json"))
+            logDataList.add(gson.fromJson(json, LogData::class.java))
+        }
+
+        cursor.close()
+        DBLogger.getInstance(context).close()
+        return logDataList
+    }
+
+
 
 
 }

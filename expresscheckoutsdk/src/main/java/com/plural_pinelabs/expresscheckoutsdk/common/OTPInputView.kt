@@ -20,6 +20,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.withStyledAttributes
 import androidx.core.view.children
 import com.plural_pinelabs.expresscheckoutsdk.R
+import com.plural_pinelabs.expresscheckoutsdk.logger.SdkLogger
 
 class OtpInputView @JvmOverloads constructor(
     context: Context,
@@ -227,6 +228,14 @@ class OtpInputView @JvmOverloads constructor(
     }
 
     private fun pasteOtp() {
+        SdkLogger.log(
+            context,
+            "OTP_PASTE",
+            "Pasting OTP from clipboard",
+            "",
+            "INFO",
+            "SDK"
+        )
         val clipboard =
             context.getSystemService(Context.CLIPBOARD_SERVICE) as? android.content.ClipboardManager
         clipboard?.primaryClip?.getItemAt(0)?.text?.toString()?.trim()?.let { pastedText ->
@@ -343,14 +352,6 @@ class OtpInputView @JvmOverloads constructor(
         return otpEditTexts.joinToString("") { it.text.toString() }
     }
 
-    // Public method to clear the input
-    fun clearInput() {
-        otpEditTexts.forEach { it.setText("") }
-        if (otpDigits > 0) {
-            otpEditTexts.first().requestFocus()
-        }
-    }
-
     // Method to hide the keyboard
     private fun hideKeyboard() {
         val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
@@ -363,28 +364,5 @@ class OtpInputView @JvmOverloads constructor(
     fun setOtpCompleteListener(listener: (String) -> Unit) {
         otpCompleteListener = listener
     }
-
-    // Trigger the listener when the last digit is entered
-    // Modify the afterTextChanged in setupEditTexts:
-    /*
-       override fun afterTextChanged(s: Editable?) {
-           if (s?.length == 1) {
-               if (i < otpDigits - 1) {
-                   otpEditTexts[i + 1].requestFocus()
-               } else {
-                   // Last digit entered
-                   clearFocus()
-                   hideKeyboard()
-                   otpCompleteListener?.invoke(getOtp()) // Trigger listener
-               }
-           } else if (s?.length == 0) {
-               if (i > 0) {
-                   otpEditTexts[i - 1].requestFocus()
-                   // You might want to clear the content of the previous box here
-                   // otpEditTexts[i-1].setText("")
-               }
-           }
-       }
-     */
 
 }

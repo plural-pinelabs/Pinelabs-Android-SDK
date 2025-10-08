@@ -24,8 +24,6 @@
             android:name=".presentation.LandingActivity"
             android:exported="false" />
 
-        <activity android:name=".common.PdfActivity"
-            android:exported="false" />
     </application>
 
     <queries>

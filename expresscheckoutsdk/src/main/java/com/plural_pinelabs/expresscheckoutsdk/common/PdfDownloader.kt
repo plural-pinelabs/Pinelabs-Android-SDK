@@ -11,6 +11,7 @@ import android.os.Environment
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.net.toUri
+import com.plural_pinelabs.expresscheckoutsdk.logger.SdkLogger
 import java.io.File
 
 class PdfDownloader(private val context: Context) {
@@ -18,6 +19,14 @@ class PdfDownloader(private val context: Context) {
     private var downloadId: Long = -1
 
     fun downloadPdf(pdfUrl: String) {
+        SdkLogger.log(
+            context,
+            "PDF_DOWNLOAD_INITIATED",
+            "Starting PDF download from $pdfUrl",
+            "",
+            "INFO",
+            "SDK"
+        )
         val request = DownloadManager.Request(pdfUrl.toUri())
         request.setTitle("Downloading PDF")
         request.setDescription("Saving PDF file")
@@ -51,6 +60,14 @@ class PdfDownloader(private val context: Context) {
                 openDownloadedPdf()
                 context.unregisterReceiver(this)
             }
+            SdkLogger.log(
+                context,
+                "PDF_DOWNLOAD_COMPLETED",
+                "PDF download completed with ID: $id",
+                "",
+                "INFO",
+                "SDK"
+            )
         }
     }
 

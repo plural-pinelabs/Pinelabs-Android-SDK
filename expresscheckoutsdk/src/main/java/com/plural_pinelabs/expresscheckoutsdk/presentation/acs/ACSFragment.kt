@@ -35,7 +35,9 @@ import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PROCESSED_PENDING
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PROCESSED_STATUS
 import com.plural_pinelabs.expresscheckoutsdk.common.NetworkHelper
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils.MTAG
+import com.plural_pinelabs.expresscheckoutsdk.data.model.SDKData
 import com.plural_pinelabs.expresscheckoutsdk.data.model.TransactionStatusResponse
+import com.plural_pinelabs.expresscheckoutsdk.logger.SdkLogger
 import com.plural_pinelabs.expresscheckoutsdk.presentation.LandingActivity
 import kotlinx.coroutines.launch
 
@@ -83,6 +85,14 @@ internal class ACSFragment : Fragment() {
         setUpViews(view)
         observeViewModel()
         setUpWebView()
+        SdkLogger.log(
+            requireContext(),
+            "ACS_LOADED",
+            "ACS WebView loaded with URL: $redirectUrl",
+            orderId,
+            "INFO",
+            "SDK"
+        )
     }
 
     private fun observeViewModel() {
@@ -93,6 +103,14 @@ internal class ACSFragment : Fragment() {
                     when (it) {
                         is BaseResult.Error -> {
                             //Throw error and exit SDK
+                            SdkLogger.log(
+                                requireContext(),
+                                "ACS_TRANSACTION_STATUS_ERROR",
+                                "Error fetching transaction status: ${it.errorCode}, ${it.errorMessage}, ${it.errorDescription} ",
+                                orderId,
+                                "HIGH",
+                                "SDK"
+                            )
                             findNavController().navigate(R.id.action_ACSFragment_to_failureFragment)
                         }
 
@@ -102,8 +120,16 @@ internal class ACSFragment : Fragment() {
 
                         is BaseResult.Success<TransactionStatusResponse> -> {
                             val status = it.data.data.status
+                            SdkLogger.log(
+                                requireContext(),
+                                "ACS_TRANSACTION_STATUS_SUCCESS",
+                                "Transaction status fetched successfully: $status",
+                                orderId,
+                                "INFO",
+                                "SDK"
+                            )
                             when (status) {
-                                PROCESSED_PENDING , PROCESSED_CREATED-> {
+                                PROCESSED_PENDING, PROCESSED_CREATED -> {
                                     // Do nothing, we will keep polling for the transaction status
                                 }
 
@@ -114,7 +140,7 @@ internal class ACSFragment : Fragment() {
 
                                 PROCESSED_ATTEMPTED -> {
                                     viewModel.stopPolling()
-                                     findNavController().navigate(R.id.action_ACSFragment_to_successFragment)
+                                    findNavController().navigate(R.id.action_ACSFragment_to_successFragment)
                                 }
 
                                 PROCESSED_FAILED -> {
@@ -171,7 +197,7 @@ internal class ACSFragment : Fragment() {
                 if (url?.contains(BFF_RESPONSE_HANDLER_ENDPOINT, ignoreCase = true) == true) {
                     webAcs.visibility = View.GONE
                     constrainSuccess.visibility = View.VISIBLE
-                   // viewModel.getTransactionStatus(ExpressSDKObject.getToken())
+                    // viewModel.getTransactionStatus(ExpressSDKObject.getToken())
                     viewModel.startPolling()
 
                 }
@@ -193,9 +219,6 @@ internal class ACSFragment : Fragment() {
             viewModel.getTransactionStatus(ExpressSDKObject.getToken())
         }
     }
-
-
-
 
 
 }

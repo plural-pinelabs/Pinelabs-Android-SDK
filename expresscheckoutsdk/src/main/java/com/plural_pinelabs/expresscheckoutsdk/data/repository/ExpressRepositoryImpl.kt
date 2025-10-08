@@ -17,6 +17,7 @@ import com.plural_pinelabs.expresscheckoutsdk.data.model.ExpressAddress
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ExpressAddressResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.FetchResponseDTO
 import com.plural_pinelabs.expresscheckoutsdk.data.model.KFSResponse
+import com.plural_pinelabs.expresscheckoutsdk.data.model.LogRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.model.OTPRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.model.OTPResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.OfferEligibilityResponse
@@ -170,6 +171,12 @@ class ExpressRepositoryImpl(
     ): Flow<BaseResult<AddressResponse>> {
         return toResultFlow(networkHelper = networkHelper) {
             (apiService as CommonApiService).updateAddress(token, request)
+        }
+    }
+
+    override suspend fun logData(token: String?, request: LogRequest?): Flow<BaseResult<Any>> {
+        return toResultFlow(networkHelper = networkHelper) {
+            (apiService as CommonApiService).log(token, request)
         }
     }
 }

@@ -37,6 +37,7 @@ import com.plural_pinelabs.expresscheckoutsdk.common.TimerManager
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils.formatToReadableDate
 import com.plural_pinelabs.expresscheckoutsdk.data.model.TransactionStatusResponse
+import com.plural_pinelabs.expresscheckoutsdk.logger.SdkLogger
 import com.plural_pinelabs.expresscheckoutsdk.presentation.LandingActivity
 import kotlinx.coroutines.launch
 
@@ -151,10 +152,27 @@ class SuccessFragment : Fragment() {
                                         findNavController().navigate(R.id.action_successFragment_to_retryFragment)
                                     else
                                         findNavController().navigate(R.id.action_successFragment_to_failureFragment)
+                                    SdkLogger.log(
+                                        requireContext(),
+                                        "SUCCESS_TRANSACTION_ATTEMPTED",
+                                        "Transaction status is $status and retry is ${it.data.data.is_retry_available}",
+                                        it.data.data.order_id,
+                                        "HIGH",
+                                        "SDK"
+                                    )
                                 }
 
                                 PROCESSED_FAILED -> {
                                     findNavController().navigate(R.id.action_successFragment_to_failureFragment)
+                                    SdkLogger.log(
+                                        requireContext(),
+                                        "SUCCESS_TRANSACTION_FAILED",
+                                        "Transaction status is $status",
+                                        it.data.data.order_id,
+                                        "HIGH",
+                                        "SDK"
+                                    )
+                                    viewModel.logData(ExpressSDKObject.getToken(), Utils.getUnSyncedErrors(requireContext()))
                                 }
                             }
                         }
@@ -225,6 +243,9 @@ class SuccessFragment : Fragment() {
             )
         }
         successParentLayout.visibility = View.VISIBLE
+
+        val logs = Utils.getUnSyncedErrors(requireContext())
+        viewModel.logData(ExpressSDKObject.getToken(), logs)
     }
 
 

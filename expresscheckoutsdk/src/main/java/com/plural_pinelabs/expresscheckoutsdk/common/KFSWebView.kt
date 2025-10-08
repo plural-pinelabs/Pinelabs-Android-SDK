@@ -12,6 +12,8 @@ import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.LinearLayout
+import com.plural_pinelabs.expresscheckoutsdk.ExpressSDKObject
+import com.plural_pinelabs.expresscheckoutsdk.logger.SdkLogger
 
 class KFSWebView(
     private val context: Context,
@@ -27,6 +29,14 @@ class KFSWebView(
 
     @SuppressLint("JavascriptInterface")
     private fun setupWebView() {
+        SdkLogger.log(
+            context,
+            "WEBVIEW_INIT",
+            "KFS Initializing WebView",
+            "",
+            "INFO",
+            "SDK"
+        )
         webView.settings.javaScriptEnabled = true
         webView.settings.domStorageEnabled = true
         webView.addJavascriptInterface(WebAppInterface(), "AndroidInterface")
@@ -50,6 +60,14 @@ class KFSWebView(
             ) {
                 progressBarContainer.visibility = View.GONE
                 errorView.visibility = View.VISIBLE
+                SdkLogger.log(
+                    context,
+                    "WEBVIEW_ERROR",
+                    " KFS WebView error: ${error?.description}",
+                    ExpressSDKObject.getFetchData()?.transactionInfo?.orderId ?: "",
+                    "HIGH",
+                    "SDK"
+                )
             }
 
             override fun onReceivedHttpError(
@@ -59,6 +77,14 @@ class KFSWebView(
             ) {
                 progressBarContainer.visibility = View.GONE
                 errorView.visibility = View.VISIBLE
+                SdkLogger.log(
+                    context,
+                    "WEBVIEW_HTTP_ERROR",
+                    " KFS WebView HTTP error: ${errorResponse?.statusCode}",
+                    ExpressSDKObject.getFetchData()?.transactionInfo?.orderId ?: "",
+                    "HIGH",
+                    "SDK"
+                )
             }
         }
 
@@ -91,13 +117,4 @@ class KFSWebView(
             onScrollEnd?.invoke()
         }
     }
-
-    fun loadUrl(url: String) {
-        webView.loadUrl(url)
-    }
-
-    fun destroy() {
-        webView.removeJavascriptInterface("AndroidInterface")
-    }
-
 }

@@ -1,6 +1,5 @@
 package com.plural_pinelabs.expresscheckoutsdk.data.fetch
 
-import com.plural_pinelabs.expresscheckoutsdk.data.model.Address
 import com.plural_pinelabs.expresscheckoutsdk.data.model.AddressRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.model.AddressResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CardBinMetaDataRequestList
@@ -8,6 +7,7 @@ import com.plural_pinelabs.expresscheckoutsdk.data.model.CardBinMetaDataResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CustomerInfo
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CustomerInfoResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.KFSResponse
+import com.plural_pinelabs.expresscheckoutsdk.data.model.LogRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.model.OTPRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.model.OTPResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.OfferEligibilityResponse
@@ -124,6 +124,11 @@ interface CommonApiService : ApiService {
     ): Response<AddressResponse>
 
 
+    @POST("log")
+    suspend fun log(
+        @Query("token", encoded = true) token: String?,
+        @Body request: LogRequest?
+    ): Response<String>
 
 
 }

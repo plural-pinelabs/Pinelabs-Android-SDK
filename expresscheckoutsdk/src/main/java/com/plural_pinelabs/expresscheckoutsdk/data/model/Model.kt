@@ -938,3 +938,23 @@ data class AddressRequest
 ) : Parcelable
 
 
+data class LogData(
+    val logCode: String?,
+    val logMessage: String?,
+    val logDetails: SDKErrorDetails?,
+    val sdkData: SDKData?,
+    val severity: String?,
+    val source: String,
+    val timestamp: Long
+)
+
+data class SDKErrorDetails(
+    val transactionId: String?
+)
+
+data class LogRequest(
+    val logs: List<LogData>
+)
+
+
+

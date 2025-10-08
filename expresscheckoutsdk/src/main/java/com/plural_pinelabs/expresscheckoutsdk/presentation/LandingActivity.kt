@@ -30,6 +30,7 @@ import com.plural_pinelabs.expresscheckoutsdk.common.Utils.MTAG
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ConvenienceFeesInfo
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CustomerInfo
 import com.plural_pinelabs.expresscheckoutsdk.data.model.FetchResponseDTO
+import com.plural_pinelabs.expresscheckoutsdk.logger.SdkLogger
 import com.plural_pinelabs.expresscheckoutsdk.presentation.ordersummary.TopSheetDialogFragment
 
 class LandingActivity : AppCompatActivity() {
@@ -55,6 +56,14 @@ class LandingActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         Log.i(MTAG, "insie oncreate")
+        SdkLogger.log(
+            this,
+            "SDK_LAUNCH",
+            "SDK Launched",
+            "",
+            "INFO",
+            "SDK"
+        )
         setContentView(R.layout.activity_landing)
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -74,7 +83,7 @@ class LandingActivity : AppCompatActivity() {
         val currentHandler = Thread.getDefaultUncaughtExceptionHandler()
         if (currentHandler !is CustomExceptionHandler) {
             Thread.setDefaultUncaughtExceptionHandler(
-                CustomExceptionHandler(currentHandler)
+                CustomExceptionHandler(applicationContext,currentHandler)
             )
         }
     }
@@ -82,6 +91,14 @@ class LandingActivity : AppCompatActivity() {
 
     fun showHideHeaderLayout(isShow: Boolean) {
         val headerLayout = findViewById<View>(R.id.header_layout)
+        SdkLogger.log(
+            this,
+            "HEADER_VISIBILITY",
+            "Header visibility changed: $isShow",
+            ExpressSDKObject.getFetchData()?.transactionInfo?.orderId ?: "",
+            "INFO",
+            "SDK"
+        )
         headerLayout.visibility = if (!isShow) {
             View.GONE
         } else {
@@ -106,9 +123,25 @@ class LandingActivity : AppCompatActivity() {
         showHideHeaderLayout(false)
         mainContentLayout = findViewById(R.id.main)
         cancelBtn.setOnClickListener {
+            SdkLogger.log(
+                this,
+                "PAYMENT_CANCEL_INITIATED",
+                "User initiated payment cancellation",
+                ExpressSDKObject.getFetchData()?.transactionInfo?.orderId ?: "",
+                "INFO",
+                "SDK"
+            )
             Utils.showCancelPaymentDialog(this, object : ItemClickListener<Boolean> {
                 override fun onItemClick(position: Int, item: Boolean) {
                     if (item) {
+                        SdkLogger.log(
+                            this@LandingActivity,
+                            "PAYMENT_CANCELLED",
+                            "Payment cancelled by user",
+                            ExpressSDKObject.getFetchData()?.transactionInfo?.orderId ?: "",
+                            "INFO",
+                            "SDK"
+                        )
                         val navHostController = findNavController(R.id.nav_host_fragment_container)
                         navHostController.navigate(R.id.failureFragment)
                         CleverTapUtil.sdkTransactionAbandoned(
@@ -127,6 +160,14 @@ class LandingActivity : AppCompatActivity() {
         }
 
         orderSummary.setOnClickListener {
+            SdkLogger.log(
+                this,
+                "ORDER_SUMMARY_CLICKED",
+                "User clicked on Order Summary",
+                ExpressSDKObject.getFetchData()?.transactionInfo?.orderId ?: "",
+                "INFO",
+                "SDK"
+            )
             val topFragment = TopSheetDialogFragment()
             topFragment.show(supportFragmentManager, "TopSheetDialogFragment")
         }
@@ -197,6 +238,14 @@ class LandingActivity : AppCompatActivity() {
                 originalAmount.setText(spannable, TextView.BufferType.SPANNABLE)
             }
             if (!fetchResponse.convenienceFeesInfo.isNullOrEmpty()) {
+                SdkLogger.log(
+                    this,
+                    "CONVENIENCE_FEE_INFO",
+                    "Convenience fee info available",
+                    ExpressSDKObject.getFetchData()?.transactionInfo?.orderId ?: "",
+                    "INFO",
+                    "SDK"
+                )
                 showHideConvenienceFessMessage(true)
             }
         }
@@ -295,6 +344,14 @@ class LandingActivity : AppCompatActivity() {
             Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
         )
         originalAmount.setText(spannable, TextView.BufferType.SPANNABLE)
+        SdkLogger.log(
+            this,
+            "ORDER_AMOUNT_UPDATED",
+            "Order amount updated to $payableAmount",
+            ExpressSDKObject.getFetchData()?.transactionInfo?.orderId ?: "",
+            "INFO",
+            "SDK"
+        )
     }
 
 

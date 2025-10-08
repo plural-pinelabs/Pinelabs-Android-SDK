@@ -1,8 +1,12 @@
 package com.plural_pinelabs.expresscheckoutsdk.presentation.terminal
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.plural_pinelabs.expresscheckoutsdk.common.BaseResult
+import com.plural_pinelabs.expresscheckoutsdk.common.Utils.MTAG
+import com.plural_pinelabs.expresscheckoutsdk.data.model.LogData
+import com.plural_pinelabs.expresscheckoutsdk.data.model.LogRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.model.TransactionStatusResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.repository.ExpressRepositoryImpl
 import kotlinx.coroutines.Dispatchers
@@ -26,6 +30,16 @@ class SuccessViewModel(private val expressRepositoryImpl: ExpressRepositoryImpl)
                 expressRepositoryImpl.transactionStatus(token).collect {
                     _transactionStatusResult.value = it
                 }
+            }
+        }
+    }
+
+    fun logData(token: String?, logs: List<LogData>) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val logRequest = LogRequest(logs)
+            expressRepositoryImpl.logData(token, logRequest).collect {
+                // No need to handle response
+                Log.d(MTAG, "logData: $it")
             }
         }
     }
