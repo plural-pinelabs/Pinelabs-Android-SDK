@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:backgroundTint="@color/white"
+    android:paddingHorizontal="16dp"
+    android:paddingVertical="16dp">
+
+    <TextView
+        android:id="@+id/txt_all_banks"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:fontFamily="sans-serif-medium"
+        android:text="Select bank"
+        android:textColor="@color/black_text"
+        android:textFontWeight="600"
+        android:textSize="16sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/cancel_btn"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/circle_background"
+        android:backgroundTint="@color/black_text_30"
+        android:contentDescription="@string/cancel"
+        android:foregroundTint="@color/black_text"
+        android:padding="4dp"
+        android:src="@drawable/ic_cancel_close"
+        android:tint="@color/black_text"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:fontFamily="sans-serif-medium"
+        android:text="@string/scan_the_qr_using_any_of_the_following_banking_apps"
+        android:textColor="@color/black_text_50"
+        android:textSize="12sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/cancel_btn" />
+
+
+    <LinearLayout
+        android:id="@+id/qr_banks_icon_ll"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/label">
+
+        <ImageView
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginHorizontal="6dp"
+            android:background="@drawable/rectangle_upi_border"
+            android:src="@drawable/ic_axis_logo" />
+
+        <ImageView
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginHorizontal="6dp"
+            android:background="@drawable/rectangle_upi_border"
+            android:padding="4dp"
+            android:src="@drawable/ic_sbi_logo" />
+
+        <ImageView
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginHorizontal="6dp"
+            android:background="@drawable/rectangle_upi_border"
+            android:padding="4dp"
+            android:src="@drawable/ic_icici_logo" />
+
+        <ImageView
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginHorizontal="6dp"
+            android:background="@drawable/rectangle_upi_border"
+            android:padding="4dp"
+            android:src="@drawable/ic_hdfc_logo" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/qr_image_ll"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="70dp"
+        android:layout_marginTop="20dp"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/qr_banks_icon_ll">
+
+        <ImageView
+            android:id="@+id/qr_code_image"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/powered_by_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:fontFamily="sans-serif-medium"
+        android:text="@string/powered_by"
+        android:textColor="@color/black_text_50"
+        android:textSize="12sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/qr_image_ll" />
+
+    <ImageView
+        android:id="@+id/nbbl_logo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:src="@drawable/ic_nbbl_logo"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/powered_by_tv" />
+
+    <TextView
+        android:id="@+id/complete_payment_timer_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:fontFamily="sans-serif-medium"
+        android:text="@string/complete_the_payment_within"
+        android:textColor="@color/black_text_50"
+        android:textSize="12sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/nbbl_logo" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+
+

@@ -83,4 +83,5 @@ dependencies {
 
     implementation(libs.coil)
     implementation(libs.coil.svg)
+    implementation ("com.journeyapps:zxing-android-embedded:4.3.0")
 }

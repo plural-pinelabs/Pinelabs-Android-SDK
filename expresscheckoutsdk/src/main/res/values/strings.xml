@@ -223,6 +223,9 @@
     <string name="address_error_address_1_required">House/Apartment No. is required</string>
     <string name="address_error_address_2_error">Street Name is required</string>
     <string name="address_error_address_type_error">Please select a valid address type.</string>
+    <string name="scan_the_qr_using_any_of_the_following_banking_apps">Scan the QR using any of the following banking apps</string>
+    <string name="powered_by">Powered by</string>
+    <string name="complete_the_payment_within">Complete the payment within <font color="#C96B00">%s</font></string>
 
 
 </resources>

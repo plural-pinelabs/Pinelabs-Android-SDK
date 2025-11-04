@@ -1,5 +1,7 @@
 package com.plural_pinelabs.expresscheckoutsdk.presentation.netbanking
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -9,6 +11,7 @@ import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
@@ -24,6 +27,8 @@ import coil.request.ImageRequest
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.gson.Gson
 import com.google.gson.internal.LinkedTreeMap
+import com.google.zxing.BarcodeFormat
+import com.journeyapps.barcodescanner.BarcodeEncoder
 import com.plural_pinelabs.expresscheckoutsdk.ExpressSDKObject
 import com.plural_pinelabs.expresscheckoutsdk.R
 import com.plural_pinelabs.expresscheckoutsdk.common.BaseResult
@@ -33,6 +38,10 @@ import com.plural_pinelabs.expresscheckoutsdk.common.Constants.DEFAULT_BANK_CODE
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.ERROR_KEY
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.ERROR_MESSAGE_KEY
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.NET_BANKING
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PROCESSED_ATTEMPTED
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PROCESSED_FAILED
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PROCESSED_PENDING
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PROCESSED_STATUS
 import com.plural_pinelabs.expresscheckoutsdk.common.DeviceType
 import com.plural_pinelabs.expresscheckoutsdk.common.ItemClickListener
 import com.plural_pinelabs.expresscheckoutsdk.common.NetBankingViewModelFactory
@@ -51,6 +60,7 @@ import com.plural_pinelabs.expresscheckoutsdk.data.model.NetBankingData
 import com.plural_pinelabs.expresscheckoutsdk.data.model.PaymentModeData
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ProcessPaymentRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ProcessPaymentResponse
+import com.plural_pinelabs.expresscheckoutsdk.data.model.TransactionStatusResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.issuerDataList
 import com.plural_pinelabs.expresscheckoutsdk.presentation.LandingActivity
 import com.plural_pinelabs.expresscheckoutsdk.presentation.utils.DividerItemDecoration
@@ -58,12 +68,20 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class NetBankingFragment : Fragment() {
 
-    private lateinit var payByBankWebsite: LinearLayout
+class NetBankingFragment : Fragment() {
     private lateinit var conventionalParentLayout: LinearLayout
     private lateinit var conventionalSearchEt: EditText
     private lateinit var conventionalRecyclerView: RecyclerView
+
+    private lateinit var payByAnyBankLayout: ConstraintLayout
+    private lateinit var payByQRLayout: ConstraintLayout
+    private lateinit var payByNBLayout: ConstraintLayout
+
+    private lateinit var payByAnyBankButton: LinearLayout
+    private lateinit var payByQRButton: LinearLayout
+    private lateinit var payByBankWebsite: LinearLayout
+
 
     private var bankList: List<NetBank> = mutableListOf()
     private var nbblBankList: List<NetBank> = arrayListOf()
@@ -71,6 +89,8 @@ class NetBankingFragment : Fragment() {
     private var imageLoader: ImageLoader? = null
     private lateinit var viewModel: NetBankingViewModel
     private var convenienceFeesData: ConvenienceFeesInfo? = null
+    private var isAnyBankApp: Boolean = false
+    private var isQRPayment: Boolean = false
 
 
     override fun onCreateView(
@@ -113,14 +133,90 @@ class NetBankingFragment : Fragment() {
                         }
 
                         is BaseResult.Success<ProcessPaymentResponse> -> {
+                            if (isAnyBankApp || isQRPayment) {
+                                //do enquiry
+                                viewModel.startPolling()
+                            } else {
+                                bottomSheetDialog?.dismiss()
+                                ExpressSDKObject.setProcessPaymentResponse(it.data)
+                                redirectToACS()
+                            }
+                        }
+                    }
+                }
+            }
+
+
+        }
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED)
+            {
+                viewModel.transactionStatusResult.collect {
+                    when (it) {
+                        is BaseResult.Error -> {
+                            //Throw error and exit SDK
+                            //TODO Pass error message and description
                             bottomSheetDialog?.dismiss()
-                            ExpressSDKObject.setProcessPaymentResponse(it.data)
-                            redirectToACS()
+                            findNavController().navigate(R.id.action_netBankingFragment_to_successFragment)
+                        }
+
+                        is BaseResult.Loading -> {
+                            // nothing to do since we already show the process payment dialog
+                        }
+
+                        is BaseResult.Success<TransactionStatusResponse> -> {
+                            val status = it.data.data.status
+                            when (status) {
+
+                                PROCESSED_PENDING -> {
+                                    // Do nothing, we will keep polling for the transaction status
+                                    val deepLink = it.data.data.deep_link
+                                    if (!deepLink.isNullOrEmpty()) {
+                                        cancelTransactionProcess()
+                                        if (isAnyBankApp) {
+                                            //show intent
+                                            val intent = Intent(Intent.ACTION_VIEW)
+                                            intent.setData(Uri.parse(deepLink)) // Replace with your actual deep link
+                                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                                            requireContext().startActivity(intent)
+                                        } else {
+                                            //show QR
+                                            showQRBottomSheet(deepLink)
+                                        }
+                                    }
+
+                                }
+
+                                PROCESSED_STATUS -> {
+                                    cancelTransactionProcess()
+                                    // findNavController().navigate(R.id.action_netBankingFragment_to_successFragment)
+                                }
+
+                                PROCESSED_ATTEMPTED -> {
+                                    cancelTransactionProcess()
+                                    if (it.data.data.is_retry_available)
+                                        findNavController().navigate(R.id.action_successFragment_to_retryFragment)
+                                    else
+                                        findNavController().navigate(R.id.action_successFragment_to_failureFragment)
+                                }
+
+                                PROCESSED_FAILED -> {
+                                    cancelTransactionProcess()
+                                    findNavController().navigate(R.id.action_netBankingFragment_to_successFragment)
+                                }
+                            }
+                            viewModel.resetTransactionResponse()
                         }
                     }
                 }
             }
         }
+    }
+
+    private fun cancelTransactionProcess() {
+        bottomSheetDialog?.dismiss()
+        viewModel.stopPolling()
     }
 
     private fun redirectToACS(
@@ -205,14 +301,51 @@ class NetBankingFragment : Fragment() {
     }
 
     private fun setViews(view: View) {
-        payByBankWebsite = view.findViewById(R.id.pay_by_bank_website_btn)
         conventionalParentLayout = view.findViewById(R.id.pay_by_bank_website_conventional_parent)
         conventionalSearchEt = view.findViewById(R.id.pay_by_bank_website_conventional_search_et)
         conventionalRecyclerView = view.findViewById(R.id.pay_by_bank_website_conventional_rv)
+
+        payByAnyBankLayout = view.findViewById(R.id.pay_by_any_bank)
+        payByQRLayout = view.findViewById(R.id.pay_by_qr)
+        payByNBLayout = view.findViewById(R.id.pay_by_bank_website)
+        payByAnyBankButton = view.findViewById(R.id.pay_by_any_bank_btn)
+        payByQRButton = view.findViewById(R.id.pay_by_qr_btn)
+        payByBankWebsite = view.findViewById(R.id.pay_by_bank_website_btn)
+
+
         setUpConventionalViews()
         payByBankWebsite.setOnClickListener {
             showAllBanksBottomSheet()
         }
+
+        payByAnyBankButton.setOnClickListener {
+            val processPaymentRequest = createProcessPaymentRequest(
+                null, null,
+                ExpressSDKObject.getAmount(),
+                ExpressSDKObject.getCurrency(),
+                txnMode = "INTENT",
+                ExpressSDKObject.getPhoneNumber()
+            )
+            isAnyBankApp = true
+            isQRPayment = false
+            viewModel.processPayment(ExpressSDKObject.getToken(), processPaymentRequest)
+
+        }
+
+        payByQRButton.setOnClickListener {
+            val processPaymentRequest = createProcessPaymentRequest(
+                null, null,
+                ExpressSDKObject.getAmount(),
+                ExpressSDKObject.getCurrency(),
+                txnMode = "QR",
+                ExpressSDKObject.getPhoneNumber()
+            )
+            isQRPayment = true
+            isAnyBankApp = false
+            viewModel.processPayment(ExpressSDKObject.getToken(), processPaymentRequest)
+
+        }
+
         conventionalSearchEt.setOnFocusChangeListener { _, hasFocus ->
             if (hasFocus) {
                 conventionalSearchEt.setBackgroundResource(R.drawable.black_field_border)
@@ -269,10 +402,34 @@ class NetBankingFragment : Fragment() {
         bottomSheetDialog?.show()
     }
 
+    private fun showQRBottomSheet(deepLink: String? = null) {
+        bottomSheetDialog = BottomSheetDialog(requireContext())
+        val view =
+            LayoutInflater.from(requireActivity())
+                .inflate(R.layout.nb_qr_bottomsheet_layout, null)
+        bottomSheetDialog?.setContentView(view)
+
+        val btnClose: ImageView = view.findViewById(R.id.cancel_btn)
+        val qrImageView: ImageView = view.findViewById(R.id.qr_code_image)
+        btnClose.setOnClickListener {
+            bottomSheetDialog?.dismiss()
+        }
+        try {
+            val barcodeEncoder = BarcodeEncoder()
+            val bitmap = barcodeEncoder.encodeBitmap(deepLink, BarcodeFormat.QR_CODE, 400, 400)
+            qrImageView.setImageBitmap(bitmap)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        bottomSheetDialog?.show()
+    }
+
     private fun getItemClickListener(): ItemClickListener<NetBank> {
         return object : ItemClickListener<NetBank> {
             override fun onItemClick(position: Int, item: NetBank) {
                 bottomSheetDialog?.dismiss()
+                isAnyBankApp = false
+                isQRPayment = false
                 val processPaymentRequest = createProcessPaymentRequest(
                     item.bankName,
                     item.bankCode,
