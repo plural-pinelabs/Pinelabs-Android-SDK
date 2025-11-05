@@ -130,6 +130,7 @@
     <string name="processing_your_payment">Processing your payment</string>
     <string name="just_a_moment_we_re_confirming_your_payment">Just a moment! We\'re confirming your payment.</string>
     <string name="try_another_upi_app">Try another UPI App? <u><font color="#DD4D42">Cancel payment</font> </u> </string>
+    <string name="try_another_nb_app">Try another NBBL App? <u><font color="#DD4D42">Cancel payment</font> </u> </string>
     <string name="select_a_wallet">Select a Wallet</string>
     <string name="netbanking">Netbanking</string>
     <string name="pay_via_bank_app">Pay via bank app</string>

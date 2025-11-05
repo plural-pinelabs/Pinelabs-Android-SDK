@@ -1,5 +1,6 @@
 package com.plural_pinelabs.expresscheckoutsdk.presentation.netbanking
 
+import android.os.CountDownTimer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.plural_pinelabs.expresscheckoutsdk.ExpressSDKObject
@@ -22,6 +23,11 @@ class NetBankingViewModel(private val expressRepositoryImpl: ExpressRepositoryIm
 
     private var pollingJob: Job? = null
 
+    var isShowingUPIDialog = false
+
+
+    private val _countDownTimer = MutableStateFlow<Long>(-1)
+    val countDownTimer: StateFlow<Long> = _countDownTimer
 
     private val _processPaymentResult =
         MutableStateFlow<BaseResult<ProcessPaymentResponse>>(BaseResult.Loading(false))
@@ -65,4 +71,22 @@ class NetBankingViewModel(private val expressRepositoryImpl: ExpressRepositoryIm
     fun resetTransactionResponse() {
         _transactionStatusResult.value = BaseResult.Loading(false)
     }
+
+    fun startCountDownTimer() {
+        val totalTime = 600000L
+        val interval = 1000L
+        viewModelScope.launch(Dispatchers.Main) {
+            object : CountDownTimer(totalTime, interval) {
+                override fun onTick(millisUntilFinished: Long) {
+                    _countDownTimer.value = millisUntilFinished
+                }
+
+                override fun onFinish() {
+                    _countDownTimer.value = 0L
+                    // Optionally, you can reset the process payment result here
+                }
+            }.start()
+        }
+    }
+
 }
