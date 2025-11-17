@@ -90,12 +90,11 @@ dependencies {
 afterEvaluate {
     publishing {
         publications {
-            create<MavenPublication>("release") {
+            create<MavenPublication>("maven") {
+                from (components["release"])
                 groupId = "com.pinelabs"
-                artifactId = "infinity-sdk"
-                version = "1.0.0"
-
-                from(components["release"])
+                artifactId = "plural-sdk"
+                version = "1.0"
             }
         }
     }
