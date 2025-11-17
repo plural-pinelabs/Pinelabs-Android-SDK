@@ -2,7 +2,8 @@ plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.parcelize)
-    `maven-publish`
+    alias(libs.plugins.kotlin.maven)
+
 }
 
 android {
@@ -89,11 +90,12 @@ dependencies {
 afterEvaluate {
     publishing {
         publications {
-            create<MavenPublication>("maven") {
-                from (components["release"])
+            create<MavenPublication>("release") {
                 groupId = "com.pinelabs"
                 artifactId = "infinity-sdk"
                 version = "1.0.0"
+
+                from(components["release"])
             }
         }
     }
