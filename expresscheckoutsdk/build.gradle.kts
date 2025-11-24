@@ -92,9 +92,9 @@ afterEvaluate {
         publications {
             create<MavenPublication>("maven") {
                 from (components["release"])
-                groupId = "com.pinelabs"
+                groupId = "com.github.pinelabs"
                 artifactId = "plural-sdk"
-                version = "1.0"
+                version = "1.0.0"
             }
         }
     }
