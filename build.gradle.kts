@@ -6,7 +6,7 @@ plugins {
     id("com.google.gms.google-services") version "4.4.2" apply false
     id("com.google.firebase.crashlytics") version "3.0.4" apply false
    // `maven-publish`
-    id("maven-publish") apply false   // good to declare it here too
+    //id("maven-publish") apply false   // good to declare it here too
 
 
 }
