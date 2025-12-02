@@ -3,7 +3,8 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.parcelize)
     //alias(libs.plugins.kotlin.maven)
-    `maven-publish`
+    //`maven-publish`
+    id("maven-publish")
 }
 
 android {
