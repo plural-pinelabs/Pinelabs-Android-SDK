@@ -1,0 +1,13 @@
+jdk:
+  - openjdk17
+
+before_install:
+  # Make sure Android SDK is correctly wired for Gradle
+  - echo "sdk.dir=$ANDROID_HOME" > local.properties
+
+install:
+  # Only build & publish the library module, NOT the app
+  - ./gradlew :ExpressCheckoutSdk:clean :ExpressCheckoutSdk:publishToMavenLocal \
+    -Pgroup=com.github.plural-pinelabs \
+    -Pversion=10 \
+    -x test
