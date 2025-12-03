@@ -13,5 +13,5 @@ plugins {
 
 
 tasks.register("publishToMavenLocal") {
-    dependsOn(":expresscheckoutsdk:publishToMavenLocal")
+    dependsOn(":ExpressCheckoutSdk:publishToMavenLocal")
 }
