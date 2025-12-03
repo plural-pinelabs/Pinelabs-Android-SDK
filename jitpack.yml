@@ -7,4 +7,4 @@ before_install:
 
 install:
   # Only build & publish the library module, NOT the app
-  - ./gradlew clean :ExpressCheckoutSdk:publishToMavenLocal -Pgroup=com.github.plural-pinelabs -Pversion=10 -x test
+  - ./gradlew clean :ExpressCheckoutSdk:publishMavenPublicationToMavenLocal -Pgroup=com.github.plural-pinelabs -Pversion=10 -x test

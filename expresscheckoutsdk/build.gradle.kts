@@ -3,8 +3,8 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.parcelize)
     //alias(libs.plugins.kotlin.maven)
-    //`maven-publish`
-    id("maven-publish")
+    `maven-publish`
+  //  id("maven-publish")
 }
 
 android {
@@ -93,9 +93,9 @@ afterEvaluate {
         publications {
             create<MavenPublication>("maven") {
                 from (components["release"])
-                groupId = "com.github.pinelabs"
+                groupId = "com.pinelabs"
                 artifactId = "plural-sdk"
-                version = "1.0.0"
+                version = "1.0"
             }
         }
     }
