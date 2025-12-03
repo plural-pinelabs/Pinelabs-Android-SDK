@@ -3,8 +3,10 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.parcelize)
     //alias(libs.plugins.kotlin.maven)
-    `maven-publish`
-  //  id("maven-publish")
+//    `maven-publish`
+    id("maven-publish")
+
+    //  id("maven-publish")
 }
 
 android {
@@ -91,11 +93,14 @@ dependencies {
 afterEvaluate {
     publishing {
         publications {
-            create<MavenPublication>("maven") {
-                from (components["release"])
-                groupId = "com.pinelabs"
+            create<MavenPublication>("release") {
+                from(components["release"])
+
+                // Best to align with JitPack group & version,
+                // which you're passing via -Pgroup and -Pversion
+                groupId = project.findProperty("group")?.toString() ?: "com.github.plural-pinelabs"
                 artifactId = "plural-sdk"
-                version = "1.0"
+                version = project.findProperty("version")?.toString() ?: "10"
             }
         }
     }
