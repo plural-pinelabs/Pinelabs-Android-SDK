@@ -113,7 +113,7 @@ plugins {
     id("com.android.library")
     id("org.jetbrains.kotlin.android")
     id("kotlin-parcelize")
-    id("maven-publish")
+  //  id("maven-publish")
 }
 
 android {
@@ -203,16 +203,16 @@ dependencies {
 }
 
 // ---- Publishing ----
-afterEvaluate {
-    publishing {
-        publications {
-            create<MavenPublication>("release") {
-                from(components["release"])
-
-                groupId = (project.findProperty("group") ?: "com.github.plural-pinelabs").toString()
-                artifactId = "plural-sdk"
-                version = (project.findProperty("version") ?: "10").toString()
-            }
-        }
-    }
-}
+//afterEvaluate {
+//    publishing {
+//        publications {
+//            create<MavenPublication>("release") {
+//                from(components["release"])
+//
+//                groupId = (project.findProperty("group") ?: "com.github.plural-pinelabs").toString()
+//                artifactId = "plural-sdk"
+//                version = (project.findProperty("version") ?: "10").toString()
+//            }
+//        }
+//    }
+//}
