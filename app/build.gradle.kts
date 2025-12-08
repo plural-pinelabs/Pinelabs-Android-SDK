@@ -48,6 +48,6 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-    implementation(project(":ExpressCheckoutSdk"))
-
+   // implementation(project(":ExpressCheckoutSdk"))
+    implementation("com.github.plural-pinelabs:plural-sdk:21") // <-- Use this format
 }

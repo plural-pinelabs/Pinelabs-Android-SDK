@@ -56,6 +56,24 @@ android {
     kotlinOptions {
         jvmTarget = "11"
     }
+
+
+    publishing {
+        // Tells AGP to create the necessary components for the 'release' variant
+        // including sources and javadoc, which Gradle needs to resolve dependencies.
+        singleVariant("release") {
+            withSourcesJar()
+            withJavadocJar()
+        }
+        // Ensure you also configure the debug variant if your app module is depending on the
+        // debug build type, which the error indicates:
+        // attribute 'com.android.build.api.attributes.BuildTypeAttr' with value 'debug'
+        singleVariant("debug") {
+            withSourcesJar()
+            withJavadocJar()
+        }
+    }
+
 }
 
 dependencies {
