@@ -5,4 +5,4 @@ before_install:
   - echo "sdk.dir=$ANDROID_HOME" > local.properties
 
 install:
-  - ./gradlew :ExpressCheckoutSdk:assembleRelease -x test
+  - ./gradlew install
