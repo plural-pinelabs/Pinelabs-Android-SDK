@@ -5,5 +5,13 @@ plugins {
     alias(libs.plugins.android.library) apply false
     id("com.google.gms.google-services") version "4.4.2" apply false
     id("com.google.firebase.crashlytics") version "3.0.4" apply false
+}
 
+/**
+ * Required for JitPack.
+ * JitPack runs `./gradlew publishToMavenLocal` at the ROOT project level.
+ * This forwards that task to the Android library module.
+ */
+tasks.register("publishToMavenLocal") {
+    dependsOn(":ExpressCheckoutSdk:publishToMavenLocal")
 }
