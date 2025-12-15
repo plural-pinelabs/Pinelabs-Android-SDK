@@ -95,7 +95,7 @@ dependencies {
 
 publishing {
     publications {
-        register<MavenPublication>("release") {
+        create<MavenPublication>("release") {
             groupId = "com.github.plural-pinelabs"
             artifactId = "express-checkout-sdk"
             version = "1.0.0"
