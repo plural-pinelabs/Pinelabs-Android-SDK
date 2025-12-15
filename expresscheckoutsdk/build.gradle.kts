@@ -2,6 +2,7 @@ plugins {
         id("com.android.library")
         id("org.jetbrains.kotlin.android")
         id("kotlin-parcelize")
+        id("maven-publish")
 }
 
 android {
@@ -83,4 +84,18 @@ dependencies {
     implementation(libs.coil)
     implementation(libs.coil.svg)
     implementation ("com.journeyapps:zxing-android-embedded:4.3.0")
+}
+
+afterEvaluate {
+    publishing {
+        publications {
+            create<MavenPublication>("release") {
+                from(components["release"])
+
+                groupId = "com.github.plural-pinelabs"
+                artifactId = "express-checkout-sdk"
+                version = "1.0.0"
+            }
+        }
+    }
 }
