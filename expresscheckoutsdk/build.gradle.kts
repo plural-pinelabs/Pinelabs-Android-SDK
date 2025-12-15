@@ -51,6 +51,8 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
+        isCoreLibraryDesugaringEnabled = true
+
     }
     kotlinOptions {
         jvmTarget = "11"
@@ -91,6 +93,8 @@ dependencies {
     implementation(libs.coil)
     implementation(libs.coil.svg)
     implementation ("com.journeyapps:zxing-android-embedded:4.3.0")
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
+
 }
 
 publishing {
