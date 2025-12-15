@@ -13,5 +13,5 @@ plugins {
  * This forwards that task to the Android library module.
  */
 tasks.register("publishToMavenLocal") {
-    dependsOn(":ExpressCheckoutSdk:publishToMavenLocal")
+    dependsOn(":expresscheckoutsdk:publishToMavenLocal")
 }

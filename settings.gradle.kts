@@ -21,4 +21,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "Native_Express_Sdk"
 include(":app")
-include(":ExpressCheckoutSdk")
+include(":expresscheckoutsdk")
