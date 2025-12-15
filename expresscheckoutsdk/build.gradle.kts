@@ -41,6 +41,13 @@ android {
             )
         }
     }
+
+    publishing {
+        singleVariant("release") {
+            withSourcesJar()
+        }
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
@@ -86,15 +93,15 @@ dependencies {
     implementation ("com.journeyapps:zxing-android-embedded:4.3.0")
 }
 
-afterEvaluate {
-    publishing {
-        publications {
-            create<MavenPublication>("release") {
-                from(components["release"])
+publishing {
+    publications {
+        register<MavenPublication>("release") {
+            groupId = "com.github.plural-pinelabs"
+            artifactId = "express-checkout-sdk"
+            version = "1.0.0"
 
-                groupId = "com.github.plural-pinelabs"
-                artifactId = "express-checkout-sdk"
-                version = "1.0.0"
+            afterEvaluate {
+                from(components["release"])
             }
         }
     }
