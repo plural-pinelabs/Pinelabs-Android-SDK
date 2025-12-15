@@ -56,6 +56,8 @@ android {
     }
     kotlinOptions {
         jvmTarget = "11"
+        freeCompilerArgs += "-Xstring-concat=inline"
+
     }
 }
 
@@ -93,7 +95,7 @@ dependencies {
     implementation(libs.coil)
     implementation(libs.coil.svg)
     implementation ("com.journeyapps:zxing-android-embedded:4.3.0")
-    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
 
 }
 
