@@ -18,6 +18,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.plural_pinelabs.expresscheckoutsdk.ExpressSDKObject
 import com.plural_pinelabs.expresscheckoutsdk.R
@@ -34,13 +35,15 @@ import com.plural_pinelabs.expresscheckoutsdk.common.Constants.UPI_ID
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.WALLET_ID
 import com.plural_pinelabs.expresscheckoutsdk.common.NetworkHelper
 import com.plural_pinelabs.expresscheckoutsdk.common.SuccessViewModelFactory
-import com.plural_pinelabs.expresscheckoutsdk.common.TimerManager
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils.formatToReadableDate
 import com.plural_pinelabs.expresscheckoutsdk.data.model.LogResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.TransactionStatusResponse
 import com.plural_pinelabs.expresscheckoutsdk.logger.SdkLogger
 import com.plural_pinelabs.expresscheckoutsdk.presentation.LandingActivity
+import com.plural_pinelabs.expresscheckoutsdk.presentation.ordersummary.SubtotalRVAdapter
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class SuccessFragment : Fragment() {
@@ -51,8 +54,9 @@ class SuccessFragment : Fragment() {
     private lateinit var dateTimeValueText: TextView
     private lateinit var transactionIdLabelText: TextView
     private lateinit var transactionIdValueText: TextView
-    private lateinit var amountPaidValue: TextView
-    private lateinit var originalPaidValue: TextView
+
+     private lateinit var amountPaidValue: TextView
+    //  private lateinit var originalPaidValue: TextView
     private lateinit var cardNameView: TextView
     private lateinit var cardLast4DigitsText: TextView
     private lateinit var paymentIcon: ImageView
@@ -60,9 +64,13 @@ class SuccessFragment : Fragment() {
     private lateinit var cardDotsView: ImageView
     private lateinit var continueToMerchantButton: TextView
     private lateinit var reDirectingText: TextView
+    private lateinit var subtotalRecylerView: RecyclerView
 
     private lateinit var viewModel: SuccessViewModel
     private var bottomSheetDialog: BottomSheetDialog? = null
+
+    private var timerJob: Job? = null
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -89,15 +97,17 @@ class SuccessFragment : Fragment() {
         dateTimeValueText = view.findViewById(R.id.date_time_value)
         transactionIdLabelText = view.findViewById(R.id.transaction_id_label)
         transactionIdValueText = view.findViewById(R.id.transaction_id_value)
-        amountPaidValue = view.findViewById(R.id.final_price_value)
+          amountPaidValue = view.findViewById(R.id.final_price_value)
         cardNameView = view.findViewById(R.id.card_name)
         cardLast4DigitsText = view.findViewById(R.id.card_number)
         paymentIcon = view.findViewById(R.id.payment_icon)
         cardDotsView = view.findViewById(R.id.card_dots)
         cardsDivider = view.findViewById(R.id.card_divider)
-        originalPaidValue = view.findViewById(R.id.original_price_value)
+        //    originalPaidValue = view.findViewById(R.id.original_price_value)
         reDirectingText = view.findViewById(R.id.redirecting_text)
         continueToMerchantButton = view.findViewById(R.id.continue_to_merchant_text)
+        subtotalRecylerView = view.findViewById(R.id.subtotal_recycler_view)
+
         continueToMerchantButton.setOnClickListener {
             ExpressSDKObject.getCallback()?.onSuccess(
                 "200",
@@ -174,7 +184,10 @@ class SuccessFragment : Fragment() {
                                         "HIGH",
                                         "SDK"
                                     )
-                                    viewModel.logData(ExpressSDKObject.getToken(), Utils.getUnSyncedErrors(requireContext()))
+                                    viewModel.logData(
+                                        ExpressSDKObject.getToken(),
+                                        Utils.getUnSyncedErrors(requireContext())
+                                    )
                                 }
                             }
                         }
@@ -202,7 +215,10 @@ class SuccessFragment : Fragment() {
                                 Utils.clearLogs(requireContext())
                                 Log.i("SuccessFragment", "Logs reported successfully")
                             } else {
-                                Log.e("SuccessFragment", "Failed to report logs: ${it.data.message}")
+                                Log.e(
+                                    "SuccessFragment",
+                                    "Failed to report logs: ${it.data.message}"
+                                )
                             }
 
                         }
@@ -227,8 +243,45 @@ class SuccessFragment : Fragment() {
             cardsDivider.visibility = View.GONE
             amountPaidValue.text =
                 Utils.convertToRupeesWithSymobl(requireContext(), paymentData.payment_amount.value)
-            originalPaidValue.text =
-                Utils.convertToRupeesWithSymobl(requireContext(), paymentData.payment_amount.value)
+//            originalPaidValue.text =
+//                Utils.convertToRupeesWithSymobl(requireContext(), paymentData.payment_amount.value)
+            val valuesMap: ArrayList<Pair<String, Any?>> = arrayListOf()
+            val subtotal =
+                Pair(
+                    getString(R.string.subtotal),
+                    Utils.convertToRupeesWithSymobl(
+                        requireContext(),
+                        ExpressSDKObject.getOriginalOrderAmount()
+                    )
+                )
+            val convenienceFees =
+                Pair(
+                    getString(R.string.convenience_fee),
+                    Utils.convertToRupeesWithSymobl(
+                        requireContext(),
+                        ExpressSDKObject.getConvenienceFee()
+                    )
+                )
+            val convenienceFeesGST =
+                Pair(
+                    getString(R.string.convenience_fee_gst),
+                    Utils.convertToRupeesWithSymobl(
+                        requireContext(),
+                        ExpressSDKObject.getConvenienceFeeGst()
+                    )
+                )
+            valuesMap.add(subtotal)
+            if (convenienceFees.second.isNotEmpty() && ExpressSDKObject.getConvenienceFee() != null && ExpressSDKObject.getConvenienceFee()!! > 0)
+                valuesMap.add(convenienceFees)
+            if (convenienceFees.second.isNotEmpty() && ExpressSDKObject.getConvenienceFeeGst() != null && ExpressSDKObject.getConvenienceFeeGst()!! > 0)
+                valuesMap.add(convenienceFeesGST)
+
+            val subtotalAdapter = SubtotalRVAdapter(valuesMap, valuesMap.size)
+            subtotalRecylerView.layoutManager =
+                androidx.recyclerview.widget.LinearLayoutManager(requireContext())
+            subtotalRecylerView.adapter = subtotalAdapter
+
+
             if (paymentData.payment_method.equals(PAYMENT_REFERENCE_TYPE_CARD, true)) {
                 val issuerName = paymentData.payment_option?.card_data?.issuer_name?.let { name ->
                     when {
@@ -281,25 +334,29 @@ class SuccessFragment : Fragment() {
 
 
     private fun handleTimer() {
-        val timer = TimerManager
-        timer.startTimer(10000)
-        timer.timeLeft.observe(viewLifecycleOwner) { timeLeft ->
-            if (timeLeft == 0L) {
-                ExpressSDKObject.getCallback()?.onSuccess("200", "success", "trt")
-                requireActivity().finish()
-            } else {
+        timerJob?.cancel()
+        timerJob = viewLifecycleOwner.lifecycleScope.launch {
+            var timeLeft = 10_000L
+
+            while (timeLeft > 0) {
                 reDirectingText.text = String.format(
                     getString(R.string.redirecting_to_website_in_x_sec),
                     Utils.formatTimeInMinutes(requireContext(), timeLeft)
                 )
+                delay(1_000)
+                timeLeft -= 1_000
             }
+
+            ExpressSDKObject.getCallback()
+                ?.onSuccess("200", "success", "Transaction Successful")
+            requireActivity().finish()
         }
     }
-
 
     override fun onDestroyView() {
         bottomSheetDialog?.dismiss()
         bottomSheetDialog = null
+        timerJob?.cancel()
         super.onDestroyView()
     }
 

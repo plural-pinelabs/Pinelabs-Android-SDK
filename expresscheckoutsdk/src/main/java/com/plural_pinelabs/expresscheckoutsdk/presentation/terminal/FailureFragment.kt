@@ -37,7 +37,7 @@ class FailureFragment : Fragment() {
                 ExpressSDKObject.getCallback()?.onError(
                     "1000",
                     "Failure",
-                    ""
+                    "Some error occurred"
                 ) // Replace with actual success data if needed
                 requireActivity().finish()
                 requireActivity().finish() // Close the activity or navigate to another screen

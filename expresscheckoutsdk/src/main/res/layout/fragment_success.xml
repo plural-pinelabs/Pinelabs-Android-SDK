@@ -291,38 +291,14 @@
 
             </LinearLayout>
 
-            <TextView
-                android:id="@+id/original_price_label"
-                android:layout_width="wrap_content"
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/subtotal_recycler_view"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="20dp"
-                android:layout_marginBottom="20dp"
-                android:fontFamily="sans-serif"
-                android:text="@string/original_price"
-                android:textColor="@color/black_text_80"
-                android:textFontWeight="600"
-                android:textSize="14sp"
+                android:layout_marginTop="12dp"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/paid_using_value" />
-
-            <TextView
-                android:id="@+id/original_price_value"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="12dp"
-                android:layout_marginTop="20dp"
-                android:layout_marginEnd="16dp"
-                android:layout_marginBottom="20dp"
-                android:fontFamily="sans-serif"
-                android:gravity="end"
-                android:textColor="@color/black_text_80"
-                android:textFontWeight="600"
-                android:textSize="14sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@id/original_price_label"
-                app:layout_constraintTop_toBottomOf="@id/paid_using_value"
-                tools:text="TXN1234567890" />
 
             <View
                 android:id="@+id/seperator"
@@ -333,7 +309,7 @@
                 android:background="@color/black_text_8"
                 app:layout_constraintEnd_toEndOf="@id/paid_using_value"
                 app:layout_constraintStart_toStartOf="@id/paid_using_value"
-                app:layout_constraintTop_toBottomOf="@id/original_price_value" />
+                app:layout_constraintTop_toBottomOf="@id/subtotal_recycler_view" />
 
 
             <TextView
@@ -366,7 +342,6 @@
                 android:textFontWeight="600"
                 android:textSize="14sp"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@id/original_price_label"
                 app:layout_constraintTop_toBottomOf="@id/seperator"
                 tools:text="TXN1234567890" />
 
