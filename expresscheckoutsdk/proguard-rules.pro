@@ -135,3 +135,13 @@
     public static *** v(...);
     public static *** i(...);
 }
+
+
+# =========================================================
+# REQUIRED: Keep SDK Fragments (Navigation / FragmentContainerView)
+# =========================================================
+
+# Fragments are instantiated via reflection from Navigation XML
+-keep class com.plural_pinelabs.expresscheckoutsdk.presentation.** extends androidx.fragment.app.Fragment {
+    public <init>();
+}
