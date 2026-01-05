@@ -61,11 +61,7 @@ class LandingActivity : AppCompatActivity() {
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        Toast.makeText(this,"Inside oncreate",Toast.LENGTH_SHORT).show()
-        Toast.makeText(this,"id ${com.plural_pinelabs.expresscheckoutsdk.R.layout.activity_landing}\"",Toast.LENGTH_SHORT).show()
-        Log.i(MTAG, "insie oncreate")
-        Log.i(MTAG, "id: ${com.plural_pinelabs.expresscheckoutsdk.R.layout.activity_landing}\"")
-        SdkLogger.log(
+          SdkLogger.log(
             this,
             "SDK_LAUNCH",
             "SDK Launched",
@@ -73,7 +69,6 @@ class LandingActivity : AppCompatActivity() {
             "INFO",
             "SDK"
         )
-        Toast.makeText(this,"setting  content view ",Toast.LENGTH_SHORT).show()
         setContentView(R.layout.activity_landing)
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())

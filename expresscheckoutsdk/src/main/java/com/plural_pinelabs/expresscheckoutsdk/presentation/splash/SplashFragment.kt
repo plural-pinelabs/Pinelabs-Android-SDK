@@ -28,7 +28,7 @@ class SplashFragment : Fragment() {
     private var isDataFetched = false
 
     private var isRevealShown = false
-    private lateinit var logoAnimation: LottieAnimationView
+    private  var logoAnimation: LottieAnimationView?=null
 
     private lateinit var viewModel: SplashViewModel
 
@@ -59,19 +59,23 @@ class SplashFragment : Fragment() {
     }
 
     private fun setLottieAnimation(view: View) {
+
         logoAnimation = view.findViewById(R.id.img_logo)
-        logoAnimation.setAnimation(R.raw.reveal)
-        logoAnimation.playAnimation()
+        if (logoAnimation ==null) {
+            return
+        }
+        logoAnimation?.setAnimation(R.raw.reveal)
+        logoAnimation?.playAnimation()
 
 
-        logoAnimation.addAnimatorListener(object : Animator.AnimatorListener {
+        logoAnimation?.addAnimatorListener(object : Animator.AnimatorListener {
             override fun onAnimationStart(animation: Animator) {
 
             }
 
             override fun onAnimationEnd(animation: Animator) {
                 if (isDataFetched) {
-                    logoAnimation.pauseAnimation()
+                    logoAnimation?.pauseAnimation()
                 }
             }
 
@@ -81,12 +85,12 @@ class SplashFragment : Fragment() {
 
             override fun onAnimationRepeat(animation: Animator) {
                 if (isDataFetched) {
-                    logoAnimation.pauseAnimation()
+                    logoAnimation?.pauseAnimation()
                 }
                 if (!isRevealShown) {
                     isRevealShown = true
-                    logoAnimation.setAnimation(R.raw.logo)
-                    logoAnimation.playAnimation()
+                    logoAnimation?.setAnimation(R.raw.logo)
+                    logoAnimation?.playAnimation()
                 }
 
             }
