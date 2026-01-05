@@ -54,9 +54,7 @@ class LandingActivity : AppCompatActivity() {
     private lateinit var customerEmail: TextView
     private lateinit var separator: TextView
     private lateinit var customerInfoData: CustomerInfo
-    private lateinit var headerParentLayout: ConstraintLayout
     private lateinit var convenienceFessMessage: TextView
-
     private lateinit var mainContentLayout: ConstraintLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -130,7 +128,6 @@ class LandingActivity : AppCompatActivity() {
         customerId = findViewById(R.id.txt_customer_id)
         customerEmail = findViewById(R.id.txt_customer_email)
         separator = findViewById(R.id.seperator)
-        headerParentLayout = findViewById(R.id.header_layout_parent)
         convenienceFessMessage = findViewById(R.id.convenience_fees_message)
         showHideHeaderLayout(false)
         mainContentLayout = findViewById(R.id.main)
