@@ -1,20 +1,19 @@
 plugins {
-        id("com.android.library")
-        id("org.jetbrains.kotlin.android")
-        id("kotlin-parcelize")
-        id("maven-publish")
+    id("com.android.library")
+    id("org.jetbrains.kotlin.android")
+    id("kotlin-parcelize")
+    id("maven-publish")
 }
 
 android {
     namespace = "com.plural_pinelabs.expresscheckoutsdk"
-    compileSdk = 35
+    compileSdk = 34
 
     buildFeatures {
         buildConfig = true
     }
     defaultConfig {
         minSdk = 26
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
 
@@ -42,27 +41,23 @@ android {
         }
     }
 
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = "1.8"
+        freeCompilerArgs += "-Xstring-concat=inline"
+    }
+
     publishing {
         singleVariant("release") {
             withSourcesJar()
         }
     }
-
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
-        isCoreLibraryDesugaringEnabled = true
-
-    }
-    kotlinOptions {
-        jvmTarget = "11"
-        freeCompilerArgs += "-Xstring-concat=inline"
-
-    }
 }
 
 dependencies {
-
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
@@ -86,17 +81,17 @@ dependencies {
     implementation(libs.activity.ktx)
     implementation(libs.fragment.ktx)
     implementation(libs.clevertap)
-    //coroutines
-    implementation(libs.kotlinx.coroutines.core) // Replace with the latest version
-    implementation(libs.kotlinx.coroutines.android) // Replace with the latest version
+
+    // Coroutines
+    implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.kotlinx.coroutines.android)
+
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.androidx.navigation.ui.ktx)
 
     implementation(libs.coil)
     implementation(libs.coil.svg)
-    implementation ("com.journeyapps:zxing-android-embedded:4.3.0")
-    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
-
+    implementation("com.journeyapps:zxing-android-embedded:4.3.0")
 }
 
 publishing {

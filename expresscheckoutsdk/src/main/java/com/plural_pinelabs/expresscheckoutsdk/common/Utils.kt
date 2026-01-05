@@ -8,9 +8,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.PixelFormat
-import android.graphics.drawable.Drawable
 import android.graphics.drawable.GradientDrawable
-import android.graphics.drawable.StateListDrawable
 import android.os.Build
 import android.provider.Settings
 import android.text.TextUtils
@@ -26,7 +24,6 @@ import android.widget.TextView
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toDrawable
-import androidx.core.graphics.toColorInt
 import com.airbnb.lottie.LottieAnimationView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -203,7 +200,6 @@ import com.plural_pinelabs.expresscheckoutsdk.data.model.ConvenienceFeesData
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ConvenienceFeesInfo
 import com.plural_pinelabs.expresscheckoutsdk.data.model.Issuer
 import com.plural_pinelabs.expresscheckoutsdk.data.model.LogData
-import com.plural_pinelabs.expresscheckoutsdk.data.model.Palette
 import com.plural_pinelabs.expresscheckoutsdk.data.model.PaymentMode
 import com.plural_pinelabs.expresscheckoutsdk.data.model.RecyclerViewPaymentOptionData
 import com.plural_pinelabs.expresscheckoutsdk.data.model.SDKData
@@ -213,9 +209,7 @@ import java.net.Inet4Address
 import java.net.NetworkInterface
 import java.net.SocketException
 import java.text.DecimalFormat
-import java.time.Instant
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
+import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.TimeZone
 import java.util.regex.Pattern
@@ -463,15 +457,26 @@ internal object Utils {
     }
 
 
+
     fun formatToReadableDate(input: String): String {
-        if (input.isNullOrEmpty()) {
-            return ""
+        if (input.isEmpty()) return ""
+
+        return try {
+            // Pattern updated to handle milliseconds and 'Z'
+            val isoFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.ENGLISH)
+            isoFormat.timeZone = TimeZone.getTimeZone("UTC")
+
+            val date = isoFormat.parse(input)
+
+            val outputFormat = SimpleDateFormat("MMM d, yyyy | hh:mm a", Locale.ENGLISH)
+            outputFormat.timeZone = TimeZone.getTimeZone("Asia/Kolkata")
+
+            outputFormat.format(date!!)
+        } catch (e: Exception) {
+            ""
         }
-        val instant = Instant.parse(input)
-        val formatter = DateTimeFormatter.ofPattern("MMM d, yyyy | hh:mm a", Locale.ENGLISH)
-            .withZone(ZoneId.of("Asia/Kolkata")) // Use your desired timezone
-        return formatter.format(instant)
     }
+
 
 
     fun showProcessPaymentDialog(context: Context): BottomSheetDialog? {
@@ -1041,6 +1046,16 @@ internal object Utils {
     }
 
 
+    fun transformAmount(ratio: Int?, amountInPaisa: Int?): String {
+        if (amountInPaisa == null) return "0"
+        val r = ratio ?: 0
+        return if (r > 1) {
+            val divideBy = 10.0.pow(r.toDouble())
+            (amountInPaisa / divideBy).toString()
+        } else {
+            amountInPaisa.toString()
+        }
+    }
 
 
 }
