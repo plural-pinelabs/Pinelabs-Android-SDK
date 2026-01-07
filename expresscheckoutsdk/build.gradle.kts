@@ -58,6 +58,13 @@ android {
     }
 }
 
+configurations.all {
+    resolutionStrategy {
+        force("androidx.fragment:fragment:1.7.1")
+        force("androidx.fragment:fragment-ktx:1.7.1")
+    }
+}
+
 dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
