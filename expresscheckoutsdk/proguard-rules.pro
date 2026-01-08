@@ -145,3 +145,22 @@
 -keep class com.plural_pinelabs.expresscheckoutsdk.presentation.** extends androidx.fragment.app.Fragment {
     public <init>();
 }
+
+
+# Fragment
+-keep class androidx.fragment.** { *; }
+
+# Lifecycle (often used with Fragment)
+-keep class androidx.lifecycle.** { *; }
+
+# Navigation
+-keep class androidx.navigation.** { *; }
+
+
+-keep class androidx.fragment.app.FragmentContainerView { *; }
+
+-keep class androidx.savedstate.** { *; }
+
+-keepattributes KotlinMetadata
+
+
