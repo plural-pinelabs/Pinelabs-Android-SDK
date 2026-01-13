@@ -198,9 +198,14 @@ class LandingActivity : AppCompatActivity() {
                         } catch (e: Exception) {
                             Log.e("ExpressLibrary", "Failed to report crash", e)
                         } finally {
+
+                            val bundle = Bundle().apply {
+                                putBoolean("isCancelled", true) // Your boolean value
+                            }
+
                             val navHostController =
                                 findNavController(R.id.nav_host_fragment_container)
-                            navHostController.navigate(R.id.failureFragment)
+                            navHostController.navigate(R.id.failureFragment,bundle)
                             // If you want to let the app crash after logging:
                         }
                     }

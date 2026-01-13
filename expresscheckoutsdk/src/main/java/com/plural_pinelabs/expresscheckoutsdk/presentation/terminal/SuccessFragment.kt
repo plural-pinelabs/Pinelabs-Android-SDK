@@ -55,7 +55,8 @@ class SuccessFragment : Fragment() {
     private lateinit var transactionIdLabelText: TextView
     private lateinit var transactionIdValueText: TextView
 
-     private lateinit var amountPaidValue: TextView
+    private lateinit var amountPaidValue: TextView
+
     //  private lateinit var originalPaidValue: TextView
     private lateinit var cardNameView: TextView
     private lateinit var cardLast4DigitsText: TextView
@@ -97,7 +98,7 @@ class SuccessFragment : Fragment() {
         dateTimeValueText = view.findViewById(R.id.date_time_value)
         transactionIdLabelText = view.findViewById(R.id.transaction_id_label)
         transactionIdValueText = view.findViewById(R.id.transaction_id_value)
-          amountPaidValue = view.findViewById(R.id.final_price_value)
+        amountPaidValue = view.findViewById(R.id.final_price_value)
         cardNameView = view.findViewById(R.id.card_name)
         cardLast4DigitsText = view.findViewById(R.id.card_number)
         paymentIcon = view.findViewById(R.id.payment_icon)
@@ -348,7 +349,12 @@ class SuccessFragment : Fragment() {
             }
 
             ExpressSDKObject.getCallback()
-                ?.onSuccess("200", "success", "Transaction Successful")
+                ?.onSuccess(
+                    "200",
+                    "success",
+                    "Transaction Successful",
+                    ExpressSDKObject.getFetchData()?.transactionInfo?.orderId
+                )
             requireActivity().finish()
         }
     }

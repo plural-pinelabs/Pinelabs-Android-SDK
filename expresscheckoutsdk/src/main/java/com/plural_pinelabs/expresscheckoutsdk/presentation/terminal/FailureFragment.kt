@@ -31,14 +31,29 @@ class FailureFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         val timer = TimerManager
         Log.i(MTAG, "inside failure fragment")
+
+        val isCancelled = arguments?.getBoolean("isCancelled") ?: false
+
         timer.startTimer(5000)
         timer.timeLeft.observe(viewLifecycleOwner, { timeLeft ->
             if (timeLeft == 0L) {
-                ExpressSDKObject.getCallback()?.onError(
-                    "1000",
-                    "Failure",
-                    "Some error occurred"
-                ) // Replace with actual success data if needed
+                val message =
+                    if (isCancelled) "Transaction Cancelled by User" else "Transaction Failed"
+                if (isCancelled) {
+                    ExpressSDKObject.getCallback()?.onCancel(
+                        "1001",
+                        "Cancelled",
+                        message,
+                        ExpressSDKObject.getFetchData()?.transactionInfo?.orderId
+                    )
+                } else {
+                    ExpressSDKObject.getCallback()?.onError(
+                        "1000",
+                        "Failure",
+                        message,
+                        ExpressSDKObject.getFetchData()?.transactionInfo?.orderId
+                    )
+                }// Replace with actual success data if needed
                 requireActivity().finish()
                 requireActivity().finish() // Close the activity or navigate to another screen
                 // Handle timer finish, e.g., navigate to another fragment or activity
