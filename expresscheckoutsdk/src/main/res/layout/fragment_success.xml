@@ -364,6 +364,7 @@
             android:visibility="gone" />
 
         <TextView
+            android:visibility="gone"
             android:id="@+id/continue_to_merchant_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

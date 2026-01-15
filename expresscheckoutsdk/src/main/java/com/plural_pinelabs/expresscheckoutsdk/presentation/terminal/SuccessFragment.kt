@@ -107,12 +107,12 @@ class SuccessFragment : Fragment() {
         reDirectingText = view.findViewById(R.id.redirecting_text)
         continueToMerchantButton = view.findViewById(R.id.continue_to_merchant_text)
         subtotalRecylerView = view.findViewById(R.id.subtotal_recycler_view)
-
+        continueToMerchantButton.visibility=View.GONE
         continueToMerchantButton.setOnClickListener {
             ExpressSDKObject.getCallback()?.onSuccess(
                 "200",
                 "success",
-                "trt"
+                "Transaction Successful"
             ) // Replace with actual success data if needed
             requireActivity().finish()
         }
@@ -248,7 +248,7 @@ class SuccessFragment : Fragment() {
             val valuesMap: ArrayList<Pair<String, Any?>> = arrayListOf()
             val subtotal =
                 Pair(
-                    getString(R.string.subtotal),
+                    getString(R.string.original_price),
                     Utils.convertToRupeesWithSymobl(
                         requireContext(),
                         ExpressSDKObject.getOriginalOrderAmount()
