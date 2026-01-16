@@ -108,12 +108,13 @@ class SuccessFragment : Fragment() {
         reDirectingText = view.findViewById(R.id.redirecting_text)
         continueToMerchantButton = view.findViewById(R.id.continue_to_merchant_text)
         subtotalRecylerView = view.findViewById(R.id.subtotal_recycler_view)
-
+        continueToMerchantButton.visibility = View.GONE
         continueToMerchantButton.setOnClickListener {
             ExpressSDKObject.getCallback()?.onSuccess(
                 "200",
                 "success",
-                "trt"
+                "Transaction Successful",
+                ExpressSDKObject.getFetchData()?.transactionInfo?.orderId
             ) // Replace with actual success data if needed
             requireActivity().finish()
         }

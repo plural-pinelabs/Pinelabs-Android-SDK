@@ -35,7 +35,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:fontFamily="sans-serif"
-            android:text="@string/order_confirmed"
+            android:text="@string/payment_successful"
             android:textColor="@color/black_text"
             android:textFontWeight="500"
             android:textSize="24sp" />
@@ -369,6 +369,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_marginVertical="24dp"
+            android:visibility="gone"
             android:fontFamily="sans-serif"
             android:gravity="center_horizontal"
             android:text="@string/continue_to_merchant"
