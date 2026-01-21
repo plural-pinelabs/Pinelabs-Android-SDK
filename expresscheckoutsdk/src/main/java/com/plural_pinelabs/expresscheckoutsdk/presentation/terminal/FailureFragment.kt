@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.plural_pinelabs.expresscheckoutsdk.ExpressSDKObject
@@ -30,43 +31,9 @@ class FailureFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val timer = TimerManager
-        Log.i(MTAG, "inside failure fragment")
-
         val isCancelled = arguments?.getBoolean("isCancelled") ?: false
 
-        timer.startTimer(5000)
-        timer.timeLeft.observe(viewLifecycleOwner, { timeLeft ->
-            if (timeLeft == 0L) {
-                val message =
-                    if (isCancelled) "Transaction Cancelled by User" else "Transaction Failed"
-                if (isCancelled) {
-                    ExpressSDKObject.getCallback()?.onCancel(
-                        "1001",
-                        "Cancelled",
-                        message,
-                        ExpressSDKObject.getFetchData()?.transactionInfo?.orderId
-                    )
-                } else {
-                    ExpressSDKObject.getCallback()?.onError(
-                        "1000",
-                        "Failure",
-                        message,
-                        ExpressSDKObject.getFetchData()?.transactionInfo?.orderId
-                    )
-                }// Replace with actual success data if needed
-                requireActivity().finish()
-                requireActivity().finish() // Close the activity or navigate to another screen
-                // Handle timer finish, e.g., navigate to another fragment or activity
-                // For example: findNavController().navigate(R.id.action_failureFragment_to_nextFragment)
-            } else {
-                val autoCloseTv = view.findViewById<TextView>(R.id.txt_autoclose)
-                val autoCloseString = getString(
-                    R.string.auto_close,
-                    Utils.formatTimeInMinutes(requireContext(), timeLeft)
-                )
-                autoCloseTv.text = Html.fromHtml(autoCloseString)
-            }
-        })
+        Log.i(MTAG, "inside failure fragment")
 
         CleverTapUtil.sdkTransactionFailed(
             CleverTapUtil.getInstance(requireContext()),
@@ -80,6 +47,45 @@ class FailureFragment : Fragment() {
             Utils.createSDKData(requireContext()).toString(),
         )
 
+        view.findViewById<Button>(R.id.continue_btn).setOnClickListener {
+            timer.stopTimer()
+            handleClosingSDK(isCancelled)
+        }
+        timer.startTimer(5000)
+        timer.timeLeft.observe(viewLifecycleOwner, { timeLeft ->
+            if (timeLeft == 0L) {
+                handleClosingSDK(isCancelled)
+            } else {
+                val autoCloseTv = view.findViewById<TextView>(R.id.txt_autoclose)
+                val autoCloseString = getString(
+                    R.string.auto_close,
+                    Utils.formatTimeInMinutes(requireContext(), timeLeft)
+                )
+                autoCloseTv.text = Html.fromHtml(autoCloseString)
+            }
+        })
+    }
+
+    private fun handleClosingSDK(isCancelled: Boolean) {
+        val message =
+            if (isCancelled) "Transaction Cancelled by User" else "Transaction Failed"
+        if (isCancelled) {
+            ExpressSDKObject.getCallback()?.onCancel(
+                "1001",
+                "Cancelled",
+                message,
+                ExpressSDKObject.getFetchData()?.transactionInfo?.orderId
+            )
+        } else {
+            ExpressSDKObject.getCallback()?.onError(
+                "1000",
+                "Failure",
+                message,
+                ExpressSDKObject.getFetchData()?.transactionInfo?.orderId
+            )
+        }// Replace with actual success data if needed
+        requireActivity().finish()
+        requireActivity().finish()
     }
 
 }

@@ -6,9 +6,9 @@ import com.plural_pinelabs.expresscheckoutsdk.common.toResultFlow
 import com.plural_pinelabs.expresscheckoutsdk.data.fetch.CommonApiService
 import com.plural_pinelabs.expresscheckoutsdk.data.fetch.ExpressApiService
 import com.plural_pinelabs.expresscheckoutsdk.data.fetch.FetchApiService
-import com.plural_pinelabs.expresscheckoutsdk.data.model.Address
 import com.plural_pinelabs.expresscheckoutsdk.data.model.AddressRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.model.AddressResponse
+import com.plural_pinelabs.expresscheckoutsdk.data.model.CancelTransactionResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CardBinMetaDataRequestList
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CardBinMetaDataResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CustomerInfo
@@ -126,7 +126,10 @@ class ExpressRepositoryImpl(
         request: ExpressAddress
     ): Flow<BaseResult<ExpressAddressResponse>> {
         return toResultFlow(networkHelper = networkHelper) {
-            (apiService as ExpressApiService).addCustomerAddresses("Bearer ${token?.trim()}", request)
+            (apiService as ExpressApiService).addCustomerAddresses(
+                "Bearer ${token?.trim()}",
+                request
+            )
         }
     }
 
@@ -175,9 +178,21 @@ class ExpressRepositoryImpl(
         }
     }
 
-    override suspend fun logData(token: String?, request: LogRequest?): Flow<BaseResult<LogResponse>> {
+    override suspend fun logData(
+        token: String?,
+        request: LogRequest?
+    ): Flow<BaseResult<LogResponse>> {
         return toResultFlow(networkHelper = networkHelper) {
             (apiService as CommonApiService).log(token, request)
+        }
+    }
+
+    override suspend fun cancelPayment(
+        token: String?,
+        cancelPayment: Boolean
+    ): Flow<BaseResult<CancelTransactionResponse>> {
+        return toResultFlow(networkHelper = networkHelper) {
+            (apiService as CommonApiService).cancelTransaction(token, cancelPayment)
         }
     }
 }

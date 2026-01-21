@@ -38,7 +38,8 @@ class MainActivity : AppCompatActivity() {
                     override fun onError(
                         errorCode: String?,
                         errorMessage: String?,
-                        errorDescription: String?
+                        errorDescription: String?,
+                        orderId: String?
                     ) {
                         Toast.makeText(
                             this@MainActivity,
@@ -51,7 +52,8 @@ class MainActivity : AppCompatActivity() {
                     override fun onSuccess(
                         responseCode: String?,
                         responseMessage: String?,
-                        responseDescription: String?
+                        responseDescription: String?,
+                        orderId: String?
                     ) {
                         Toast.makeText(
                             this@MainActivity,
@@ -67,7 +69,8 @@ class MainActivity : AppCompatActivity() {
                     override fun onCancel(
                         responseCode: String?,
                         responseMessage: String?,
-                        responseDescription: String?
+                        responseDescription: String?,
+                        orderId: String?
                     ) {
                         Toast.makeText(
                             this@MainActivity,
@@ -79,8 +82,7 @@ class MainActivity : AppCompatActivity() {
                             "Cancelled: $responseCode, $responseMessage, $responseDescription"
                         )
                     }
-                }
-                ,true
+                }, true
             )
         }
     }

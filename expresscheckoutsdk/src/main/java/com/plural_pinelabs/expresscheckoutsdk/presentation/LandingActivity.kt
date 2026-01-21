@@ -22,6 +22,7 @@ import com.clevertap.android.sdk.ActivityLifecycleCallback
 import com.clevertap.android.sdk.CleverTapAPI
 import com.plural_pinelabs.expresscheckoutsdk.ExpressSDKObject
 import com.plural_pinelabs.expresscheckoutsdk.R
+import com.plural_pinelabs.expresscheckoutsdk.SDKObject
 import com.plural_pinelabs.expresscheckoutsdk.common.BaseResult
 import com.plural_pinelabs.expresscheckoutsdk.common.CleverTapUtil
 import com.plural_pinelabs.expresscheckoutsdk.common.CustomExceptionHandler
@@ -138,47 +139,20 @@ class LandingActivity : AppCompatActivity() {
             Utils.showCancelPaymentDialog(this, object : ItemClickListener<Boolean> {
                 override fun onItemClick(position: Int, item: Boolean) {
                     if (item) {
-                        SdkLogger.log(
-                            this@LandingActivity,
-                            "PAYMENT_CANCELLED",
-                            "Payment cancelled by user",
-                            ExpressSDKObject.getFetchData()?.transactionInfo?.orderId ?: "",
-                            "INFO",
-                            "SDK"
-                        )
-                        CleverTapUtil.sdkTransactionAbandoned(
-                            CleverTapUtil.getInstance(applicationContext),
-                            ExpressSDKObject.getFetchData(),
-                            System.currentTimeMillis().toString(),
-                            "",
-                            "",
-                            Utils.createSDKData(applicationContext).toString(),
-                            ""
-                        )
                         try {
                             runBlocking {
                                 withTimeout(3000) { // Optional: timeout to avoid hanging
                                     val repo = ExpressRepositoryImpl(
-                                        RetrofitBuilder.fetchApiService,
+                                        RetrofitBuilder.commonApiService,
                                         NetworkHelper(applicationContext)
                                     )
-                                    val logs = Utils.getUnSyncedErrors(applicationContext)
-                                    val result = repo.logData(
-                                        ExpressSDKObject.getToken(), LogRequest(logs)
+                                    val result = repo.cancelPayment(
+                                        ExpressSDKObject.getToken(), ExpressSDKObject.getProcessPaymentResponse()!=null
                                     )
                                     result.collect {
                                         when (it) {
                                             is BaseResult.Success -> {
-                                                if (it.data.status.equals(
-                                                        "success",
-                                                        ignoreCase = true
-                                                    )
-                                                )
-                                                    Utils.clearLogs(applicationContext)
-                                                Log.i(
-                                                    "ExpressLibrary",
-                                                    "Crash logs reported successfully"
-                                                )
+
                                             }
 
                                             is BaseResult.Error -> {
@@ -195,18 +169,82 @@ class LandingActivity : AppCompatActivity() {
                                     }
                                 }
                             }
-                        } catch (e: Exception) {
-                            Log.e("ExpressLibrary", "Failed to report crash", e)
-                        } finally {
+                        } catch (e: Exception){
+                            Log.i("PineLabs error", "Error cancelling the transaction")
+                        }
+                        finally {
+                            SdkLogger.log(
+                                this@LandingActivity,
+                                "PAYMENT_CANCELLED",
+                                "Payment cancelled by user",
+                                ExpressSDKObject.getFetchData()?.transactionInfo?.orderId ?: "",
+                                "INFO",
+                                "SDK"
+                            )
+                            CleverTapUtil.sdkTransactionAbandoned(
+                                CleverTapUtil.getInstance(applicationContext),
+                                ExpressSDKObject.getFetchData(),
+                                System.currentTimeMillis().toString(),
+                                "",
+                                "",
+                                Utils.createSDKData(applicationContext).toString(),
+                                ""
+                            )
 
-                            val bundle = Bundle().apply {
-                                putBoolean("isCancelled", true) // Your boolean value
+                            try {
+                                runBlocking {
+                                    withTimeout(3000) { // Optional: timeout to avoid hanging
+                                        val repo = ExpressRepositoryImpl(
+                                            RetrofitBuilder.fetchApiService,
+                                            NetworkHelper(applicationContext)
+                                        )
+                                        val logs = Utils.getUnSyncedErrors(applicationContext)
+                                        val result = repo.logData(
+                                            ExpressSDKObject.getToken(), LogRequest(logs)
+                                        )
+                                        result.collect {
+                                            when (it) {
+                                                is BaseResult.Success -> {
+                                                    if (it.data.status.equals(
+                                                            "success",
+                                                            ignoreCase = true
+                                                        )
+                                                    )
+                                                        Utils.clearLogs(applicationContext)
+                                                    Log.i(
+                                                        "ExpressLibrary",
+                                                        "Crash logs reported successfully"
+                                                    )
+                                                }
+
+                                                is BaseResult.Error -> {
+                                                    Log.e(
+                                                        "ExpressLibrary",
+                                                        "Failed to report crash logs: ${it.errorDescription}"
+                                                    )
+                                                }
+
+                                                is BaseResult.Loading -> {
+                                                    // No action needed for loading state here
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            } catch (e: Exception) {
+                                Log.e("ExpressLibrary", "Failed to report crash", e)
+                            } finally {
+
+                                val bundle = Bundle().apply {
+                                    putBoolean("isCancelled", true) // Your boolean value
+                                }
+
+                                val navHostController =
+                                    findNavController(R.id.nav_host_fragment_container)
+                                navHostController.navigate(R.id.failureFragment,bundle)
+                                // If you want to let the app crash after logging:
                             }
 
-                            val navHostController =
-                                findNavController(R.id.nav_host_fragment_container)
-                            navHostController.navigate(R.id.failureFragment,bundle)
-                            // If you want to let the app crash after logging:
                         }
                     }
                 }
