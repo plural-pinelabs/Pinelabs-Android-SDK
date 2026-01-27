@@ -20,6 +20,7 @@ import com.plural_pinelabs.expresscheckoutsdk.common.Utils.MTAG
 class FailureFragment : Fragment() {
 
 
+    private var cancelCallbackCalled: Boolean = false
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -67,6 +68,8 @@ class FailureFragment : Fragment() {
     }
 
     private fun handleClosingSDK(isCancelled: Boolean) {
+        if (cancelCallbackCalled) return
+        cancelCallbackCalled = true
         val message =
             if (isCancelled) "Transaction Cancelled by User" else "Transaction Failed"
         if (isCancelled) {
@@ -84,7 +87,6 @@ class FailureFragment : Fragment() {
                 ExpressSDKObject.getFetchData()?.transactionInfo?.orderId
             )
         }// Replace with actual success data if needed
-        requireActivity().finish()
         requireActivity().finish()
     }
 
