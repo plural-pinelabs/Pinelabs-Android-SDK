@@ -1,5 +1,6 @@
 package com.plural_pinelabs.expresscheckoutsdk.presentation
 
+import android.content.Intent
 import android.os.Bundle
 import android.text.Spannable
 import android.text.SpannableString
@@ -57,6 +58,12 @@ class LandingActivity : AppCompatActivity() {
     private lateinit var customerInfoData: CustomerInfo
     private lateinit var convenienceFessMessage: TextView
     private lateinit var mainContentLayout: ConstraintLayout
+
+
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
