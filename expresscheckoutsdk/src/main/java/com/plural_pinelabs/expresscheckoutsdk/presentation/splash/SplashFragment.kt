@@ -19,6 +19,8 @@ import com.plural_pinelabs.expresscheckoutsdk.R
 import com.plural_pinelabs.expresscheckoutsdk.common.BaseResult
 import com.plural_pinelabs.expresscheckoutsdk.common.CleverTapUtil
 import com.plural_pinelabs.expresscheckoutsdk.common.NetworkHelper
+import com.plural_pinelabs.expresscheckoutsdk.common.SdkE2ETestController
+import com.plural_pinelabs.expresscheckoutsdk.common.SdkTestMode
 import com.plural_pinelabs.expresscheckoutsdk.common.SplashViewModelFactory
 import com.plural_pinelabs.expresscheckoutsdk.data.model.FetchResponseDTO
 import com.plural_pinelabs.expresscheckoutsdk.presentation.LandingActivity
@@ -61,43 +63,69 @@ class SplashFragment : Fragment() {
     private fun setLottieAnimation(view: View) {
 
         logoAnimation = view.findViewById(R.id.img_logo)
-        if (logoAnimation ==null) {
-            return
+        if (logoAnimation == null) return
+
+        // 🧠 Local guard to prevent double decrement
+        var idlingAcquired = false
+
+        // 🔓 Acquire idling ONLY in test mode
+        if (SdkTestMode.enabled) {
+            SdkE2ETestController.idlingResource.increment()
+            idlingAcquired = true
         }
+
         logoAnimation?.setAnimation(R.raw.reveal)
         logoAnimation?.playAnimation()
 
-
         logoAnimation?.addAnimatorListener(object : Animator.AnimatorListener {
-            override fun onAnimationStart(animation: Animator) {
 
+            override fun onAnimationStart(animation: Animator) {
+                // no-op
             }
 
             override fun onAnimationEnd(animation: Animator) {
-                if (isDataFetched) {
-                    logoAnimation?.pauseAnimation()
+                // 🔒 Release idling when animation ends
+                if (SdkTestMode.enabled && idlingAcquired) {
+                    if (!SdkE2ETestController.idlingResource.isIdleNow) {
+                        SdkE2ETestController.idlingResource.decrement()
+                    }
+                    idlingAcquired = false
                 }
             }
 
             override fun onAnimationCancel(animation: Animator) {
-
+                // 🔒 Safety release
+                if (SdkTestMode.enabled && idlingAcquired) {
+                    if (!SdkE2ETestController.idlingResource.isIdleNow) {
+                        SdkE2ETestController.idlingResource.decrement()
+                    }
+                    idlingAcquired = false
+                }
             }
 
             override fun onAnimationRepeat(animation: Animator) {
-                if (isDataFetched) {
-                    logoAnimation?.pauseAnimation()
-                }
+
                 if (!isRevealShown) {
                     isRevealShown = true
                     logoAnimation?.setAnimation(R.raw.logo)
                     logoAnimation?.playAnimation()
                 }
 
+                // 🟢 If data already fetched, stop animation + release idling
+                if (isDataFetched) {
+                    logoAnimation?.pauseAnimation()
+
+                    if (SdkTestMode.enabled && idlingAcquired) {
+                        if (!SdkE2ETestController.idlingResource.isIdleNow) {
+                            SdkE2ETestController.idlingResource.decrement()
+                        }
+                        idlingAcquired = false
+                    }
+                }
             }
-
         })
-
     }
+
 
     private fun observeViewModel() {
         lifecycleScope.launch {

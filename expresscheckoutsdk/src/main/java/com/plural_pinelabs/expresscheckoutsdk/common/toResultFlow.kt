@@ -14,49 +14,77 @@ inline fun <reified T> toResultFlow(
     networkHelper: NetworkHelper,
     crossinline call: suspend () -> retrofit2.Response<T>?
 ): Flow<BaseResult<T>> {
-    return flow {
-        val isInternetConnected = networkHelper.hasInternetConnection()
-        if (isInternetConnected) {
-            emit(BaseResult.Loading(true))
-            try {
-                val c = call()
-                c?.let { response ->
-                    Log.d("Toresultflow", "Response: ${response.raw().body}")
-                    Log.d("Toresultflow", "Response: ${response.raw().isSuccessful}")
-                    Log.d("Toresultflow", "Response: ${response.raw().toString()}")
-                    if (c.isSuccessful && c.body() != null) {
-                        c.body()?.let {
-                            emit(BaseResult.Success(it))
-                        }
-                    } else {
-                        Log.d("Toresultflow", "Response: emit error  ${response.raw().body}")
-                        val type = object : TypeToken<FetchError>() {}.type
-                        val errorResponse: FetchError? =
-                            Gson().fromJson(response.errorBody()?.charStream(), type)
-                        emit(
-                            BaseResult.Error(
-                                errorResponse?.error_code ?: ErrorCode.INTERNAL_SERVER_ERROR.code,
-                                errorResponse?.error_message
-                            )
-                        )
-                    }
-                }
-            } catch (e: Exception) {
-                Log.d("Toresultflow", "exception error: ${e.message}")
 
-                emit(
-                    BaseResult.Error(
-                        ErrorCode.EXCEPTION_THROWN.code,
-                        e.message,
-                        e.stackTrace.toString()
-                    )
-                )
-            }
-        } else {
-            emit(BaseResult.Error(ErrorCode.INTERNET_NOT_AVAILABLE.code))
+    return flow {
+
+        var idlingAcquired = false   // 🧠 local guard flag
+
+        // 🔓 Acquire idling ONLY in test mode
+        if (SdkTestMode.enabled) {
+            SdkE2ETestController.idlingResource.increment()
+            idlingAcquired = true
         }
+
+        try {
+            val isInternetConnected = networkHelper.hasInternetConnection()
+            if (!isInternetConnected) {
+                emit(BaseResult.Error(ErrorCode.INTERNET_NOT_AVAILABLE.code))
+                return@flow
+            }
+
+            emit(BaseResult.Loading(true))
+
+            val c = call()   // 🌍 REAL BACKEND CALL
+
+            c?.let { response ->
+                Log.d("Toresultflow", "Response successful=${response.isSuccessful}")
+
+                if (response.isSuccessful && response.body() != null) {
+                    emit(BaseResult.Success(response.body()!!))
+                } else {
+                    val type = object : TypeToken<FetchError>() {}.type
+                    val errorResponse: FetchError? =
+                        Gson().fromJson(response.errorBody()?.charStream(), type)
+
+                    emit(
+                        BaseResult.Error(
+                            errorResponse?.error_code
+                                ?: ErrorCode.INTERNAL_SERVER_ERROR.code,
+                            errorResponse?.error_message
+                        )
+                    )
+                }
+            }
+
+        } catch (e: Exception) {
+            Log.e("Toresultflow", "exception error: ${e.message}", e)
+
+            emit(
+                BaseResult.Error(
+                    ErrorCode.EXCEPTION_THROWN.code,
+                    e.message,
+                    e.stackTraceToString()
+                )
+            )
+
+        } finally {
+            // 🔒 Guaranteed release (only if acquired)
+            if (SdkTestMode.enabled && idlingAcquired) {
+                if (!SdkE2ETestController.idlingResource.isIdleNow) {
+                    SdkE2ETestController.idlingResource.decrement()
+                }
+            }
+        }
+
     }.catch { e ->
-        Log.e("Toresultflow", "Caught exception: ${e.message}")
+
+        // 🧯 Absolute safety net (flow cancellation / upstream crash)
+        if (SdkTestMode.enabled && !SdkE2ETestController.idlingResource.isIdleNow) {
+            SdkE2ETestController.idlingResource.decrement()
+        }
+
+        Log.e("Toresultflow", "Caught exception in flow: ${e.message}", e)
+
         when (e) {
             is java.net.SocketTimeoutException -> {
                 emit(
@@ -78,6 +106,6 @@ inline fun <reified T> toResultFlow(
                 )
             }
         }
+
     }.flowOn(Dispatchers.IO)
 }
-

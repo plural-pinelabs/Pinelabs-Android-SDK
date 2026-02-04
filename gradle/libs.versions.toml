@@ -22,6 +22,9 @@ playServicesAuthApiPhone = "18.1.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
+espressoIdlingResource = "3.7.0"
+espressoContrib = "3.7.0"
+espressoWeb = "3.7.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -58,6 +61,9 @@ play-services-auth-api-phone = { group = "com.google.android.gms", name = "play-
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
+androidx-espresso-idling-resource = { group = "androidx.test.espresso", name = "espresso-idling-resource", version.ref = "espressoIdlingResource" }
+androidx-espresso-contrib = { group = "androidx.test.espresso", name = "espresso-contrib", version.ref = "espressoContrib" }
+androidx-espresso-web = { group = "androidx.test.espresso", name = "espresso-web", version.ref = "espressoWeb" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

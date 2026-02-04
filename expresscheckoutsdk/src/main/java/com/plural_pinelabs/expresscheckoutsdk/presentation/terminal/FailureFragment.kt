@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment
 import com.plural_pinelabs.expresscheckoutsdk.ExpressSDKObject
 import com.plural_pinelabs.expresscheckoutsdk.R
 import com.plural_pinelabs.expresscheckoutsdk.common.CleverTapUtil
+import com.plural_pinelabs.expresscheckoutsdk.common.SdkTestMode
 import com.plural_pinelabs.expresscheckoutsdk.common.TimerManager
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils.MTAG
@@ -34,7 +35,11 @@ class FailureFragment : Fragment() {
 
         val isCancelled = arguments?.getBoolean("isCancelled") ?: false
 
-        timer.startTimer(5000)
+
+        var timerValue:Long = 5000
+        if(SdkTestMode.enabled) timerValue = 15000
+        timer.startTimer(timerValue)
+        Log.i(MTAG, "timer  failure fragment")
         timer.timeLeft.observe(viewLifecycleOwner, { timeLeft ->
             if (timeLeft == 0L) {
                 val message =

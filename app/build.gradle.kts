@@ -46,6 +46,8 @@ dependencies {
     implementation(libs.material)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
+    implementation(libs.androidx.espresso.contrib)
+    implementation(libs.androidx.espresso.web)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -54,6 +56,9 @@ dependencies {
    // implementation("com.google.firebase:firebase-analytics")
    // implementation("com.google.firebase:firebase-crashlytics")
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
+    testImplementation(kotlin("test"))
+    androidTestImplementation ("androidx.test.espresso:espresso-web:3.5.1")
+
 
 
 }
