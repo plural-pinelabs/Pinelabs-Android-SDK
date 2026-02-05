@@ -27,6 +27,7 @@ import com.plural_pinelabs.expresscheckoutsdk.common.CleverTapUtil
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.NET_BANKING
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PAYMENT_REFERENCE_TYPE_CARD
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PROCESSED_ATTEMPTED
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PROCESSED_CANCELLED
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PROCESSED_CREATED
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PROCESSED_FAILED
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PROCESSED_PENDING
@@ -176,7 +177,7 @@ class SuccessFragment : Fragment() {
                                     )
                                 }
 
-                                PROCESSED_FAILED -> {
+                                PROCESSED_FAILED , PROCESSED_CANCELLED -> {
                                     findNavController().navigate(R.id.action_successFragment_to_failureFragment)
                                     SdkLogger.log(
                                         requireContext(),

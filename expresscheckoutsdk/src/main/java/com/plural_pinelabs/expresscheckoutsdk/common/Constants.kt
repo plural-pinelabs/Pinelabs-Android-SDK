@@ -59,6 +59,7 @@ internal object Constants {
     const val PROCESSED_PENDING = "PENDING"
     const val PROCESSED_FAILED = "FAILED"
     const val PROCESSED_ATTEMPTED = "ATTEMPTED"
+    const val PROCESSED_CANCELLED = "CANCELLED"
     const val PROCESSED_CREATED = "CREATED"
 
     const val REQ_USER_CONSENT = 200
