@@ -153,7 +153,11 @@ class SuccessFragment : Fragment() {
                             bottomSheetDialog?.dismiss()
                             val status = it.data.data.status
                             when (status) {
-                                PROCESSED_PENDING, PROCESSED_CREATED -> {
+                                PROCESSED_PENDING -> {
+                                    findNavController().navigate(R.id.action_successFragment_to_pendingFragment)
+                                }
+
+                                PROCESSED_CREATED -> {
                                     findNavController().navigate(R.id.action_successFragment_to_retryFragment)
                                 }
 
@@ -177,7 +181,7 @@ class SuccessFragment : Fragment() {
                                     )
                                 }
 
-                                PROCESSED_FAILED , PROCESSED_CANCELLED -> {
+                                PROCESSED_FAILED, PROCESSED_CANCELLED -> {
                                     findNavController().navigate(R.id.action_successFragment_to_failureFragment)
                                     SdkLogger.log(
                                         requireContext(),

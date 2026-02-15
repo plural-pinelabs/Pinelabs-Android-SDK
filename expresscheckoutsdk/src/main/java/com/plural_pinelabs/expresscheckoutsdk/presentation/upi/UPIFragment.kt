@@ -5,18 +5,23 @@ import android.content.Intent
 import android.content.pm.ResolveInfo
 import android.net.Uri
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.text.Editable
+import android.text.Html
 import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
@@ -30,6 +35,8 @@ import com.clevertap.android.sdk.isNotNullAndBlank
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.gson.Gson
 import com.google.gson.internal.LinkedTreeMap
+import com.google.zxing.BarcodeFormat
+import com.journeyapps.barcodescanner.BarcodeEncoder
 import com.plural_pinelabs.expresscheckoutsdk.ExpressSDKObject
 import com.plural_pinelabs.expresscheckoutsdk.ExpressSDKObject.getAmount
 import com.plural_pinelabs.expresscheckoutsdk.ExpressSDKObject.getCurrency
@@ -49,11 +56,14 @@ import com.plural_pinelabs.expresscheckoutsdk.common.Constants.UPI_COLLECT
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.UPI_ID
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.UPI_INTENT
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.UPI_INTENT_PREFIX
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.UPI_INTENT_QR
 import com.plural_pinelabs.expresscheckoutsdk.common.ItemClickListener
 import com.plural_pinelabs.expresscheckoutsdk.common.NetworkHelper
 import com.plural_pinelabs.expresscheckoutsdk.common.PaymentModes
+import com.plural_pinelabs.expresscheckoutsdk.common.TimerManager
 import com.plural_pinelabs.expresscheckoutsdk.common.UPIViewModelFactory
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils
+import com.plural_pinelabs.expresscheckoutsdk.common.Utils.MTAG
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils.showProcessPaymentDialog
 import com.plural_pinelabs.expresscheckoutsdk.data.model.Extra
 import com.plural_pinelabs.expresscheckoutsdk.data.model.PaymentModeData
@@ -77,10 +87,17 @@ class UPIFragment : Fragment() {
     private lateinit var viewModel: UPIViewModel
     private var mTransactionMode: String? = null
     private var bottomSheetDialog: BottomSheetDialog? = null
+    private var qrBottomSheetDialog: BottomSheetDialog? = null
     private var bottomVPASheetDialog: BottomSheetDialog? = null
     private var bottomTimerSheetDialog: BottomSheetDialog? = null
     private var selectUPIPackage: String? = null
     private var recommnededActionUPI: String? = null
+
+    private lateinit var payByQRButton: LinearLayout
+    private lateinit var payByQRLayout: ConstraintLayout
+    private var isQRPayment: Boolean = false
+    private var consumedDeepLink = false
+    private var isQRAllowed = false
 
 
     private lateinit var transactionLauncher: ActivityResultLauncher<Intent>
@@ -100,7 +117,7 @@ class UPIFragment : Fragment() {
             viewModel.startPolling()
         }
 
-        recommnededActionUPI = arguments?.getString("RECOMMENDED_ACTION_UPI",null)
+        recommnededActionUPI = arguments?.getString("RECOMMENDED_ACTION_UPI", null)
 
     }
 
@@ -128,9 +145,9 @@ class UPIFragment : Fragment() {
     }
 
     private fun handleRecommendedAction() {
-        if (recommnededActionUPI.isNotNullAndBlank()){
+        if (recommnededActionUPI.isNotNullAndBlank()) {
             //upi id passed set it  to vpa
-             upiIdEt.text= Editable.Factory.getInstance().newEditable(recommnededActionUPI)
+            upiIdEt.text = Editable.Factory.getInstance().newEditable(recommnededActionUPI)
             payAction(recommnededActionUPI, UPI_COLLECT)
         }
     }
@@ -141,6 +158,9 @@ class UPIFragment : Fragment() {
         verifyContinueButton = view.findViewById(R.id.verify_and_continueButton)
         upiIdEt = view.findViewById(R.id.upi_id_edittext)
         errorinfoTextView = view.findViewById(R.id.error_upi_id)
+        payByQRButton = view.findViewById(R.id.pay_by_qr_btn)
+        payByQRLayout = view.findViewById(R.id.pay_by_qr)
+
 
         payByAnyUPIButton.setOnClickListener {
             payAction(null, UPI_INTENT)
@@ -157,8 +177,16 @@ class UPIFragment : Fragment() {
             upiAppsRv.visibility = View.GONE
             payByAnyUPIButton.visibility = View.GONE
         }
-      //  if (!upiPaymentMode.contains("Collect", true))
-         //   upiIdEt.visibility = View.GONE
+        //  if (!upiPaymentMode.contains("Collect", true))
+        //   upiIdEt.visibility = View.GONE
+        if (!upiPaymentMode.contains("Intent", true) && isQRAllowed) {
+            payByQRLayout.visibility = View.GONE
+        }
+
+        payByQRButton.setOnClickListener {
+            isQRPayment = true
+            payAction(null, UPI_INTENT_QR)
+        }
     }
 
     private fun setUpPayByUPIApps() {
@@ -290,11 +318,18 @@ class UPIFragment : Fragment() {
             null,
             null,
             null,
+
             null,
             null,
             Utils.createSDKData(requireActivity())
         )
-        val upiData = UpiData(UPI_ID, vpa, transactionMode)
+        val transactionModeValue = when (transactionMode) {
+            UPI_COLLECT -> "Collect"
+            UPI_INTENT -> "Intent"
+            UPI_INTENT_QR -> "Intent"
+            else -> null
+        }
+        val upiData = UpiData(UPI_ID, vpa, transactionModeValue)
         val convenienceFeesData = viewModel.selectedConvenienceFee?.let {
             Utils.getConvenienceFeesRequest(
                 it
@@ -354,6 +389,8 @@ class UPIFragment : Fragment() {
                                     it.data.deep_link ?: "",
                                     upiAppPackageName = selectUPIPackage
                                 )
+                            } else if (mTransactionMode == UPI_INTENT_QR && isQRPayment) {
+                                viewModel.startPolling()
                             } else {
                                 showProcessPaymentVPADialog()
                                 viewModel.startPolling()
@@ -376,6 +413,7 @@ class UPIFragment : Fragment() {
                             //Throw error and exit SDK
                             //TODO Pass error message and description
                             bottomSheetDialog?.dismiss()
+                            qrBottomSheetDialog?.dismiss()
                             findNavController().navigate(R.id.action_UPIFragment_to_failureFragment)
                         }
 
@@ -389,19 +427,24 @@ class UPIFragment : Fragment() {
 
                                 PROCESSED_PENDING -> {
                                     // Do nothing, we will keep polling for the transaction status
+                                    val deepLink = it.data.data.deep_link
+                                    if (!deepLink.isNullOrEmpty() && !consumedDeepLink && isQRPayment) {
+                                        consumedDeepLink = true
+                                        //show QR
+                                        showQRBottomSheet(deepLink)
+                                    }
                                 }
 
+
                                 PROCESSED_STATUS -> {
-                                    cancelTransactionProcess()
-                                    findNavController().navigate(R.id.action_UPIFragment_to_successFragment)
+                                  //  cancelTransactionProcess()
+                                    // findNavController().navigate(R.id.action_UPIFragment_to_successFragment)
                                 }
 
                                 PROCESSED_ATTEMPTED -> {
                                     cancelTransactionProcess()
-                                    if (it.data.data.is_retry_available)
-                                        findNavController().navigate(R.id.action_successFragment_to_retryFragment)
-                                    else
-                                        findNavController().navigate(R.id.action_successFragment_to_failureFragment)
+                                    findNavController().navigate(R.id.action_UPIFragment_to_successFragment)
+
                                 }
 
                                 PROCESSED_FAILED -> {
@@ -424,6 +467,7 @@ class UPIFragment : Fragment() {
         bottomSheetDialog?.dismiss()
         bottomTimerSheetDialog?.dismiss()
         bottomVPASheetDialog?.dismiss()
+        qrBottomSheetDialog?.dismiss()
         viewModel.stopPolling()
     }
 
@@ -488,6 +532,8 @@ class UPIFragment : Fragment() {
     override fun onDestroyView() {
         bottomTimerSheetDialog?.dismiss()
         bottomVPASheetDialog?.dismiss()
+        qrBottomSheetDialog?.dismiss()
+        qrCountDownTimer?.cancel()
         super.onDestroyView()
     }
 
@@ -525,11 +571,77 @@ class UPIFragment : Fragment() {
                 when (val pm = paymentMode.paymentModeData) {
                     is LinkedTreeMap<*, *> -> {
                         val paymentModeData = convertMapToJsonObject(pm)
+                        isQRAllowed = paymentModeData.isMobileQRCode ?: false && paymentModeData.upi_flows?.contains("Intent") == true
                         return paymentModeData.upi_flows ?: emptyList()
                     }
                 }
             }
         return emptyList()
     }
+
+    private fun showQRBottomSheet(deepLink: String? = null) {
+        qrBottomSheetDialog = BottomSheetDialog(requireContext())
+        qrBottomSheetDialog?.setCancelable(false)
+        val view =
+            LayoutInflater.from(requireActivity())
+                .inflate(R.layout.upi_qr_layout, null)
+        qrBottomSheetDialog?.setContentView(view)
+
+        val qrImageView: ImageView = view.findViewById(R.id.qr_code_image)
+        val timerText = view.findViewById<TextView>(R.id.complete_payment_timer_tv)
+        val cancelPaymentBtn = view.findViewById<TextView>(R.id.cancel_qr_payment)
+        cancelPaymentBtn.setOnClickListener{
+            cancelTransactionProcess()
+            viewModel.cancelPayment()
+        }
+        try {
+            val barcodeEncoder = BarcodeEncoder()
+            val bitmap = barcodeEncoder.encodeBitmap(deepLink, BarcodeFormat.QR_CODE, 400, 400)
+            qrImageView.setImageBitmap(bitmap)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        startQRTimer(timerText)
+        qrBottomSheetDialog?.show()
+        qrBottomSheetDialog?.setOnDismissListener {
+                cancelTransactionProcess()
+                viewModel.cancelPayment()
+        }
+    }
+
+    private var qrCountDownTimer: CountDownTimer? = null
+
+    private fun startQRTimer(timerText: TextView) {
+
+        qrCountDownTimer?.cancel() // cancel if already running
+
+        qrCountDownTimer = object : CountDownTimer(60_000, 1_000) { // 60 sec, tick every 1 sec
+
+            override fun onTick(millisUntilFinished: Long) {
+                Log.d(MTAG, "Time left for QR code: $millisUntilFinished ms")
+
+               val text = getString(
+                    R.string.qr_expires_in,
+                    Utils.formatTimeInMinutes(requireContext(), millisUntilFinished)
+                )
+                timerText.text = Html.fromHtml(text, Html.FROM_HTML_MODE_LEGACY)
+            }
+
+            override fun onFinish() {
+                qrBottomSheetDialog?.dismiss()
+                viewModel.cancelPayment()
+                findNavController().navigate(R.id.action_UPIFragment_to_successFragment)
+            }
+
+        }.start()
+    }
+
+
+    override fun onDestroy() {
+        super.onDestroy()
+        qrBottomSheetDialog?.dismiss()
+    }
+
+
 
 }

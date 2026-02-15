@@ -107,11 +107,13 @@
     <string name="continue_to_merchant">Continue to merchant</string>
     <string name="you_re_saving_500_on_this_order">You’re saving ₹ 500 on this order!</string>
     <string name="cancel_payment">Cancel Payment?</string>
+    <string name="cancel_payment_underlined"><u>Cancel Payment</u></string>
     <string name="are_you_sure_you_want_to_cancel_the_payment">Are you sure you want to cancel the payment?</string>
     <string name="no">No</string>
     <string name="yes_cancel">Yes, Cancel</string>
     <string name="payment_not_completed">Payment not completed!</string>
     <string name="your_payment_has_been_failed_try_again_or_complete_the_payment_later">Your payment has been failed. Try again or complete the payment later.</string>
+    <string name="your_payment_pending">Your payment is pending. Try again or complete the payment later.</string>
     <string name="redeem_reward_points_on_this_transaction">Redeem reward points on this transaction</string>
     <string name="eligible_cards_list_text">Eligible cards: SBI, AXIS, ICICI, HDFC, and  <font color="#1C1C1C"><u><b>12 more</b></u></font></string>
     <string name="your_card_may_have_points">Your card may have points</string>
@@ -227,6 +229,8 @@
     <string name="scan_the_qr_using_any_of_the_following_banking_apps">Scan the QR using any of the following banking apps</string>
     <string name="powered_by">Powered by</string>
     <string name="complete_the_payment_within">Complete the payment within <font color="#C96B00">%s</font></string>
+    <string name="qr_expires_in">QR code expires in <font color="#C96B00">%s</font> minutes</string>
     <string name="payment_successful">Payment successful</string>
+    <string name="please_do_not_close_or_refresh_this_page_after_scanning">Please do not close or refresh this page after scanning</string>
 
 </resources>

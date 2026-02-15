@@ -183,6 +183,9 @@
         <action
             android:id="@+id/action_successFragment_to_failureFragment"
             app:destination="@id/failureFragment" />
+        <action
+            android:id="@+id/action_successFragment_to_pendingFragment"
+            app:destination="@id/pendingFragment" />
     </fragment>
     <fragment
         android:id="@+id/saveCardOTPFragment"
@@ -326,5 +329,9 @@
             android:id="@+id/action_offerSummaryDialog_to_tenureSelectionFragment"
             app:destination="@id/tenureSelectionFragment" />
     </dialog>
+    <fragment
+        android:id="@+id/pendingFragment"
+        android:name="com.plural_pinelabs.expresscheckoutsdk.presentation.terminal.PendingFragment"
+        android:label="PendingFragment" />
 
 </navigation>

@@ -113,7 +113,8 @@ data class PaymentMode(
 data class PaymentModeData(
     val upi_flows: List<String>?,
     val IssersUIDataList: List<issuerDataList>?,
-    val acquirerWisePaymentData: List<AcquirerWisePaymentData>?
+    val acquirerWisePaymentData: List<AcquirerWisePaymentData>?,
+    val isMobileQRCode:Boolean ?,
 )
 
 data class AcquirerWisePaymentData(

@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.plural_pinelabs.expresscheckoutsdk.ExpressSDKObject
 import com.plural_pinelabs.expresscheckoutsdk.common.BaseResult
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.UPI_TRANSACTION_STATUS_INTERVAL
+import com.plural_pinelabs.expresscheckoutsdk.data.model.CancelTransactionResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ConvenienceFeesInfo
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ProcessPaymentRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ProcessPaymentResponse
@@ -29,6 +30,10 @@ class UPIViewModel(private val expressRepositoryImpl: ExpressRepositoryImpl) : V
         MutableStateFlow<BaseResult<TransactionStatusResponse>>(BaseResult.Loading(false))
     val transactionStatusResult: StateFlow<BaseResult<TransactionStatusResponse>> =
         _transactionStatusResult
+
+    private val _cancelTransactionResult =  MutableStateFlow<BaseResult<CancelTransactionResponse>>(BaseResult.Loading(false))
+    val cancelTransactionResult: StateFlow<BaseResult<CancelTransactionResponse>> =
+        _cancelTransactionResult
 
     private val _countDownTimer = MutableStateFlow<Long>(-1)
     val countDownTimer: StateFlow<Long> = _countDownTimer
@@ -93,6 +98,14 @@ class UPIViewModel(private val expressRepositoryImpl: ExpressRepositoryImpl) : V
 
     fun stopPolling() {
         pollingJob?.cancel()
+    }
+
+    fun cancelPayment(){
+        viewModelScope.launch(Dispatchers.IO) {
+            expressRepositoryImpl.cancelPayment(ExpressSDKObject.getToken(),true).collect{
+                _cancelTransactionResult.value = it
+            }
+        }
     }
 
 }
