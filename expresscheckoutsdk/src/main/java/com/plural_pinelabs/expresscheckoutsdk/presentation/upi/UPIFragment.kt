@@ -3,12 +3,17 @@ package com.plural_pinelabs.expresscheckoutsdk.presentation.upi
 import UpiAppsAdapter
 import android.content.Intent
 import android.content.pm.ResolveInfo
+import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.text.Editable
 import android.text.Html
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.SpannableStringBuilder
 import android.text.TextWatcher
+import android.text.style.ForegroundColorSpan
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -437,8 +442,8 @@ class UPIFragment : Fragment() {
 
 
                                 PROCESSED_STATUS -> {
-                                  //  cancelTransactionProcess()
-                                    // findNavController().navigate(R.id.action_UPIFragment_to_successFragment)
+                                    cancelTransactionProcess()
+                                     findNavController().navigate(R.id.action_UPIFragment_to_successFragment)
                                 }
 
                                 PROCESSED_ATTEMPTED -> {
@@ -615,16 +620,36 @@ class UPIFragment : Fragment() {
 
         qrCountDownTimer?.cancel() // cancel if already running
 
-        qrCountDownTimer = object : CountDownTimer(60_000, 1_000) { // 60 sec, tick every 1 sec
+        qrCountDownTimer = object : CountDownTimer(600_000, 1_000) { // 60 sec, tick every 1 sec
 
             override fun onTick(millisUntilFinished: Long) {
                 Log.d(MTAG, "Time left for QR code: $millisUntilFinished ms")
+                val prefix = "QR code expires in "
+                val time = Utils.formatTimeInMinutes(requireContext(), millisUntilFinished)
+                val postFix = " minutes"
+                val spannableBuilder = SpannableStringBuilder()
 
-               val text = getString(
-                    R.string.qr_expires_in,
-                    Utils.formatTimeInMinutes(requireContext(), millisUntilFinished)
+// Part 1 — normal text
+                spannableBuilder.append(prefix)
+
+// Part 2 — colored time
+                val timeSpan = SpannableString(time)
+                timeSpan.setSpan(
+                    ForegroundColorSpan(Color.parseColor("#C96B00")),
+                    0,
+                    time.length,
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
                 )
-                timerText.text = Html.fromHtml(text, Html.FROM_HTML_MODE_LEGACY)
+
+                spannableBuilder.append(timeSpan)
+
+                // end part
+
+                spannableBuilder.append(postFix)
+
+                timerText.text = spannableBuilder
+
+
             }
 
             override fun onFinish() {

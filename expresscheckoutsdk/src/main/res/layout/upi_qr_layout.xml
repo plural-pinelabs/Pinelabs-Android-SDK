@@ -122,7 +122,6 @@
             android:gravity="center_horizontal"
             android:letterSpacing=".03"
             android:text="@string/qr_expires_in"
-            android:textColor="@color/black_text_50"
             android:textFontWeight="600"
             android:textSize="16sp"
             android:textStyle="bold"
