@@ -8,7 +8,6 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.text.Editable
-import android.text.Html
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.SpannableStringBuilder
@@ -65,7 +64,6 @@ import com.plural_pinelabs.expresscheckoutsdk.common.Constants.UPI_INTENT_QR
 import com.plural_pinelabs.expresscheckoutsdk.common.ItemClickListener
 import com.plural_pinelabs.expresscheckoutsdk.common.NetworkHelper
 import com.plural_pinelabs.expresscheckoutsdk.common.PaymentModes
-import com.plural_pinelabs.expresscheckoutsdk.common.TimerManager
 import com.plural_pinelabs.expresscheckoutsdk.common.UPIViewModelFactory
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils.MTAG
@@ -443,7 +441,7 @@ class UPIFragment : Fragment() {
 
                                 PROCESSED_STATUS -> {
                                     cancelTransactionProcess()
-                                     findNavController().navigate(R.id.action_UPIFragment_to_successFragment)
+                                    findNavController().navigate(R.id.action_UPIFragment_to_successFragment)
                                 }
 
                                 PROCESSED_ATTEMPTED -> {
@@ -576,7 +574,10 @@ class UPIFragment : Fragment() {
                 when (val pm = paymentMode.paymentModeData) {
                     is LinkedTreeMap<*, *> -> {
                         val paymentModeData = convertMapToJsonObject(pm)
-                        isQRAllowed = paymentModeData.isMobileQRCode ?: false && paymentModeData.upi_flows?.contains("Intent") == true
+                        isQRAllowed =
+                            paymentModeData.isMobileQRCode ?: false && paymentModeData.upi_flows?.contains(
+                                "Intent"
+                            ) == true
                         return paymentModeData.upi_flows ?: emptyList()
                     }
                 }
@@ -595,7 +596,7 @@ class UPIFragment : Fragment() {
         val qrImageView: ImageView = view.findViewById(R.id.qr_code_image)
         val timerText = view.findViewById<TextView>(R.id.complete_payment_timer_tv)
         val cancelPaymentBtn = view.findViewById<TextView>(R.id.cancel_qr_payment)
-        cancelPaymentBtn.setOnClickListener{
+        cancelPaymentBtn.setOnClickListener {
             cancelTransactionProcess()
             viewModel.cancelPayment()
         }
@@ -609,8 +610,7 @@ class UPIFragment : Fragment() {
         startQRTimer(timerText)
         qrBottomSheetDialog?.show()
         qrBottomSheetDialog?.setOnDismissListener {
-                cancelTransactionProcess()
-                viewModel.cancelPayment()
+            cancelTransactionProcess()
         }
     }
 
@@ -619,8 +619,8 @@ class UPIFragment : Fragment() {
     private fun startQRTimer(timerText: TextView) {
 
         qrCountDownTimer?.cancel() // cancel if already running
-
-        qrCountDownTimer = object : CountDownTimer(600_000, 1_000) { // 60 sec, tick every 1 sec
+        val millis: Long = if (ExpressSDKObject.isSandBoxMode()) 120_000 else 600_000
+        qrCountDownTimer = object : CountDownTimer(millis, 1_000) { // 60 sec, tick every 1 sec
 
             override fun onTick(millisUntilFinished: Long) {
                 Log.d(MTAG, "Time left for QR code: $millisUntilFinished ms")
@@ -654,7 +654,7 @@ class UPIFragment : Fragment() {
 
             override fun onFinish() {
                 qrBottomSheetDialog?.dismiss()
-                viewModel.cancelPayment()
+                cancelTransactionProcess()
                 findNavController().navigate(R.id.action_UPIFragment_to_successFragment)
             }
 
@@ -666,7 +666,6 @@ class UPIFragment : Fragment() {
         super.onDestroy()
         qrBottomSheetDialog?.dismiss()
     }
-
 
 
 }

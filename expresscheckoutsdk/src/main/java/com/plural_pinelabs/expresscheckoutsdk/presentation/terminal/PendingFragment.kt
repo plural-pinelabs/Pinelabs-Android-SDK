@@ -33,7 +33,7 @@ class PendingFragment : Fragment() {
     ): View? {
         // Inflate the layout for this fragment
         ExpressSDKObject.setSelectedOfferDetail(null)
-        return inflater.inflate(R.layout.fragment_retry, container, false)
+        return inflater.inflate(R.layout.fragment_pending, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
