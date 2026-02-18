@@ -234,4 +234,5 @@
     <string name="please_do_not_close_or_refresh_this_page_after_scanning">Please do not close or refresh this page after scanning</string>
     <string name="payment_pending">Payment Confirmation Pending</string>
     <string name="awaiting_payment_confirmation">Waiting for your bank to confirm the transaction.If money was deducted twice, it will be credited to source account in 2-9 business days. </string>
+    <string name="_9_28_am_upi_net_banking">%s, UPI/Net Banking</string>
 </resources>

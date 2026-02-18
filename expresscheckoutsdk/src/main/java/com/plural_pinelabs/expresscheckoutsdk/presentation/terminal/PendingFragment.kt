@@ -41,7 +41,7 @@ class PendingFragment : Fragment() {
         (activity as LandingActivity).showHideHeaderLayout(true)
         (requireActivity() as LandingActivity).showHideConvenienceFessMessage(ExpressSDKObject.getFetchData()?.convenienceFeesInfo?.isEmpty() == false)
         val timer = TimerManager
-        timer.startTimer(5000)
+        timer.startTimer(10000)
 
         timer.timeLeft.observe(viewLifecycleOwner, { timeLeft ->
             if (timeLeft == 0L) {
@@ -55,6 +55,22 @@ class PendingFragment : Fragment() {
                 autoCloseTv.text = Html.fromHtml(autoCloseString)
             }
         })
+
+        val timing = view.findViewById<TextView>(R.id.timing)
+        val time = ExpressSDKObject.getCreatedAt()
+        val formattedTime = time?.let {
+            try {
+                val instant = java.time.Instant.parse(it)
+                val dateTime = java.time.ZonedDateTime.ofInstant(instant, java.time.ZoneId.systemDefault())
+                val formatter = java.time.format.DateTimeFormatter.ofPattern("hh:mm a")
+                formatter.format(dateTime)
+            } catch (e: Exception) {
+                ""
+            }
+        } ?: ""
+        val timingString = getString(R.string._9_28_am_upi_net_banking, formattedTime)
+        timing.text = timingString
+
 
     }
 
