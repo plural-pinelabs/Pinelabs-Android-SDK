@@ -154,6 +154,7 @@ class SuccessFragment : Fragment() {
                             val status = it.data.data.status
                             when (status) {
                                 PROCESSED_PENDING -> {
+                                    ExpressSDKObject.setCreatedAt(it.data.data.order_summary?.created_at)
                                     findNavController().navigate(R.id.action_successFragment_to_pendingFragment)
                                 }
 
