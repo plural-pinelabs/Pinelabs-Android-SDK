@@ -115,7 +115,7 @@ data class PaymentModeData(
     val upi_flows: List<String>?,
     val IssersUIDataList: List<issuerDataList>?,
     val acquirerWisePaymentData: List<AcquirerWisePaymentData>?,
-    val isMobileQRCode:Boolean ?,
+    val isMobileQRCode: Boolean?,
 )
 
 data class AcquirerWisePaymentData(
@@ -952,13 +952,13 @@ data class SDKErrorDetails(
     val transactionId: String?,
     val sdkData: SDKData?,
     val message: String?,
-    )
+)
 
 data class LogRequest(
     val logs: List<LogData>
 )
 
-data class  LogResponse(
+data class LogResponse(
     val status: String,
     val message: String
 )

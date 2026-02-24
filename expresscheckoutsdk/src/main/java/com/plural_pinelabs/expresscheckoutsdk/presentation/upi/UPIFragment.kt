@@ -50,6 +50,8 @@ import com.plural_pinelabs.expresscheckoutsdk.common.CleverTapUtil
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.BHIM_UPI
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.CRED_UPI
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.GPAY
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.KIWI_UPI
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.MOBIKWIK_UPI
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PAYTM
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PHONEPE
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PROCESSED_ATTEMPTED
@@ -218,6 +220,8 @@ class UPIFragment : Fragment() {
         val listOfUPIPackage = listOf(
             GPAY, // Google Pay
             PHONEPE, // PhonePe
+            MOBIKWIK_UPI,
+            KIWI_UPI,
             PAYTM,
             CRED_UPI,
             BHIM_UPI// Paytm
@@ -242,13 +246,8 @@ class UPIFragment : Fragment() {
     private fun getListOfActiveUPIApps(listOfUPIPackage: List<String>): List<String> {
         try { //Keeping a try-catch block to avoid crashes if no UPI apps are installed
             val finalUpiAppsList = mutableListOf<String>()
-            val upiIntent = Intent(Intent.ACTION_VIEW, Uri.parse(UPI_INTENT_PREFIX))
-            val pm = requireActivity().packageManager
-            val upiActivities: List<ResolveInfo> = pm.queryIntentActivities(upiIntent, 0)
             val packageNamesOfAllInstalledApps = mutableListOf<String>()
-//            for (app in upiActivities) {
-//                packageNamesOfAllInstalledApps.add(app.activityInfo.packageName.lowercase())
-//            }
+
             for (app in listOfUPIPackage) {
                 if (isAppUpiReady(app.lowercase())) {
                     packageNamesOfAllInstalledApps.add(app.lowercase())
@@ -257,7 +256,7 @@ class UPIFragment : Fragment() {
                     finalUpiAppsList.add(app)
                 }
             }
-            return finalUpiAppsList
+            return listOfUPIPackage
         } catch (_: Exception) {
             // If no UPI apps are installed, return an empty list
             return emptyList()

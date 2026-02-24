@@ -235,4 +235,6 @@
     <string name="payment_pending">Payment Confirmation Pending</string>
     <string name="awaiting_payment_confirmation">Waiting for your bank to confirm the transaction.If money was deducted twice, it will be credited to source account in 2-9 business days. </string>
     <string name="_9_28_am_upi_net_banking">%s, UPI/Net Banking</string>
+    <string name="kiwi">KIWI</string>
+    <string name="mokiwik">Mobikwik</string>
 </resources>
