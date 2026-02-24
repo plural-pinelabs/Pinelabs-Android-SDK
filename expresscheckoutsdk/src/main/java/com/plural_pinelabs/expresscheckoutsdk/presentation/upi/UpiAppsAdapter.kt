@@ -8,6 +8,8 @@ import com.plural_pinelabs.expresscheckoutsdk.R
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.BHIM_UPI
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.CRED_UPI
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.GPAY
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.KIWI_UPI
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.MOBIKWIK_UPI
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PAYTM
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PHONEPE
 import com.plural_pinelabs.expresscheckoutsdk.common.ItemClickListener
@@ -51,6 +53,7 @@ class UpiAppsAdapter(
                 PAYTM -> R.drawable.wallet_paytm
                 BHIM_UPI -> R.drawable.ic_bhim_upi
                 CRED_UPI -> R.drawable.ic_cred_upi
+                KIWI_UPI -> R.drawable.ic_kiwi_upi
                 else -> R.drawable.ic_upi // Default icon for unknown apps
             }
         }
@@ -62,6 +65,8 @@ class UpiAppsAdapter(
                 PAYTM -> R.string.upi_app_paytm
                 BHIM_UPI -> R.string.upi_app_bhim_upi
                 CRED_UPI -> R.string.upi_app_cred
+                KIWI_UPI -> R.string.kiwi
+                MOBIKWIK_UPI ->R.string.mokiwik
                 else -> -1 // Default icon for unknown apps
             }
         }
