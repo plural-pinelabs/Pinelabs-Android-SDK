@@ -20,6 +20,10 @@
         <action
             android:id="@+id/action_splashFragment_to_failureFragment"
             app:destination="@id/failureFragment" />
+
+        <action
+            android:id="@+id/action_splashFragment_to_successFragment"
+            app:destination="@id/successFragment" />
     </fragment>
     <fragment
         android:id="@+id/phoneNumberFragment"

@@ -457,7 +457,6 @@ internal object Utils {
     }
 
 
-
     fun formatToReadableDate(input: String): String {
         if (input.isEmpty()) return ""
 
@@ -476,7 +475,6 @@ internal object Utils {
             ""
         }
     }
-
 
 
     fun showProcessPaymentDialog(context: Context): BottomSheetDialog? {
@@ -1006,12 +1004,19 @@ internal object Utils {
 
 
     fun insertLog(context: Context, logData: String, timestamp: Long) {
+        ExpressSDKObject.setLogCount(1)
         val db = DBLogger.getInstance(context).writableDatabase
         val values = ContentValues().apply {
             put("json", logData)
             put("timestamp", timestamp)
         }
         db.insert("logs", null, values)
+    }
+
+    fun getLogCount(): Int {
+        if (ExpressSDKObject.getLogCount() != -1) {
+            return 1
+        } else return -1
     }
 
     fun getUnSyncedErrors(context: Context): List<LogData> {

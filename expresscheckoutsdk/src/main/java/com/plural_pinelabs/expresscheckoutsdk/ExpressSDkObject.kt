@@ -27,7 +27,8 @@ internal data class SDKObject(
     var selectedAddress: Address? = null,
     var customerId: String? = null,
     var customerToken: String? = null,
-    var createdAt: String? = null
+    var createdAt: String? = null,
+    var logCount: Int = -1
 )
 
 internal object ExpressSDKObject {
@@ -184,10 +185,22 @@ internal object ExpressSDKObject {
         getSDKObject()?.customerToken = customerToken
     }
 
-    fun getCreatedAt(): String? { return getSDKObject()?.createdAt }
+    fun getCreatedAt(): String? {
+        return getSDKObject()?.createdAt
+    }
+
     fun setCreatedAt(createdAt: String?) {
         getSDKObject()?.createdAt = createdAt
     }
+
+    fun getLogCount(): Int {
+        return getSDKObject()?.logCount ?: -1
+    }
+
+    fun setLogCount(logCount: Int) {
+        getSDKObject()?.logCount = logCount
+    }
+
 
 }
 

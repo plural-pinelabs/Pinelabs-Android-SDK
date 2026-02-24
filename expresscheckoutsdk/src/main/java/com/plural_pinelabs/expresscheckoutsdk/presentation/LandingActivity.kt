@@ -207,7 +207,7 @@ class LandingActivity : AppCompatActivity() {
                                         )
                                         val logs = Utils.getUnSyncedErrors(applicationContext)
                                         val result = repo.logData(
-                                            ExpressSDKObject.getToken(), LogRequest(logs)
+                                            ExpressSDKObject.getToken(), logs
                                         )
                                         result.collect {
                                             when (it) {

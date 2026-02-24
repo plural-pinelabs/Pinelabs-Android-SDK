@@ -85,7 +85,8 @@ data class FetchFailure(
 )
 
 data class TransactionInfo(
-    val orderId: String
+    val orderId: String,
+    val orderStatus: String?
 )
 
 data class MerchantInfo(
@@ -940,18 +941,18 @@ data class AddressRequest
 
 
 data class LogData(
-    val logCode: String?,
-    val logMessage: String?,
-    val logDetails: SDKErrorDetails?,
-    val sdkData: SDKData?,
+    val errorCode: String?,
+    val errorDetails: SDKErrorDetails?,
     val severity: String?,
     val source: String,
     val timestamp: Long
 )
 
 data class SDKErrorDetails(
-    val transactionId: String?
-)
+    val transactionId: String?,
+    val sdkData: SDKData?,
+    val message: String?,
+    )
 
 data class LogRequest(
     val logs: List<LogData>

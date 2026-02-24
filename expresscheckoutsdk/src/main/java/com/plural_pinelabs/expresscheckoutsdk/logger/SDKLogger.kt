@@ -18,16 +18,20 @@ object SdkLogger {
         severity: String = "HIGH",
         source: String = "SDK"
     ) {
+        val logCount = Utils.getLogCount()
+        val sdkData = if (logCount <= 0) Utils.createSDKData(context) else null
         val logData = LogData(
-            logCode = errorCode,
-            logMessage = errorMessage,
-            logDetails = SDKErrorDetails(transactionId),
-            sdkData = Utils.createSDKData(context),
+            errorCode = errorCode,
+            errorDetails = SDKErrorDetails(
+                transactionId,
+                sdkData,
+                errorMessage
+            ),
             severity = severity,
             source = source,
             timestamp = System.currentTimeMillis()
         )
 
-        Utils.insertLog(context, gson.toJson(logData),logData.timestamp)
+        Utils.insertLog(context, gson.toJson(logData), logData.timestamp)
     }
 }

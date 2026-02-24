@@ -18,9 +18,14 @@ import com.plural_pinelabs.expresscheckoutsdk.ExpressSDKObject
 import com.plural_pinelabs.expresscheckoutsdk.R
 import com.plural_pinelabs.expresscheckoutsdk.common.BaseResult
 import com.plural_pinelabs.expresscheckoutsdk.common.CleverTapUtil
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PROCESSED_ATTEMPTED
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PROCESSED_FAILED
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PROCESSED_PENDING
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PROCESSED_STATUS
 import com.plural_pinelabs.expresscheckoutsdk.common.NetworkHelper
 import com.plural_pinelabs.expresscheckoutsdk.common.SplashViewModelFactory
 import com.plural_pinelabs.expresscheckoutsdk.data.model.FetchResponseDTO
+import com.plural_pinelabs.expresscheckoutsdk.data.model.TransactionStatusResponse
 import com.plural_pinelabs.expresscheckoutsdk.presentation.LandingActivity
 import kotlinx.coroutines.launch
 
@@ -28,7 +33,7 @@ class SplashFragment : Fragment() {
     private var isDataFetched = false
 
     private var isRevealShown = false
-    private  var logoAnimation: LottieAnimationView?=null
+    private var logoAnimation: LottieAnimationView? = null
 
     private lateinit var viewModel: SplashViewModel
 
@@ -61,7 +66,7 @@ class SplashFragment : Fragment() {
     private fun setLottieAnimation(view: View) {
 
         logoAnimation = view.findViewById(R.id.img_logo)
-        if (logoAnimation ==null) {
+        if (logoAnimation == null) {
             return
         }
         logoAnimation?.setAnimation(R.raw.reveal)
@@ -124,22 +129,23 @@ class SplashFragment : Fragment() {
                             result.data.let { it ->
                                 // Process the data
                                 ExpressSDKObject.setFetchData(it)
+                                (activity as? LandingActivity)?.updateValueForHeaderLayout(it)
                                 CleverTapUtil.sdkCheckoutRendered(
                                     CleverTapUtil.getInstance(requireContext()),
                                     it
                                 )
-//                                Log.d("Success", "Data fetched successfully")
-//                                // TODO Finalize the condition for the d2c flow
-                                (activity as? LandingActivity)?.updateValueForHeaderLayout(it)
-//                                if (it.customerInfo?.customerId.isNullOrEmpty()) {
-//                                    // no customer id new user
-//                                    //  findNavController().navigate(R.id.action_splashFragment_to_phoneNumberFragment)
-                                //   findNavController().navigate(R.id.action_splashFragment_to_paymentModeFragment)
-//                                } else
-//                                // TODO UNCOMMENT NAVIGATION TO LANDING AND REMOVE THIS
-                                //    findNavController().navigate(R.id.action_splashFragment_to_paymentModeFragment)
-                                //    findNavController().navigate(R.id.action_splashFragment_to_phoneNumberFragment)
-                                navD2C()
+                                if (it?.transactionInfo?.orderStatus?.equals(
+                                        PROCESSED_STATUS,
+                                        true
+                                    ) == true
+                                ) {
+                                    // order is already processed check with the inquiry to confirm
+                                    viewModel.getTransactionStatus(ExpressSDKObject.getToken())
+                                } else {
+                                    // directly handle nav
+                                    handleNav()
+                                }
+//
                             }
                         }
 
@@ -152,6 +158,55 @@ class SplashFragment : Fragment() {
                 }
             }
         }
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED)
+            {
+                viewModel.transactionStatusResult.collect {
+                    when (it) {
+                        is BaseResult.Error -> {
+                            //TODO  discuss in case of error what to do
+                            findNavController().navigate(R.id.action_splashFragment_to_successFragment)
+                        }
+
+                        is BaseResult.Loading -> {
+                            // nothing to do since we already show the process payment dialog
+                        }
+
+                        is BaseResult.Success<TransactionStatusResponse> -> {
+                            val status = it.data.data.status
+                            when (status) {
+                                PROCESSED_PENDING, PROCESSED_ATTEMPTED -> {
+                                    // continue
+                                    handleNav()
+                                }
+
+                                PROCESSED_STATUS -> {
+                                    findNavController().navigate(R.id.action_splashFragment_to_successFragment)
+                                }
+
+                                PROCESSED_FAILED -> {
+                                    findNavController().navigate(R.id.action_splashFragment_to_successFragment)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun handleNav() {
+        // TODO Finalize the condition for the d2c flow
+//                                if (it.customerInfo?.customerId.isNullOrEmpty()) {
+//                                    // no customer id new user
+//                                    //  findNavController().navigate(R.id.action_splashFragment_to_phoneNumberFragment)
+        //   findNavController().navigate(R.id.action_splashFragment_to_paymentModeFragment)
+//                                } else
+//                                // TODO UNCOMMENT NAVIGATION TO LANDING AND REMOVE THIS
+        //    findNavController().navigate(R.id.action_splashFragment_to_paymentModeFragment)
+        //    findNavController().navigate(R.id.action_splashFragment_to_phoneNumberFragment)
+        navD2C()
     }
 
     private fun navD2C() {

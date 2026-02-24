@@ -44,8 +44,7 @@ class SuccessViewModel(private val expressRepositoryImpl: ExpressRepositoryImpl)
 
     fun logData(token: String?, logs: List<LogData>) {
         viewModelScope.launch(Dispatchers.IO) {
-            val logRequest = LogRequest(logs)
-            expressRepositoryImpl.logData(token, logRequest).collect {
+            expressRepositoryImpl.logData(token, logs).collect {
                 // No need to handle response
                 _logsResult.value = it
             }

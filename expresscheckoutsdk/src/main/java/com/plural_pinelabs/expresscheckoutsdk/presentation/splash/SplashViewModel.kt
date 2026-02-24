@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.plural_pinelabs.expresscheckoutsdk.common.BaseResult
 import com.plural_pinelabs.expresscheckoutsdk.data.model.FetchResponseDTO
+import com.plural_pinelabs.expresscheckoutsdk.data.model.TransactionStatusResponse
 import com.plural_pinelabs.expresscheckoutsdk.domain.repository.ExpressRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -11,6 +12,11 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class SplashViewModel(private val expressRepository: ExpressRepository) : ViewModel() {
+
+    private val _transactionStatusResult =
+        MutableStateFlow<BaseResult<TransactionStatusResponse>>(BaseResult.Loading(false))
+    val transactionStatusResult: StateFlow<BaseResult<TransactionStatusResponse>> =
+        _transactionStatusResult
 
     private val _fetchDataResult =
         MutableStateFlow<BaseResult<FetchResponseDTO>>(BaseResult.Loading(true))
@@ -41,4 +47,14 @@ class SplashViewModel(private val expressRepository: ExpressRepository) : ViewMo
         }
 
     }
+
+    fun getTransactionStatus(token: String?) =
+        viewModelScope.launch(Dispatchers.IO) {
+            expressRepository.transactionStatus(token).collect {
+                _transactionStatusResult.value = it
+            }
+        }
+
+
+
 }
