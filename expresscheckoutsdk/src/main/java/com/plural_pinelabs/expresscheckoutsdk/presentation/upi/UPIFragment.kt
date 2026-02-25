@@ -256,7 +256,7 @@ class UPIFragment : Fragment() {
                     finalUpiAppsList.add(app)
                 }
             }
-            return listOfUPIPackage
+            return finalUpiAppsList
         } catch (_: Exception) {
             // If no UPI apps are installed, return an empty list
             return emptyList()
