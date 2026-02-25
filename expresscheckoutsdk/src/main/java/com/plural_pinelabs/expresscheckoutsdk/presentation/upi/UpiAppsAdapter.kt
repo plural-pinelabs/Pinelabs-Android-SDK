@@ -54,6 +54,7 @@ class UpiAppsAdapter(
                 BHIM_UPI -> R.drawable.ic_bhim_upi
                 CRED_UPI -> R.drawable.ic_cred_upi
                 KIWI_UPI -> R.drawable.ic_kiwi_upi
+                MOBIKWIK_UPI -> R.drawable.wallet_mobikwik
                 else -> R.drawable.ic_upi // Default icon for unknown apps
             }
         }
