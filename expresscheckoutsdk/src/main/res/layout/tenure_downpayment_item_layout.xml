@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/tenure_down_payment_item_layout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginVertical="8dp"
+    android:background="@drawable/input_field_border"
+    android:padding="4dp"
+    android:paddingBottom="8dp">
+
+    <!-- Top tags row (Best Value / Recommended / Saving) -->
+    <LinearLayout
+        android:id="@+id/tag_row"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="4dp"
+        android:orientation="horizontal"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/best_value_tag"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/best_value_blue_bg"
+            android:fontFamily="sans-serif-medium"
+            android:paddingHorizontal="6dp"
+            android:paddingVertical="4dp"
+            android:text="@string/best_value"
+            android:textColor="@color/blue_4D85B4"
+            android:textFontWeight="600"
+            android:textSize="12sp"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/recommended_tag"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/recommended_tag_bg"
+            android:fontFamily="sans-serif-medium"
+            android:paddingHorizontal="6dp"
+            android:paddingVertical="4dp"
+            android:text="@string/recommended"
+            android:textColor="@color/purple_6A60AF"
+            android:textFontWeight="600"
+            android:textSize="12sp"
+            android:visibility="gone" />
+
+        <LinearLayout
+            android:id="@+id/saving_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="4dp"
+            android:background="@drawable/saving_gradient"
+            android:orientation="horizontal"
+            android:padding="3dp"
+            android:visibility="gone">
+
+            <ImageView
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/ic_saving_offer_tag" />
+
+            <TextView
+                android:id="@+id/saving_text_value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:fontFamily="sans-serif-medium"
+                android:letterSpacing="0.02"
+                android:text="@string/save_rs_x"
+                android:textColor="@color/CC00722F_green_80"
+                android:textFontWeight="600"
+                android:textSize="12sp" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <RadioButton
+        android:id="@+id/tenure_down_payment_radio_button"
+        android:layout_width="32dp"
+        android:layout_height="24dp"
+        android:layout_marginTop="8dp"
+        android:gravity="center"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- EMI amount -->
+    <TextView
+        android:id="@+id/emi_amount_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="sans-serif-medium"
+        android:textColor="@color/black_text"
+        android:textFontWeight="700"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@id/tenure_down_payment_radio_button"
+        app:layout_constraintStart_toEndOf="@id/tenure_down_payment_radio_button"
+        app:layout_constraintTop_toTopOf="@id/tenure_down_payment_radio_button"
+        tools:text="₹3,333" />
+
+    <TextView
+        android:id="@+id/emi_per_month_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:fontFamily="sans-serif"
+        android:text="@string/amount_emi_per_month_label"
+        android:textColor="@color/black_text_80"
+        android:textFontWeight="600"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toBottomOf="@id/tenure_down_payment_radio_button"
+        app:layout_constraintStart_toEndOf="@id/emi_amount_text_view"
+        app:layout_constraintTop_toTopOf="@id/tenure_down_payment_radio_button" />
+
+    <TextView
+        android:id="@+id/tenure_months_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="6dp"
+        android:fontFamily="sans-serif"
+        android:text="@string/for_x_months"
+        android:textColor="@color/black_text_60"
+        android:textFontWeight="600"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toBottomOf="@id/tenure_down_payment_radio_button"
+        app:layout_constraintStart_toEndOf="@id/emi_per_month_label"
+        app:layout_constraintTop_toTopOf="@id/tenure_down_payment_radio_button"
+        tools:text="for 12 months" />
+
+    <!-- Total payable block on right -->
+    <TextView
+        android:id="@+id/payable_amount_label_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="4dp"
+        android:ellipsize="end"
+        android:fontFamily="sans-serif"
+        android:maxLines="1"
+        android:paddingTop="4dp"
+        android:text="@string/total_payable"
+        android:textColor="@color/black_text_60"
+        android:textFontWeight="600"
+        android:textSize="10sp"
+        app:layout_constraintBottom_toTopOf="@id/tenure_down_payment_radio_button"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:ignore="SmallSp" />
+
+    <TextView
+        android:id="@+id/payable_amount_value_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="4dp"
+        android:ellipsize="end"
+        android:fontFamily="sans-serif-medium"
+        android:maxLines="1"
+        android:textColor="@color/black_text_80"
+        android:textFontWeight="700"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/payable_amount_label_text_view"
+        tools:ignore="SmallSp"
+        tools:text="₹40,000" />
+
+    <!-- Processing fee / EMI type row -->
+    <TextView
+        android:id="@+id/processing_fee_text_view"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:ellipsize="end"
+        android:fontFamily="sans-serif"
+        android:maxLines="1"
+        android:paddingBottom="8dp"
+        android:text="@string/x_one_time_processing_fee"
+        android:textColor="@color/black_text_50"
+        android:textFontWeight="500"
+        android:textSize="12sp"
+        app:layout_constraintEnd_toStartOf="@id/emi_type_text_view"
+        app:layout_constraintStart_toEndOf="@id/tenure_down_payment_radio_button"
+        app:layout_constraintTop_toBottomOf="@id/tenure_down_payment_radio_button"
+        tools:text="₹199 One-time processing fee" />
+
+    <TextView
+        android:id="@+id/emi_type_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="10dp"
+        android:ellipsize="end"
+        android:fontFamily="sans-serif"
+        android:gravity="center_vertical"
+        android:maxLines="1"
+        android:paddingBottom="8dp"
+        android:textColor="@color/yellow_D6A243"
+        android:textFontWeight="500"
+        android:textSize="12sp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tenure_down_payment_radio_button"
+        tools:text="No Cost" />
+
+    <!-- Optional downpayment line (if Figma shows it for each plan) -->
+    <TextView
+        android:id="@+id/downpayment_text_view"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:ellipsize="end"
+        android:fontFamily="sans-serif"
+        android:maxLines="1"
+        android:textColor="@color/black_text_60"
+        android:textFontWeight="500"
+        android:textSize="12sp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/tenure_down_payment_radio_button"
+        app:layout_constraintTop_toBottomOf="@id/processing_fee_text_view"
+        tools:text="Downpayment: ₹5,000" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

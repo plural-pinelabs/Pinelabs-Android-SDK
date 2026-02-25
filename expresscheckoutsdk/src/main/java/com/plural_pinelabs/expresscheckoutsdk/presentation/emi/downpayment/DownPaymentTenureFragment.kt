@@ -257,7 +257,7 @@ class DownPaymentTenureFragment  : Fragment() {
                         tenure.tenure_value != 0 || !tenure.name.contains("No EMI", true)
                     }.customSorted()
                 }
-            val adapter = EMITenureListAdapter(
+            val adapter = DownPaymentTenureListAdapter(
                 requireContext(),
                 filteredList.markBestValueInPlace(selectedIssuerId),
                 getTenureClickListener()
