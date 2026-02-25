@@ -93,7 +93,7 @@ class EMIFragment : Fragment() {
 
     private fun showEMIList(listOfCCBank: List<Issuer>) {
         Utils.getMaxDiscountTenurePerIssuer(listOfCCBank)
-       val list =  listOfCCBank.sortedByDescending { it.maxDiscountAmount }
+        val list = listOfCCBank.sortedByDescending { it.maxDiscountAmount }
         val adapter = EMIBankRecyclerViewAdapter(
             requireContext(),
             list,
@@ -165,10 +165,17 @@ class EMIFragment : Fragment() {
                 val bundle = Bundle().apply {
                     putString(ISSUE_ID, item.id)
                 }
-                findNavController().navigate(
-                    R.id.action_EMIFragment_to_tenureSelectionFragment,
-                    bundle
-                )
+                if (ExpressSDKObject.getFetchData()?.transactionInfo?.isPartPayment == true) {
+                    //navigate to downpayment
+                    findNavController().navigate(
+                        R.id.action_EMIFragment_to_downPaymentTenureFragment,
+                        bundle
+                    )
+                } else
+                    findNavController().navigate(
+                        R.id.action_EMIFragment_to_tenureSelectionFragment,
+                        bundle
+                    )
             }
         }
     }

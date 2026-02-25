@@ -250,6 +250,9 @@
         <action
             android:id="@+id/action_EMIFragment_to_tenureSelectionFragment"
             app:destination="@id/tenureSelectionFragment" />
+        <action
+            android:id="@+id/action_EMIFragment_to_downPaymentTenureFragment"
+            app:destination="@id/downPaymentTenureFragment" />
     </fragment>
     <fragment
         android:id="@+id/tenureSelectionFragment"
@@ -337,5 +340,9 @@
         android:id="@+id/pendingFragment"
         android:name="com.plural_pinelabs.expresscheckoutsdk.presentation.terminal.PendingFragment"
         android:label="PendingFragment" />
+    <fragment
+        android:id="@+id/downPaymentTenureFragment"
+        android:name="com.plural_pinelabs.expresscheckoutsdk.presentation.emi.downpayment.DownPaymentTenureFragment"
+        android:label="DownPaymentTenureFragment" />
 
 </navigation>
