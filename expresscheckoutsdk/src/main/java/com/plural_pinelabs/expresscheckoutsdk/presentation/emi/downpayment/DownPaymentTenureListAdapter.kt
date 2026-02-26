@@ -12,9 +12,8 @@ import com.plural_pinelabs.expresscheckoutsdk.R
 import com.plural_pinelabs.expresscheckoutsdk.common.ItemClickListener
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils
 import com.plural_pinelabs.expresscheckoutsdk.data.model.Tenure
-import com.plural_pinelabs.expresscheckoutsdk.presentation.emi.EMITenureListAdapter
 
-class DownPaymentTenureListAdapter (
+class DownPaymentTenureListAdapter(
     private val context: Context,
     private val tenures: List<Tenure>,
     private val emiBankSelectionCallback: ItemClickListener<Tenure?>?
@@ -23,105 +22,104 @@ class DownPaymentTenureListAdapter (
 
     private var selectedPosition = -1 // No selection by default
 
-
     inner class ItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
-//        fun setItem(item: Tenure, position: Int) {
-//            val tenureRadioButton: RadioButton = itemView.findViewById(R.id.tenure_radio_button)
-//            val tenureAmountTextView: TextView = itemView.findViewById(R.id.tenure_amount_text_view)
-//            val tenureXMonthsTextView: TextView = itemView.findViewById(R.id.tenure_x_months_view)
-//            val emiTypeTextView: TextView = itemView.findViewById(R.id.tenure_emi_type_text_view)
-//            val bestValueLabel: TextView = itemView.findViewById(R.id.best_value_tag)
-//            val recommendedLabel: TextView = itemView.findViewById(R.id.recommended_tag)
-//            val saveLayout: LinearLayout = itemView.findViewById(R.id.saving_layout)
-//            val saveAmountTv: TextView = itemView.findViewById(R.id.saving_text_value)
-//
-//            val tenureTotalPayableTextView: TextView =
-//                itemView.findViewById(R.id.tenure_payable_amount_value_text_view)
-//            val processingFeesTextView: TextView =
-//                itemView.findViewById(R.id.tenure_processing_fee_text_view)
-//
-//
-//            val maxDiscount: String = item.let { tenure ->
-//                val discount: Int = tenure.total_discount_amount?.value ?: 0
-//                val subvention: Int = tenure.total_subvention_amount?.value ?: 0
-//                val total = discount + subvention
-//                if (total == 0) {
-//                    "error"
-//                } else
-//                    Utils.convertToRupeesWithSymobl(context, total)
-//            } ?: "error"
-//            saveLayout.visibility = View.GONE
-//            if (!maxDiscount.contains("error", true)) {
-//                saveLayout.visibility = View.VISIBLE
-//                saveAmountTv.text = maxDiscount
-//            } else {
-//                saveLayout.visibility = View.GONE
-//            }
-//            tenureAmountTextView.text =
-//                Utils.convertToRupeesWithSymobl(context, item.monthly_emi_amount?.value)
-//            tenureXMonthsTextView.text = context.getString(
-//                R.string.x_3_months,
-//                item.tenure_value.toString()
-//            )
-//            if (item.processing_fee_details?.amount == null) {
-//                processingFeesTextView.visibility = View.INVISIBLE
-//            } else {
-//                processingFeesTextView.text = context.getString(
-//                    R.string.x_one_time_processing_fee,
-//                    Utils.convertToRupeesWithSymobl(
-//                        context,
-//                        item.processing_fee_details.amount.value
-//                    )
-//                )
-//                processingFeesTextView.visibility = View.VISIBLE
-//            }
-//            tenureTotalPayableTextView.text =
-//                Utils.convertToRupeesWithSymobl(context, item.net_payment_amount?.value)
-//            if (item.isBestValue) {
-//                bestValueLabel.visibility = View.VISIBLE
-//            } else if (item.isRecommended) {
-//                recommendedLabel.visibility = View.VISIBLE
-//            }
-//
-//            emiTypeTextView.text = item.emi_type.let {
-//                when (it) {
-//                    "STANDARD" -> {
-//                        emiTypeTextView.visibility = View.GONE
-//                        "" //return
-//                    }
-//
-//                    "NO_COST" -> context.getString(R.string.no_cost)
-//                    "LOW_COST" -> {
-//                        val percentage = item.interest_rate_percentage
-//                        val text = if (percentage != null) {
-//                            String.format(
-//                                context.getString(R.string.low_interest_with_value),
-//                                percentage.toString()
-//                            )
-//                        } else {
-//                            String.format(context.getString(R.string.low_interest))
-//                        }
-//                        text
-//                    }
-//
-//                    else -> {
-//                        emiTypeTextView.visibility = View.GONE
-//                        ""//return empty
-//                    }
-//                }
-//            }
-//
-//            // Set the radio button state based on the selected position
-//            tenureRadioButton.isChecked = position == selectedPosition
-//            tenureRadioButton.setOnClickListener {
-//                val previousPosition = selectedPosition
-//                selectedPosition = adapterPosition
-//                notifyItemChanged(previousPosition)
-//                notifyItemChanged(selectedPosition)
-//                emiBankSelectionCallback?.onItemClick(position, item)
-//            }
-//        }
+        fun setItem(item: Tenure, position: Int) {
+            val tenureRadioButton: RadioButton = itemView.findViewById(R.id.tenure_radio_button)
+            val tenureAmountTextView: TextView = itemView.findViewById(R.id.tenure_amount_text_view)
+            val tenureXMonthsTextView: TextView = itemView.findViewById(R.id.tenure_x_months_view)
+            val emiTypeTextView: TextView = itemView.findViewById(R.id.tenure_emi_type_text_view)
+            val bestValueLabel: TextView = itemView.findViewById(R.id.best_value_tag)
+            val recommendedLabel: TextView = itemView.findViewById(R.id.recommended_tag)
+            val saveLayout: LinearLayout = itemView.findViewById(R.id.saving_layout)
+            val saveAmountTv: TextView = itemView.findViewById(R.id.saving_text_value)
+
+            val tenureTotalPayableTextView: TextView =
+                itemView.findViewById(R.id.tenure_payable_amount_value_text_view)
+            val processingFeesTextView: TextView =
+                itemView.findViewById(R.id.tenure_processing_fee_text_view)
+
+
+            val maxDiscount: String = item.let { tenure ->
+                val discount: Int = tenure.total_discount_amount?.value ?: 0
+                val subvention: Int = tenure.total_subvention_amount?.value ?: 0
+                val total = discount + subvention
+                if (total == 0) {
+                    "error"
+                } else
+                    Utils.convertToRupeesWithSymobl(context, total)
+            } ?: "error"
+            saveLayout.visibility = View.GONE
+            if (!maxDiscount.contains("error", true)) {
+                saveLayout.visibility = View.VISIBLE
+                saveAmountTv.text = maxDiscount
+            } else {
+                saveLayout.visibility = View.GONE
+            }
+            tenureAmountTextView.text =
+                Utils.convertToRupeesWithSymobl(context, item.monthly_emi_amount?.value)
+            tenureXMonthsTextView.text = context.getString(
+                R.string.x_3_months,
+                item.tenure_value.toString()
+            )
+            if (item.processing_fee_details?.amount == null) {
+                processingFeesTextView.visibility = View.INVISIBLE
+            } else {
+                processingFeesTextView.text = context.getString(
+                    R.string.x_one_time_processing_fee,
+                    Utils.convertToRupeesWithSymobl(
+                        context,
+                        item.processing_fee_details.amount.value
+                    )
+                )
+                processingFeesTextView.visibility = View.VISIBLE
+            }
+            tenureTotalPayableTextView.text =
+                Utils.convertToRupeesWithSymobl(context, item.net_payment_amount?.value)
+            if (item.isBestValue) {
+                bestValueLabel.visibility = View.VISIBLE
+            } else if (item.isRecommended) {
+                recommendedLabel.visibility = View.VISIBLE
+            }
+
+            emiTypeTextView.text = item.emi_type.let {
+                when (it) {
+                    "STANDARD" -> {
+                        emiTypeTextView.visibility = View.GONE
+                        "" //return
+                    }
+
+                    "NO_COST" -> context.getString(R.string.no_cost)
+                    "LOW_COST" -> {
+                        val percentage = item.interest_rate_percentage
+                        val text = if (percentage != null) {
+                            String.format(
+                                context.getString(R.string.low_interest_with_value),
+                                percentage.toString()
+                            )
+                        } else {
+                            String.format(context.getString(R.string.low_interest))
+                        }
+                        text
+                    }
+
+                    else -> {
+                        emiTypeTextView.visibility = View.GONE
+                        ""//return empty
+                    }
+                }
+            }
+
+            // Set the radio button state based on the selected position
+            tenureRadioButton.isChecked = position == selectedPosition
+            tenureRadioButton.setOnClickListener {
+                val previousPosition = selectedPosition
+                selectedPosition = adapterPosition
+                notifyItemChanged(previousPosition)
+                notifyItemChanged(selectedPosition)
+                emiBankSelectionCallback?.onItemClick(position, item)
+            }
+        }
 
     }
 
