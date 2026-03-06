@@ -91,9 +91,8 @@
         android:id="@+id/tenure_radio_button"
         android:layout_width="32dp"
         android:layout_height="24dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="12dp"
         android:gravity="center|center_horizontal"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -169,6 +168,7 @@
         android:ellipsize="end"
         android:fontFamily="sans-serif"
         android:maxLines="1"
+        android:layout_marginTop="12dp"
         android:paddingTop="4dp"
         android:text="@string/total_payable"
         android:textColor="@color/black_text_60"
@@ -201,6 +201,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="4dp"
         android:text="@string/card_details"
+        android:visibility="gone"
         android:layout_marginTop="12dp"
         android:fontFamily="sans-serif-medium"
         android:textFontWeight="500"
@@ -209,6 +210,7 @@
         app:layout_constraintTop_toBottomOf="@id/tenure_processing_fee_text_view" />
 
     <LinearLayout
+        android:visibility="gone"
         android:id="@+id/card_detail_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -230,10 +232,7 @@
             android:maxLength="19"
             android:padding="15dp"
             android:textColorHint="@color/black_text_30"
-            android:textSize="14sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:textSize="14sp" />
 
     </LinearLayout>
 
