@@ -31,7 +31,7 @@ android {
         buildConfigField(
             "String",
             "SHA256_PROD",
-            "\"D3pseS7ojH9IDxqT4rUEuAt5/IykaPmeaiNHhJabd3c=\""
+            "\"DxH4tt40L+eduF6szpY6TONlxhZhBd+pJ9wbHlQ2fuw=\""
         )
     }
 
