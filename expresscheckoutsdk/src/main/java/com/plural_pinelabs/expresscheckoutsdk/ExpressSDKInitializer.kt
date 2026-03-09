@@ -18,8 +18,8 @@ class ExpressSDKInitializer {
         runInSandBoxMode: Boolean = false
     ) {
         //TODO remove after testing
-        navigateToLandingActivity(context, sdkCallback, token, runInSandBoxMode)
-        return
+        //navigateToLandingActivity(context, sdkCallback, token, runInSandBoxMode)
+        //return
         if (!NetworkHelper(context).hasInternetConnection()) {
             sdkCallback.onError(
                 ErrorCode.INVALID_TOKEN.code, "-1",

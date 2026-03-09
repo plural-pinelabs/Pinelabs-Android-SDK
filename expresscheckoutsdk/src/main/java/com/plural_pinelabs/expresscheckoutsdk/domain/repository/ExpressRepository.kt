@@ -4,6 +4,7 @@ import com.plural_pinelabs.expresscheckoutsdk.common.BaseResult
 import com.plural_pinelabs.expresscheckoutsdk.data.model.Address
 import com.plural_pinelabs.expresscheckoutsdk.data.model.AddressRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.model.AddressResponse
+import com.plural_pinelabs.expresscheckoutsdk.data.model.CancelTransactionResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CardBinMetaDataRequestList
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CardBinMetaDataResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CustomerInfo
@@ -12,6 +13,7 @@ import com.plural_pinelabs.expresscheckoutsdk.data.model.ExpressAddress
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ExpressAddressResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.FetchResponseDTO
 import com.plural_pinelabs.expresscheckoutsdk.data.model.KFSResponse
+import com.plural_pinelabs.expresscheckoutsdk.data.model.LogData
 import com.plural_pinelabs.expresscheckoutsdk.data.model.LogRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.model.LogResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.OTPRequest
@@ -95,6 +97,11 @@ interface ExpressRepository {
 
     suspend fun logData(
         token: String?,
-        request: LogRequest?,
+        request: List<LogData>?,
     ): Flow<BaseResult<LogResponse>>
+
+    suspend fun  cancelPayment(
+        token: String?,
+        cancelPayment:Boolean
+    ):Flow<BaseResult<CancelTransactionResponse>>
 }

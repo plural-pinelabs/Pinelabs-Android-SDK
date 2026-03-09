@@ -20,9 +20,11 @@
             android:value="520-44b" />
 
         <activity
-            android:windowSoftInputMode="adjustResize"
             android:name=".presentation.LandingActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:launchMode="singleTask"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize|uiMode"
+            android:windowSoftInputMode="adjustResize" />
 
     </application>
 

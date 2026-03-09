@@ -50,7 +50,10 @@ internal object Constants {
     const val PAYTM = "net.one97.paytm"
     const val BHIM_UPI = "in.org.npci.upiapp"
     const val CRED_UPI = "com.dreamplug.androidapp"
+    const val MOBIKWIK_UPI= "com.mobikwik_new"
+    const val KIWI_UPI= "in.gokiwi.kiwitpap"
     const val UPI_INTENT = "INTENT"
+    const val UPI_INTENT_QR = "INTENT_QR"
     const val UPI_COLLECT = "COLELCT"
     const val UPI_TRANSACTION_STATUS_INTERVAL = 5000L
 
@@ -59,6 +62,7 @@ internal object Constants {
     const val PROCESSED_PENDING = "PENDING"
     const val PROCESSED_FAILED = "FAILED"
     const val PROCESSED_ATTEMPTED = "ATTEMPTED"
+    const val PROCESSED_CANCELLED = "CANCELLED"
     const val PROCESSED_CREATED = "CREATED"
 
     const val REQ_USER_CONSENT = 200

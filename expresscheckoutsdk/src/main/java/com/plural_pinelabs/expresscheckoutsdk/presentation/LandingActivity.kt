@@ -1,5 +1,6 @@
 package com.plural_pinelabs.expresscheckoutsdk.presentation
 
+import android.content.Intent
 import android.os.Bundle
 import android.text.Spannable
 import android.text.SpannableString
@@ -14,6 +15,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.cardview.widget.CardView
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.navigation.findNavController
@@ -28,11 +30,9 @@ import com.plural_pinelabs.expresscheckoutsdk.common.ItemClickListener
 import com.plural_pinelabs.expresscheckoutsdk.common.NetworkHelper
 import com.plural_pinelabs.expresscheckoutsdk.common.PaymentModes
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils
-import com.plural_pinelabs.expresscheckoutsdk.common.Utils.MTAG
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ConvenienceFeesInfo
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CustomerInfo
 import com.plural_pinelabs.expresscheckoutsdk.data.model.FetchResponseDTO
-import com.plural_pinelabs.expresscheckoutsdk.data.model.LogRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.repository.ExpressRepositoryImpl
 import com.plural_pinelabs.expresscheckoutsdk.data.retrofit.RetrofitBuilder
 import com.plural_pinelabs.expresscheckoutsdk.logger.SdkLogger
@@ -53,17 +53,20 @@ class LandingActivity : AppCompatActivity() {
     private lateinit var customerEmail: TextView
     private lateinit var separator: TextView
     private lateinit var customerInfoData: CustomerInfo
-    private lateinit var headerParentLayout: ConstraintLayout
     private lateinit var convenienceFessMessage: TextView
-
     private lateinit var mainContentLayout: ConstraintLayout
+
+
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        Log.i(MTAG, "insie oncreate")
-        SdkLogger.log(
+          SdkLogger.log(
             this,
             "SDK_LAUNCH",
             "SDK Launched",
@@ -78,12 +81,11 @@ class LandingActivity : AppCompatActivity() {
             insets
         }
         //Required to change the background color of the screen
-        window.decorView.setBackgroundColor(getResources().getColor(R.color.screen_background));
+        window.decorView.setBackgroundColor(ContextCompat.getColor(this, R.color.screen_background))
         setView()
         initExceptionHandler()
         ActivityLifecycleCallback.register(this.application)
-        var cleverTapDefaultInstance: CleverTapAPI? =
-            CleverTapAPI.getDefaultInstance(applicationContext)
+        CleverTapAPI.getDefaultInstance(applicationContext)
     }
 
     private fun initExceptionHandler() {
@@ -125,7 +127,6 @@ class LandingActivity : AppCompatActivity() {
         customerId = findViewById(R.id.txt_customer_id)
         customerEmail = findViewById(R.id.txt_customer_email)
         separator = findViewById(R.id.seperator)
-        headerParentLayout = findViewById(R.id.header_layout_parent)
         convenienceFessMessage = findViewById(R.id.convenience_fees_message)
         showHideHeaderLayout(false)
         mainContentLayout = findViewById(R.id.main)
@@ -140,75 +141,13 @@ class LandingActivity : AppCompatActivity() {
             )
             Utils.showCancelPaymentDialog(this, object : ItemClickListener<Boolean> {
                 override fun onItemClick(position: Int, item: Boolean) {
-                    if (item) {
-                        SdkLogger.log(
-                            this@LandingActivity,
-                            "PAYMENT_CANCELLED",
-                            "Payment cancelled by user",
-                            ExpressSDKObject.getFetchData()?.transactionInfo?.orderId ?: "",
-                            "INFO",
-                            "SDK"
-                        )
-                        CleverTapUtil.sdkTransactionAbandoned(
-                            CleverTapUtil.getInstance(applicationContext),
-                            ExpressSDKObject.getFetchData(),
-                            System.currentTimeMillis().toString(),
-                            "",
-                            "",
-                            Utils.createSDKData(applicationContext).toString(),
-                            ""
-                        )
-                        try {
-                            runBlocking {
-                                withTimeout(3000) { // Optional: timeout to avoid hanging
-                                    val repo = ExpressRepositoryImpl(
-                                        RetrofitBuilder.fetchApiService,
-                                        NetworkHelper(applicationContext)
-                                    )
-                                    val logs = Utils.getUnSyncedErrors(applicationContext)
-                                    val result = repo.logData(
-                                        ExpressSDKObject.getToken(), LogRequest(logs)
-                                    )
-                                    result.collect {
-                                        when (it) {
-                                            is BaseResult.Success -> {
-                                                if (it.data.status.equals(
-                                                        "success",
-                                                        ignoreCase = true
-                                                    )
-                                                )
-                                                    Utils.clearLogs(applicationContext)
-                                                Log.i(
-                                                    "ExpressLibrary",
-                                                    "Crash logs reported successfully"
-                                                )
-                                            }
+                    if (!item) return
 
-                                            is BaseResult.Error -> {
-                                                Log.e(
-                                                    "ExpressLibrary",
-                                                    "Failed to report crash logs: ${it.errorDescription}"
-                                                )
-                                            }
-
-                                            is BaseResult.Loading -> {
-                                                // No action needed for loading state here
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        } catch (e: Exception) {
-                            Log.e("ExpressLibrary", "Failed to report crash", e)
-                        } finally {
-                            val navHostController =
-                                findNavController(R.id.nav_host_fragment_container)
-                            navHostController.navigate(R.id.failureFragment)
-                            // If you want to let the app crash after logging:
-                        }
+                    val navHostController = findNavController(R.id.nav_host_fragment_container)
+                    if (navHostController.currentDestination?.id != R.id.cancelReasonsFragment) {
+                        navHostController.navigate(R.id.action_global_cancelReasonsFragment)
                     }
                 }
-
             })
         }
 
@@ -223,6 +162,112 @@ class LandingActivity : AppCompatActivity() {
             )
             val topFragment = TopSheetDialogFragment()
             topFragment.show(supportFragmentManager, "TopSheetDialogFragment")
+        }
+    }
+
+    fun confirmPaymentCancellation(selectedReasonId: String? = null, otherText: String = "") {
+        if (!selectedReasonId.isNullOrBlank() || otherText.isNotBlank()) {
+            Log.i(
+                "ExpressLibrary",
+                "Cancelling payment with reason=$selectedReasonId, otherText=$otherText"
+            )
+        }
+
+        try {
+            runBlocking {
+                withTimeout(3000) {
+                    val repo = ExpressRepositoryImpl(
+                        RetrofitBuilder.commonApiService,
+                        NetworkHelper(applicationContext)
+                    )
+                    val result = repo.cancelPayment(
+                        ExpressSDKObject.getToken(),
+                        ExpressSDKObject.getProcessPaymentResponse() != null
+                    )
+                    result.collect {
+                        when (it) {
+                            is BaseResult.Success -> {
+                            }
+
+                            is BaseResult.Error -> {
+                                Log.e(
+                                    "ExpressLibrary",
+                                    "Failed to report crash logs: ${it.errorDescription}"
+                                )
+                            }
+
+                            is BaseResult.Loading -> {
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            Log.i("PineLabs error", "Error cancelling the transaction")
+        } finally {
+            SdkLogger.log(
+                this@LandingActivity,
+                "PAYMENT_CANCELLED",
+                "Payment cancelled by user",
+                ExpressSDKObject.getFetchData()?.transactionInfo?.orderId ?: "",
+                "INFO",
+                "SDK"
+            )
+            CleverTapUtil.sdkTransactionAbandoned(
+                CleverTapUtil.getInstance(applicationContext),
+                ExpressSDKObject.getFetchData(),
+                System.currentTimeMillis().toString(),
+                "",
+                "",
+                Utils.createSDKData(applicationContext).toString(),
+                ""
+            )
+
+            try {
+                runBlocking {
+                    withTimeout(3000) {
+                        val repo = ExpressRepositoryImpl(
+                            RetrofitBuilder.fetchApiService,
+                            NetworkHelper(applicationContext)
+                        )
+                        val logs = Utils.getUnSyncedErrors(applicationContext)
+                        val result = repo.logData(
+                            ExpressSDKObject.getToken(), logs
+                        )
+                        result.collect {
+                            when (it) {
+                                is BaseResult.Success -> {
+                                    if (it.data.status.equals("success", ignoreCase = true)) {
+                                        Utils.clearLogs(applicationContext)
+                                    }
+                                    Log.i(
+                                        "ExpressLibrary",
+                                        "Crash logs reported successfully"
+                                    )
+                                }
+
+                                is BaseResult.Error -> {
+                                    Log.e(
+                                        "ExpressLibrary",
+                                        "Failed to report crash logs: ${it.errorDescription}"
+                                    )
+                                }
+
+                                is BaseResult.Loading -> {
+                                }
+                            }
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e("ExpressLibrary", "Failed to report crash", e)
+            } finally {
+                val bundle = Bundle().apply {
+                    putBoolean("isCancelled", true)
+                }
+
+                findNavController(R.id.nav_host_fragment_container).navigate(R.id.failureFragment, bundle)
+            }
         }
     }
 
@@ -283,7 +328,7 @@ class LandingActivity : AppCompatActivity() {
                 val start = end - (amountString.split(".")[1]).length
 
                 spannable.setSpan(
-                    ForegroundColorSpan(resources.getColor(R.color.grey_99FFFFFF)),
+                    ForegroundColorSpan(ContextCompat.getColor(this, R.color.grey_99FFFFFF)),
                     start,
                     end,
                     Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
@@ -391,7 +436,7 @@ class LandingActivity : AppCompatActivity() {
         val start = end - (amountString.split(".")[1]).length
 
         spannable.setSpan(
-            ForegroundColorSpan(resources.getColor(R.color.grey_99FFFFFF)),
+            ForegroundColorSpan(ContextCompat.getColor(this, R.color.grey_99FFFFFF)),
             start,
             end,
             Spannable.SPAN_EXCLUSIVE_EXCLUSIVE

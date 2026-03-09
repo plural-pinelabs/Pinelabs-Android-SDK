@@ -278,9 +278,10 @@ class NetBankingFragment : Fragment() {
 
         acquirerWisePaymentData?.forEach { item ->
             val nbbl = item.isNbbl
-            if (nbbl) {
-                isNBBLEnabled = true
-            }
+            //to keep nbbl always disable for now for merchant
+//            if (nbbl) {
+//                isNBBLEnabled = true
+//            }
 
             item.PaymentOption.forEach {
                 if (!hashSet.contains(it.merchantPaymentCode)) {
@@ -646,9 +647,11 @@ class NetBankingFragment : Fragment() {
     }
 
     private fun showHideConventionalNBLayout(show: Boolean) {
-        if (show) {
+        if (!show) {
             conventionalParentLayout.visibility = View.VISIBLE
-            nbblParentLayout.visibility = View.GONE
+            payByAnyBankLayout.visibility= View.GONE
+            payByQRLayout.visibility= View.GONE
+            payByNBLayout.visibility =View.GONE
         } else {
             conventionalParentLayout.visibility = View.GONE
             nbblParentLayout.visibility = View.VISIBLE

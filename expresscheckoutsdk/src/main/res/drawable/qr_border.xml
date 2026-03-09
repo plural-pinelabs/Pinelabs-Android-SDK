@@ -1,0 +1,28 @@
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Outer Gradient Layer (Border) -->
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:startColor="#004940"
+                android:endColor="#00D893"
+                android:angle="90" />   <!-- 90 = top to bottom -->
+            <corners android:radius="24dp" />
+        </shape>
+    </item>
+
+    <!-- Inner White Layer -->
+    <item
+        android:left="6dp"
+        android:top="6dp"
+        android:right="6dp"
+        android:bottom="6dp">
+
+        <shape android:shape="rectangle">
+            <solid android:color="@android:color/white" />
+            <corners android:radius="20dp" />
+        </shape>
+
+    </item>
+
+</layer-list>

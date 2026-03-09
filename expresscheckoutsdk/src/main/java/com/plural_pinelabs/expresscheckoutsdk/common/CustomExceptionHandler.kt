@@ -2,7 +2,6 @@ package com.plural_pinelabs.expresscheckoutsdk.common
 
 import android.util.Log
 import com.plural_pinelabs.expresscheckoutsdk.ExpressSDKObject
-import com.plural_pinelabs.expresscheckoutsdk.data.model.LogRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.repository.ExpressRepositoryImpl
 import com.plural_pinelabs.expresscheckoutsdk.data.retrofit.RetrofitBuilder
 import com.plural_pinelabs.expresscheckoutsdk.logger.SdkLogger
@@ -44,14 +43,14 @@ class CustomExceptionHandler(
                         NetworkHelper(applicationContext)
                     )
                     val logs = Utils.getUnSyncedErrors(applicationContext)
-                  val result =  repo.logData(
-                        ExpressSDKObject.getToken(), LogRequest(logs)
+                    val result = repo.logData(
+                        ExpressSDKObject.getToken(), logs
                     )
                     result.collect {
                         when (it) {
                             is BaseResult.Success -> {
-                                if (it.data.status.equals( "success", ignoreCase = true))
-                                Utils.clearLogs(applicationContext)
+                                if (it.data.status.equals("success", ignoreCase = true))
+                                    Utils.clearLogs(applicationContext)
                                 Log.i("ExpressLibrary", "Crash logs reported successfully")
                             }
 

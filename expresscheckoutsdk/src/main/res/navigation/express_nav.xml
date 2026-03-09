@@ -20,6 +20,10 @@
         <action
             android:id="@+id/action_splashFragment_to_failureFragment"
             app:destination="@id/failureFragment" />
+
+        <action
+            android:id="@+id/action_splashFragment_to_successFragment"
+            app:destination="@id/successFragment" />
     </fragment>
     <fragment
         android:id="@+id/phoneNumberFragment"
@@ -183,6 +187,9 @@
         <action
             android:id="@+id/action_successFragment_to_failureFragment"
             app:destination="@id/failureFragment" />
+        <action
+            android:id="@+id/action_successFragment_to_pendingFragment"
+            app:destination="@id/pendingFragment" />
     </fragment>
     <fragment
         android:id="@+id/saveCardOTPFragment"
@@ -315,6 +322,9 @@
         app:destination="@id/retryFragment"
         app:popUpTo="@id/express_nav"
         app:popUpToInclusive="true" />
+    <action
+        android:id="@+id/action_global_cancelReasonsFragment"
+        app:destination="@id/cancelReasonsFragment" />
     <dialog
         android:id="@+id/offerSummaryDialog"
         android:name="com.plural_pinelabs.expresscheckoutsdk.presentation.offers.OfferSummaryDialog"
@@ -326,5 +336,14 @@
             android:id="@+id/action_offerSummaryDialog_to_tenureSelectionFragment"
             app:destination="@id/tenureSelectionFragment" />
     </dialog>
+    <fragment
+        android:id="@+id/pendingFragment"
+        android:name="com.plural_pinelabs.expresscheckoutsdk.presentation.terminal.PendingFragment"
+        android:label="PendingFragment" />
+    <fragment
+        android:id="@+id/cancelReasonsFragment"
+        android:name="com.plural_pinelabs.expresscheckoutsdk.presentation.terminal.CancelReasonsFragment"
+        android:label="fragment_cancel_reasons"
+        tools:layout="@layout/fragment_cancel_reasons" />
 
 </navigation>

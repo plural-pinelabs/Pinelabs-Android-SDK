@@ -2,11 +2,13 @@ package com.plural_pinelabs.expresscheckoutsdk.data.fetch
 
 import com.plural_pinelabs.expresscheckoutsdk.data.model.AddressRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.model.AddressResponse
+import com.plural_pinelabs.expresscheckoutsdk.data.model.CancelTransactionResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CardBinMetaDataRequestList
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CardBinMetaDataResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CustomerInfo
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CustomerInfoResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.KFSResponse
+import com.plural_pinelabs.expresscheckoutsdk.data.model.LogData
 import com.plural_pinelabs.expresscheckoutsdk.data.model.LogRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.model.LogResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.OTPRequest
@@ -128,8 +130,16 @@ interface CommonApiService : ApiService {
     @POST("log")
     suspend fun log(
         @Query("token", encoded = true) token: String?,
-        @Body request: LogRequest?
+        @Body request: List<LogData>?
     ): Response<LogResponse>
+
+    @POST("cancel")
+    suspend fun cancelTransaction(
+        @Query(
+            "token",
+            encoded = true
+        ) token: String?, @Query("cancelPayment") cancelPayment: Boolean? = true
+    ): Response<CancelTransactionResponse>
 
 
 }
