@@ -93,7 +93,8 @@ data class MerchantInfo(
     val merchantId: Int,
     val merchantName: String,
     val merchantDisplayName: String?,
-    val featureFlags: FeatureFlag?
+    val featureFlags: FeatureFlag?,
+    val isTpapConfigurable:Boolean?
 )
 
 data class FeatureFlag(

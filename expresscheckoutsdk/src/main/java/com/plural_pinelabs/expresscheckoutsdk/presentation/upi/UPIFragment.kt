@@ -47,13 +47,6 @@ import com.plural_pinelabs.expresscheckoutsdk.ExpressSDKObject.getCurrency
 import com.plural_pinelabs.expresscheckoutsdk.R
 import com.plural_pinelabs.expresscheckoutsdk.common.BaseResult
 import com.plural_pinelabs.expresscheckoutsdk.common.CleverTapUtil
-import com.plural_pinelabs.expresscheckoutsdk.common.Constants.BHIM_UPI
-import com.plural_pinelabs.expresscheckoutsdk.common.Constants.CRED_UPI
-import com.plural_pinelabs.expresscheckoutsdk.common.Constants.GPAY
-import com.plural_pinelabs.expresscheckoutsdk.common.Constants.KIWI_UPI
-import com.plural_pinelabs.expresscheckoutsdk.common.Constants.MOBIKWIK_UPI
-import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PAYTM
-import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PHONEPE
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PROCESSED_ATTEMPTED
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PROCESSED_FAILED
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PROCESSED_PENDING
@@ -217,15 +210,7 @@ class UPIFragment : Fragment() {
     }
 
     private fun getUpiAppsInstalledInDevice(): List<String> {
-        val listOfUPIPackage = listOf(
-            GPAY, // Google Pay
-            PHONEPE, // PhonePe
-            MOBIKWIK_UPI,
-            KIWI_UPI,
-            PAYTM,
-            CRED_UPI,
-            BHIM_UPI// Paytm
-        )
+        val listOfUPIPackage = getSupportedUpiPackages(ExpressSDKObject.getFetchData())
         val listOfPaymentReadyApps = mutableListOf<String>()
         listOfPaymentReadyApps.addAll(getListOfActiveUPIApps(listOfUPIPackage))
         return listOfPaymentReadyApps
@@ -668,3 +653,4 @@ class UPIFragment : Fragment() {
 
 
 }
+
