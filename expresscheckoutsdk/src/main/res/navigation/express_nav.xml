@@ -322,6 +322,9 @@
         app:destination="@id/retryFragment"
         app:popUpTo="@id/express_nav"
         app:popUpToInclusive="true" />
+    <action
+        android:id="@+id/action_global_cancelReasonsFragment"
+        app:destination="@id/cancelReasonsFragment" />
     <dialog
         android:id="@+id/offerSummaryDialog"
         android:name="com.plural_pinelabs.expresscheckoutsdk.presentation.offers.OfferSummaryDialog"
@@ -337,5 +340,10 @@
         android:id="@+id/pendingFragment"
         android:name="com.plural_pinelabs.expresscheckoutsdk.presentation.terminal.PendingFragment"
         android:label="PendingFragment" />
+    <fragment
+        android:id="@+id/cancelReasonsFragment"
+        android:name="com.plural_pinelabs.expresscheckoutsdk.presentation.terminal.CancelReasonsFragment"
+        android:label="fragment_cancel_reasons"
+        tools:layout="@layout/fragment_cancel_reasons" />
 
 </navigation>

@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/screen_background"
+    android:paddingHorizontal="16dp"
+    android:paddingTop="12dp"
+    android:paddingBottom="16dp"
+    tools:context=".presentation.terminal.CancelReasonsFragment">
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/content_scroll"
+        android:tag="cancel_reasons_content_scroll"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:clipToPadding="false"
+        android:fillViewport="false"
+        android:overScrollMode="ifContentScrolls"
+        app:layout_constraintBottom_toTopOf="@id/bottom_actions"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/icon"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="12dp"
+                android:contentDescription="@null"
+                android:src="@drawable/ic_error_icon"
+                app:tint="@color/yellow_C96B00" />
+
+            <TextView
+                android:id="@+id/title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="18dp"
+                android:fontFamily="sans-serif"
+                android:gravity="center"
+                android:text="@string/cancel_reasons_title"
+                android:textColor="@color/black_text"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/reasons_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="12dp"
+                android:background="@drawable/input_field_border"
+                android:paddingTop="4dp"
+                android:paddingBottom="8dp">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/reasons_rv"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:clipToPadding="false"
+                    android:nestedScrollingEnabled="false"
+                    android:overScrollMode="never"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:itemCount="5"
+                    tools:listitem="@layout/item_cancel_reason" />
+
+                <EditText
+                    android:id="@+id/other_input"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="12dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="4dp"
+                    android:autofillHints=""
+                    android:background="@drawable/input_field_border"
+                    android:hint="@string/cancel_reason_optional_comment"
+                    android:imeOptions="actionDone"
+                    android:importantForAutofill="no"
+                    android:inputType="textCapSentences|textMultiLine"
+                    android:minLines="3"
+                    android:padding="14dp"
+                    android:textColor="@color/black_text"
+                    android:textColorHint="@color/black_text_30"
+                    android:textSize="14sp"
+                    android:visibility="gone"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/reasons_rv"
+                    tools:visibility="visible" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <LinearLayout
+        android:id="@+id/bottom_actions"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/back_btn"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_marginEnd="6dp"
+            android:layout_weight="1"
+            android:background="@drawable/ic_rounded_button_border"
+            android:gravity="center"
+            android:text="@string/continue_payment"
+            android:textAllCaps="false"
+            android:textColor="@color/black_text" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/confirm_cancel_btn"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="6dp"
+            android:layout_weight="1"
+            android:background="@drawable/primary_button_background"
+            android:gravity="center"
+            android:text="@string/skip_cancel"
+            android:textAllCaps="false"
+            android:textColor="@color/white" />
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

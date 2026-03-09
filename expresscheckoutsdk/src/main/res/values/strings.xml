@@ -237,4 +237,14 @@
     <string name="_9_28_am_upi_net_banking">%s, UPI/Net Banking</string>
     <string name="kiwi">KIWI</string>
     <string name="mokiwik">Mobikwik</string>
+    <string name="cancel_reason_taking_too_long">Payment is taking too long</string>
+    <string name="cancel_reason_wrong_payment_method">Selected wrong payment method</string>
+    <string name="cancel_reason_order_changed">I changed my mind / order details changed</string>
+    <string name="cancel_reason_technical_issue">Facing a technical issue</string>
+    <string name="cancel_reason_optional_comment">Anything else? (Optional)</string>
+    <string name="skip_cancel">Skip and Cancel</string>
+    <string name="submit_cancel">Submit and Cancel</string>
+    <string name="continue_payment">Continue Payment</string>
+    <string name="cancel_reasons_title">Please tell us why you want to cancel your payment.</string>
+
 </resources>
