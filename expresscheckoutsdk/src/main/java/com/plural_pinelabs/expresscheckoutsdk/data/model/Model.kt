@@ -93,14 +93,14 @@ data class MerchantInfo(
     val merchantId: Int,
     val merchantName: String,
     val merchantDisplayName: String?,
-    val featureFlags: FeatureFlag?,
-    val isTpapConfigurable:Boolean?
+    val featureFlags: FeatureFlag?
 )
 
 data class FeatureFlag(
     var isSavedCardEnabled: Boolean?,
     var isNativeOTPEnabled: Boolean?,
-    var isDCCEnabled: Boolean?
+    var isDCCEnabled: Boolean?,
+    val isTpapConfigurable: Boolean?
 )
 
 data class OrignalTransactionAmount(var amount: Int?, val currency: String)

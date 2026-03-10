@@ -1,5 +1,4 @@
 package com.plural_pinelabs.expresscheckoutsdk.presentation.upi
-
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.BHIM_UPI
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.CRED_UPI
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.GPAY
@@ -8,21 +7,25 @@ import com.plural_pinelabs.expresscheckoutsdk.common.Constants.MOBIKWIK_UPI
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PAYTM
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PHONEPE
 import com.plural_pinelabs.expresscheckoutsdk.data.model.FetchResponseDTO
-
 internal fun getSupportedUpiPackages(fetchData: FetchResponseDTO?): List<String> {
-    val supportedPackages = mutableListOf(
-        GPAY,
-        PHONEPE,
-        PAYTM,
-        CRED_UPI,
-        BHIM_UPI
-    )
-
-    if (fetchData?.merchantInfo?.isTpapConfigurable == true) {
-        supportedPackages.add(1, KIWI_UPI)
-        supportedPackages.add(3, MOBIKWIK_UPI)
+    val isTpapConfigurable = fetchData?.merchantInfo?.featureFlags?.isTpapConfigurable == true
+    return if (isTpapConfigurable) {
+        listOf(
+            PHONEPE,
+            GPAY,
+            KIWI_UPI,
+            CRED_UPI,
+            BHIM_UPI,
+            PAYTM,
+            MOBIKWIK_UPI
+        )
+    } else {
+        listOf(
+            PHONEPE,
+            GPAY,
+            CRED_UPI,
+            BHIM_UPI,
+            PAYTM
+        )
     }
-
-    return supportedPackages
 }
-
