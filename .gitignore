@@ -13,3 +13,9 @@
 .externalNativeBuild
 .cxx
 local.properties
+/.idea/appInsightsSettings.xml
+/.idea/copilot.data.migration.ask2agent.xml
+/.idea/deploymentTargetSelector.xml
+/gradle-assemble.log
+/gradle-verify.log
+/.idea/inspectionProfiles/Project_Default.xml
