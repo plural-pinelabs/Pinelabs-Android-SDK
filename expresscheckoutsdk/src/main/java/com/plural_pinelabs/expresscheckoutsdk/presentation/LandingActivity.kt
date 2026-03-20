@@ -18,6 +18,8 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 import androidx.navigation.findNavController
 import com.clevertap.android.sdk.ActivityLifecycleCallback
 import com.clevertap.android.sdk.CleverTapAPI
@@ -41,6 +43,20 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeout
 
 class LandingActivity : AppCompatActivity() {
+    private val dynamicThemeLifecycleCallback = object : FragmentManager.FragmentLifecycleCallbacks() {
+        override fun onFragmentViewCreated(
+            fm: FragmentManager,
+            f: Fragment,
+            v: View,
+            savedInstanceState: Bundle?
+        ) {
+            Utils.applyDynamicPrimaryButtonBackgrounds(v)
+            v.findViewById<View>(R.id.pay_by_qr_btn)?.let { Utils.applyPrimaryButtonBackground(it) }
+            v.findViewById<View>(R.id.confirm_cancel_btn)?.let { Utils.applyPrimaryButtonBackground(it) }
+            Utils.applyCardIconTint(v)
+        }
+    }
+
     private lateinit var merchantLogoCard: CardView
     private lateinit var merchantLogo: ImageView
     private lateinit var merchantName: TextView
@@ -83,9 +99,15 @@ class LandingActivity : AppCompatActivity() {
         //Required to change the background color of the screen
         window.decorView.setBackgroundColor(ContextCompat.getColor(this, R.color.screen_background))
         setView()
+        supportFragmentManager.registerFragmentLifecycleCallbacks(dynamicThemeLifecycleCallback, true)
         initExceptionHandler()
         ActivityLifecycleCallback.register(this.application)
         CleverTapAPI.getDefaultInstance(applicationContext)
+    }
+
+    override fun onDestroy() {
+        supportFragmentManager.unregisterFragmentLifecycleCallbacks(dynamicThemeLifecycleCallback)
+        super.onDestroy()
     }
 
     private fun initExceptionHandler() {
@@ -276,6 +298,7 @@ class LandingActivity : AppCompatActivity() {
         fetchResponse?.let { fetchData ->
             CleverTapUtil.updateCleverTapUserProfile(applicationContext, fetchData)
             showHideHeaderLayout(true)
+            applyMerchantBrandTheme()
             fetchData.customerInfo?.let { customerInfo ->
                 strikeAmount.visibility = View.GONE
                 if (!customerInfo.mobileNo.isNullOrEmpty() || !customerInfo.emailId.isNullOrEmpty()) {
@@ -452,5 +475,20 @@ class LandingActivity : AppCompatActivity() {
         )
     }
 
-
+    private fun applyMerchantBrandTheme() {
+        val primaryColor = Utils.resolveBrandPrimaryColor(this)
+        (findViewById<View>(R.id.header_layout)
+            ?: findViewById(R.id.header_layout_parent)
+            ?: findViewById(R.id.layout_header))?.setBackgroundColor(primaryColor)
+        findViewById<View>(R.id.nav_host_fragment_container)?.let {
+            Utils.applyDynamicPrimaryButtonBackgrounds(it)
+            it.findViewById<View>(R.id.pay_by_qr_btn)?.let { qrButton ->
+                Utils.applyPrimaryButtonBackground(qrButton)
+            }
+            it.findViewById<View>(R.id.confirm_cancel_btn)?.let { cancelButton ->
+                Utils.applyPrimaryButtonBackground(cancelButton)
+            }
+             Utils.applyCardIconTint(it)
+        }
+    }
 }

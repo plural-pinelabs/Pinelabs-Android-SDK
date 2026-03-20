@@ -29,7 +29,7 @@
             android:orientation="vertical">
 
             <ImageView
-                android:id="@+id/icon"
+                android:id="@+id/cancel_reason_icon_fragment"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:layout_gravity="center_horizontal"

@@ -50,6 +50,9 @@ class CancelReasonsFragment : Fragment() {
         val backBtn = view.findViewById<View>(R.id.back_btn)
         val confirmCancelBtn = view.findViewById<Button>(R.id.confirm_cancel_btn)
 
+        Utils.applyPrimaryButtonBackground(confirmCancelBtn)
+        Utils.applyCardIconTint(view)
+
         requireActivity().onBackPressedDispatcher.addCallback(
             viewLifecycleOwner,
             object : OnBackPressedCallback(true) {

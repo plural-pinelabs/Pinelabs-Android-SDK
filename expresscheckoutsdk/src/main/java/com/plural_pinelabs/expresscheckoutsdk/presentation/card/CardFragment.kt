@@ -15,7 +15,6 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
-import androidx.appcompat.content.res.AppCompatResources
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -814,6 +813,7 @@ class CardFragment : Fragment() {
         val view = LayoutInflater.from(context).inflate(R.layout.pbp_bottom_sheetl_layout, null)
         val phoneNumberEt = view.findViewById<EditText>(R.id.phone_number_et)
         val checkPointsBtn = view.findViewById<Button>(R.id.check_points_btn)
+        Utils.applyPrimaryButtonBackground(checkPointsBtn)
 
         phoneNumberEt.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
@@ -868,31 +868,8 @@ class CardFragment : Fragment() {
     }
 
     private fun enableDisableContinueBtn(isEnabled: Boolean) {
-        if (isEnabled && isCardValid && isExpiryValid && isCVVValid && isCardHolderNameValid) {
-            payBtn.background = AppCompatResources.getDrawable(
-                requireContext(),
-                R.drawable.primary_button_background
-            )
-            payBtn.setTextColor(
-                AppCompatResources.getColorStateList(
-                    requireContext(),
-                    R.color.white
-                )
-            )
-            payBtn.isEnabled = true
-        } else {
-            payBtn.background = AppCompatResources.getDrawable(
-                requireContext(),
-                R.drawable.primary_button_disabled_bg
-            )
-            payBtn.setTextColor(
-                AppCompatResources.getColorStateList(
-                    requireContext(),
-                    R.color.text_disabled_C0C9D2
-                )
-            )
-            payBtn.isEnabled = false
-        }
+        val shouldEnable = isEnabled && isCardValid && isExpiryValid && isCVVValid && isCardHolderNameValid
+        Utils.handleCTAEnableDisable(requireContext(), shouldEnable, payBtn)
     }
 
 
