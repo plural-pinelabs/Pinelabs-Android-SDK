@@ -57,7 +57,7 @@ class CancelReasonsFragment : Fragment() {
             viewLifecycleOwner,
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
-                    parentFragmentManager.popBackStack()
+                    findNavController().popBackStack()
                 }
             }
         )
@@ -107,7 +107,7 @@ class CancelReasonsFragment : Fragment() {
             }
         })
 
-        backBtn.setOnClickListener { parentFragmentManager.popBackStack() }
+        backBtn.setOnClickListener { findNavController().popBackStack() }
         confirmCancelBtn.setOnClickListener {
             val selectedReason = adapter.getSelected()
             val otherText = otherInput.text?.toString().orEmpty().trim()
