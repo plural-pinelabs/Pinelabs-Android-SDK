@@ -135,10 +135,10 @@ class OfferSummaryDialog : DialogFragment() {
                 ExpressSDKObject.setSelectedOfferDetail(item)
                 dismiss()
                 if (item.isInstantSaving) {
-                    findNavController().navigate(R.id.action_paymentModeFragment_to_EMICardDetailsFragment)
+                    findNavController().navigate(R.id.action_offerSummaryDialog_to_EMICardDetailsFragment)
                     //take directly to EMIFragment
                 } else {
-                    findNavController().navigate(R.id.action_paymentModeFragment_to_tenureSelectionFragment)
+                    findNavController().navigate(R.id.action_offerSummaryDialog_to_tenureSelectionFragment)
                 }
                 CleverTapUtil.sdkOfferApplied(
                     CleverTapUtil.getInstance(requireContext()),

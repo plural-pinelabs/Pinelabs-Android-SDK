@@ -60,6 +60,7 @@ import com.plural_pinelabs.expresscheckoutsdk.common.ItemClickListener
 import com.plural_pinelabs.expresscheckoutsdk.common.NetworkHelper
 import com.plural_pinelabs.expresscheckoutsdk.common.PaymentModes
 import com.plural_pinelabs.expresscheckoutsdk.common.UPIViewModelFactory
+import com.plural_pinelabs.expresscheckoutsdk.common.safeNavigate
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils.MTAG
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils.showProcessPaymentDialog
@@ -361,7 +362,7 @@ class UPIFragment : Fragment() {
                     when (it) {
                         is BaseResult.Error -> {
                             cancelTransactionProcess()
-                            findNavController().navigate(R.id.action_UPIFragment_to_successFragment)
+                            safeNavigate(R.id.action_UPIFragment_to_successFragment)
                         }
 
                         is BaseResult.Loading -> {
@@ -401,7 +402,7 @@ class UPIFragment : Fragment() {
                             //TODO Pass error message and description
                             bottomSheetDialog?.dismiss()
                             qrBottomSheetDialog?.dismiss()
-                            findNavController().navigate(R.id.action_UPIFragment_to_failureFragment)
+                            safeNavigate(R.id.action_UPIFragment_to_failureFragment)
                         }
 
                         is BaseResult.Loading -> {
@@ -425,18 +426,18 @@ class UPIFragment : Fragment() {
 
                                 PROCESSED_STATUS -> {
                                     cancelTransactionProcess()
-                                    findNavController().navigate(R.id.action_UPIFragment_to_successFragment)
+                                    safeNavigate(R.id.action_UPIFragment_to_successFragment)
                                 }
 
                                 PROCESSED_ATTEMPTED -> {
                                     cancelTransactionProcess()
-                                    findNavController().navigate(R.id.action_UPIFragment_to_successFragment)
+                                    safeNavigate(R.id.action_UPIFragment_to_successFragment)
 
                                 }
 
                                 PROCESSED_FAILED -> {
                                     cancelTransactionProcess()
-                                    findNavController().navigate(R.id.action_UPIFragment_to_successFragment)
+                                    safeNavigate(R.id.action_UPIFragment_to_successFragment)
                                 }
                             }
                             viewModel.resetTransactionResponse()
@@ -639,7 +640,7 @@ class UPIFragment : Fragment() {
             override fun onFinish() {
                 qrBottomSheetDialog?.dismiss()
                 cancelTransactionProcess()
-                findNavController().navigate(R.id.action_UPIFragment_to_successFragment)
+                safeNavigate(R.id.action_UPIFragment_to_successFragment)
             }
 
         }.start()

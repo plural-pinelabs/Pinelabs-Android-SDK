@@ -53,6 +53,7 @@ import com.plural_pinelabs.expresscheckoutsdk.common.Constants.YES_TITLE
 import com.plural_pinelabs.expresscheckoutsdk.common.ItemClickListener
 import com.plural_pinelabs.expresscheckoutsdk.common.NetworkHelper
 import com.plural_pinelabs.expresscheckoutsdk.common.PaymentModes
+import com.plural_pinelabs.expresscheckoutsdk.common.safeNavigate
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils.showProcessPaymentDialog
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CardTokenData
@@ -152,7 +153,7 @@ class PaymentModeFragment : Fragment() {
         setPaymentMode()
         setSavedCardsView()
         addNewCardText.setOnClickListener {
-            findNavController().navigate(R.id.action_paymentModeFragment_to_cardFragment)
+            safeNavigate(R.id.action_paymentModeFragment_to_cardFragment)
         }
         viewOffersBtn.setOnClickListener {
             showOffers()
@@ -228,10 +229,10 @@ class PaymentModeFragment : Fragment() {
         addresType.text = address?.address_type ?: getString(R.string.home)
 
         contactEditIcon.setOnClickListener {
-            findNavController().navigate(R.id.action_paymentModeFragment_to_phoneNumberFragment)
+            safeNavigate(R.id.action_paymentModeFragment_to_phoneNumberFragment)
         }
         deliveryEditIcon.setOnClickListener {
-            findNavController().navigate(R.id.action_paymentModeFragment_to_savedAddressFragment)
+            safeNavigate(R.id.action_paymentModeFragment_to_savedAddressFragment)
         }
         contactDeliveryCollapsedLayout.setOnClickListener {
             contactDeliveryCollapsedLayout.visibility = View.GONE
@@ -333,7 +334,7 @@ class PaymentModeFragment : Fragment() {
     private fun createProcessPaymentRequest(savedCardTokens: SavedCardTokens): ProcessPaymentRequest {
         val paymentData = ExpressSDKObject.getFetchData()?.paymentData
         if (paymentData == null) {
-            findNavController().navigate(R.id.action_paymentModeFragment_to_successFragment)
+            safeNavigate(R.id.action_paymentModeFragment_to_successFragment)
         }
         val customerInfo = ExpressSDKObject.getFetchData()?.customerInfo
         val amount = paymentData?.originalTxnAmount?.amount
@@ -434,26 +435,26 @@ class PaymentModeFragment : Fragment() {
                 )
                 when (item.paymentModeId) {
                     PaymentModes.CREDIT_DEBIT.paymentModeID -> {
-                        findNavController().navigate(R.id.action_paymentModeFragment_to_cardFragment)
+                        safeNavigate(R.id.action_paymentModeFragment_to_cardFragment)
                     }
 
                     PaymentModes.UPI.paymentModeID -> {
-                        findNavController().navigate(R.id.action_paymentModeFragment_to_UPIFragment)
+                        safeNavigate(R.id.action_paymentModeFragment_to_UPIFragment)
                     }
 
                     PaymentModes.NET_BANKING.paymentModeID -> {
                         // Handle Netbanking selection
-                        findNavController().navigate(R.id.action_paymentModeFragment_to_netBankingFragment)
+                        safeNavigate(R.id.action_paymentModeFragment_to_netBankingFragment)
                     }
 
                     PaymentModes.WALLET.paymentModeID -> {
                         // Handle Wallet selection
-                        findNavController().navigate(R.id.action_paymentModeFragment_to_walletFragment)
+                        safeNavigate(R.id.action_paymentModeFragment_to_walletFragment)
                     }
 
                     PaymentModes.EMI.paymentModeID -> {
                         // Handle EMI selection
-                        findNavController().navigate(R.id.action_paymentModeFragment_to_EMIFragment)
+                        safeNavigate(R.id.action_paymentModeFragment_to_EMIFragment)
                     }
 
                     else -> {
@@ -481,7 +482,7 @@ class PaymentModeFragment : Fragment() {
                             bundle.putString(ERROR_KEY, it.errorCode)
                             bundle.putString(ERROR_MESSAGE_KEY, it.errorMessage)
                             bottomSheetDialog?.dismiss()
-                            findNavController().navigate(R.id.action_paymentModeFragment_to_successFragment)
+                            safeNavigate(R.id.action_paymentModeFragment_to_successFragment)
                         }
 
                         is BaseResult.Loading -> {
@@ -492,7 +493,7 @@ class PaymentModeFragment : Fragment() {
                         is BaseResult.Success<ProcessPaymentResponse> -> {
                             ExpressSDKObject.setProcessPaymentResponse(it.data)
                             bottomSheetDialog?.dismiss()
-                            findNavController().navigate(R.id.action_paymentModeFragment_to_ACSFragment)
+                            safeNavigate(R.id.action_paymentModeFragment_to_ACSFragment)
 
                         }
                     }
@@ -624,12 +625,12 @@ class PaymentModeFragment : Fragment() {
             bundle.putString(ISSUE_ID, offerDetails?.issuerId)
             bundle.putString(TENURE_ID, tenure?.tenure_id)
             if (offerDetails?.type?.equals(EMI_DC_TYPE, true) == false)
-                findNavController().navigate(
+                safeNavigate(
                     R.id.action_paymentModeFragment_to_EMICardDetailsFragment,
                     bundle
                 )
             else
-                findNavController().navigate(
+                safeNavigate(
                     R.id.action_paymentModeFragment_to_DCEMICardDetailsFragment,
                     bundle
                 )
@@ -725,7 +726,7 @@ class PaymentModeFragment : Fragment() {
                         // pass upi id to upifragment and run the process payment
                         val bundle = Bundle()
                         bundle.putString("RECOMMENDED_ACTION_UPI", upiId)
-                        findNavController().navigate(
+                        safeNavigate(
                             R.id.action_paymentModeFragment_to_UPIFragment,
                             bundle
                         )
@@ -781,3 +782,4 @@ class PaymentModeFragment : Fragment() {
 
 
 }
+

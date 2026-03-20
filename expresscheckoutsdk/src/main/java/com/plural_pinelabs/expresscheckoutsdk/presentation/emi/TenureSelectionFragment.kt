@@ -333,7 +333,7 @@ class TenureSelectionFragment : Fragment() {
 
         val paymentData = ExpressSDKObject.getFetchData()?.paymentData
         if (paymentData == null) {
-            findNavController().navigate(R.id.action_EMICardDetailsFragment_to_failureFragment)
+            findNavController().navigate(R.id.action_tenureSelectionFragment_to_failureFragment)
         }
         val amount = issuer?.tenures?.find { it.tenure_id == tenureId }?.loan_amount?.value
             ?: 0

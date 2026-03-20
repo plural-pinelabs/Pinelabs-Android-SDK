@@ -356,7 +356,7 @@ class DCEMICardDetailsFragment : Fragment() {
     private fun redirectToACS(
     ) {
         bottomSheetDialog?.dismiss()
-        findNavController().navigate(R.id.action_EMICardDetailsFragment_to_ACSFragment)
+        findNavController().navigate(R.id.action_DCEMICardDetailsFragment_to_ACSFragment)
 
     }
 
@@ -522,7 +522,7 @@ class DCEMICardDetailsFragment : Fragment() {
         val paymentData = ExpressSDKObject.getFetchData()?.paymentData
         if (paymentData == null) {
             //TODO notify of payment failure
-            findNavController().navigate(R.id.action_EMICardDetailsFragment_to_failureFragment)
+            findNavController().navigate(R.id.action_DCEMICardDetailsFragment_to_failureFragment)
         }
         val amount = issuer?.tenures?.find { it.tenure_id == tenureId }?.loan_amount?.value
             ?: 0
