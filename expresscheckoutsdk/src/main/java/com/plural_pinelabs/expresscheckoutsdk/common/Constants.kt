@@ -19,6 +19,7 @@ internal object Constants {
 
     const val CREDIT_DEBIT_ID = "CREDIT_DEBIT"
     const val PAY_BY_POINTS_ID = "PAYBYPOINTS"
+    const val BRAND_WALLET_ID = "BRAND_WALLET"
     const val NET_BANKING_ID = "NET_BANKING"
     const val UPI_ID = "UPI"
     const val WALLET_ID = "WALLET"

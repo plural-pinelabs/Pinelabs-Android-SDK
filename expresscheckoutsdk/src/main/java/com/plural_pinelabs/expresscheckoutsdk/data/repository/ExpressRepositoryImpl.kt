@@ -11,6 +11,8 @@ import com.plural_pinelabs.expresscheckoutsdk.data.model.AddressResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CancelTransactionResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CardBinMetaDataRequestList
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CardBinMetaDataResponse
+import com.plural_pinelabs.expresscheckoutsdk.data.model.CreateWalletRequest
+import com.plural_pinelabs.expresscheckoutsdk.data.model.CreateWalletResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CustomerInfo
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CustomerInfoResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ExpressAddress
@@ -185,6 +187,15 @@ class ExpressRepositoryImpl(
     ): Flow<BaseResult<LogResponse>> {
         return toResultFlow(networkHelper = networkHelper) {
             (apiService as CommonApiService).log(token, request)
+        }
+    }
+
+    override suspend fun createWallet(
+        token: String?,
+        request: CreateWalletRequest
+    ): Flow<BaseResult<CreateWalletResponse>> {
+        return toResultFlow(networkHelper = networkHelper) {
+            (apiService as CommonApiService).createWallet(token, request)
         }
     }
 

@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bottomsheet_rounded_corners"
+    android:paddingStart="16dp"
+    android:paddingTop="24dp"
+    android:paddingEnd="16dp"
+    android:paddingBottom="20dp">
+
+    <TextView
+        android:id="@+id/brand_wallet_add_money_otp_title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:fontFamily="sans-serif-medium"
+        android:text="@string/brand_wallet_add_money_otp_title"
+        android:textColor="@color/black_text"
+        android:textFontWeight="700"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/brand_wallet_add_money_otp_subtitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="@string/brand_wallet_add_money_otp_subtitle"
+        android:textColor="@color/black_text_60"
+        android:textFontWeight="500"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/brand_wallet_add_money_otp_title" />
+
+    <LinearLayout
+        android:id="@+id/brand_wallet_add_money_otp_field"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="24dp"
+        android:background="@drawable/brand_wallet_verification_field_background"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/brand_wallet_add_money_otp_subtitle">
+
+        <androidx.appcompat.widget.AppCompatEditText
+            android:id="@+id/brand_wallet_add_money_otp_input"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@null"
+            android:fontFamily="sans-serif-medium"
+            android:hint="@string/brand_wallet_add_money_otp_hint"
+            android:inputType="number"
+            android:maxLength="6"
+            android:maxLines="1"
+            android:padding="0dp"
+            android:textColor="@color/black_text"
+            android:textColorHint="@color/black_text_30"
+            android:textSize="16sp"
+            tools:text="123456" />
+
+        <TextView
+            android:id="@+id/brand_wallet_add_money_otp_resend"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:textColor="@color/black_text_80"
+            android:textFontWeight="600"
+            android:textSize="14sp"
+            tools:text="Resend PIN in 30 sec" />
+
+    </LinearLayout>
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/brand_wallet_add_money_otp_cta"
+        android:layout_width="0dp"
+        android:layout_height="52dp"
+        android:layout_marginTop="32dp"
+        android:background="@drawable/primary_button_disabled_bg"
+        android:fontFamily="sans-serif-medium"
+        android:text="@string/brand_wallet_verify_and_add"
+        android:textAllCaps="false"
+        android:textColor="@color/text_disabled_C0C9D2"
+        android:textFontWeight="700"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/brand_wallet_add_money_otp_field" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

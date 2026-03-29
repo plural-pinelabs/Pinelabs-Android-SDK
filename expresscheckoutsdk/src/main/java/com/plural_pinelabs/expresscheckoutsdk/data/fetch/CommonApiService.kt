@@ -18,6 +18,8 @@ import com.plural_pinelabs.expresscheckoutsdk.data.model.ProcessPaymentRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ProcessPaymentResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.SavedCardResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.TransactionStatusResponse
+import com.plural_pinelabs.expresscheckoutsdk.data.model.CreateWalletRequest
+import com.plural_pinelabs.expresscheckoutsdk.data.model.CreateWalletResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.retrofit.ApiService
 import retrofit2.Response
 import retrofit2.http.Body
@@ -133,6 +135,12 @@ interface CommonApiService : ApiService {
         @Body request: List<LogData>?
     ): Response<LogResponse>
 
+    @POST("wallet/create")
+    suspend fun createWallet(
+        @Query("token", encoded = true) token: String?,
+        @Body request: CreateWalletRequest
+    ): Response<CreateWalletResponse>
+
     @POST("cancel")
     suspend fun cancelTransaction(
         @Query(
@@ -142,5 +150,6 @@ interface CommonApiService : ApiService {
     ): Response<CancelTransactionResponse>
 
 
-}
 
+
+}

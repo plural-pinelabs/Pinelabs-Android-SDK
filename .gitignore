@@ -19,3 +19,5 @@ local.properties
 /gradle-assemble.log
 /gradle-verify.log
 /.idea/inspectionProfiles/Project_Default.xml
+/.vscode/mcp.json
+/.vscode/settings.json

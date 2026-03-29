@@ -150,10 +150,16 @@ data class RecyclerViewPaymentOptionData(
 )
 
 @Parcelize
+data class BrandWalletBalance(
+    val value: Int? = null,
+    val currency: String? = null,
+) : Parcelable
+
+@Parcelize
 // New data class to hold customer information
 data class CustomerInfo(
     val lastUsedPaymode: LastUsedPaymode? = null,
-    val shipping_address: Address? = null,
+    var shipping_address: Address? = null,
     val customerId: String? = null,
     var customer_id: String? = null,
     val firstName: String? = null,
@@ -177,13 +183,32 @@ data class CustomerInfo(
     val status: String? = null,
     val created_at: String? = null,
     val updated_at: String? = null,
-    var customerToken: String? = null
+    var customerToken: String? = null,
+    var brandWalletEnabled: Boolean? = null,
+    @SerializedName("brandWalletBalance")
+    var brandWalletBalance: BrandWalletBalance? = null,
 ) : Parcelable
 
 data class CustomerInfoResponse(
     val status: String?,
     val customerInfo: CustomerInfo?,
     val customerToken: String? = null,
+)
+
+data class CreateWalletRequest(
+    val currency_code: String? = null,
+    val customers: List<CustomerInfo> = emptyList(),
+)
+
+data class CreateWalletResponse(
+    val success: Boolean? = null,
+    val message: String? = null,
+    val data: CreateWalletData? = null,
+)
+
+data class CreateWalletData(
+    val currency_code: String? = null,
+    val customers: List<CustomerInfo> = emptyList(),
 )
 
 @Parcelize

@@ -2,29 +2,41 @@ package com.plural_pinelabs.expresscheckoutsdk.presentation.landing
 
 import BankColors
 import android.content.Context
+import android.content.res.Resources
+import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
+import android.text.Editable
+import android.text.InputFilter
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.CheckBox
+import android.widget.EditText
+import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.ProgressBar
 import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.cardview.widget.CardView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.toDrawable
+import androidx.core.text.HtmlCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.airbnb.lottie.LottieAnimationView
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.gson.Gson
 import com.google.gson.internal.LinkedTreeMap
@@ -52,10 +64,12 @@ import com.plural_pinelabs.expresscheckoutsdk.common.Constants.TENURE_ID
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.YES_TITLE
 import com.plural_pinelabs.expresscheckoutsdk.common.ItemClickListener
 import com.plural_pinelabs.expresscheckoutsdk.common.NetworkHelper
+import com.plural_pinelabs.expresscheckoutsdk.common.PaymentModeViewModelFactory
 import com.plural_pinelabs.expresscheckoutsdk.common.PaymentModes
 import com.plural_pinelabs.expresscheckoutsdk.common.safeNavigate
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils.showProcessPaymentDialog
+import com.plural_pinelabs.expresscheckoutsdk.data.model.BrandWalletBalance
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CardTokenData
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CustomerData
 import com.plural_pinelabs.expresscheckoutsdk.data.model.EMIPaymentModeData
@@ -65,18 +79,29 @@ import com.plural_pinelabs.expresscheckoutsdk.data.model.PaymentMode
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ProcessPaymentRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ProcessPaymentResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.SavedCardTokens
+import com.plural_pinelabs.expresscheckoutsdk.data.model.CreateWalletRequest
+import com.plural_pinelabs.expresscheckoutsdk.data.model.CreateWalletResponse
+import com.plural_pinelabs.expresscheckoutsdk.data.model.CustomerInfo
 import com.plural_pinelabs.expresscheckoutsdk.presentation.LandingActivity
 import com.plural_pinelabs.expresscheckoutsdk.presentation.card.CardFragmentViewModel
 import com.plural_pinelabs.expresscheckoutsdk.presentation.offers.OfferSummaryDialog
 import com.plural_pinelabs.expresscheckoutsdk.presentation.utils.DividerItemDecoration
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class PaymentModeFragment : Fragment() {
+    private enum class BrandWalletVerificationSheetState {
+        EMAIL,
+        OTP,
+    }
+
     private lateinit var savedCardRecyclerView: RecyclerView
     private lateinit var savedCardsHeading: TextView
     private lateinit var paymentModeRecyclerView: RecyclerView
     private lateinit var logoAnimation: LottieAnimationView
     private lateinit var viewModel: CardFragmentViewModel
+    private lateinit var paymentModeViewModel: PaymentModeViewModel
     private lateinit var addNewCardText: TextView
     private lateinit var savedCardView: CardView
     private var bottomSheetDialog: BottomSheetDialog? = null
@@ -118,6 +143,34 @@ class PaymentModeFragment : Fragment() {
     private lateinit var recommendedSavedCardText: TextView
     private lateinit var recommendedSavedCardLast4: TextView
     private lateinit var recommendedSavedCardCheckBox: CheckBox
+    private lateinit var paymentOptionCard: CardView
+    private lateinit var brandWalletCard: CardView
+    private lateinit var brandWalletIcon: ImageView
+    private lateinit var brandWalletTitle: TextView
+    private lateinit var brandWalletBalance: TextView
+    private lateinit var brandWalletDescription: TextView
+    private lateinit var brandWalletPrimaryAction: TextView
+    private lateinit var brandWalletSecondaryAction: TextView
+    private lateinit var brandWalletActivateCtaRow: LinearLayout
+    private lateinit var brandWalletActionsRow: LinearLayout
+    private lateinit var brandWalletSelectedIcon: ImageView
+    private var brandWalletBottomSheetDialog: BottomSheetDialog? = null
+    private var brandWalletReadyDismissJob: Job? = null
+    private var brandWalletOtpCountdownJob: Job? = null
+    private var brandWalletRedeemProgressJob: Job? = null
+    private var brandWalletRedeemMockResultJob: Job? = null
+    private var isBrandWalletActivatedCardToggled: Boolean = false
+    private var isBrandWalletCardSelected: Boolean = false
+    private var brandWalletVerificationEmail: String? = null
+
+    private companion object {
+        const val BRAND_WALLET_PIN_LENGTH = 6
+        const val BRAND_WALLET_PIN_RESEND_SECONDS = 120
+        const val BRAND_WALLET_REDEEM_TIMEOUT_MS = 60_000L
+        const val BRAND_WALLET_REDEEM_MOCK_RESULT_DELAY_MS = 3_000L
+        const val BRAND_WALLET_REDEEM_PROGRESS_INTERVAL_MS = 250L
+        const val BRAND_WALLET_TERMS_SHEET_HEIGHT_RATIO = 0.82f
+    }
 
 
     override fun onCreateView(
@@ -129,8 +182,25 @@ class PaymentModeFragment : Fragment() {
             this,
             CardFragmentViewModelFactory(NetworkHelper(requireContext()))
         )[CardFragmentViewModel::class.java]
+        paymentModeViewModel = ViewModelProvider(
+            this,
+            PaymentModeViewModelFactory(NetworkHelper(requireContext()))
+        )[PaymentModeViewModel::class.java]
         ExpressSDKObject.setSelectedOfferDetail(null)
         return inflater.inflate(R.layout.fragment_payment_mode, container, false)
+    }
+
+    override fun onDestroyView() {
+        brandWalletReadyDismissJob?.cancel()
+        brandWalletReadyDismissJob = null
+        brandWalletOtpCountdownJob?.cancel()
+        brandWalletOtpCountdownJob = null
+        cancelBrandWalletRedeemJobs()
+        brandWalletBottomSheetDialog?.dismiss()
+        brandWalletBottomSheetDialog = null
+        bottomSheetDialog?.dismiss()
+        bottomSheetDialog = null
+        super.onDestroyView()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -158,6 +228,7 @@ class PaymentModeFragment : Fragment() {
         viewOffersBtn.setOnClickListener {
             showOffers()
         }
+        observeCreateWalletResult()
         (requireActivity() as LandingActivity).showHideConvenienceFessMessage(ExpressSDKObject.getFetchData()?.convenienceFeesInfo?.isEmpty() == false)
         CleverTapUtil.sdkPaymentModeView(
             CleverTapUtil.getInstance(requireContext()),
@@ -174,6 +245,11 @@ class PaymentModeFragment : Fragment() {
         val paymentModeArray = arrayListOf<String>()
         paymentModes?.forEach {
             paymentModeArray.add(it.paymentModeId)
+        }
+        getBrandWalletPaymentMode()?.paymentModeId?.let { brandWalletId ->
+            if (!paymentModeArray.contains(brandWalletId)) {
+                paymentModeArray.add(brandWalletId)
+            }
         }
         val joinedString = paymentModeArray.joinToString(
             separator = ", ",
@@ -242,6 +318,7 @@ class PaymentModeFragment : Fragment() {
 
     private fun setViews(view: View) {
         paymentModeRecyclerView = view.findViewById(R.id.payment_option_list)
+        paymentOptionCard = view.findViewById(R.id.payment_option_card)
         savedCardRecyclerView = view.findViewById(R.id.saved_cards_list)
         savedCardsHeading = view.findViewById(R.id.saved_cards_title)
         logoAnimation = view.findViewById(R.id.offers_gif)
@@ -283,6 +360,17 @@ class PaymentModeFragment : Fragment() {
         recommendedSavedCardText = view.findViewById(R.id.card_issuer_name)
         recommendedSavedCardLast4 = view.findViewById(R.id.card_last_4_digits)
         recommendedSavedCardCheckBox = view.findViewById(R.id.cvv_less_selection)
+
+        brandWalletCard = view.findViewById(R.id.brand_wallet_card_view)
+        brandWalletIcon = view.findViewById(R.id.brand_wallet_icon)
+        brandWalletTitle = view.findViewById(R.id.brand_wallet_title)
+        brandWalletBalance = view.findViewById(R.id.brand_wallet_balance)
+        brandWalletDescription = view.findViewById(R.id.brand_wallet_description)
+        brandWalletPrimaryAction = view.findViewById(R.id.brand_wallet_primary_action)
+        brandWalletSecondaryAction = view.findViewById(R.id.brand_wallet_secondary_action)
+        brandWalletActivateCtaRow = view.findViewById(R.id.brand_wallet_activate_cta_row)
+        brandWalletActionsRow = view.findViewById(R.id.brand_wallet_actions_row)
+        brandWalletSelectedIcon = view.findViewById(R.id.brand_wallet_selected_icon)
     }
 
     private fun setSavedCardsView() {
@@ -385,16 +473,927 @@ class PaymentModeFragment : Fragment() {
                 ContextCompat.getDrawable(requireContext(), R.drawable.recycler_view_divider)
             )
         )
-        val paymentModes = getPaymentModes()
-        paymentModes?.let {
-            val adapter =
-                PaymentModeRecyclerViewAdapter(
+        bindBrandWalletCard()
+        val paymentModes = getPaymentModes().orEmpty()
+        if (paymentModes.isEmpty()) {
+            paymentOptionCard.visibility = View.GONE
+            paymentModeRecyclerView.visibility = View.GONE
+            return
+        }
+        paymentOptionCard.visibility = View.VISIBLE
+        paymentModeRecyclerView.visibility = View.VISIBLE
+        val adapter =
+            PaymentModeRecyclerViewAdapter(
+                requireContext(),
+                paymentModes,
+                isPBPEnabled(paymentModes),
+                getPaymentModeSelectionCallback(requireContext())
+            )
+        paymentModeRecyclerView.adapter = adapter
+    }
+
+    private fun bindBrandWalletCard() {
+        val brandWalletMode = getBrandWalletPaymentMode()
+        if (brandWalletMode == null) {
+            brandWalletCard.visibility = View.GONE
+            return
+        }
+
+        val customerInfo = ExpressSDKObject.getFetchData()?.customerInfo
+        val isActivatedState = customerInfo?.brandWalletEnabled == true
+        val resolvedBalanceText = if (isActivatedState) {
+            formatBrandWalletBalance(customerInfo?.brandWalletBalance?.value)
+        } else {
+            null
+        }
+        if (!isActivatedState) {
+            isBrandWalletCardSelected = false
+        }
+
+        brandWalletCard.visibility = View.VISIBLE
+        brandWalletIcon.imageTintList = null
+        brandWalletTitle.text = getBrandWalletTitle()
+
+        brandWalletBalance.text = resolvedBalanceText
+        brandWalletBalance.setTextColor(
+            ContextCompat.getColor(
+                requireContext(),
+                if (isActivatedState) R.color.black_text else R.color.green_00722F
+            )
+        )
+        brandWalletBalance.visibility =
+            if (isActivatedState && !resolvedBalanceText.isNullOrBlank()) View.VISIBLE else View.GONE
+        brandWalletSelectedIcon.visibility = if (isActivatedState) View.VISIBLE else View.GONE
+        brandWalletSelectedIcon.setImageResource(
+            if (isBrandWalletCardSelected) R.drawable.ic_check_circle_selected
+            else R.drawable.ic_check_circle_unselected
+        )
+        brandWalletActionsRow.visibility = if (isActivatedState) View.VISIBLE else View.GONE
+        brandWalletDescription.visibility = if (isActivatedState) View.GONE else View.VISIBLE
+        brandWalletActivateCtaRow.visibility = if (isActivatedState) View.GONE else View.VISIBLE
+
+        brandWalletDescription.text = getString(R.string.brand_wallet_activate_description)
+        brandWalletCard.isClickable = !isActivatedState
+        brandWalletActivateCtaRow.isClickable = !isActivatedState
+        if (!isActivatedState) {
+            val activateClickListener = View.OnClickListener {
+                showBrandWalletBottomSheet()
+            }
+            brandWalletCard.setOnClickListener(activateClickListener)
+            brandWalletActivateCtaRow.setOnClickListener(activateClickListener)
+        } else {
+            brandWalletCard.setOnClickListener(null)
+            brandWalletActivateCtaRow.setOnClickListener(null)
+        }
+
+        brandWalletSelectedIcon.setOnClickListener(
+            if (isActivatedState) {
+                View.OnClickListener {
+                    isBrandWalletCardSelected = !isBrandWalletCardSelected
+                    brandWalletSelectedIcon.setImageResource(
+                        if (isBrandWalletCardSelected) R.drawable.ic_check_circle_selected
+                        else R.drawable.ic_check_circle_unselected
+                    )
+                    // Placeholder: update the selected payment mode state for Brand Wallet here.
+                }
+            } else {
+                null
+            }
+        )
+        brandWalletSelectedIcon.isClickable = isActivatedState
+        brandWalletSelectedIcon.isFocusable = isActivatedState
+
+        brandWalletPrimaryAction.text = getString(R.string.brand_wallet_action_add_money)
+        brandWalletPrimaryAction.visibility = if (isActivatedState) View.VISIBLE else View.GONE
+
+        val secondaryActionLabel = getString(R.string.brand_wallet_action_redeem_gift_card)
+        brandWalletSecondaryAction.text = secondaryActionLabel
+        brandWalletSecondaryAction.visibility =
+            if (!isActivatedState || secondaryActionLabel.isBlank()) View.GONE else View.VISIBLE
+
+        bindBrandWalletActionListeners(isActivatedState, brandWalletPrimaryAction, brandWalletPrimaryAction.text?.toString())
+        bindBrandWalletActionListeners(isActivatedState, brandWalletSecondaryAction, secondaryActionLabel)
+    }
+
+    private fun bindBrandWalletActionListeners(
+        isActivatedState: Boolean,
+        actionView: TextView,
+        actionLabel: String?
+    ) {
+        if (!isActivatedState || actionLabel.isNullOrBlank()) {
+            actionView.setOnClickListener(null)
+            return
+        }
+        if (actionLabel.equals(getString(R.string.brand_wallet_action_add_money), true)) {
+            actionView.setOnClickListener {
+                showBrandWalletAddMoneyBottomSheet()
+            }
+        } else if (actionLabel.equals(getString(R.string.brand_wallet_action_redeem_gift_card), true)) {
+            actionView.setOnClickListener {
+                showBrandWalletRedeemGiftCardBottomSheet()
+            }
+        } else {
+            actionView.setOnClickListener(null)
+        }
+    }
+
+    private fun showBrandWalletBottomSheet() {
+        if (!isAdded) return
+
+        brandWalletBottomSheetDialog?.dismiss()
+        brandWalletBottomSheetDialog = BottomSheetDialog(requireContext())
+        val view = LayoutInflater.from(requireContext())
+            .inflate(R.layout.brand_wallet_activation_bottom_sheet, null)
+
+        val closeButton = view.findViewById<ImageView>(R.id.brand_wallet_sheet_close)
+        val createWalletButton = view.findViewById<Button>(R.id.brand_wallet_sheet_create_wallet)
+        val termsText = view.findViewById<TextView>(R.id.brand_wallet_sheet_terms)
+        Utils.applyPrimaryButtonBackground(createWalletButton)
+        termsText.text = HtmlCompat.fromHtml(
+            getString(R.string.brand_wallet_terms_text),
+            HtmlCompat.FROM_HTML_MODE_LEGACY
+        )
+
+        closeButton.setOnClickListener {
+            brandWalletBottomSheetDialog?.dismiss()
+        }
+        createWalletButton.setOnClickListener {
+            if (getBrandWalletCustomerEmail().isNullOrBlank()) {
+                showBrandWalletVerificationBottomSheet()
+            } else {
+                createBrandWallet()
+            }
+        }
+
+        brandWalletBottomSheetDialog?.setContentView(view)
+        val bottomSheet =
+            brandWalletBottomSheetDialog?.findViewById<FrameLayout>(com.google.android.material.R.id.design_bottom_sheet)
+        bottomSheet?.let {
+            val behavior = BottomSheetBehavior.from(it)
+            val layoutParams = it.layoutParams
+            val screenHeight = Resources.getSystem().displayMetrics.heightPixels
+            layoutParams.height = (screenHeight * 0.74f).toInt()
+            it.layoutParams = layoutParams
+            behavior.peekHeight = layoutParams.height
+            behavior.expandedOffset = (screenHeight * 0.26f).toInt()
+            behavior.state = BottomSheetBehavior.STATE_EXPANDED
+            behavior.skipCollapsed = true
+            behavior.isFitToContents = false
+            behavior.isDraggable = true
+            it.setBackgroundColor(Color.TRANSPARENT)
+        }
+        brandWalletBottomSheetDialog?.setCancelable(true)
+        brandWalletBottomSheetDialog?.setCanceledOnTouchOutside(true)
+        brandWalletBottomSheetDialog?.window?.setBackgroundDrawable(Color.TRANSPARENT.toDrawable())
+        brandWalletBottomSheetDialog?.show()
+    }
+
+    private fun showBrandWalletVerificationBottomSheet() {
+        if (!isAdded) return
+
+        brandWalletReadyDismissJob?.cancel()
+        brandWalletReadyDismissJob = null
+        brandWalletOtpCountdownJob?.cancel()
+        brandWalletOtpCountdownJob = null
+        brandWalletBottomSheetDialog?.dismiss()
+        brandWalletBottomSheetDialog = BottomSheetDialog(requireContext())
+        val view = LayoutInflater.from(requireContext())
+            .inflate(R.layout.brand_wallet_verification_bottom_sheet, null)
+
+        val closeButton = view.findViewById<ImageView>(R.id.brand_wallet_verification_close)
+        val emailContainer = view.findViewById<LinearLayout>(R.id.brand_wallet_verification_email_state)
+        val otpContainer = view.findViewById<LinearLayout>(R.id.brand_wallet_verification_otp_state)
+        val emailInput = view.findViewById<EditText>(R.id.brand_wallet_verification_email_input)
+        val otpInput = view.findViewById<EditText>(R.id.brand_wallet_verification_otp_input)
+        val otpResendText = view.findViewById<TextView>(R.id.brand_wallet_verification_otp_resend)
+        val ctaButton = view.findViewById<Button>(R.id.brand_wallet_verification_cta)
+
+        var currentState = BrandWalletVerificationSheetState.EMAIL
+        emailInput.setText(brandWalletVerificationEmail ?: "")
+        Utils.handleCTAEnableDisable(
+            requireContext(),
+            Utils.isValidEmail(emailInput.text?.toString()?.trim()),
+            ctaButton
+        )
+
+        val emailWatcher = object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) = Unit
+
+            override fun afterTextChanged(s: Editable?) {
+                if (currentState == BrandWalletVerificationSheetState.EMAIL) {
+                    Utils.handleCTAEnableDisable(
+                        requireContext(),
+                        Utils.isValidEmail(s?.toString()?.trim()),
+                        ctaButton
+                    )
+                }
+            }
+        }
+        val otpWatcher = object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) = Unit
+
+            override fun afterTextChanged(s: Editable?) {
+                if (currentState == BrandWalletVerificationSheetState.OTP) {
+                    Utils.handleCTAEnableDisable(
+                        requireContext(),
+                        (s?.length ?: 0) == 6,
+                        ctaButton
+                    )
+                }
+            }
+        }
+        emailInput.addTextChangedListener(emailWatcher)
+        otpInput.addTextChangedListener(otpWatcher)
+
+        fun startBrandWalletOtpCountdown() {
+            brandWalletOtpCountdownJob?.cancel()
+            brandWalletOtpCountdownJob = viewLifecycleOwner.lifecycleScope.launch {
+                var timeLeftMs = 100_000L
+                while (timeLeftMs > 0) {
+                    otpResendText.isEnabled = false
+                    otpResendText.text = HtmlCompat.fromHtml(
+                        getString(
+                            R.string.resend_otp_in,
+                            Utils.formatTimeInMinutes(requireContext(), timeLeftMs)
+                        ),
+                        HtmlCompat.FROM_HTML_MODE_LEGACY
+                    )
+                    delay(1000)
+                    timeLeftMs -= 1000
+                }
+                otpResendText.text = getString(R.string.resend_otp)
+                otpResendText.isEnabled = true
+            }
+        }
+
+        fun bindVerificationState(state: BrandWalletVerificationSheetState) {
+            currentState = state
+            when (state) {
+                BrandWalletVerificationSheetState.EMAIL -> {
+                    brandWalletOtpCountdownJob?.cancel()
+                    brandWalletOtpCountdownJob = null
+                    emailContainer.visibility = View.VISIBLE
+                    otpContainer.visibility = View.GONE
+                    ctaButton.text = getString(R.string.brand_wallet_continue)
+                    Utils.handleCTAEnableDisable(
+                        requireContext(),
+                        Utils.isValidEmail(emailInput.text?.toString()?.trim()),
+                        ctaButton
+                    )
+                }
+
+                BrandWalletVerificationSheetState.OTP -> {
+                    emailContainer.visibility = View.GONE
+                    otpContainer.visibility = View.VISIBLE
+                    ctaButton.text = getString(R.string.brand_wallet_verify_and_create)
+                    startBrandWalletOtpCountdown()
+                    Utils.handleCTAEnableDisable(
+                        requireContext(),
+                        (otpInput.text?.length ?: 0) == 6,
+                        ctaButton
+                    )
+                }
+            }
+            (ctaButton.layoutParams as? ConstraintLayout.LayoutParams)?.topToBottom =
+                if (state == BrandWalletVerificationSheetState.EMAIL) {
+                    R.id.brand_wallet_verification_email_state
+                } else {
+                    R.id.brand_wallet_verification_otp_state
+                }
+            ctaButton.requestLayout()
+        }
+
+        closeButton.setOnClickListener {
+            brandWalletBottomSheetDialog?.dismiss()
+        }
+        otpResendText.setOnClickListener {
+            if (currentState != BrandWalletVerificationSheetState.OTP || !otpResendText.isEnabled) {
+                return@setOnClickListener
+            }
+            otpInput.text?.clear()
+            Utils.handleCTAEnableDisable(requireContext(), false, ctaButton)
+            startBrandWalletOtpCountdown()
+        }
+        ctaButton.setOnClickListener {
+            when (currentState) {
+                BrandWalletVerificationSheetState.EMAIL -> {
+                    val enteredEmail = emailInput.text?.toString()?.trim().orEmpty()
+                    if (!Utils.isValidEmail(enteredEmail)) return@setOnClickListener
+                    brandWalletVerificationEmail = enteredEmail
+                    otpInput.text?.clear()
+                    bindVerificationState(BrandWalletVerificationSheetState.OTP)
+                }
+
+                BrandWalletVerificationSheetState.OTP -> {
+                    if ((otpInput.text?.length ?: 0) != 6) return@setOnClickListener
+                    persistBrandWalletCustomerEmail(brandWalletVerificationEmail)
+                    createBrandWallet()
+                }
+            }
+        }
+
+        bindVerificationState(BrandWalletVerificationSheetState.EMAIL)
+        brandWalletBottomSheetDialog?.setContentView(view)
+        val bottomSheet =
+            brandWalletBottomSheetDialog?.findViewById<FrameLayout>(com.google.android.material.R.id.design_bottom_sheet)
+        bottomSheet?.let {
+            val behavior = BottomSheetBehavior.from(it)
+            val layoutParams = it.layoutParams
+            layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
+            it.layoutParams = layoutParams
+            behavior.state = BottomSheetBehavior.STATE_EXPANDED
+            behavior.skipCollapsed = true
+            behavior.isFitToContents = true
+            behavior.isDraggable = true
+            it.setBackgroundColor(Color.TRANSPARENT)
+        }
+        brandWalletBottomSheetDialog?.setCancelable(true)
+        brandWalletBottomSheetDialog?.setCanceledOnTouchOutside(true)
+        brandWalletBottomSheetDialog?.setOnDismissListener {
+            brandWalletOtpCountdownJob?.cancel()
+            brandWalletOtpCountdownJob = null
+            brandWalletBottomSheetDialog = null
+        }
+        brandWalletBottomSheetDialog?.window?.setBackgroundDrawable(Color.TRANSPARENT.toDrawable())
+        brandWalletBottomSheetDialog?.show()
+    }
+
+    private fun showBrandWalletAddMoneyBottomSheet() {
+        if (!isAdded) return
+
+        brandWalletOtpCountdownJob?.cancel()
+        brandWalletOtpCountdownJob = null
+        brandWalletBottomSheetDialog?.dismiss()
+        brandWalletBottomSheetDialog = BottomSheetDialog(requireContext())
+        val view = LayoutInflater.from(requireContext())
+            .inflate(R.layout.brand_wallet_add_money_bottom_sheet, null)
+
+        val closeButton = view.findViewById<ImageView>(R.id.brand_wallet_add_money_close)
+        val amountInput = view.findViewById<EditText>(R.id.brand_wallet_add_money_input)
+        val minimumText = view.findViewById<TextView>(R.id.brand_wallet_add_money_minimum)
+        val quickAdd3000 = view.findViewById<TextView>(R.id.brand_wallet_quick_add_3000)
+        val quickAdd5000 = view.findViewById<TextView>(R.id.brand_wallet_quick_add_5000)
+        val quickAdd8000 = view.findViewById<TextView>(R.id.brand_wallet_quick_add_8000)
+        val ctaButton = view.findViewById<Button>(R.id.brand_wallet_add_money_cta)
+        val requiredTopUpAmount = getBrandWalletRequiredTopUpAmount()
+        val roundedHundredAmount = getNextRoundedTopUpAmount(requiredTopUpAmount, 100)
+        val roundedThousandAmount = getNextRoundedTopUpAmount(roundedHundredAmount, 1000)
+
+        amountInput.filters = arrayOf(InputFilter.LengthFilter(10))
+        amountInput.isSingleLine = true
+        amountInput.maxLines = 1
+        Utils.handleCTAEnableDisable(
+            requireContext(),
+            isBrandWalletAddMoneyAmountValid(
+                extractBrandWalletAmountValue(amountInput.text?.toString()),
+                requiredTopUpAmount
+            ),
+            ctaButton
+        )
+
+        minimumText.text = HtmlCompat.fromHtml(
+            getString(
+                R.string.brand_wallet_add_money_required_text,
+                formatBrandWalletBalance(requiredTopUpAmount)
+            ),
+            HtmlCompat.FROM_HTML_MODE_LEGACY
+        )
+
+        fun updateAmount(amount: Int) {
+            val amountText = amount.toString()
+            amountInput.setText(amountText)
+            amountInput.setSelection(amountText.length)
+        }
+
+        quickAdd3000.text = formatBrandWalletBalance(requiredTopUpAmount)
+        quickAdd5000.text = formatBrandWalletBalance(roundedHundredAmount)
+        quickAdd8000.text = formatBrandWalletBalance(roundedThousandAmount)
+        if (requiredTopUpAmount > 0) {
+            updateAmount(requiredTopUpAmount)
+        } else {
+            amountInput.text?.clear()
+        }
+
+        amountInput.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) = Unit
+
+            override fun afterTextChanged(s: Editable?) {
+                Utils.handleCTAEnableDisable(
                     requireContext(),
-                    it,
-                    isPBPEnabled(paymentModes),
-                    getPaymentModeSelectionCallback(requireContext())
+                    isBrandWalletAddMoneyAmountValid(
+                        extractBrandWalletAmountValue(s?.toString()),
+                        requiredTopUpAmount
+                    ),
+                    ctaButton
                 )
-            paymentModeRecyclerView.adapter = adapter
+            }
+        })
+
+        closeButton.setOnClickListener {
+            brandWalletBottomSheetDialog?.dismiss()
+        }
+        quickAdd3000.setOnClickListener { updateAmount(requiredTopUpAmount) }
+        quickAdd5000.setOnClickListener { updateAmount(roundedHundredAmount) }
+        quickAdd8000.setOnClickListener { updateAmount(roundedThousandAmount) }
+        ctaButton.setOnClickListener {
+            if (!isBrandWalletAddMoneyAmountValid(
+                    extractBrandWalletAmountValue(amountInput.text?.toString()),
+                    requiredTopUpAmount
+                )
+            ) {
+                return@setOnClickListener
+            }
+            showBrandWalletAddMoneyOtpBottomSheet()
+        }
+
+        brandWalletBottomSheetDialog?.setContentView(view)
+        val bottomSheet =
+            brandWalletBottomSheetDialog?.findViewById<FrameLayout>(com.google.android.material.R.id.design_bottom_sheet)
+        bottomSheet?.let {
+            val behavior = BottomSheetBehavior.from(it)
+            val layoutParams = it.layoutParams
+            layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
+            it.layoutParams = layoutParams
+            behavior.state = BottomSheetBehavior.STATE_EXPANDED
+            behavior.skipCollapsed = true
+            behavior.isFitToContents = true
+            behavior.isDraggable = true
+            it.setBackgroundColor(Color.TRANSPARENT)
+        }
+        brandWalletBottomSheetDialog?.setCancelable(true)
+        brandWalletBottomSheetDialog?.setCanceledOnTouchOutside(true)
+        brandWalletBottomSheetDialog?.setOnDismissListener {
+            brandWalletOtpCountdownJob?.cancel()
+            brandWalletOtpCountdownJob = null
+            brandWalletBottomSheetDialog = null
+        }
+        brandWalletBottomSheetDialog?.window?.setBackgroundDrawable(Color.TRANSPARENT.toDrawable())
+        brandWalletBottomSheetDialog?.show()
+    }
+
+    private fun showBrandWalletAddMoneyOtpBottomSheet() {
+        if (!isAdded) return
+
+        brandWalletOtpCountdownJob?.cancel()
+        brandWalletOtpCountdownJob = null
+        brandWalletBottomSheetDialog?.dismiss()
+        brandWalletBottomSheetDialog = BottomSheetDialog(requireContext())
+        val view = LayoutInflater.from(requireContext())
+            .inflate(R.layout.brand_wallet_add_money_otp_bottom_sheet, null)
+
+        val otpInput = view.findViewById<EditText>(R.id.brand_wallet_add_money_otp_input)
+        val resendText = view.findViewById<TextView>(R.id.brand_wallet_add_money_otp_resend)
+        val ctaButton = view.findViewById<Button>(R.id.brand_wallet_add_money_otp_cta)
+
+        otpInput.filters = arrayOf(InputFilter.LengthFilter(BRAND_WALLET_PIN_LENGTH))
+        Utils.handleCTAEnableDisable(requireContext(), false, ctaButton)
+
+        otpInput.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) = Unit
+
+            override fun afterTextChanged(s: Editable?) {
+                Utils.handleCTAEnableDisable(
+                    requireContext(),
+                    (s?.length ?: 0) == BRAND_WALLET_PIN_LENGTH,
+                    ctaButton
+                )
+            }
+        })
+
+        fun startPinCountdown() {
+            brandWalletOtpCountdownJob?.cancel()
+            brandWalletOtpCountdownJob = viewLifecycleOwner.lifecycleScope.launch {
+                var secondsLeft = BRAND_WALLET_PIN_RESEND_SECONDS
+                while (secondsLeft > 0) {
+                    resendText.isEnabled = false
+                    resendText.text = getString(R.string.brand_wallet_add_money_resend_pin_in, secondsLeft)
+                    delay(1000)
+                    secondsLeft -= 1
+                }
+                resendText.text = getString(R.string.brand_wallet_add_money_resend_pin)
+                resendText.isEnabled = true
+            }
+        }
+
+        resendText.setOnClickListener {
+            if (!resendText.isEnabled) return@setOnClickListener
+            otpInput.text?.clear()
+            Utils.handleCTAEnableDisable(requireContext(), false, ctaButton)
+            startPinCountdown()
+        }
+        ctaButton.setOnClickListener {
+            if ((otpInput.text?.length ?: 0) != BRAND_WALLET_PIN_LENGTH) {
+                return@setOnClickListener
+            }
+            // Placeholder: verify the add-money PIN and continue the wallet funding flow here.
+            brandWalletBottomSheetDialog?.dismiss()
+        }
+
+        startPinCountdown()
+        brandWalletBottomSheetDialog?.setContentView(view)
+        val bottomSheet =
+            brandWalletBottomSheetDialog?.findViewById<FrameLayout>(com.google.android.material.R.id.design_bottom_sheet)
+        bottomSheet?.let {
+            val behavior = BottomSheetBehavior.from(it)
+            val layoutParams = it.layoutParams
+            layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
+            it.layoutParams = layoutParams
+            behavior.state = BottomSheetBehavior.STATE_EXPANDED
+            behavior.skipCollapsed = true
+            behavior.isFitToContents = true
+            behavior.isDraggable = true
+            it.setBackgroundColor(Color.TRANSPARENT)
+        }
+        brandWalletBottomSheetDialog?.setCancelable(true)
+        brandWalletBottomSheetDialog?.setCanceledOnTouchOutside(true)
+        brandWalletBottomSheetDialog?.setOnDismissListener {
+            brandWalletOtpCountdownJob?.cancel()
+            brandWalletOtpCountdownJob = null
+            brandWalletBottomSheetDialog = null
+        }
+        brandWalletBottomSheetDialog?.window?.setBackgroundDrawable(Color.TRANSPARENT.toDrawable())
+        brandWalletBottomSheetDialog?.show()
+    }
+
+    private fun showBrandWalletRedeemGiftCardBottomSheet() {
+        if (!isAdded) return
+
+        cancelBrandWalletRedeemJobs()
+        brandWalletBottomSheetDialog?.dismiss()
+        brandWalletBottomSheetDialog = BottomSheetDialog(requireContext())
+        val view = LayoutInflater.from(requireContext())
+            .inflate(R.layout.brand_wallet_redeem_gift_card_bottom_sheet, null)
+
+        val formContainer = view.findViewById<View>(R.id.brand_wallet_redeem_form_container)
+        val loadingContainer = view.findViewById<View>(R.id.brand_wallet_redeem_loading_container)
+        val closeButton = view.findViewById<ImageView>(R.id.brand_wallet_redeem_close)
+        val loadingCloseButton = view.findViewById<ImageView>(R.id.brand_wallet_redeem_loading_close)
+        val giftCardNumberInput = view.findViewById<EditText>(R.id.brand_wallet_redeem_card_number_input)
+        val giftCardPinInput = view.findViewById<EditText>(R.id.brand_wallet_redeem_card_pin_input)
+        val redeemButton = view.findViewById<Button>(R.id.brand_wallet_redeem_cta)
+        val progressBar = view.findViewById<ProgressBar>(R.id.brand_wallet_redeem_loading_progress)
+
+        giftCardPinInput.filters = arrayOf(InputFilter.LengthFilter(BRAND_WALLET_PIN_LENGTH))
+        formContainer.visibility = View.VISIBLE
+        loadingContainer.visibility = View.GONE
+        progressBar.progress = 0
+
+        fun updateRedeemButtonState() {
+            val isEnabled = isValidBrandWalletGiftCardNumber(giftCardNumberInput.text?.toString()) &&
+                    isValidBrandWalletGiftCardPin(giftCardPinInput.text?.toString())
+            Utils.handleCTAEnableDisable(requireContext(), isEnabled, redeemButton)
+        }
+
+        val textWatcher = object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) = Unit
+
+            override fun afterTextChanged(s: Editable?) {
+                updateRedeemButtonState()
+            }
+        }
+
+        giftCardNumberInput.addTextChangedListener(textWatcher)
+        giftCardPinInput.addTextChangedListener(textWatcher)
+        updateRedeemButtonState()
+
+        closeButton.setOnClickListener {
+            brandWalletBottomSheetDialog?.dismiss()
+        }
+        loadingCloseButton.setOnClickListener {
+            brandWalletBottomSheetDialog?.dismiss()
+        }
+        redeemButton.setOnClickListener {
+            val giftCardNumber = giftCardNumberInput.text?.toString().orEmpty()
+            val giftCardPin = giftCardPinInput.text?.toString().orEmpty()
+            if (!isValidBrandWalletGiftCardNumber(giftCardNumber) ||
+                !isValidBrandWalletGiftCardPin(giftCardPin)) {
+                return@setOnClickListener
+            }
+            formContainer.visibility = View.GONE
+            loadingContainer.visibility = View.VISIBLE
+            startBrandWalletRedeemMockFlow(progressBar)
+        }
+
+        brandWalletBottomSheetDialog?.setContentView(view)
+        val bottomSheet =
+            brandWalletBottomSheetDialog?.findViewById<FrameLayout>(com.google.android.material.R.id.design_bottom_sheet)
+        bottomSheet?.let {
+            val behavior = BottomSheetBehavior.from(it)
+            val layoutParams = it.layoutParams
+            layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
+            it.layoutParams = layoutParams
+            behavior.state = BottomSheetBehavior.STATE_EXPANDED
+            behavior.skipCollapsed = true
+            behavior.isFitToContents = true
+            behavior.isDraggable = true
+            it.setBackgroundColor(Color.TRANSPARENT)
+        }
+        brandWalletBottomSheetDialog?.setCancelable(true)
+        brandWalletBottomSheetDialog?.setCanceledOnTouchOutside(true)
+        brandWalletBottomSheetDialog?.setOnDismissListener {
+            cancelBrandWalletRedeemJobs()
+            brandWalletBottomSheetDialog = null
+        }
+        brandWalletBottomSheetDialog?.window?.setBackgroundDrawable(Color.TRANSPARENT.toDrawable())
+        brandWalletBottomSheetDialog?.show()
+    }
+
+    private fun startBrandWalletRedeemMockFlow(progressBar: ProgressBar) {
+        cancelBrandWalletRedeemJobs()
+        progressBar.max = 100
+        progressBar.progress = 0
+
+        brandWalletRedeemProgressJob = viewLifecycleOwner.lifecycleScope.launch {
+            var elapsedMs = 0L
+            while (elapsedMs < BRAND_WALLET_REDEEM_TIMEOUT_MS) {
+                val progress = ((elapsedMs.toFloat() / BRAND_WALLET_REDEEM_TIMEOUT_MS) * 100).toInt()
+                    .coerceIn(0, 95)
+                progressBar.progress = progress
+                delay(BRAND_WALLET_REDEEM_PROGRESS_INTERVAL_MS)
+                elapsedMs += BRAND_WALLET_REDEEM_PROGRESS_INTERVAL_MS
+            }
+            progressBar.progress = 100
+            if (isAdded) {
+                brandWalletBottomSheetDialog?.dismiss()
+                showBrandWalletRedeemNotEligibleBottomSheet()
+            }
+        }
+
+        brandWalletRedeemMockResultJob = viewLifecycleOwner.lifecycleScope.launch {
+            delay(BRAND_WALLET_REDEEM_MOCK_RESULT_DELAY_MS)
+            brandWalletRedeemProgressJob?.cancel()
+            brandWalletRedeemProgressJob = null
+            progressBar.progress = 100
+            delay(150)
+            if (isAdded) {
+                brandWalletBottomSheetDialog?.dismiss()
+                showBrandWalletRedeemNotEligibleBottomSheet()
+            }
+        }
+    }
+
+    private fun showBrandWalletRedeemNotEligibleBottomSheet() {
+        if (!isAdded) return
+
+        cancelBrandWalletRedeemJobs()
+        brandWalletBottomSheetDialog?.dismiss()
+        brandWalletBottomSheetDialog = BottomSheetDialog(requireContext())
+        val view = LayoutInflater.from(requireContext())
+            .inflate(R.layout.brand_wallet_redeem_not_eligible_bottom_sheet, null)
+
+        val closeButton = view.findViewById<ImageView>(R.id.brand_wallet_redeem_not_eligible_close)
+        val tryAnotherButton = view.findViewById<Button>(R.id.brand_wallet_redeem_not_eligible_cta)
+        val termsText = view.findViewById<TextView>(R.id.brand_wallet_redeem_not_eligible_terms_text)
+
+        closeButton.setOnClickListener {
+            brandWalletBottomSheetDialog?.dismiss()
+        }
+        tryAnotherButton.setOnClickListener {
+            brandWalletBottomSheetDialog?.dismiss()
+            showBrandWalletRedeemGiftCardBottomSheet()
+        }
+        termsText.setOnClickListener {
+            brandWalletBottomSheetDialog?.dismiss()
+            showBrandWalletTermsConditionsBottomSheet()
+        }
+
+        brandWalletBottomSheetDialog?.setContentView(view)
+        val bottomSheet =
+            brandWalletBottomSheetDialog?.findViewById<FrameLayout>(com.google.android.material.R.id.design_bottom_sheet)
+        bottomSheet?.let {
+            val behavior = BottomSheetBehavior.from(it)
+            val layoutParams = it.layoutParams
+            layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
+            it.layoutParams = layoutParams
+            behavior.state = BottomSheetBehavior.STATE_EXPANDED
+            behavior.skipCollapsed = true
+            behavior.isFitToContents = true
+            behavior.isDraggable = true
+            it.setBackgroundColor(Color.TRANSPARENT)
+        }
+        brandWalletBottomSheetDialog?.setCancelable(true)
+        brandWalletBottomSheetDialog?.setCanceledOnTouchOutside(true)
+        brandWalletBottomSheetDialog?.setOnDismissListener {
+            brandWalletBottomSheetDialog = null
+        }
+        brandWalletBottomSheetDialog?.window?.setBackgroundDrawable(Color.TRANSPARENT.toDrawable())
+        brandWalletBottomSheetDialog?.show()
+    }
+
+    private fun showBrandWalletTermsConditionsBottomSheet() {
+        if (!isAdded) return
+
+        brandWalletBottomSheetDialog?.dismiss()
+        brandWalletBottomSheetDialog = BottomSheetDialog(requireContext())
+        val view = LayoutInflater.from(requireContext())
+            .inflate(R.layout.brand_wallet_terms_conditions_bottom_sheet, null)
+
+        val closeButton = view.findViewById<ImageView>(R.id.brand_wallet_terms_close)
+        val gotItButton = view.findViewById<Button>(R.id.brand_wallet_terms_cta)
+
+        closeButton.setOnClickListener {
+            brandWalletBottomSheetDialog?.dismiss()
+        }
+        gotItButton.setOnClickListener {
+            brandWalletBottomSheetDialog?.dismiss()
+        }
+
+        brandWalletBottomSheetDialog?.setContentView(view)
+        val bottomSheet =
+            brandWalletBottomSheetDialog?.findViewById<FrameLayout>(com.google.android.material.R.id.design_bottom_sheet)
+        bottomSheet?.let {
+            val behavior = BottomSheetBehavior.from(it)
+            val layoutParams = it.layoutParams
+            val screenHeight = Resources.getSystem().displayMetrics.heightPixels
+            layoutParams.height = (screenHeight * BRAND_WALLET_TERMS_SHEET_HEIGHT_RATIO).toInt()
+            it.layoutParams = layoutParams
+            behavior.peekHeight = layoutParams.height
+            behavior.state = BottomSheetBehavior.STATE_EXPANDED
+            behavior.skipCollapsed = true
+            behavior.isFitToContents = false
+            behavior.expandedOffset = ((1 - BRAND_WALLET_TERMS_SHEET_HEIGHT_RATIO) * screenHeight).toInt()
+            behavior.isDraggable = true
+            it.setBackgroundColor(Color.TRANSPARENT)
+        }
+        brandWalletBottomSheetDialog?.setCancelable(true)
+        brandWalletBottomSheetDialog?.setCanceledOnTouchOutside(true)
+        brandWalletBottomSheetDialog?.setOnDismissListener {
+            brandWalletBottomSheetDialog = null
+        }
+        brandWalletBottomSheetDialog?.window?.setBackgroundDrawable(Color.TRANSPARENT.toDrawable())
+        brandWalletBottomSheetDialog?.show()
+    }
+
+    private fun cancelBrandWalletRedeemJobs() {
+        brandWalletRedeemProgressJob?.cancel()
+        brandWalletRedeemProgressJob = null
+        brandWalletRedeemMockResultJob?.cancel()
+        brandWalletRedeemMockResultJob = null
+    }
+
+    private fun isValidBrandWalletGiftCardNumber(value: String?): Boolean {
+        return value?.trim()?.isNotEmpty() == true
+    }
+
+    private fun isValidBrandWalletGiftCardPin(value: String?): Boolean {
+        return value?.length == BRAND_WALLET_PIN_LENGTH && value.all { it.isDigit() }
+    }
+
+    private fun extractBrandWalletAmountValue(amountText: String?): Int {
+        val digits = amountText.orEmpty().filter { it.isDigit() }
+        return digits.toIntOrNull() ?: 0
+    }
+
+    private fun showBrandWalletReadyBottomSheet() {
+        if (!isAdded) return
+
+        brandWalletReadyDismissJob?.cancel()
+        brandWalletReadyDismissJob = null
+        brandWalletBottomSheetDialog?.dismiss()
+        brandWalletBottomSheetDialog = BottomSheetDialog(requireContext())
+        val view = LayoutInflater.from(requireContext())
+            .inflate(R.layout.brand_wallet_ready_bottom_sheet, null)
+
+        val closeButton = view.findViewById<ImageView>(R.id.brand_wallet_ready_close)
+        val subtitle = view.findViewById<TextView>(R.id.brand_wallet_ready_subtitle)
+        subtitle.text = HtmlCompat.fromHtml(
+            getString(R.string.brand_wallet_ready_subtitle),
+            HtmlCompat.FROM_HTML_MODE_LEGACY
+        )
+
+        closeButton.setOnClickListener {
+            brandWalletBottomSheetDialog?.dismiss()
+        }
+
+        brandWalletBottomSheetDialog?.setOnDismissListener {
+            brandWalletReadyDismissJob?.cancel()
+            brandWalletReadyDismissJob = null
+            setBrandWalletActivatedCardToggle(true)
+            brandWalletBottomSheetDialog = null
+        }
+        brandWalletBottomSheetDialog?.setContentView(view)
+        val bottomSheet =
+            brandWalletBottomSheetDialog?.findViewById<FrameLayout>(com.google.android.material.R.id.design_bottom_sheet)
+        bottomSheet?.let {
+            val behavior = BottomSheetBehavior.from(it)
+            val layoutParams = it.layoutParams
+            layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
+            it.layoutParams = layoutParams
+            behavior.state = BottomSheetBehavior.STATE_EXPANDED
+            behavior.skipCollapsed = true
+            behavior.isFitToContents = true
+            behavior.isDraggable = true
+            it.setBackgroundColor(Color.TRANSPARENT)
+        }
+        brandWalletBottomSheetDialog?.setCancelable(true)
+        brandWalletBottomSheetDialog?.setCanceledOnTouchOutside(true)
+        brandWalletBottomSheetDialog?.window?.setBackgroundDrawable(Color.TRANSPARENT.toDrawable())
+        brandWalletBottomSheetDialog?.show()
+        brandWalletReadyDismissJob = viewLifecycleOwner.lifecycleScope.launch {
+            delay(5000)
+            if (brandWalletBottomSheetDialog?.isShowing == true) {
+                brandWalletBottomSheetDialog?.dismiss()
+            }
+        }
+    }
+
+    private fun setBrandWalletActivatedCardToggle(enabled: Boolean) {
+        if (isBrandWalletActivatedCardToggled == enabled) return
+        isBrandWalletActivatedCardToggled = enabled
+        ExpressSDKObject.getFetchData()?.customerInfo?.apply {
+            brandWalletEnabled = enabled
+            if (enabled && brandWalletBalance == null) {
+                brandWalletBalance = BrandWalletBalance(value = 0, currency = "INR")
+            }
+        }
+        if (view != null && isAdded) {
+            bindBrandWalletCard()
+        }
+    }
+
+    private fun getBrandWalletCustomerEmail(): String? {
+        val customerInfo = ExpressSDKObject.getFetchData()?.customerInfo
+        return customerInfo?.emailId?.trim()?.takeIf { it.isNotEmpty() }
+            ?: customerInfo?.email_id?.trim()?.takeIf { it.isNotEmpty() }
+    }
+
+    private fun createBrandWallet() {
+        val request = buildCreateWalletRequest() ?: run {
+            showBrandWalletReadyBottomSheet()
+            return
+        }
+        paymentModeViewModel.resetCreateWalletState()
+        paymentModeViewModel.createWallet(ExpressSDKObject.getToken(), request)
+    }
+
+    private fun buildCreateWalletRequest(): CreateWalletRequest? {
+        val fetchData = ExpressSDKObject.getFetchData() ?: return null
+        val customer = fetchData.customerInfo ?: return null
+        val emailId = getBrandWalletCustomerEmail() ?: return null
+        val shippingAddress =
+            ExpressSDKObject.getSelectedAddress() ?: customer.shippingAddress ?: customer.shipping_address
+        val billingAddress = customer.billingAddress ?: fetchData.billingAddress ?: shippingAddress
+
+        val walletCustomer = CustomerInfo(
+            firstName = customer.firstName,
+            first_name = customer.first_name ?: customer.firstName,
+            lastName = customer.lastName,
+            last_name = customer.last_name ?: customer.lastName,
+            countryCode = customer.countryCode,
+            country_code = customer.country_code ?: customer.countryCode,
+            mobileNo = customer.mobileNo,
+            mobileNumber = customer.mobileNumber,
+            mobile_number = customer.mobile_number ?: customer.mobileNumber ?: customer.mobileNo,
+            emailId = emailId,
+            email_id = emailId,
+            customerId = customer.customerId,
+            customer_id = customer.customer_id ?: customer.customerId,
+            billingAddress = billingAddress,
+            shippingAddress = shippingAddress,
+            shipping_address = shippingAddress,
+        )
+
+        val currencyCode = fetchData.paymentData?.originalTxnAmount?.currency ?: "INR"
+        return CreateWalletRequest(
+            currency_code = currencyCode,
+            customers = listOf(walletCustomer),
+        )
+    }
+
+    private fun mergeBrandWalletCustomerResponse(customerResponse: CreateWalletResponse) {
+        val updatedCustomer = customerResponse.data?.customers?.firstOrNull() ?: return
+        val currentCustomer = ExpressSDKObject.getFetchData()?.customerInfo ?: return
+        currentCustomer.first_name = updatedCustomer.first_name ?: currentCustomer.first_name
+        currentCustomer.last_name = updatedCustomer.last_name ?: currentCustomer.last_name
+        currentCustomer.country_code = updatedCustomer.country_code ?: currentCustomer.country_code
+        currentCustomer.mobile_number = updatedCustomer.mobile_number ?: currentCustomer.mobile_number
+        currentCustomer.email_id = updatedCustomer.email_id ?: currentCustomer.email_id
+        currentCustomer.emailId = updatedCustomer.email_id ?: currentCustomer.emailId
+        currentCustomer.customer_id = updatedCustomer.customer_id ?: currentCustomer.customer_id
+        currentCustomer.shipping_address = updatedCustomer.shipping_address ?: currentCustomer.shipping_address
+        currentCustomer.shippingAddress = updatedCustomer.shipping_address ?: currentCustomer.shippingAddress
+        currentCustomer.billingAddress = updatedCustomer.billingAddress ?: currentCustomer.billingAddress
+    }
+
+    private fun persistBrandWalletCustomerEmail(email: String?) {
+        val resolvedEmail = email?.trim()?.takeIf { it.isNotEmpty() } ?: return
+        ExpressSDKObject.getFetchData()?.customerInfo?.apply {
+            emailId = resolvedEmail
+            email_id = resolvedEmail
+        }
+        brandWalletVerificationEmail = resolvedEmail
+        if (view != null && isAdded) {
+            setContactAndDeliveryDetails()
         }
     }
 
@@ -411,6 +1410,52 @@ class PaymentModeFragment : Fragment() {
                     !(isCard && hasToken)
         }
         return filteredPaymentModes
+    }
+
+    private fun getBrandWalletPaymentMode(): PaymentMode? {
+        return ExpressSDKObject.getFetchData()?.paymentModes?.firstOrNull {
+            it.paymentModeId.equals(Constants.BRAND_WALLET_ID, true)
+        }
+    }
+
+    private fun getBrandWalletTitle(): String {
+        val merchantName = ExpressSDKObject.getFetchData()?.merchantInfo?.merchantDisplayName
+            ?.trim()
+            ?.takeIf { it.isNotEmpty() }
+            ?: ExpressSDKObject.getFetchData()?.merchantInfo?.merchantName
+                ?.trim()
+                ?.takeIf { it.isNotEmpty() }
+            ?: getString(R.string.brand_wallet_title).replace(" Wallet", "")
+        return "$merchantName Wallet"
+    }
+
+    private fun formatBrandWalletBalance(balance: Int?): String {
+        return Utils.convertToRupeesWithSymobl(requireContext(), balance ?: 0)
+    }
+
+    private fun getBrandWalletRequiredTopUpAmount(): Int {
+        val payableAmount = ExpressSDKObject.getPayableAmount() ?: ExpressSDKObject.getAmount()
+        val walletBalance = ExpressSDKObject.getFetchData()?.customerInfo?.brandWalletBalance?.value ?: 0
+        return (payableAmount - walletBalance).coerceAtLeast(1)
+    }
+
+    private fun getNextRoundedTopUpAmount(baseAmount: Int, step: Int): Int {
+        if (step <= 0) return baseAmount.coerceAtLeast(0)
+        val normalizedAmount = baseAmount.coerceAtLeast(0)
+        val remainder = normalizedAmount % step
+        return if (remainder == 0) {
+            normalizedAmount + step
+        } else {
+            normalizedAmount + (step - remainder)
+        }
+    }
+
+    private fun isBrandWalletAddMoneyAmountValid(enteredAmount: Int, requiredAmount: Int): Boolean {
+        return if (requiredAmount > 0) {
+            enteredAmount >= requiredAmount
+        } else {
+            enteredAmount > 0
+        }
     }
 
     private fun isPBPEnabled(paymentModes: List<PaymentMode>): Boolean {
@@ -495,6 +1540,33 @@ class PaymentModeFragment : Fragment() {
                             bottomSheetDialog?.dismiss()
                             safeNavigate(R.id.action_paymentModeFragment_to_ACSFragment)
 
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun observeCreateWalletResult() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                paymentModeViewModel.createWalletResult.collect { result ->
+                    when (result) {
+                        is BaseResult.Error -> {
+                            paymentModeViewModel.resetCreateWalletState()
+                            Toast.makeText(
+                                requireContext(),
+                                result.errorMessage ?: "Something went wrong",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+
+                        is BaseResult.Loading -> Unit
+
+                        is BaseResult.Success<CreateWalletResponse> -> {
+                            paymentModeViewModel.resetCreateWalletState()
+                            mergeBrandWalletCustomerResponse(result.data)
+                            showBrandWalletReadyBottomSheet()
                         }
                     }
                 }
@@ -782,4 +1854,3 @@ class PaymentModeFragment : Fragment() {
 
 
 }
-

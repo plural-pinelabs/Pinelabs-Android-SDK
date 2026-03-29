@@ -217,6 +217,101 @@
     <string name="recommended_payment_option">Recommended Payment Option</string>
     <string name="incorrect_otp_please_try_again">Incorrect OTP. Please try again.</string>
     <string name="continue_to_pay">Continue to Pay</string>
+    <string name="brand_wallet_action_redeem_gift_card">Redeem Gift Card</string>
+    <string name="brand_wallet_action_add_money">+ Add Money</string>
+    <string name="brand_wallet_redeem_gift_card_title">Redeem gift card</string>
+    <string name="brand_wallet_redeem_loading_title">Applying Gift Card</string>
+    <string name="brand_wallet_redeem_gift_card_number">Gift Card Number</string>
+    <string name="brand_wallet_redeem_gift_card_number_hint">Enter gift card number</string>
+    <string name="brand_wallet_redeem_gift_card_pin">Gift Card PIN</string>
+    <string name="brand_wallet_redeem_gift_card_pin_hint">Enter gift card PIN</string>
+    <string name="brand_wallet_redeem_not_eligible_title">Gift card not eligible for redemption</string>
+    <string name="brand_wallet_redeem_not_eligible_subtitle_prefix">Check  </string>
+    <string name="brand_wallet_redeem_not_eligible_terms"><u> terms &amp; conditions</u></string>
+    <string name="brand_wallet_redeem_not_eligible_subtitle_suffix"> for eligibility.</string>
+    <string name="brand_wallet_redeem_not_eligible_cta">Try another gift card</string>
+    <string name="brand_wallet_terms_conditions_title">Terms &amp; Conditions</string>
+    <string name="brand_wallet_terms_conditions_cta">Got it</string>
+    <string name="brand_wallet_terms_conditions_body"><![CDATA[• This Gift Voucher is issued by Croma Retail Limited (Croma).
+
+• This Gift Voucher is valid only for a period of 12 months from the date of receipt.
+
+• Gift Voucher can be redeemed at JioMart online platform in India. This GV cannot be used on 3P products (Third-party products listed on JioMart Platform).
+
+• Gift Voucher cannot be exchanged for cash. This Gift Voucher can be redeemed only once.
+
+• This Gift Voucher is not valid on purchase of Gold/Silver Coins and fine jewellery.
+
+• This Gift Voucher cannot be redeemed in parts and needs to be redeemed for full value.
+
+• This Gift Voucher is redeemable for a single order only. Also, multiple Gift Vouchers cannot be redeemed in a single order.
+
+• No extension of the validity period nor refund of the value of the Gift Voucher in case of failure to use the Gift Voucher on or before the validity period.
+
+• Croma shall not be responsible for loss or misuse of Gift Voucher and no duplicate or compensation in lieu of the Gift Voucher shall be given by Croma.
+
+• Croma’s overall liability will not exceed the value of the Gift Voucher.
+
+• Bearer of the Gift Voucher shall be deemed to have read, understood, and accepted these terms and conditions.
+
+• Bearer of the code of the Gift Voucher is deemed to be the beneficiary of this Gift Voucher. Any redemption by the bearer of the Gift Voucher shall be considered as a valid discharge of liabilities by Croma.
+
+• Croma shall not be liable under any circumstances towards any loss or damage or expenses or cost or any third-party liability, whether directly or indirectly arising out of or in relation to use of Gift Voucher and redemption thereunder by the bearer.
+
+• Croma reserves its right to modify/amend the terms and conditions of the Gift Voucher at any time without prior notice and such modifications shall be binding on the user/bearer of the Gift Voucher.
+
+• Any dispute with regard to product liability, guarantee, warranty, and quality of the products to be purchased under redemption of the Gift Voucher shall be addressed to the respective manufacturer/brand owner and Croma shall not be held responsible/liabIe for the same. The guarantee and warranty of the products shall be transferred as received from the respective manufacturer/distributor.
+
+• In case of any issue faced by the Gift Voucher bearer, they can reach out to customer service at the stores or customer care at toll-free number 1800 891 0001 or email at customerservice@croma.com.
+
+• For any Croma Retail GV queries/issues related to receiving of the voucher, please reach out to customer care via cromasupport@pinelabs.com or toll-free number 080-64534440.
+
+• The Gift Voucher is binding for all applicable laws of India.
+
+• All disputes are subject to the jurisdiction of courts at Mumbai only.
+
+• E-Gift Cards are normally delivered instantly. But sometimes due to system issues, delivery can be delayed up to 24–48 hours.
+
+• No returns and no refunds on gift cards, e-gift cards, and gift vouchers shipped by Woohoo.in. Please check the refund policy at http://www.woohoo.in/faq for further details.]]></string>
+    <string name="brand_wallet_title">Croma Wallet</string>
+    <string name="brand_wallet_zero_balance">₹ 0</string>
+    <string name="brand_wallet_activate_description">Access balance, add funds, redeem gift card, and make your shopping more rewarding.</string>
+    <string name="brand_wallet_activate_now"><u>Activate Now</u></string>
+    <string name="brand_wallet_bottom_sheet_title">Pay using Brand Wallet!</string>
+    <string name="brand_wallet_bottom_sheet_subtitle">Get Rewards and Exclusive Offers on the wallet</string>
+    <string name="brand_wallet_bottom_sheet_why">Why Croma Wallet ?</string>
+    <string name="brand_wallet_create_wallet">Create Wallet</string>
+    <string name="brand_wallet_add_money_title">Add Money to Wallet</string>
+    <string name="brand_wallet_add_money_label">Enter the amount to add</string>
+    <string name="brand_wallet_add_money_amount_default">₹ 3,000</string>
+    <string name="brand_wallet_add_money_minimum_text">Minimum amount is <b>₹ 3,000</b> is required</string>
+    <string name="brand_wallet_add_money_required_text">Amount required to complete payment is <b>%1$s</b></string>
+    <string name="brand_wallet_quick_adds">Quick Adds</string>
+    <string name="brand_wallet_quick_add_3000">₹ 3,000</string>
+    <string name="brand_wallet_quick_add_5000">₹ 5,000</string>
+    <string name="brand_wallet_quick_add_8000">₹ 8,000</string>
+    <string name="brand_wallet_add_money_cta">Add Money</string>
+    <string name="brand_wallet_add_money_otp_title">Enter PIN to complete transaction</string>
+    <string name="brand_wallet_add_money_otp_subtitle">PIN sent to the mobile number/email linked to your wallet</string>
+    <string name="brand_wallet_add_money_otp_hint">Enter OTP</string>
+    <string name="brand_wallet_add_money_resend_pin_in">Resend PIN in %1$d sec</string>
+    <string name="brand_wallet_add_money_resend_pin">Resend PIN</string>
+    <string name="brand_wallet_verify_and_add">Verify &amp; Add</string>
+    <string name="brand_wallet_verify_email_title">Verify email to create wallet</string>
+    <string name="brand_wallet_email_label">Email ID</string>
+    <string name="brand_wallet_email_hint">Enter email ID</string>
+    <string name="brand_wallet_continue">Continue</string>
+    <string name="brand_wallet_otp_title">Enter OTP to complete verification</string>
+    <string name="brand_wallet_otp_subtitle">OTP sent to the email ID</string>
+    <string name="brand_wallet_otp_hint">Enter OTP</string>
+    <string name="brand_wallet_otp_resend">Resend OTP in 1:40 min</string>
+    <string name="brand_wallet_verify_and_create">Verify &amp; Create</string>
+    <string name="brand_wallet_stepper_line_one">One click Payment through Croma Credit without PIN or card details</string>
+    <string name="brand_wallet_stepper_line_two">Personalised Offers on payment through Croma Credit</string>
+    <string name="brand_wallet_stepper_line_three">Instant Refund in Croma Credit without waiting for 5-7 days for bank transfer</string>
+    <string name="brand_wallet_terms_text">By proceeding, I agree to the Wallet <u><b>Terms &amp; Conditions</b></u> and understand that a wallet associated to Croma will be created</string>
+    <string name="brand_wallet_ready_title">Great, Your wallet is ready!</string>
+    <string name="brand_wallet_ready_subtitle"><![CDATA[<b>Access balance, add funds, redeem gift card,</b><br/>and make your shopping more rewarding.]]></string>
     <string name="address_error_full_name_required">Full Name is required</string>
     <string name="address_error_full_name_error">Full Name should contain only alphabets and spaces.</string>
     <string name="address_error_pincode_required">Pincode is required</string>
