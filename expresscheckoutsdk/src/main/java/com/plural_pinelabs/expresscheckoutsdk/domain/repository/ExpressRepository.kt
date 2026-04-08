@@ -1,7 +1,6 @@
 package com.plural_pinelabs.expresscheckoutsdk.domain.repository
 
 import com.plural_pinelabs.expresscheckoutsdk.common.BaseResult
-import com.plural_pinelabs.expresscheckoutsdk.data.model.Address
 import com.plural_pinelabs.expresscheckoutsdk.data.model.AddressRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.model.AddressResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CancelTransactionResponse
@@ -16,7 +15,6 @@ import com.plural_pinelabs.expresscheckoutsdk.data.model.ExpressAddressResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.FetchResponseDTO
 import com.plural_pinelabs.expresscheckoutsdk.data.model.KFSResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.LogData
-import com.plural_pinelabs.expresscheckoutsdk.data.model.LogRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.model.LogResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.OTPRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.model.OTPResponse
@@ -25,6 +23,8 @@ import com.plural_pinelabs.expresscheckoutsdk.data.model.ProcessPaymentRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ProcessPaymentResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.SavedCardResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.TransactionStatusResponse
+import com.plural_pinelabs.expresscheckoutsdk.data.model.WalletAddMoneyRequest
+import com.plural_pinelabs.expresscheckoutsdk.data.model.WalletAddMoneyResponse
 import kotlinx.coroutines.flow.Flow
 
 interface ExpressRepository {
@@ -67,9 +67,9 @@ interface ExpressRepository {
         request: ExpressAddress
     ): Flow<BaseResult<ExpressAddressResponse>>
 
-   suspend fun createInactiveUser(
-    token: String?,
-    request: CustomerInfo?
+    suspend fun createInactiveUser(
+        token: String?,
+        request: CustomerInfo?
     ): Flow<BaseResult<CustomerInfo>>
 
     suspend fun validateOffers(
@@ -107,8 +107,15 @@ interface ExpressRepository {
         request: CreateWalletRequest
     ): Flow<BaseResult<CreateWalletResponse>>
 
-    suspend fun  cancelPayment(
+    suspend fun cancelPayment(
         token: String?,
-        cancelPayment:Boolean
-    ):Flow<BaseResult<CancelTransactionResponse>>
+        cancelPayment: Boolean
+    ): Flow<BaseResult<CancelTransactionResponse>>
+
+    suspend fun addMoneyWallet(
+        token: String?,
+        request: WalletAddMoneyRequest
+    ): Flow<BaseResult<WalletAddMoneyResponse>>
+
+
 }

@@ -51,6 +51,7 @@ import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PROCESSED_ATTEMPT
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PROCESSED_FAILED
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PROCESSED_PENDING
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PROCESSED_STATUS
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.BRAND_WALLET_ID
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.UPI_COLLECT
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.UPI_ID
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.UPI_INTENT
@@ -91,6 +92,7 @@ class UPIFragment : Fragment() {
     private var bottomTimerSheetDialog: BottomSheetDialog? = null
     private var selectUPIPackage: String? = null
     private var recommnededActionUPI: String? = null
+    private var flowMode: String? = null
 
     private lateinit var payByQRButton: LinearLayout
     private lateinit var payByQRLayout: ConstraintLayout
@@ -117,6 +119,10 @@ class UPIFragment : Fragment() {
         }
 
         recommnededActionUPI = arguments?.getString("RECOMMENDED_ACTION_UPI", null)
+        flowMode = arguments?.getString("MODE", null) ?: ExpressSDKObject.getSelectedMode()
+        if (!flowMode.isNullOrBlank()) {
+            ExpressSDKObject.setSelectedMode(flowMode)
+        }
 
     }
 
@@ -159,6 +165,10 @@ class UPIFragment : Fragment() {
         errorinfoTextView = view.findViewById(R.id.error_upi_id)
         payByQRButton = view.findViewById(R.id.pay_by_qr_btn)
         payByQRLayout = view.findViewById(R.id.pay_by_qr)
+
+        if (flowMode.equals(BRAND_WALLET_ID, true)) {
+            payByAnyUPIButton.text = getString(R.string.pay_by_existing_upi_app)
+        }
 
 
         payByAnyUPIButton.setOnClickListener {
@@ -295,6 +305,18 @@ class UPIFragment : Fragment() {
         vpa: String? = null,
         transactionMode: String?,
     ) {
+        if (flowMode.equals(BRAND_WALLET_ID, true) && transactionMode == UPI_INTENT) {
+            val addMoneyResponse = ExpressSDKObject.getWalletAddMoneyResponse()
+            val existingDeepLink = addMoneyResponse?.charge_order?.challenge_url
+                ?: addMoneyResponse?.charge_order?.payments?.firstOrNull()?.challenge_url
+                ?: ExpressSDKObject.getProcessPaymentResponse()?.deep_link
+
+            if (!existingDeepLink.isNullOrBlank()) {
+                showUpiTray(existingDeepLink, upiAppPackageName = selectUPIPackage)
+                return
+            }
+        }
+
         mTransactionMode = transactionMode
         val paymentMode = arrayListOf(UPI_ID)
         val extra = Extra(

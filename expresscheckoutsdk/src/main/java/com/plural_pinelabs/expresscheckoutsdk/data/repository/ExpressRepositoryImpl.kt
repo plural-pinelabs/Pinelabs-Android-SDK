@@ -20,7 +20,6 @@ import com.plural_pinelabs.expresscheckoutsdk.data.model.ExpressAddressResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.FetchResponseDTO
 import com.plural_pinelabs.expresscheckoutsdk.data.model.KFSResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.LogData
-import com.plural_pinelabs.expresscheckoutsdk.data.model.LogRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.model.LogResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.OTPRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.model.OTPResponse
@@ -29,6 +28,8 @@ import com.plural_pinelabs.expresscheckoutsdk.data.model.ProcessPaymentRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ProcessPaymentResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.SavedCardResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.TransactionStatusResponse
+import com.plural_pinelabs.expresscheckoutsdk.data.model.WalletAddMoneyRequest
+import com.plural_pinelabs.expresscheckoutsdk.data.model.WalletAddMoneyResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.retrofit.ApiService
 import com.plural_pinelabs.expresscheckoutsdk.domain.repository.ExpressRepository
 import kotlinx.coroutines.flow.Flow
@@ -205,6 +206,15 @@ class ExpressRepositoryImpl(
     ): Flow<BaseResult<CancelTransactionResponse>> {
         return toResultFlow(networkHelper = networkHelper) {
             (apiService as CommonApiService).cancelTransaction(token, cancelPayment)
+        }
+    }
+
+    override suspend fun addMoneyWallet(
+        token: String?,
+        request: WalletAddMoneyRequest
+    ): Flow<BaseResult<WalletAddMoneyResponse>> {
+        return toResultFlow(networkHelper = networkHelper) {
+            (apiService as CommonApiService).addMoneyToWallet(token, request)
         }
     }
 }

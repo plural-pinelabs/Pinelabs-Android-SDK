@@ -5,6 +5,10 @@ import androidx.lifecycle.viewModelScope
 import com.plural_pinelabs.expresscheckoutsdk.common.BaseResult
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CreateWalletRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CreateWalletResponse
+import com.plural_pinelabs.expresscheckoutsdk.data.model.ProcessPaymentRequest
+import com.plural_pinelabs.expresscheckoutsdk.data.model.ProcessPaymentResponse
+import com.plural_pinelabs.expresscheckoutsdk.data.model.WalletAddMoneyRequest
+import com.plural_pinelabs.expresscheckoutsdk.data.model.WalletAddMoneyResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.repository.ExpressRepositoryImpl
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,9 +17,17 @@ import kotlinx.coroutines.launch
 
 class PaymentModeViewModel(private val expressRepositoryImpl: ExpressRepositoryImpl) : ViewModel() {
 
+    private val _processPaymentResult =
+        MutableStateFlow<BaseResult<ProcessPaymentResponse>>(BaseResult.Loading(false))
+    val processPaymentResult: StateFlow<BaseResult<ProcessPaymentResponse>> = _processPaymentResult
+
     private val _createWalletResult =
         MutableStateFlow<BaseResult<CreateWalletResponse>>(BaseResult.Loading(false))
     val createWalletResult: StateFlow<BaseResult<CreateWalletResponse>> = _createWalletResult
+
+    private val _addMoneyToWalletResult =
+        MutableStateFlow<BaseResult<WalletAddMoneyResponse>>(BaseResult.Loading(false))
+    val addMoneyToWalletResult: StateFlow<BaseResult<WalletAddMoneyResponse>> = _addMoneyToWalletResult
 
     fun createWallet(token: String?, request: CreateWalletRequest) =
         viewModelScope.launch(Dispatchers.IO) {
@@ -27,5 +39,20 @@ class PaymentModeViewModel(private val expressRepositoryImpl: ExpressRepositoryI
     fun resetCreateWalletState() {
         _createWalletResult.value = BaseResult.Loading(false)
     }
+
+    fun processPayment(token: String?, paymentData: ProcessPaymentRequest?) =
+        viewModelScope.launch(Dispatchers.IO) {
+            expressRepositoryImpl.processPayment(token, paymentData).collect {
+                _processPaymentResult.value = it
+            }
+        }
+
+
+    fun addMoneyToWallet(token: String?, request: WalletAddMoneyRequest) =
+        viewModelScope.launch(Dispatchers.IO) {
+            expressRepositoryImpl.addMoneyWallet(token, request).collect {
+                _addMoneyToWalletResult.value = it
+            }
+        }
 }
 

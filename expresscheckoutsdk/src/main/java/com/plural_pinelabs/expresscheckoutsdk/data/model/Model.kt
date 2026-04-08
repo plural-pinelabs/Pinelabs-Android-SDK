@@ -211,6 +211,89 @@ data class CreateWalletData(
     val customers: List<CustomerInfo> = emptyList(),
 )
 
+data class WalletAddMoneyRequest(
+    val upi_data: UpiData? = null,
+    val mode: String? = null,
+    val customer: CustomerInfo? = null,
+    val txn_data: UpiTransactionData? = null,
+    val extras: Extra? = null,
+)
+
+data class WalletAddMoneyResponse(
+    val order_id: String? = null,
+    val merchant_order_reference: String? = null,
+    val type: String? = null,
+    val status: String? = null,
+    val merchant_id: String? = null,
+    val order_amount: OrderDetailsAmount? = null,
+    val notes: String? = null,
+    val pre_auth: Boolean? = null,
+    val part_payment: Boolean? = null,
+    val allowed_payment_methods: List<String>? = null,
+    val purchase_details: WalletAddMoneyPurchaseDetails? = null,
+    val charge_order: WalletAddMoneyChargeOrder? = null,
+    val created_at: String? = null,
+    val updated_at: String? = null,
+    val integration_mode: String? = null,
+    val payment_retries_remaining: Int? = null,
+    val is_mcc_transaction: Boolean? = null,
+    val is_domestic_txn_for_risk_enabled: Boolean? = null,
+    val is_v2_emi_transaction: Boolean? = null,
+    val response_code: Int? = null,
+    val response_message: String? = null,
+)
+
+data class WalletAddMoneyChargeOrder(
+    val order_id: String? = null,
+    val parent_order_id: String? = null,
+    val merchant_order_reference: String? = null,
+    val type: String? = null,
+    val status: String? = null,
+    val challenge_url: String? = null,
+    val merchant_id: String? = null,
+    val order_amount: OrderDetailsAmount? = null,
+    val notes: String? = null,
+    val pre_auth: Boolean? = null,
+    val part_payment: Boolean? = null,
+    val allowed_payment_methods: List<String>? = null,
+    val purchase_details: WalletAddMoneyPurchaseDetails? = null,
+    val payments: List<WalletAddMoneyPayment>? = null,
+    val created_at: String? = null,
+    val updated_at: String? = null,
+    val integration_mode: String? = null,
+    val payment_retries_remaining: Int? = null,
+    val is_mcc_transaction: Boolean? = null,
+    val is_domestic_txn_for_risk_enabled: Boolean? = null,
+    val is_v2_emi_transaction: Boolean? = null,
+)
+
+data class WalletAddMoneyPurchaseDetails(
+    val customer: CustomerInfo? = null,
+)
+
+data class WalletAddMoneyPayment(
+    val id: String? = null,
+    val merchant_payment_reference: String? = null,
+    val status: String? = null,
+    val payment_amount: OrderDetailsAmount? = null,
+    val challenge_url: String? = null,
+    val payment_method: String? = null,
+    val payment_option: PaymentOptions? = null,
+    val acquirer_data: AcquirerData? = null,
+    val created_at: String? = null,
+    val updated_at: String? = null,
+)
+
+
+@Parcelize
+data class WalletAddMoneyLocationInfo(
+    val latitude: Double? = null,
+    val longitude: Double? = null,
+    val city: String? = null,
+    val state: String? = null,
+    val country: String? = null,
+) : Parcelable
+
 @Parcelize
 data class ProcessPaymentRequest(
     val card_token_data: CardTokenData? = null,
@@ -224,6 +307,7 @@ data class ProcessPaymentRequest(
     val convenience_fee_data: ConvenienceFeesData? = null,
     val emi_data: EmiData? = null,
     val card_meta_data: CardMetaData? = null,
+    val payment_option: PaymentOptions? = null,
 ) : Parcelable
 
 @Parcelize
@@ -344,7 +428,10 @@ data class Extra(
     var dcc_status: String? = null,
     val sdk_data: SDKData? = null,
     val order_amount: Int? = null,
-    val language: String? = null
+    val language: String? = null,
+    val is_final_part_payment: Boolean? = null,
+    val location_info: WalletAddMoneyLocationInfo? = null,
+    val order_currency: String? = null,
 ) : Parcelable
 
 data class PBPBank(
@@ -487,6 +574,13 @@ data class AcquirerData(
 @Parcelize
 data class PaymentOptions(
     val card_data: CardData? = null,
+    val upi_data: UpiData? = null,
+    val wallet_details: WalletDetails? = null,
+) : Parcelable
+
+@Parcelize
+data class WalletDetails(
+    val customer_id: String? = null,
 ) : Parcelable
 
 @Parcelize

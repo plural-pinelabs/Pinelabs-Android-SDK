@@ -41,6 +41,8 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.gson.Gson
 import com.google.gson.internal.LinkedTreeMap
 import com.plural_pinelabs.expresscheckoutsdk.ExpressSDKObject
+import com.plural_pinelabs.expresscheckoutsdk.ExpressSDKObject.getAmount
+import com.plural_pinelabs.expresscheckoutsdk.ExpressSDKObject.getCurrency
 import com.plural_pinelabs.expresscheckoutsdk.R
 import com.plural_pinelabs.expresscheckoutsdk.common.BaseResult
 import com.plural_pinelabs.expresscheckoutsdk.common.CardFragmentViewModelFactory
@@ -61,27 +63,34 @@ import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PAY_BY_POINTS_ID
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.SBI_TITLE
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.STANDARD_CHARTERED_TITLE
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.TENURE_ID
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.UPI_ID
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.YES_TITLE
 import com.plural_pinelabs.expresscheckoutsdk.common.ItemClickListener
 import com.plural_pinelabs.expresscheckoutsdk.common.NetworkHelper
 import com.plural_pinelabs.expresscheckoutsdk.common.PaymentModeViewModelFactory
 import com.plural_pinelabs.expresscheckoutsdk.common.PaymentModes
-import com.plural_pinelabs.expresscheckoutsdk.common.safeNavigate
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils.showProcessPaymentDialog
+import com.plural_pinelabs.expresscheckoutsdk.common.safeNavigate
 import com.plural_pinelabs.expresscheckoutsdk.data.model.BrandWalletBalance
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CardTokenData
+import com.plural_pinelabs.expresscheckoutsdk.data.model.CreateWalletRequest
+import com.plural_pinelabs.expresscheckoutsdk.data.model.CreateWalletResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CustomerData
+import com.plural_pinelabs.expresscheckoutsdk.data.model.CustomerInfo
 import com.plural_pinelabs.expresscheckoutsdk.data.model.EMIPaymentModeData
 import com.plural_pinelabs.expresscheckoutsdk.data.model.Extra
 import com.plural_pinelabs.expresscheckoutsdk.data.model.OfferDetail
 import com.plural_pinelabs.expresscheckoutsdk.data.model.PaymentMode
+import com.plural_pinelabs.expresscheckoutsdk.data.model.PaymentOptions
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ProcessPaymentRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ProcessPaymentResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.SavedCardTokens
-import com.plural_pinelabs.expresscheckoutsdk.data.model.CreateWalletRequest
-import com.plural_pinelabs.expresscheckoutsdk.data.model.CreateWalletResponse
-import com.plural_pinelabs.expresscheckoutsdk.data.model.CustomerInfo
+import com.plural_pinelabs.expresscheckoutsdk.data.model.UpiData
+import com.plural_pinelabs.expresscheckoutsdk.data.model.UpiTransactionData
+import com.plural_pinelabs.expresscheckoutsdk.data.model.WalletDetails
+import com.plural_pinelabs.expresscheckoutsdk.data.model.WalletAddMoneyRequest
+import com.plural_pinelabs.expresscheckoutsdk.data.model.WalletAddMoneyResponse
 import com.plural_pinelabs.expresscheckoutsdk.presentation.LandingActivity
 import com.plural_pinelabs.expresscheckoutsdk.presentation.card.CardFragmentViewModel
 import com.plural_pinelabs.expresscheckoutsdk.presentation.offers.OfferSummaryDialog
@@ -147,10 +156,13 @@ class PaymentModeFragment : Fragment() {
     private lateinit var brandWalletCard: CardView
     private lateinit var brandWalletIcon: ImageView
     private lateinit var brandWalletTitle: TextView
+    private lateinit var brandWalletBalanceRow: LinearLayout
     private lateinit var brandWalletBalance: TextView
+    private lateinit var brandWalletBalanceRefreshIcon: ImageView
     private lateinit var brandWalletDescription: TextView
     private lateinit var brandWalletPrimaryAction: TextView
     private lateinit var brandWalletSecondaryAction: TextView
+    private lateinit var brandWalletProceedAction: TextView
     private lateinit var brandWalletActivateCtaRow: LinearLayout
     private lateinit var brandWalletActionsRow: LinearLayout
     private lateinit var brandWalletSelectedIcon: ImageView
@@ -162,6 +174,7 @@ class PaymentModeFragment : Fragment() {
     private var isBrandWalletActivatedCardToggled: Boolean = false
     private var isBrandWalletCardSelected: Boolean = false
     private var brandWalletVerificationEmail: String? = null
+    private var hasObservedPaymentResult = false
 
     private companion object {
         const val BRAND_WALLET_PIN_LENGTH = 6
@@ -222,6 +235,7 @@ class PaymentModeFragment : Fragment() {
         initOffersAnimation()
         setPaymentMode()
         setSavedCardsView()
+        observeViewModel()
         addNewCardText.setOnClickListener {
             safeNavigate(R.id.action_paymentModeFragment_to_cardFragment)
         }
@@ -364,10 +378,13 @@ class PaymentModeFragment : Fragment() {
         brandWalletCard = view.findViewById(R.id.brand_wallet_card_view)
         brandWalletIcon = view.findViewById(R.id.brand_wallet_icon)
         brandWalletTitle = view.findViewById(R.id.brand_wallet_title)
+        brandWalletBalanceRow = view.findViewById(R.id.brand_wallet_balance_row)
         brandWalletBalance = view.findViewById(R.id.brand_wallet_balance)
+        brandWalletBalanceRefreshIcon = view.findViewById(R.id.brand_wallet_balance_refresh)
         brandWalletDescription = view.findViewById(R.id.brand_wallet_description)
         brandWalletPrimaryAction = view.findViewById(R.id.brand_wallet_primary_action)
         brandWalletSecondaryAction = view.findViewById(R.id.brand_wallet_secondary_action)
+        brandWalletProceedAction = view.findViewById(R.id.brand_wallet_proceed_action)
         brandWalletActivateCtaRow = view.findViewById(R.id.brand_wallet_activate_cta_row)
         brandWalletActionsRow = view.findViewById(R.id.brand_wallet_actions_row)
         brandWalletSelectedIcon = view.findViewById(R.id.brand_wallet_selected_icon)
@@ -465,6 +482,86 @@ class PaymentModeFragment : Fragment() {
         return processPaymentRequest
     }
 
+    private fun createBrandWalletProcessPaymentRequest(): ProcessPaymentRequest {
+        val customerInfo = ExpressSDKObject.getFetchData()?.customerInfo
+        val customerId = customerInfo?.customer_id ?: customerInfo?.customerId
+        val amount = getBrandWalletOrderAmount()
+        val currency = getCurrency()
+
+        val paymentOption = PaymentOptions(
+            wallet_details = WalletDetails(customer_id = customerId)
+        )
+        val extras = Extra(
+            payment_mode = arrayListOf(Constants.BRAND_WALLET_ID),
+            payment_amount = amount,
+            payment_currency = currency,
+            card_last4 = null,
+            redeemable_amount = null,
+            registered_mobile_number = null,
+            txn_mode = null,
+            device_info = null,
+            risk_validation_details = null,
+            dcc_status = null,
+            sdk_data = Utils.createSDKData(requireActivity()),
+            order_amount = amount,
+            language = null,
+            is_final_part_payment = null,
+            location_info = null,
+            order_currency = currency,
+        )
+
+        return ProcessPaymentRequest(
+            extras = extras,
+            payment_option = paymentOption,
+        )
+    }
+
+    private fun addMoneyToWallet(
+    ): WalletAddMoneyRequest {
+        val paymentMode = arrayListOf(UPI_ID)
+        val extra = Extra(
+            paymentMode,
+            getAmount(),
+            getCurrency(),
+            null,
+            null,
+            null,
+            null,
+            null,
+
+            null,
+            null,
+            Utils.createSDKData(requireActivity()),
+            is_final_part_payment = false
+        )
+        val upiData = UpiData(UPI_ID, null, "Intent")
+        val mode = "Cash"
+        val convenienceFeesData = viewModel.selectedConvenienceFee?.let {
+            Utils.getConvenienceFeesRequest(
+                it
+            )
+        }
+        val customerInfo = ExpressSDKObject.getFetchData()?.customerInfo
+        val customer = CustomerInfo(
+            customer_id = customerInfo?.customerId ?: customerInfo?.customer_id ?: "",
+            country_code = customerInfo?.countryCode ?: customerInfo?.country_code ?: "",
+            email_id = customerInfo?.emailId ?: customerInfo?.email_id ?: "",
+            mobile_number = customerInfo?.mobileNo ?: customerInfo?.mobile_number
+            ?: customerInfo?.mobileNumber ?: ""
+        )
+        val upiTxnData = UpiTransactionData(10)
+        val addMoneyToWalletRequest =
+            WalletAddMoneyRequest(
+                upiData,
+                mode,
+                customer,
+                upiTxnData,
+                extra
+            )
+
+        return addMoneyToWalletRequest
+    }
+
 
     private fun setPaymentMode() {
         paymentModeRecyclerView.layoutManager = LinearLayoutManager(requireContext())
@@ -501,11 +598,17 @@ class PaymentModeFragment : Fragment() {
 
         val customerInfo = ExpressSDKObject.getFetchData()?.customerInfo
         val isActivatedState = customerInfo?.brandWalletEnabled == true
+        val walletBalanceValue = customerInfo?.brandWalletBalance?.value ?: 0
         val resolvedBalanceText = if (isActivatedState) {
-            formatBrandWalletBalance(customerInfo?.brandWalletBalance?.value)
+            formatBrandWalletBalance(walletBalanceValue)
         } else {
             null
         }
+        val orderAmount = getBrandWalletOrderAmount()
+        val hasSufficientBalanceForOrder =
+            isActivatedState && orderAmount > 0 && walletBalanceValue >= orderAmount
+        val shouldShowProceedCta = hasSufficientBalanceForOrder && isBrandWalletCardSelected
+        val isZeroBalance = isActivatedState && walletBalanceValue == 0
         if (!isActivatedState) {
             isBrandWalletCardSelected = false
         }
@@ -521,8 +624,21 @@ class PaymentModeFragment : Fragment() {
                 if (isActivatedState) R.color.black_text else R.color.green_00722F
             )
         )
-        brandWalletBalance.visibility =
-            if (isActivatedState && !resolvedBalanceText.isNullOrBlank()) View.VISIBLE else View.GONE
+        val isBalanceVisible = isActivatedState && !resolvedBalanceText.isNullOrBlank()
+        brandWalletBalanceRow.visibility = if (isBalanceVisible) View.VISIBLE else View.GONE
+        brandWalletBalance.visibility = if (isBalanceVisible) View.VISIBLE else View.GONE
+        brandWalletBalanceRefreshIcon.visibility = if (isZeroBalance) View.VISIBLE else View.GONE
+        brandWalletBalanceRefreshIcon.setOnClickListener(
+            if (isZeroBalance) {
+                View.OnClickListener {
+                    bindBrandWalletCard()
+                }
+            } else {
+                null
+            }
+        )
+        brandWalletBalanceRefreshIcon.isClickable = isZeroBalance
+        brandWalletBalanceRefreshIcon.isFocusable = isZeroBalance
         brandWalletSelectedIcon.visibility = if (isActivatedState) View.VISIBLE else View.GONE
         brandWalletSelectedIcon.setImageResource(
             if (isBrandWalletCardSelected) R.drawable.ic_check_circle_selected
@@ -550,11 +666,7 @@ class PaymentModeFragment : Fragment() {
             if (isActivatedState) {
                 View.OnClickListener {
                     isBrandWalletCardSelected = !isBrandWalletCardSelected
-                    brandWalletSelectedIcon.setImageResource(
-                        if (isBrandWalletCardSelected) R.drawable.ic_check_circle_selected
-                        else R.drawable.ic_check_circle_unselected
-                    )
-                    // Placeholder: update the selected payment mode state for Brand Wallet here.
+                    bindBrandWalletCard()
                 }
             } else {
                 null
@@ -564,15 +676,40 @@ class PaymentModeFragment : Fragment() {
         brandWalletSelectedIcon.isFocusable = isActivatedState
 
         brandWalletPrimaryAction.text = getString(R.string.brand_wallet_action_add_money)
-        brandWalletPrimaryAction.visibility = if (isActivatedState) View.VISIBLE else View.GONE
+        brandWalletPrimaryAction.visibility =
+            if (isActivatedState && !hasSufficientBalanceForOrder) View.VISIBLE else View.GONE
 
         val secondaryActionLabel = getString(R.string.brand_wallet_action_redeem_gift_card)
         brandWalletSecondaryAction.text = secondaryActionLabel
         brandWalletSecondaryAction.visibility =
             if (!isActivatedState || secondaryActionLabel.isBlank()) View.GONE else View.VISIBLE
 
-        bindBrandWalletActionListeners(isActivatedState, brandWalletPrimaryAction, brandWalletPrimaryAction.text?.toString())
-        bindBrandWalletActionListeners(isActivatedState, brandWalletSecondaryAction, secondaryActionLabel)
+        brandWalletProceedAction.visibility =
+            if (shouldShowProceedCta) View.VISIBLE else View.GONE
+        brandWalletProceedAction.setOnClickListener(
+            if (shouldShowProceedCta) {
+                View.OnClickListener {
+                    observeViewModel()
+                    paymentModeViewModel.processPayment(
+                        token = ExpressSDKObject.getToken(),
+                        paymentData = createBrandWalletProcessPaymentRequest(),
+                    )
+                }
+            } else {
+                null
+            }
+        )
+
+        bindBrandWalletActionListeners(
+            isActivatedState,
+            brandWalletPrimaryAction,
+            brandWalletPrimaryAction.text?.toString()
+        )
+        bindBrandWalletActionListeners(
+            isActivatedState,
+            brandWalletSecondaryAction,
+            secondaryActionLabel
+        )
     }
 
     private fun bindBrandWalletActionListeners(
@@ -588,7 +725,11 @@ class PaymentModeFragment : Fragment() {
             actionView.setOnClickListener {
                 showBrandWalletAddMoneyBottomSheet()
             }
-        } else if (actionLabel.equals(getString(R.string.brand_wallet_action_redeem_gift_card), true)) {
+        } else if (actionLabel.equals(
+                getString(R.string.brand_wallet_action_redeem_gift_card),
+                true
+            )
+        ) {
             actionView.setOnClickListener {
                 showBrandWalletRedeemGiftCardBottomSheet()
             }
@@ -661,7 +802,8 @@ class PaymentModeFragment : Fragment() {
             .inflate(R.layout.brand_wallet_verification_bottom_sheet, null)
 
         val closeButton = view.findViewById<ImageView>(R.id.brand_wallet_verification_close)
-        val emailContainer = view.findViewById<LinearLayout>(R.id.brand_wallet_verification_email_state)
+        val emailContainer =
+            view.findViewById<LinearLayout>(R.id.brand_wallet_verification_email_state)
         val otpContainer = view.findViewById<LinearLayout>(R.id.brand_wallet_verification_otp_state)
         val emailInput = view.findViewById<EditText>(R.id.brand_wallet_verification_email_input)
         val otpInput = view.findViewById<EditText>(R.id.brand_wallet_verification_otp_input)
@@ -677,7 +819,8 @@ class PaymentModeFragment : Fragment() {
         )
 
         val emailWatcher = object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) =
+                Unit
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) = Unit
 
@@ -692,7 +835,8 @@ class PaymentModeFragment : Fragment() {
             }
         }
         val otpWatcher = object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) =
+                Unit
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) = Unit
 
@@ -879,7 +1023,8 @@ class PaymentModeFragment : Fragment() {
         }
 
         amountInput.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) =
+                Unit
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) = Unit
 
@@ -902,13 +1047,16 @@ class PaymentModeFragment : Fragment() {
         quickAdd5000.setOnClickListener { updateAmount(roundedHundredAmount) }
         quickAdd8000.setOnClickListener { updateAmount(roundedThousandAmount) }
         ctaButton.setOnClickListener {
-            if (!isBrandWalletAddMoneyAmountValid(
-                    extractBrandWalletAmountValue(amountInput.text?.toString()),
-                    requiredTopUpAmount
-                )
-            ) {
-                return@setOnClickListener
-            }
+            val isAmountValid = isBrandWalletAddMoneyAmountValid(
+                extractBrandWalletAmountValue(amountInput.text?.toString()),
+                requiredTopUpAmount
+            )
+            if (!isAmountValid) return@setOnClickListener
+
+            paymentModeViewModel.addMoneyToWallet(
+                ExpressSDKObject.getToken(),
+                addMoneyToWallet()
+            )
             showBrandWalletAddMoneyOtpBottomSheet()
         }
 
@@ -955,7 +1103,8 @@ class PaymentModeFragment : Fragment() {
         Utils.handleCTAEnableDisable(requireContext(), false, ctaButton)
 
         otpInput.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) =
+                Unit
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) = Unit
 
@@ -974,7 +1123,8 @@ class PaymentModeFragment : Fragment() {
                 var secondsLeft = BRAND_WALLET_PIN_RESEND_SECONDS
                 while (secondsLeft > 0) {
                     resendText.isEnabled = false
-                    resendText.text = getString(R.string.brand_wallet_add_money_resend_pin_in, secondsLeft)
+                    resendText.text =
+                        getString(R.string.brand_wallet_add_money_resend_pin_in, secondsLeft)
                     delay(1000)
                     secondsLeft -= 1
                 }
@@ -1035,8 +1185,10 @@ class PaymentModeFragment : Fragment() {
         val formContainer = view.findViewById<View>(R.id.brand_wallet_redeem_form_container)
         val loadingContainer = view.findViewById<View>(R.id.brand_wallet_redeem_loading_container)
         val closeButton = view.findViewById<ImageView>(R.id.brand_wallet_redeem_close)
-        val loadingCloseButton = view.findViewById<ImageView>(R.id.brand_wallet_redeem_loading_close)
-        val giftCardNumberInput = view.findViewById<EditText>(R.id.brand_wallet_redeem_card_number_input)
+        val loadingCloseButton =
+            view.findViewById<ImageView>(R.id.brand_wallet_redeem_loading_close)
+        val giftCardNumberInput =
+            view.findViewById<EditText>(R.id.brand_wallet_redeem_card_number_input)
         val giftCardPinInput = view.findViewById<EditText>(R.id.brand_wallet_redeem_card_pin_input)
         val redeemButton = view.findViewById<Button>(R.id.brand_wallet_redeem_cta)
         val progressBar = view.findViewById<ProgressBar>(R.id.brand_wallet_redeem_loading_progress)
@@ -1047,13 +1199,15 @@ class PaymentModeFragment : Fragment() {
         progressBar.progress = 0
 
         fun updateRedeemButtonState() {
-            val isEnabled = isValidBrandWalletGiftCardNumber(giftCardNumberInput.text?.toString()) &&
-                    isValidBrandWalletGiftCardPin(giftCardPinInput.text?.toString())
+            val isEnabled =
+                isValidBrandWalletGiftCardNumber(giftCardNumberInput.text?.toString()) &&
+                        isValidBrandWalletGiftCardPin(giftCardPinInput.text?.toString())
             Utils.handleCTAEnableDisable(requireContext(), isEnabled, redeemButton)
         }
 
         val textWatcher = object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) =
+                Unit
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) = Unit
 
@@ -1076,7 +1230,8 @@ class PaymentModeFragment : Fragment() {
             val giftCardNumber = giftCardNumberInput.text?.toString().orEmpty()
             val giftCardPin = giftCardPinInput.text?.toString().orEmpty()
             if (!isValidBrandWalletGiftCardNumber(giftCardNumber) ||
-                !isValidBrandWalletGiftCardPin(giftCardPin)) {
+                !isValidBrandWalletGiftCardPin(giftCardPin)
+            ) {
                 return@setOnClickListener
             }
             formContainer.visibility = View.GONE
@@ -1116,8 +1271,9 @@ class PaymentModeFragment : Fragment() {
         brandWalletRedeemProgressJob = viewLifecycleOwner.lifecycleScope.launch {
             var elapsedMs = 0L
             while (elapsedMs < BRAND_WALLET_REDEEM_TIMEOUT_MS) {
-                val progress = ((elapsedMs.toFloat() / BRAND_WALLET_REDEEM_TIMEOUT_MS) * 100).toInt()
-                    .coerceIn(0, 95)
+                val progress =
+                    ((elapsedMs.toFloat() / BRAND_WALLET_REDEEM_TIMEOUT_MS) * 100).toInt()
+                        .coerceIn(0, 95)
                 progressBar.progress = progress
                 delay(BRAND_WALLET_REDEEM_PROGRESS_INTERVAL_MS)
                 elapsedMs += BRAND_WALLET_REDEEM_PROGRESS_INTERVAL_MS
@@ -1153,7 +1309,8 @@ class PaymentModeFragment : Fragment() {
 
         val closeButton = view.findViewById<ImageView>(R.id.brand_wallet_redeem_not_eligible_close)
         val tryAnotherButton = view.findViewById<Button>(R.id.brand_wallet_redeem_not_eligible_cta)
-        val termsText = view.findViewById<TextView>(R.id.brand_wallet_redeem_not_eligible_terms_text)
+        val termsText =
+            view.findViewById<TextView>(R.id.brand_wallet_redeem_not_eligible_terms_text)
 
         closeButton.setOnClickListener {
             brandWalletBottomSheetDialog?.dismiss()
@@ -1221,7 +1378,8 @@ class PaymentModeFragment : Fragment() {
             behavior.state = BottomSheetBehavior.STATE_EXPANDED
             behavior.skipCollapsed = true
             behavior.isFitToContents = false
-            behavior.expandedOffset = ((1 - BRAND_WALLET_TERMS_SHEET_HEIGHT_RATIO) * screenHeight).toInt()
+            behavior.expandedOffset =
+                ((1 - BRAND_WALLET_TERMS_SHEET_HEIGHT_RATIO) * screenHeight).toInt()
             behavior.isDraggable = true
             it.setBackgroundColor(Color.TRANSPARENT)
         }
@@ -1341,7 +1499,8 @@ class PaymentModeFragment : Fragment() {
         val customer = fetchData.customerInfo ?: return null
         val emailId = getBrandWalletCustomerEmail() ?: return null
         val shippingAddress =
-            ExpressSDKObject.getSelectedAddress() ?: customer.shippingAddress ?: customer.shipping_address
+            ExpressSDKObject.getSelectedAddress() ?: customer.shippingAddress
+            ?: customer.shipping_address
         val billingAddress = customer.billingAddress ?: fetchData.billingAddress ?: shippingAddress
 
         val walletCustomer = CustomerInfo(
@@ -1376,13 +1535,17 @@ class PaymentModeFragment : Fragment() {
         currentCustomer.first_name = updatedCustomer.first_name ?: currentCustomer.first_name
         currentCustomer.last_name = updatedCustomer.last_name ?: currentCustomer.last_name
         currentCustomer.country_code = updatedCustomer.country_code ?: currentCustomer.country_code
-        currentCustomer.mobile_number = updatedCustomer.mobile_number ?: currentCustomer.mobile_number
+        currentCustomer.mobile_number =
+            updatedCustomer.mobile_number ?: currentCustomer.mobile_number
         currentCustomer.email_id = updatedCustomer.email_id ?: currentCustomer.email_id
         currentCustomer.emailId = updatedCustomer.email_id ?: currentCustomer.emailId
         currentCustomer.customer_id = updatedCustomer.customer_id ?: currentCustomer.customer_id
-        currentCustomer.shipping_address = updatedCustomer.shipping_address ?: currentCustomer.shipping_address
-        currentCustomer.shippingAddress = updatedCustomer.shipping_address ?: currentCustomer.shippingAddress
-        currentCustomer.billingAddress = updatedCustomer.billingAddress ?: currentCustomer.billingAddress
+        currentCustomer.shipping_address =
+            updatedCustomer.shipping_address ?: currentCustomer.shipping_address
+        currentCustomer.shippingAddress =
+            updatedCustomer.shipping_address ?: currentCustomer.shippingAddress
+        currentCustomer.billingAddress =
+            updatedCustomer.billingAddress ?: currentCustomer.billingAddress
     }
 
     private fun persistBrandWalletCustomerEmail(email: String?) {
@@ -1433,9 +1596,20 @@ class PaymentModeFragment : Fragment() {
         return Utils.convertToRupeesWithSymobl(requireContext(), balance ?: 0)
     }
 
-    private fun getBrandWalletRequiredTopUpAmount(): Int {
+    private fun getBrandWalletOrderAmount(): Int {
         val payableAmount = ExpressSDKObject.getPayableAmount() ?: ExpressSDKObject.getAmount()
-        val walletBalance = ExpressSDKObject.getFetchData()?.customerInfo?.brandWalletBalance?.value ?: 0
+        val orderAmount = if ((payableAmount ?: 0) > 0) {
+            payableAmount
+        } else {
+            ExpressSDKObject.getAmount()
+        }
+        return orderAmount.coerceAtLeast(0)
+    }
+
+    private fun getBrandWalletRequiredTopUpAmount(): Int {
+        val payableAmount = getBrandWalletOrderAmount()
+        val walletBalance =
+            ExpressSDKObject.getFetchData()?.customerInfo?.brandWalletBalance?.value ?: 0
         return (payableAmount - walletBalance).coerceAtLeast(1)
     }
 
@@ -1484,6 +1658,7 @@ class PaymentModeFragment : Fragment() {
                     }
 
                     PaymentModes.UPI.paymentModeID -> {
+                        ExpressSDKObject.setSelectedMode(null)
                         safeNavigate(R.id.action_paymentModeFragment_to_UPIFragment)
                     }
 
@@ -1517,6 +1692,9 @@ class PaymentModeFragment : Fragment() {
     }
 
     private fun observeViewModel() {
+        if (hasObservedPaymentResult) return
+        hasObservedPaymentResult = true
+
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED)
             {
@@ -1545,6 +1723,88 @@ class PaymentModeFragment : Fragment() {
                 }
             }
         }
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                paymentModeViewModel.processPaymentResult.collect {
+                    when (it) {
+                        is BaseResult.Error -> {
+                            val bundle = Bundle()
+                            bundle.putString(ERROR_KEY, it.errorCode)
+                            bundle.putString(ERROR_MESSAGE_KEY, it.errorMessage)
+                            bottomSheetDialog?.dismiss()
+                            safeNavigate(R.id.action_paymentModeFragment_to_successFragment)
+                        }
+
+                        is BaseResult.Loading -> {
+                            if (it.isLoading)
+                                bottomSheetDialog = showProcessPaymentDialog(requireContext())
+                        }
+
+                        is BaseResult.Success<ProcessPaymentResponse> -> {
+                            ExpressSDKObject.setProcessPaymentResponse(it.data)
+                            bottomSheetDialog?.dismiss()
+                            safeNavigate(R.id.action_paymentModeFragment_to_ACSFragment)
+
+                        }
+                    }
+                }
+            }
+        }
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                paymentModeViewModel.addMoneyToWalletResult.collect {
+                    when (it) {
+                        is BaseResult.Error -> {
+                            val bundle = Bundle()
+                            bundle.putString(ERROR_KEY, it.errorCode)
+                            bundle.putString(ERROR_MESSAGE_KEY, it.errorMessage)
+                            bottomSheetDialog?.dismiss()
+                            safeNavigate(R.id.action_paymentModeFragment_to_successFragment)
+                        }
+
+                        is BaseResult.Loading -> {
+                            if (it.isLoading)
+                                bottomSheetDialog = showProcessPaymentDialog(requireContext())
+
+                        }
+
+                        is BaseResult.Success<WalletAddMoneyResponse> -> {
+                            ExpressSDKObject.setWalletAddMoneyResponse(it.data)
+                            ExpressSDKObject.setProcessPaymentResponse(
+                                mapWalletAddMoneyToProcessPaymentResponse(it.data)
+                            )
+                            ExpressSDKObject.setSelectedMode(Constants.BRAND_WALLET_ID)
+                            bottomSheetDialog?.dismiss()
+                            val bundle = Bundle()
+                            bundle.putString("MODE", Constants.BRAND_WALLET_ID)
+                            safeNavigate(R.id.action_paymentModeFragment_to_UPIFragment, bundle)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun mapWalletAddMoneyToProcessPaymentResponse(
+        response: WalletAddMoneyResponse
+    ): ProcessPaymentResponse {
+        val firstPayment = response.charge_order?.payments?.firstOrNull()
+        val deepLink = response.charge_order?.challenge_url ?: firstPayment?.challenge_url
+        val paymentId = firstPayment?.id
+        val orderId = response.charge_order?.order_id ?: response.order_id
+
+        return ProcessPaymentResponse(
+            redirect_url = null,
+            response_code = response.response_code?.toString() ?: "-1",
+            response_message = response.response_message ?: "",
+            pg_upi_unique_request_id = null,
+            deep_link = deepLink,
+            payment_id = paymentId,
+            order_id = orderId,
+            short_link = null,
+        )
     }
 
     private fun observeCreateWalletResult() {
@@ -1798,6 +2058,7 @@ class PaymentModeFragment : Fragment() {
                         // pass upi id to upifragment and run the process payment
                         val bundle = Bundle()
                         bundle.putString("RECOMMENDED_ACTION_UPI", upiId)
+                        ExpressSDKObject.setSelectedMode(null)
                         safeNavigate(
                             R.id.action_paymentModeFragment_to_UPIFragment,
                             bundle

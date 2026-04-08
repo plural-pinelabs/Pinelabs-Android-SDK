@@ -420,16 +420,35 @@
                             android:textSize="16sp"
                             tools:text="Croma Wallet" />
 
-                        <TextView
-                            android:id="@+id/brand_wallet_balance"
+                        <LinearLayout
+                            android:id="@+id/brand_wallet_balance_row"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
-                            android:fontFamily="sans-serif-medium"
-                            android:textColor="@color/green_00722F"
-                            android:textFontWeight="700"
-                            android:textSize="18sp"
-                            tools:text="₹ 2,000" />
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:id="@+id/brand_wallet_balance"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="sans-serif-medium"
+                                android:textColor="@color/green_00722F"
+                                android:textFontWeight="700"
+                                android:textSize="18sp"
+                                tools:text="₹ 2,000" />
+
+                            <ImageView
+                                android:id="@+id/brand_wallet_balance_refresh"
+                                android:layout_width="16dp"
+                                android:layout_height="16dp"
+                                android:layout_marginStart="8dp"
+                                android:contentDescription="@string/brand_wallet_refresh_balance"
+                                android:src="@drawable/ic_brand_wallet_refresh"
+                                android:visibility="gone"
+                                app:tint="@color/black_text_50" />
+
+                        </LinearLayout>
 
                         <TextView
                             android:id="@+id/brand_wallet_description"
@@ -524,6 +543,24 @@
                         tools:text="+ Add Money" />
 
                 </LinearLayout>
+
+                <TextView
+                    android:id="@+id/brand_wallet_proceed_action"
+                    android:layout_width="0dp"
+                    android:layout_height="52dp"
+                    android:layout_marginTop="16dp"
+                    android:background="@drawable/brand_wallet_proceed_button_background"
+                    android:fontFamily="sans-serif-medium"
+                    android:gravity="center"
+                    android:paddingHorizontal="16dp"
+                    android:text="@string/brand_wallet_action_proceed_to_pay"
+                    android:textColor="@color/white"
+                    android:textFontWeight="600"
+                    android:textSize="16sp"
+                    android:visibility="gone"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/brand_wallet_actions_row" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 

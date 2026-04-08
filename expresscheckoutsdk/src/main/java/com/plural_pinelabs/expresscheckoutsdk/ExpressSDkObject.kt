@@ -7,6 +7,7 @@ import com.plural_pinelabs.expresscheckoutsdk.data.model.FetchResponseDTO
 import com.plural_pinelabs.expresscheckoutsdk.data.model.OfferDetail
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ProcessPaymentResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.Tenure
+import com.plural_pinelabs.expresscheckoutsdk.data.model.WalletAddMoneyResponse
 import java.util.concurrent.atomic.AtomicReference
 
 internal data class SDKObject(
@@ -16,6 +17,8 @@ internal data class SDKObject(
     val sandBoxMode: Boolean = false,
     var fetchResponseDTO: FetchResponseDTO? = null,
     var processPaymentResponse: ProcessPaymentResponse? = null,
+    var walletAddMoneyResponse: WalletAddMoneyResponse? = null,
+    var selectedMode: String? = null,
     var phoneNumber: String? = null,
     var emiPaymentModeData: EMIPaymentModeData? = null,
     var payableAmount: Int? = null,
@@ -94,6 +97,22 @@ internal object ExpressSDKObject {
 
     fun getProcessPaymentResponse(): ProcessPaymentResponse? {
         return getSDKObject()?.processPaymentResponse
+    }
+
+    fun setWalletAddMoneyResponse(response: WalletAddMoneyResponse?) {
+        getSDKObject()?.walletAddMoneyResponse = response
+    }
+
+    fun getWalletAddMoneyResponse(): WalletAddMoneyResponse? {
+        return getSDKObject()?.walletAddMoneyResponse
+    }
+
+    fun setSelectedMode(mode: String?) {
+        getSDKObject()?.selectedMode = mode
+    }
+
+    fun getSelectedMode(): String? {
+        return getSDKObject()?.selectedMode
     }
 
     fun setPhoneNumber(phoneNumber: String) {

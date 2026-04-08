@@ -57,6 +57,7 @@
     <string name="or_complete_payment_on_your"><font color='background: #1C1C1C80;'> Or, complete payment on your </font><font color='#CC1C1C1C'><u>bank’s website</u></font></string>
     <string name="pay_using_upi">Pay using UPI</string>
     <string name="pay_by_any_upi_app">Pay by any UPI app</string>
+    <string name="pay_by_existing_upi_app">Pay by existing UPI app</string>
     <string name="upi_app_google_pay">Google Pay</string>
     <string name="upi_app_phonepe">PhonePe</string>
     <string name="upi_app_paytm">Paytm</string>
@@ -219,6 +220,8 @@
     <string name="continue_to_pay">Continue to Pay</string>
     <string name="brand_wallet_action_redeem_gift_card">Redeem Gift Card</string>
     <string name="brand_wallet_action_add_money">+ Add Money</string>
+    <string name="brand_wallet_action_proceed_to_pay">Proceed to pay</string>
+    <string name="brand_wallet_refresh_balance">Refresh wallet balance</string>
     <string name="brand_wallet_redeem_gift_card_title">Redeem gift card</string>
     <string name="brand_wallet_redeem_loading_title">Applying Gift Card</string>
     <string name="brand_wallet_redeem_gift_card_number">Gift Card Number</string>
