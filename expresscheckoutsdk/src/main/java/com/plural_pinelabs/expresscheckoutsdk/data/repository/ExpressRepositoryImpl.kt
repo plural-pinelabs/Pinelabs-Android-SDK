@@ -109,10 +109,11 @@ class ExpressRepositoryImpl(
     }
 
     override suspend fun transactionStatus(
-        token: String?
+        token: String?,
+        orderId: String?,
     ): Flow<BaseResult<TransactionStatusResponse>> {
         return toResultFlow(networkHelper = networkHelper) {
-            (apiService as CommonApiService).statusOfTransaction(token)
+            (apiService as CommonApiService).statusOfTransaction(token, orderId)
         }
     }
 

@@ -8,6 +8,8 @@ import com.plural_pinelabs.expresscheckoutsdk.common.BaseResult
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.UPI_TRANSACTION_STATUS_INTERVAL
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CancelTransactionResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ConvenienceFeesInfo
+import com.plural_pinelabs.expresscheckoutsdk.data.model.OTPRequest
+import com.plural_pinelabs.expresscheckoutsdk.data.model.OTPResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ProcessPaymentRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ProcessPaymentResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.TransactionStatusResponse
@@ -35,6 +37,10 @@ class UPIViewModel(private val expressRepositoryImpl: ExpressRepositoryImpl) : V
     val cancelTransactionResult: StateFlow<BaseResult<CancelTransactionResponse>> =
         _cancelTransactionResult
 
+    private val _submitOtpResult =
+        MutableStateFlow<BaseResult<OTPResponse>>(BaseResult.Loading(false))
+    val submitOtpResult: StateFlow<BaseResult<OTPResponse>> = _submitOtpResult
+
     private val _countDownTimer = MutableStateFlow<Long>(-1)
     val countDownTimer: StateFlow<Long> = _countDownTimer
     var selectedConvenienceFee: ConvenienceFeesInfo? = null
@@ -60,10 +66,21 @@ class UPIViewModel(private val expressRepositoryImpl: ExpressRepositoryImpl) : V
         _transactionStatusResult.value = BaseResult.Loading(false)
     }
 
-
-    fun getTransactionStatus(token: String?) =
+    fun submitOtp(token: String?, otpRequest: OTPRequest) =
         viewModelScope.launch(Dispatchers.IO) {
-            expressRepositoryImpl.transactionStatus(token).collect {
+            expressRepositoryImpl.submitOTP(token, otpRequest).collect {
+                _submitOtpResult.value = it
+            }
+        }
+
+    fun resetSubmitOtpState() {
+        _submitOtpResult.value = BaseResult.Loading(false)
+    }
+
+
+    fun getTransactionStatus(token: String?, orderId: String? = null) =
+        viewModelScope.launch(Dispatchers.IO) {
+            expressRepositoryImpl.transactionStatus(token, orderId).collect {
                 _transactionStatusResult.value = it
             }
         }
@@ -85,11 +102,11 @@ class UPIViewModel(private val expressRepositoryImpl: ExpressRepositoryImpl) : V
         }
     }
 
-    fun startPolling() {
+    fun startPolling(orderId: String? = null) {
         pollingJob?.cancel()
         pollingJob = viewModelScope.launch(Dispatchers.IO) {
             while (isActive) {
-                getTransactionStatus(ExpressSDKObject.getToken())
+                getTransactionStatus(ExpressSDKObject.getToken(), orderId)
                 delay(UPI_TRANSACTION_STATUS_INTERVAL)
             }
         }

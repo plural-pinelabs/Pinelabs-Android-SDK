@@ -578,7 +578,7 @@ data class PaymentOptions(
     val wallet_details: WalletDetails? = null,
 ) : Parcelable
 
-@Parcelize
+@Parcelize 
 data class WalletDetails(
     val customer_id: String? = null,
 ) : Parcelable

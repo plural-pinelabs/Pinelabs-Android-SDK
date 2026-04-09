@@ -5,6 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.plural_pinelabs.expresscheckoutsdk.common.BaseResult
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CreateWalletRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CreateWalletResponse
+import com.plural_pinelabs.expresscheckoutsdk.data.model.OTPRequest
+import com.plural_pinelabs.expresscheckoutsdk.data.model.OTPResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ProcessPaymentRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ProcessPaymentResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.WalletAddMoneyRequest
@@ -28,6 +30,10 @@ class PaymentModeViewModel(private val expressRepositoryImpl: ExpressRepositoryI
     private val _addMoneyToWalletResult =
         MutableStateFlow<BaseResult<WalletAddMoneyResponse>>(BaseResult.Loading(false))
     val addMoneyToWalletResult: StateFlow<BaseResult<WalletAddMoneyResponse>> = _addMoneyToWalletResult
+
+    private val _submitOtpResult =
+        MutableStateFlow<BaseResult<OTPResponse>>(BaseResult.Loading(false))
+    val submitOtpResult: StateFlow<BaseResult<OTPResponse>> = _submitOtpResult
 
     fun createWallet(token: String?, request: CreateWalletRequest) =
         viewModelScope.launch(Dispatchers.IO) {
@@ -54,5 +60,16 @@ class PaymentModeViewModel(private val expressRepositoryImpl: ExpressRepositoryI
                 _addMoneyToWalletResult.value = it
             }
         }
+
+    fun submitOtp(token: String?, otpRequest: OTPRequest) =
+        viewModelScope.launch(Dispatchers.IO) {
+            expressRepositoryImpl.submitOTP(token, otpRequest).collect {
+                _submitOtpResult.value = it
+            }
+        }
+
+    fun resetSubmitOtpState() {
+        _submitOtpResult.value = BaseResult.Loading(false)
+    }
 }
 

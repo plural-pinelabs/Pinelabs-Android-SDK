@@ -1,6 +1,7 @@
 package com.plural_pinelabs.expresscheckoutsdk.presentation.upi
 
 import UpiAppsAdapter
+import android.app.Fragment
 import android.content.Intent
 import android.content.pm.ResolveInfo
 import android.graphics.Color
@@ -8,6 +9,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.text.Editable
+import android.text.InputFilter
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.SpannableStringBuilder
@@ -66,13 +68,19 @@ import com.plural_pinelabs.expresscheckoutsdk.common.Utils
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils.MTAG
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils.showProcessPaymentDialog
 import com.plural_pinelabs.expresscheckoutsdk.data.model.Extra
+import com.plural_pinelabs.expresscheckoutsdk.data.model.OTPRequest
+import com.plural_pinelabs.expresscheckoutsdk.data.model.OTPResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.PaymentModeData
+import com.plural_pinelabs.expresscheckoutsdk.data.model.PaymentOptions
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ProcessPaymentRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ProcessPaymentResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.TransactionStatusResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.UpiData
 import com.plural_pinelabs.expresscheckoutsdk.data.model.UpiTransactionData
+import com.plural_pinelabs.expresscheckoutsdk.data.model.WalletDetails
 import com.plural_pinelabs.expresscheckoutsdk.presentation.LandingActivity
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 
@@ -99,9 +107,19 @@ class UPIFragment : Fragment() {
     private var isQRPayment: Boolean = false
     private var consumedDeepLink = false
     private var isQRAllowed = false
+    private var brandWalletOtpBottomSheetDialog: BottomSheetDialog? = null
+    private var brandWalletOtpCountdownJob: Job? = null
+    private var isBrandWalletOtpTriggerProcessPayment = false
+    private var hasShownBrandWalletOtpSheet = false
+    private var brandWalletOtpPaymentId: String? = null
 
 
     private lateinit var transactionLauncher: ActivityResultLauncher<Intent>
+
+    private companion object {
+        const val BRAND_WALLET_PIN_LENGTH = 6
+        const val BRAND_WALLET_PIN_RESEND_SECONDS = 120
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -111,6 +129,13 @@ class UPIFragment : Fragment() {
             if (result.resultCode == 0) {
                 // If the result is not OK, cancel the transaction process
                 cancelTransactionProcess()
+                return@registerForActivityResult
+            }
+            if (flowMode.equals(BRAND_WALLET_ID, true)) {
+                if (bottomTimerSheetDialog?.isShowing != true) {
+                    showProcessPaymentTimerDialog()
+                    viewModel.startCountDownTimer()
+                }
                 return@registerForActivityResult
             }
             showProcessPaymentTimerDialog()
@@ -305,16 +330,37 @@ class UPIFragment : Fragment() {
         vpa: String? = null,
         transactionMode: String?,
     ) {
-        if (flowMode.equals(BRAND_WALLET_ID, true) && transactionMode == UPI_INTENT) {
+        if (flowMode.equals(BRAND_WALLET_ID, true)) {
             val addMoneyResponse = ExpressSDKObject.getWalletAddMoneyResponse()
+            val inquiryOrderId = addMoneyResponse?.charge_order?.order_id
             val existingDeepLink = addMoneyResponse?.charge_order?.challenge_url
                 ?: addMoneyResponse?.charge_order?.payments?.firstOrNull()?.challenge_url
                 ?: ExpressSDKObject.getProcessPaymentResponse()?.deep_link
 
-            if (!existingDeepLink.isNullOrBlank()) {
-                showUpiTray(existingDeepLink, upiAppPackageName = selectUPIPackage)
+            if (inquiryOrderId.isNullOrBlank()) {
+                Toast.makeText(
+                    requireActivity(),
+                    "Unable to start inquiry. Please try again.",
+                    Toast.LENGTH_SHORT
+                ).show()
                 return
             }
+
+            if (!existingDeepLink.isNullOrBlank()) {
+                if (bottomTimerSheetDialog?.isShowing != true) {
+                    showProcessPaymentTimerDialog()
+                    viewModel.startCountDownTimer()
+                }
+                viewModel.startPolling(inquiryOrderId)
+                showUpiTray(existingDeepLink, upiAppPackageName = selectUPIPackage)
+            } else {
+                Toast.makeText(
+                    requireActivity(),
+                    "Unable to launch UPI app. Please try again.",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+            return
         }
 
         mTransactionMode = transactionMode
@@ -383,6 +429,17 @@ class UPIFragment : Fragment() {
                 viewModel.processPaymentResult.collect {
                     when (it) {
                         is BaseResult.Error -> {
+                            if (isBrandWalletOtpTriggerProcessPayment) {
+                                isBrandWalletOtpTriggerProcessPayment = false
+                                bottomSheetDialog?.dismiss()
+                                viewModel.resetPaymentFlowResponse()
+                                Toast.makeText(
+                                    requireContext(),
+                                    it.errorMessage ?: "Unable to send OTP.",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                                return@collect
+                            }
                             cancelTransactionProcess()
                             safeNavigate(R.id.action_UPIFragment_to_successFragment)
                         }
@@ -393,6 +450,14 @@ class UPIFragment : Fragment() {
                         }
 
                         is BaseResult.Success<ProcessPaymentResponse> -> {
+                            if (isBrandWalletOtpTriggerProcessPayment) {
+                                isBrandWalletOtpTriggerProcessPayment = false
+                                ExpressSDKObject.setProcessPaymentResponse(it.data)
+                                brandWalletOtpPaymentId = it.data.payment_id
+                                bottomSheetDialog?.dismiss()
+                                viewModel.resetPaymentFlowResponse()
+                                return@collect
+                            }
                             bottomSheetDialog?.dismiss()
                             if (mTransactionMode == UPI_INTENT) {
                                 showUpiTray(
@@ -447,11 +512,21 @@ class UPIFragment : Fragment() {
 
 
                                 PROCESSED_STATUS -> {
+                                    if (flowMode.equals(BRAND_WALLET_ID, true)) {
+                                        startBrandWalletOtpFlowAfterUpi()
+                                        viewModel.resetTransactionResponse()
+                                        return@collect
+                                    }
                                     cancelTransactionProcess()
                                     safeNavigate(R.id.action_UPIFragment_to_successFragment)
                                 }
 
                                 PROCESSED_ATTEMPTED -> {
+                                    if (flowMode.equals(BRAND_WALLET_ID, true)) {
+                                        startBrandWalletOtpFlowAfterUpi()
+                                        viewModel.resetTransactionResponse()
+                                        return@collect
+                                    }
                                     cancelTransactionProcess()
                                     safeNavigate(R.id.action_UPIFragment_to_successFragment)
 
@@ -468,6 +543,188 @@ class UPIFragment : Fragment() {
                 }
             }
         }
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.submitOtpResult.collect {
+                    when (it) {
+                        is BaseResult.Error -> {
+                            viewModel.resetSubmitOtpState()
+                            bottomSheetDialog?.dismiss()
+                            Toast.makeText(
+                                requireContext(),
+                                it.errorMessage ?: "Invalid OTP. Please try again.",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+
+                        is BaseResult.Loading -> {
+                            if (it.isLoading) {
+                                bottomSheetDialog = showProcessPaymentDialog(requireContext())
+                            }
+                        }
+
+                        is BaseResult.Success<OTPResponse> -> {
+                            viewModel.resetSubmitOtpState()
+                            cancelTransactionProcess()
+                            safeNavigate(R.id.action_UPIFragment_to_successFragment)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun startBrandWalletOtpFlowAfterUpi() {
+        if (hasShownBrandWalletOtpSheet) return
+        hasShownBrandWalletOtpSheet = true
+        viewModel.stopPolling()
+        bottomVPASheetDialog?.dismiss()
+        bottomTimerSheetDialog?.dismiss()
+        qrBottomSheetDialog?.dismiss()
+        showBrandWalletOtpBottomSheet()
+    }
+
+    private fun showBrandWalletOtpBottomSheet() {
+        if (!isAdded) return
+        if (brandWalletOtpBottomSheetDialog?.isShowing == true) return
+
+        brandWalletOtpCountdownJob?.cancel()
+        brandWalletOtpCountdownJob = null
+        brandWalletOtpBottomSheetDialog?.dismiss()
+        brandWalletOtpBottomSheetDialog = BottomSheetDialog(requireContext())
+        val view = LayoutInflater.from(requireContext())
+            .inflate(R.layout.brand_wallet_add_money_otp_bottom_sheet, null)
+
+        val otpInput = view.findViewById<EditText>(R.id.brand_wallet_add_money_otp_input)
+        val resendText = view.findViewById<TextView>(R.id.brand_wallet_add_money_otp_resend)
+        val ctaButton = view.findViewById<Button>(R.id.brand_wallet_add_money_otp_cta)
+
+        otpInput.filters = arrayOf(InputFilter.LengthFilter(BRAND_WALLET_PIN_LENGTH))
+        Utils.handleCTAEnableDisable(requireContext(), false, ctaButton)
+
+        otpInput.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) =
+                Unit
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) = Unit
+
+            override fun afterTextChanged(s: Editable?) {
+                Utils.handleCTAEnableDisable(
+                    requireContext(),
+                    (s?.length ?: 0) == BRAND_WALLET_PIN_LENGTH,
+                    ctaButton
+                )
+            }
+        })
+
+        fun startPinCountdown() {
+            brandWalletOtpCountdownJob?.cancel()
+            brandWalletOtpCountdownJob = viewLifecycleOwner.lifecycleScope.launch {
+                var secondsLeft = BRAND_WALLET_PIN_RESEND_SECONDS
+                while (secondsLeft > 0) {
+                    resendText.isEnabled = false
+                    resendText.text =
+                        getString(R.string.brand_wallet_add_money_resend_pin_in, secondsLeft)
+                    delay(1000)
+                    secondsLeft -= 1
+                }
+                resendText.text = getString(R.string.brand_wallet_add_money_resend_pin)
+                resendText.isEnabled = true
+            }
+        }
+
+        resendText.setOnClickListener {
+            if (!resendText.isEnabled) return@setOnClickListener
+            otpInput.text?.clear()
+            Utils.handleCTAEnableDisable(requireContext(), false, ctaButton)
+            startPinCountdown()
+        }
+        ctaButton.setOnClickListener {
+            if ((otpInput.text?.length ?: 0) != BRAND_WALLET_PIN_LENGTH) {
+                return@setOnClickListener
+            }
+            val paymentId =
+                brandWalletOtpPaymentId ?: ExpressSDKObject.getProcessPaymentResponse()?.payment_id
+            if (paymentId.isNullOrBlank()) {
+                Toast.makeText(
+                    requireContext(),
+                    "Unable to verify OTP. Please try again.",
+                    Toast.LENGTH_SHORT
+                ).show()
+                return@setOnClickListener
+            }
+            viewModel.resetSubmitOtpState()
+            viewModel.submitOtp(
+                token = ExpressSDKObject.getToken(),
+                otpRequest = OTPRequest(
+                    payment_id = paymentId,
+                    otp = otpInput.text?.toString().orEmpty(),
+                )
+            )
+        }
+
+        startPinCountdown()
+        brandWalletOtpBottomSheetDialog?.setContentView(view)
+        brandWalletOtpBottomSheetDialog?.setCancelable(true)
+        brandWalletOtpBottomSheetDialog?.setCanceledOnTouchOutside(true)
+        brandWalletOtpBottomSheetDialog?.setOnDismissListener {
+            brandWalletOtpCountdownJob?.cancel()
+            brandWalletOtpCountdownJob = null
+            brandWalletOtpBottomSheetDialog = null
+        }
+        brandWalletOtpBottomSheetDialog?.show()
+
+        isBrandWalletOtpTriggerProcessPayment = true
+        brandWalletOtpPaymentId = null
+        viewModel.processPayment(
+            token = ExpressSDKObject.getToken(),
+            paymentData = createBrandWalletOtpProcessPaymentRequest(),
+        )
+    }
+
+    private fun createBrandWalletOtpProcessPaymentRequest(): ProcessPaymentRequest {
+        val customerInfo = ExpressSDKObject.getFetchData()?.customerInfo
+        val customerId = customerInfo?.customer_id ?: customerInfo?.customerId
+        val amount = getBrandWalletOrderAmount()
+        val currency = getCurrency()
+
+        val paymentOption = PaymentOptions(
+            wallet_details = WalletDetails(customer_id = customerId)
+        )
+        val extras = Extra(
+            payment_mode = arrayListOf(BRAND_WALLET_ID),
+            payment_amount = amount,
+            payment_currency = currency,
+            card_last4 = null,
+            redeemable_amount = null,
+            registered_mobile_number = null,
+            txn_mode = null,
+            device_info = null,
+            risk_validation_details = null,
+            dcc_status = null,
+            sdk_data = null,
+            order_amount = amount,
+            language = null,
+            is_final_part_payment = null,
+            location_info = null,
+            order_currency = currency,
+        )
+
+        return ProcessPaymentRequest(
+            payment_option = paymentOption,
+            extras = extras,
+        )
+    }
+
+    private fun getBrandWalletOrderAmount(): Int {
+        val payableAmount = ExpressSDKObject.getPayableAmount() ?: ExpressSDKObject.getAmount()
+        val orderAmount = if ((payableAmount ?: 0) > 0) {
+            payableAmount
+        } else {
+            ExpressSDKObject.getAmount()
+        }
+        return orderAmount.coerceAtLeast(0)
     }
 
 
@@ -478,6 +735,13 @@ class UPIFragment : Fragment() {
         bottomTimerSheetDialog?.dismiss()
         bottomVPASheetDialog?.dismiss()
         qrBottomSheetDialog?.dismiss()
+        brandWalletOtpBottomSheetDialog?.dismiss()
+        brandWalletOtpBottomSheetDialog = null
+        brandWalletOtpCountdownJob?.cancel()
+        brandWalletOtpCountdownJob = null
+        brandWalletOtpPaymentId = null
+        isBrandWalletOtpTriggerProcessPayment = false
+        hasShownBrandWalletOtpSheet = false
         viewModel.stopPolling()
     }
 
@@ -543,6 +807,10 @@ class UPIFragment : Fragment() {
         bottomTimerSheetDialog?.dismiss()
         bottomVPASheetDialog?.dismiss()
         qrBottomSheetDialog?.dismiss()
+        brandWalletOtpBottomSheetDialog?.dismiss()
+        brandWalletOtpBottomSheetDialog = null
+        brandWalletOtpCountdownJob?.cancel()
+        brandWalletOtpCountdownJob = null
         qrCountDownTimer?.cancel()
         super.onDestroyView()
     }

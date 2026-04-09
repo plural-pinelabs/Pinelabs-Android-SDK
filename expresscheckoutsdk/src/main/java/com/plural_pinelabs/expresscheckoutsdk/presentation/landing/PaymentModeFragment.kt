@@ -80,6 +80,8 @@ import com.plural_pinelabs.expresscheckoutsdk.data.model.CustomerData
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CustomerInfo
 import com.plural_pinelabs.expresscheckoutsdk.data.model.EMIPaymentModeData
 import com.plural_pinelabs.expresscheckoutsdk.data.model.Extra
+import com.plural_pinelabs.expresscheckoutsdk.data.model.OTPRequest
+import com.plural_pinelabs.expresscheckoutsdk.data.model.OTPResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.OfferDetail
 import com.plural_pinelabs.expresscheckoutsdk.data.model.PaymentMode
 import com.plural_pinelabs.expresscheckoutsdk.data.model.PaymentOptions
@@ -98,6 +100,9 @@ import com.plural_pinelabs.expresscheckoutsdk.presentation.utils.DividerItemDeco
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.math.BigDecimal
+import java.math.RoundingMode
+import java.text.DecimalFormat
 
 class PaymentModeFragment : Fragment() {
     private enum class BrandWalletVerificationSheetState {
@@ -174,6 +179,10 @@ class PaymentModeFragment : Fragment() {
     private var isBrandWalletActivatedCardToggled: Boolean = false
     private var isBrandWalletCardSelected: Boolean = false
     private var brandWalletVerificationEmail: String? = null
+    private var isBrandWalletOtpTriggerProcessPayment: Boolean = false
+    private var isBrandWalletProceedPaymentInFlight: Boolean = false
+    private var isBrandWalletProceedOtpFlow: Boolean = false
+    private var brandWalletOtpPaymentId: String? = null
     private var hasObservedPaymentResult = false
 
     private companion object {
@@ -211,6 +220,10 @@ class PaymentModeFragment : Fragment() {
         cancelBrandWalletRedeemJobs()
         brandWalletBottomSheetDialog?.dismiss()
         brandWalletBottomSheetDialog = null
+        isBrandWalletOtpTriggerProcessPayment = false
+        isBrandWalletProceedPaymentInFlight = false
+        isBrandWalletProceedOtpFlow = false
+        brandWalletOtpPaymentId = null
         bottomSheetDialog?.dismiss()
         bottomSheetDialog = null
         super.onDestroyView()
@@ -516,35 +529,63 @@ class PaymentModeFragment : Fragment() {
         )
     }
 
-    private fun addMoneyToWallet(
-    ): WalletAddMoneyRequest {
+    private fun createBrandWalletOtpProcessPaymentRequest(): ProcessPaymentRequest {
+        val customerInfo = ExpressSDKObject.getFetchData()?.customerInfo
+        val customerId = customerInfo?.customer_id ?: customerInfo?.customerId
+        val amount = getBrandWalletOrderAmount()
+        val currency = getCurrency()
+
+        val paymentOption = PaymentOptions(
+            wallet_details = WalletDetails(customer_id = customerId)
+        )
+        val extras = Extra(
+            payment_mode = arrayListOf(Constants.BRAND_WALLET_ID),
+            payment_amount = amount,
+            payment_currency = currency,
+            card_last4 = null,
+            redeemable_amount = null,
+            registered_mobile_number = null,
+            txn_mode = null,
+            device_info = null,
+            risk_validation_details = null,
+            dcc_status = null,
+            sdk_data = null,
+            order_amount = amount,
+            language = null,
+            is_final_part_payment = null,
+            location_info = null,
+            order_currency = currency,
+        )
+
+        return ProcessPaymentRequest(
+            payment_option = paymentOption,
+            extras = extras,
+        )
+    }
+
+    private fun addMoneyToWallet(addMoneyAmountInPaise: Int): WalletAddMoneyRequest {
         val paymentMode = arrayListOf(UPI_ID)
         val extra = Extra(
-            paymentMode,
-            getAmount(),
-            getCurrency(),
-            null,
-            null,
-            null,
-            null,
-            null,
-
-            null,
-            null,
-            Utils.createSDKData(requireActivity()),
+            payment_mode = paymentMode,
+            payment_amount = addMoneyAmountInPaise,
+            payment_currency = getCurrency(),
+            card_last4 = null,
+            redeemable_amount = null,
+            registered_mobile_number = null,
+            txn_mode = null,
+            device_info = null,
+            risk_validation_details = null,
+            dcc_status = null,
+            sdk_data = Utils.createSDKData(requireActivity()),
+            order_amount = addMoneyAmountInPaise,
             is_final_part_payment = false
         )
-        val upiData = UpiData(UPI_ID, null, "Intent")
-        val mode = "Cash"
-        val convenienceFeesData = viewModel.selectedConvenienceFee?.let {
-            Utils.getConvenienceFeesRequest(
-                it
-            )
-        }
+        val upiData = UpiData(UPI_ID, null, "INTENT")
+        val mode = "CASH"
         val customerInfo = ExpressSDKObject.getFetchData()?.customerInfo
         val customer = CustomerInfo(
             customer_id = customerInfo?.customerId ?: customerInfo?.customer_id ?: "",
-            country_code = customerInfo?.countryCode ?: customerInfo?.country_code ?: "",
+            country_code = customerInfo?.countryCode ?: customerInfo?.country_code ?: "91",
             email_id = customerInfo?.emailId ?: customerInfo?.email_id ?: "",
             mobile_number = customerInfo?.mobileNo ?: customerInfo?.mobile_number
             ?: customerInfo?.mobileNumber ?: ""
@@ -690,6 +731,9 @@ class PaymentModeFragment : Fragment() {
             if (shouldShowProceedCta) {
                 View.OnClickListener {
                     observeViewModel()
+                    isBrandWalletProceedPaymentInFlight = true
+                    isBrandWalletProceedOtpFlow = false
+                    brandWalletOtpPaymentId = null
                     paymentModeViewModel.processPayment(
                         token = ExpressSDKObject.getToken(),
                         paymentData = createBrandWalletProcessPaymentRequest(),
@@ -984,43 +1028,46 @@ class PaymentModeFragment : Fragment() {
         val quickAdd8000 = view.findViewById<TextView>(R.id.brand_wallet_quick_add_8000)
         val ctaButton = view.findViewById<Button>(R.id.brand_wallet_add_money_cta)
         val requiredTopUpAmount = getBrandWalletRequiredTopUpAmount()
-        val roundedHundredAmount = getNextRoundedTopUpAmount(requiredTopUpAmount, 100)
-        val roundedThousandAmount = getNextRoundedTopUpAmount(roundedHundredAmount, 1000)
+        val nearestHundredTopUpAmount = getNextRoundedTopUpAmount(requiredTopUpAmount, 10_000)
+        val plusOneThousandTopUpAmount = nearestHundredTopUpAmount + 100_000
+        val plusTwoThousandTopUpAmount = plusOneThousandTopUpAmount + 100_000
+
+        fun updateAddMoneyCtaState(value: CharSequence?) {
+            Utils.handleCTAEnableDisable(
+                requireContext(),
+                value?.toString()?.trim()?.isNotEmpty() == true,
+                ctaButton
+            )
+        }
 
         amountInput.filters = arrayOf(InputFilter.LengthFilter(10))
         amountInput.isSingleLine = true
         amountInput.maxLines = 1
-        Utils.handleCTAEnableDisable(
-            requireContext(),
-            isBrandWalletAddMoneyAmountValid(
-                extractBrandWalletAmountValue(amountInput.text?.toString()),
-                requiredTopUpAmount
-            ),
-            ctaButton
-        )
+        updateAddMoneyCtaState(amountInput.text)
 
         minimumText.text = HtmlCompat.fromHtml(
             getString(
                 R.string.brand_wallet_add_money_required_text,
-                formatBrandWalletBalance(requiredTopUpAmount)
+                formatBrandWalletBalanceWithoutPaise(requiredTopUpAmount)
             ),
             HtmlCompat.FROM_HTML_MODE_LEGACY
         )
 
         fun updateAmount(amount: Int) {
-            val amountText = amount.toString()
+            val amountText = formatBrandWalletInputAmount(amount)
             amountInput.setText(amountText)
             amountInput.setSelection(amountText.length)
         }
 
-        quickAdd3000.text = formatBrandWalletBalance(requiredTopUpAmount)
-        quickAdd5000.text = formatBrandWalletBalance(roundedHundredAmount)
-        quickAdd8000.text = formatBrandWalletBalance(roundedThousandAmount)
+        quickAdd3000.text = formatBrandWalletBalanceWithoutPaise(nearestHundredTopUpAmount)
+        quickAdd5000.text = formatBrandWalletBalanceWithoutPaise(plusOneThousandTopUpAmount)
+        quickAdd8000.text = formatBrandWalletBalanceWithoutPaise(plusTwoThousandTopUpAmount)
         if (requiredTopUpAmount > 0) {
             updateAmount(requiredTopUpAmount)
         } else {
             amountInput.text?.clear()
         }
+        updateAddMoneyCtaState(amountInput.text)
 
         amountInput.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) =
@@ -1029,35 +1076,25 @@ class PaymentModeFragment : Fragment() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) = Unit
 
             override fun afterTextChanged(s: Editable?) {
-                Utils.handleCTAEnableDisable(
-                    requireContext(),
-                    isBrandWalletAddMoneyAmountValid(
-                        extractBrandWalletAmountValue(s?.toString()),
-                        requiredTopUpAmount
-                    ),
-                    ctaButton
-                )
+                updateAddMoneyCtaState(s)
             }
         })
 
         closeButton.setOnClickListener {
             brandWalletBottomSheetDialog?.dismiss()
         }
-        quickAdd3000.setOnClickListener { updateAmount(requiredTopUpAmount) }
-        quickAdd5000.setOnClickListener { updateAmount(roundedHundredAmount) }
-        quickAdd8000.setOnClickListener { updateAmount(roundedThousandAmount) }
+        quickAdd3000.setOnClickListener { updateAmount(nearestHundredTopUpAmount) }
+        quickAdd5000.setOnClickListener { updateAmount(plusOneThousandTopUpAmount) }
+        quickAdd8000.setOnClickListener { updateAmount(plusTwoThousandTopUpAmount) }
         ctaButton.setOnClickListener {
-            val isAmountValid = isBrandWalletAddMoneyAmountValid(
-                extractBrandWalletAmountValue(amountInput.text?.toString()),
-                requiredTopUpAmount
-            )
+            val enteredTopUpAmount = extractBrandWalletAmountValue(amountInput.text?.toString())
+            val isAmountValid = isBrandWalletAddMoneyAmountValid(enteredTopUpAmount, requiredTopUpAmount)
             if (!isAmountValid) return@setOnClickListener
 
             paymentModeViewModel.addMoneyToWallet(
                 ExpressSDKObject.getToken(),
-                addMoneyToWallet()
+                addMoneyToWallet(enteredTopUpAmount)
             )
-            showBrandWalletAddMoneyOtpBottomSheet()
         }
 
         brandWalletBottomSheetDialog?.setContentView(view)
@@ -1085,7 +1122,7 @@ class PaymentModeFragment : Fragment() {
         brandWalletBottomSheetDialog?.show()
     }
 
-    private fun showBrandWalletAddMoneyOtpBottomSheet() {
+    private fun showBrandWalletAddMoneyOtpBottomSheet(triggerProcessPayment: Boolean = true) {
         if (!isAdded) return
 
         brandWalletOtpCountdownJob?.cancel()
@@ -1143,8 +1180,24 @@ class PaymentModeFragment : Fragment() {
             if ((otpInput.text?.length ?: 0) != BRAND_WALLET_PIN_LENGTH) {
                 return@setOnClickListener
             }
-            // Placeholder: verify the add-money PIN and continue the wallet funding flow here.
-            brandWalletBottomSheetDialog?.dismiss()
+            val paymentId =
+                brandWalletOtpPaymentId ?: ExpressSDKObject.getProcessPaymentResponse()?.payment_id
+            if (paymentId.isNullOrBlank()) {
+                Toast.makeText(
+                    requireContext(),
+                    "Unable to verify OTP. Please try again.",
+                    Toast.LENGTH_SHORT
+                ).show()
+                return@setOnClickListener
+            }
+            paymentModeViewModel.resetSubmitOtpState()
+            paymentModeViewModel.submitOtp(
+                token = ExpressSDKObject.getToken(),
+                otpRequest = OTPRequest(
+                    payment_id = paymentId,
+                    otp = otpInput.text?.toString().orEmpty(),
+                )
+            )
         }
 
         startPinCountdown()
@@ -1167,10 +1220,22 @@ class PaymentModeFragment : Fragment() {
         brandWalletBottomSheetDialog?.setOnDismissListener {
             brandWalletOtpCountdownJob?.cancel()
             brandWalletOtpCountdownJob = null
+            isBrandWalletOtpTriggerProcessPayment = false
+            isBrandWalletProceedOtpFlow = false
+            brandWalletOtpPaymentId = null
             brandWalletBottomSheetDialog = null
         }
         brandWalletBottomSheetDialog?.window?.setBackgroundDrawable(Color.TRANSPARENT.toDrawable())
         brandWalletBottomSheetDialog?.show()
+
+        if (triggerProcessPayment) {
+            isBrandWalletOtpTriggerProcessPayment = true
+            brandWalletOtpPaymentId = null
+            paymentModeViewModel.processPayment(
+                token = ExpressSDKObject.getToken(),
+                paymentData = createBrandWalletOtpProcessPaymentRequest(),
+            )
+        }
     }
 
     private fun showBrandWalletRedeemGiftCardBottomSheet() {
@@ -1408,8 +1473,32 @@ class PaymentModeFragment : Fragment() {
     }
 
     private fun extractBrandWalletAmountValue(amountText: String?): Int {
-        val digits = amountText.orEmpty().filter { it.isDigit() }
-        return digits.toIntOrNull() ?: 0
+        val sanitizedAmount = amountText.orEmpty().replace(",", "").trim()
+        if (sanitizedAmount.isEmpty()) return 0
+
+        return try {
+            BigDecimal(sanitizedAmount)
+                .setScale(0, RoundingMode.CEILING)
+                .toInt()
+                .coerceAtLeast(0) * 100
+        } catch (_: NumberFormatException) {
+            0
+        }
+    }
+
+    private fun formatBrandWalletInputAmount(amountInPaise: Int): String {
+        return ceilBrandWalletAmountToRupee(amountInPaise).toString()
+    }
+
+    private fun ceilBrandWalletAmountToRupee(amountInPaise: Int): Int {
+        if (amountInPaise <= 0) return 0
+        return (amountInPaise + 99) / 100
+    }
+
+    private fun formatBrandWalletBalanceWithoutPaise(amountInPaise: Int): String {
+        val formatter = DecimalFormat("##,##,##0")
+        val amountInRupee = ceilBrandWalletAmountToRupee(amountInPaise)
+        return "${getString(R.string.rupee_symbol)} ${formatter.format(amountInRupee)}"
     }
 
     private fun showBrandWalletReadyBottomSheet() {
@@ -1618,7 +1707,7 @@ class PaymentModeFragment : Fragment() {
         val normalizedAmount = baseAmount.coerceAtLeast(0)
         val remainder = normalizedAmount % step
         return if (remainder == 0) {
-            normalizedAmount + step
+            normalizedAmount
         } else {
             normalizedAmount + (step - remainder)
         }
@@ -1729,9 +1818,33 @@ class PaymentModeFragment : Fragment() {
                 paymentModeViewModel.processPaymentResult.collect {
                     when (it) {
                         is BaseResult.Error -> {
+                            if (isBrandWalletOtpTriggerProcessPayment &&
+                                brandWalletBottomSheetDialog?.isShowing == true
+                            ) {
+                                isBrandWalletOtpTriggerProcessPayment = false
+                                bottomSheetDialog?.dismiss()
+                                Toast.makeText(
+                                    requireContext(),
+                                    it.errorMessage ?: "Unable to send OTP.",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                                return@collect
+                            }
+                            if (isBrandWalletProceedPaymentInFlight) {
+                                isBrandWalletProceedPaymentInFlight = false
+                                brandWalletOtpPaymentId = null
+                                bottomSheetDialog?.dismiss()
+                                Toast.makeText(
+                                    requireContext(),
+                                    it.errorMessage ?: "Unable to proceed with payment.",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                                return@collect
+                            }
                             val bundle = Bundle()
                             bundle.putString(ERROR_KEY, it.errorCode)
                             bundle.putString(ERROR_MESSAGE_KEY, it.errorMessage)
+                            brandWalletBottomSheetDialog?.dismiss()
                             bottomSheetDialog?.dismiss()
                             safeNavigate(R.id.action_paymentModeFragment_to_successFragment)
                         }
@@ -1742,7 +1855,26 @@ class PaymentModeFragment : Fragment() {
                         }
 
                         is BaseResult.Success<ProcessPaymentResponse> -> {
+                            if (isBrandWalletOtpTriggerProcessPayment &&
+                                brandWalletBottomSheetDialog?.isShowing == true
+                            ) {
+                                isBrandWalletOtpTriggerProcessPayment = false
+                                brandWalletOtpPaymentId = it.data.payment_id
+                                ExpressSDKObject.setProcessPaymentResponse(it.data)
+                                bottomSheetDialog?.dismiss()
+                                return@collect
+                            }
+                            if (isBrandWalletProceedPaymentInFlight) {
+                                isBrandWalletProceedPaymentInFlight = false
+                                ExpressSDKObject.setProcessPaymentResponse(it.data)
+                                brandWalletOtpPaymentId = it.data.payment_id
+                                bottomSheetDialog?.dismiss()
+                                isBrandWalletProceedOtpFlow = true
+                                showBrandWalletAddMoneyOtpBottomSheet(triggerProcessPayment = false)
+                                return@collect
+                            }
                             ExpressSDKObject.setProcessPaymentResponse(it.data)
+                            brandWalletBottomSheetDialog?.dismiss()
                             bottomSheetDialog?.dismiss()
                             safeNavigate(R.id.action_paymentModeFragment_to_ACSFragment)
 
@@ -1760,6 +1892,7 @@ class PaymentModeFragment : Fragment() {
                             val bundle = Bundle()
                             bundle.putString(ERROR_KEY, it.errorCode)
                             bundle.putString(ERROR_MESSAGE_KEY, it.errorMessage)
+                            brandWalletBottomSheetDialog?.dismiss()
                             bottomSheetDialog?.dismiss()
                             safeNavigate(R.id.action_paymentModeFragment_to_successFragment)
                         }
@@ -1776,10 +1909,54 @@ class PaymentModeFragment : Fragment() {
                                 mapWalletAddMoneyToProcessPaymentResponse(it.data)
                             )
                             ExpressSDKObject.setSelectedMode(Constants.BRAND_WALLET_ID)
+                            brandWalletBottomSheetDialog?.dismiss()
                             bottomSheetDialog?.dismiss()
                             val bundle = Bundle()
                             bundle.putString("MODE", Constants.BRAND_WALLET_ID)
                             safeNavigate(R.id.action_paymentModeFragment_to_UPIFragment, bundle)
+                        }
+                    }
+                }
+            }
+        }
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                paymentModeViewModel.submitOtpResult.collect {
+                    when (it) {
+                        is BaseResult.Error -> {
+                            paymentModeViewModel.resetSubmitOtpState()
+                            bottomSheetDialog?.dismiss()
+                            Toast.makeText(
+                                requireContext(),
+                                it.errorMessage ?: "Invalid OTP. Please try again.",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+
+                        is BaseResult.Loading -> {
+                            if (it.isLoading) {
+                                bottomSheetDialog = showProcessPaymentDialog(requireContext())
+                            }
+                        }
+
+                        is BaseResult.Success<OTPResponse> -> {
+                            paymentModeViewModel.resetSubmitOtpState()
+                            isBrandWalletProceedPaymentInFlight = false
+                            val shouldNavigateToSuccess = isBrandWalletProceedOtpFlow
+                            if (shouldNavigateToSuccess) {
+                                isBrandWalletProceedOtpFlow = false
+                            }
+                            brandWalletBottomSheetDialog?.dismiss()
+                            bottomSheetDialog?.dismiss()
+                            if (shouldNavigateToSuccess) {
+                                safeNavigate(R.id.action_paymentModeFragment_to_successFragment)
+                            } else {
+                                ExpressSDKObject.setSelectedMode(Constants.BRAND_WALLET_ID)
+                                val bundle = Bundle()
+                                bundle.putString("MODE", Constants.BRAND_WALLET_ID)
+                                safeNavigate(R.id.action_paymentModeFragment_to_UPIFragment, bundle)
+                            }
                         }
                     }
                 }
