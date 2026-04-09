@@ -1,7 +1,6 @@
 package com.plural_pinelabs.expresscheckoutsdk.presentation.upi
 
 import UpiAppsAdapter
-import android.app.Fragment
 import android.content.Intent
 import android.content.pm.ResolveInfo
 import android.graphics.Color

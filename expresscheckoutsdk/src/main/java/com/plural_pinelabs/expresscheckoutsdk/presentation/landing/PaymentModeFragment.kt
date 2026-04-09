@@ -1498,7 +1498,7 @@ class PaymentModeFragment : Fragment() {
     private fun formatBrandWalletBalanceWithoutPaise(amountInPaise: Int): String {
         val formatter = DecimalFormat("##,##,##0")
         val amountInRupee = ceilBrandWalletAmountToRupee(amountInPaise)
-        return "${getString(R.string.rupee_symbol)} ${formatter.format(amountInRupee)}"
+        return "${ExpressSDKObject.getCurrencySymbol()} ${formatter.format(amountInRupee)}"
     }
 
     private fun showBrandWalletReadyBottomSheet() {
@@ -2191,7 +2191,7 @@ class PaymentModeFragment : Fragment() {
                     actionBtn.visibility = if (isChecked) View.VISIBLE else View.GONE
                     actionBtn.isClickable = isChecked
                     actionBtn.text = getString(
-                        R.string.pay_amount_text, getString(R.string.rupee_symbol),
+                        R.string.pay_amount_text, ExpressSDKObject.getCurrencySymbol(),
                         Utils.convertInRupees(ExpressSDKObject.getAmount())
                     )
                     actionBtn.setOnClickListener {

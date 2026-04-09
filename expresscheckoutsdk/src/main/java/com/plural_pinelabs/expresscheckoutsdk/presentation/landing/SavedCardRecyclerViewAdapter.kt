@@ -58,7 +58,7 @@ class SavedCardRecyclerViewAdapter(
             loadBankLogo(item.cardData.issuerName, cardLogo)
             payButton.text = context.getString(
                 R.string.pay_amount_text,
-                context.getString(R.string.rupee_symbol),
+                ExpressSDKObject.getCurrencySymbol(),
                 Utils.convertInRupees(ExpressSDKObject.getAmount())
             )
 

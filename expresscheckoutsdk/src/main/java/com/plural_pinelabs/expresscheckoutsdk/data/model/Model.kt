@@ -86,7 +86,8 @@ data class FetchFailure(
 
 data class TransactionInfo(
     val orderId: String,
-    val orderStatus: String?
+    val orderStatus: String?,
+    val isMCCTransaction: Boolean? = false
 )
 
 data class MerchantInfo(
@@ -105,7 +106,10 @@ data class FeatureFlag(
 
 data class OrignalTransactionAmount(var amount: Int?, val currency: String)
 
-data class PaymentData(var originalTxnAmount: OrignalTransactionAmount?)
+data class PaymentData(
+    var originalTxnAmount: OrignalTransactionAmount?,
+    var paymentAmount: OrignalTransactionAmount? = null
+)
 
 data class PaymentMode(
     val paymentModeId: String,
