@@ -63,6 +63,9 @@
     <string name="upi_app_paytm">Paytm</string>
     <string name="upi_app_bhim_upi">BHIM </string>
     <string name="upi_app_cred">CRED</string>
+    <string name="upi_app_navi">Navi</string>
+    <string name="upi_app_supermoney">SuperMoney</string>
+    <string name="upi_more_apps">More Apps</string>
     <string name="or_get_payment_request_on_upi_id">Or get payment request on UPI ID</string>
     <string name="upi_open_with">Open with</string>
     <string name="full_name">Full name</string>

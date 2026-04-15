@@ -36,7 +36,6 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.clevertap.android.sdk.isNotNullAndBlank
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.gson.Gson
 import com.google.gson.internal.LinkedTreeMap
@@ -53,7 +52,6 @@ import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PROCESSED_FAILED
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PROCESSED_PENDING
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PROCESSED_STATUS
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.BRAND_WALLET_ID
-import com.plural_pinelabs.expresscheckoutsdk.common.Constants.UPI_COLLECT
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.UPI_ID
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.UPI_INTENT
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.UPI_INTENT_PREFIX
@@ -76,6 +74,7 @@ import com.plural_pinelabs.expresscheckoutsdk.data.model.ProcessPaymentResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.TransactionStatusResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.UpiData
 import com.plural_pinelabs.expresscheckoutsdk.data.model.UpiTransactionData
+import com.plural_pinelabs.expresscheckoutsdk.data.model.WalletAddMoneyLocationInfo
 import com.plural_pinelabs.expresscheckoutsdk.data.model.WalletDetails
 import com.plural_pinelabs.expresscheckoutsdk.presentation.LandingActivity
 import kotlinx.coroutines.Job
@@ -87,19 +86,15 @@ class UPIFragment : Fragment() {
 
     private lateinit var payByAnyUPIButton: TextView
     private lateinit var upiAppsRv: RecyclerView
-    private lateinit var upiIdEt: EditText
-    private lateinit var verifyContinueButton: Button
-    private lateinit var errorinfoTextView: TextView
-    private val UPI_REGEX = Regex("^[\\w.\\-]+@[a-zA-Z0-9]{2,}$")
     private lateinit var viewModel: UPIViewModel
     private var mTransactionMode: String? = null
     private var bottomSheetDialog: BottomSheetDialog? = null
     private var qrBottomSheetDialog: BottomSheetDialog? = null
-    private var bottomVPASheetDialog: BottomSheetDialog? = null
     private var bottomTimerSheetDialog: BottomSheetDialog? = null
     private var selectUPIPackage: String? = null
-    private var recommnededActionUPI: String? = null
     private var flowMode: String? = null
+    private var allInstalledUpiApps: List<String> = emptyList()
+    private var isShowingAllUpiApps: Boolean = false
 
     private lateinit var payByQRButton: LinearLayout
     private lateinit var payByQRLayout: ConstraintLayout
@@ -118,6 +113,7 @@ class UPIFragment : Fragment() {
     private companion object {
         const val BRAND_WALLET_PIN_LENGTH = 6
         const val BRAND_WALLET_PIN_RESEND_SECONDS = 120
+        const val COLLAPSED_UPI_APPS_COUNT = 3
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -141,8 +137,6 @@ class UPIFragment : Fragment() {
             viewModel.startCountDownTimer()
             viewModel.startPolling()
         }
-
-        recommnededActionUPI = arguments?.getString("RECOMMENDED_ACTION_UPI", null)
         flowMode = arguments?.getString("MODE", null) ?: ExpressSDKObject.getSelectedMode()
         if (!flowMode.isNullOrBlank()) {
             ExpressSDKObject.setSelectedMode(flowMode)
@@ -167,26 +161,13 @@ class UPIFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setViews(view)
         setUpPayByUPIApps()
-        setupUPIIdValidation()
         observeViewModel()
         handleConvenienceFees()
-        handleRecommendedAction()
-    }
-
-    private fun handleRecommendedAction() {
-        if (recommnededActionUPI.isNotNullAndBlank()) {
-            //upi id passed set it  to vpa
-            upiIdEt.text = Editable.Factory.getInstance().newEditable(recommnededActionUPI)
-            payAction(recommnededActionUPI, UPI_COLLECT)
-        }
     }
 
     private fun setViews(view: View) {
         payByAnyUPIButton = view.findViewById(R.id.pay_by_any_upi)
         upiAppsRv = view.findViewById(R.id.upi_app_rv)
-        verifyContinueButton = view.findViewById(R.id.verify_and_continueButton)
-        upiIdEt = view.findViewById(R.id.upi_id_edittext)
-        errorinfoTextView = view.findViewById(R.id.error_upi_id)
         payByQRButton = view.findViewById(R.id.pay_by_qr_btn)
         payByQRLayout = view.findViewById(R.id.pay_by_qr)
 
@@ -196,10 +177,7 @@ class UPIFragment : Fragment() {
 
 
         payByAnyUPIButton.setOnClickListener {
-            payAction(null, UPI_INTENT)
-        }
-        verifyContinueButton.setOnClickListener {
-            payAction(upiIdEt.text.toString(), UPI_COLLECT)
+            payAction(UPI_INTENT)
         }
         view.findViewById<ImageView>(R.id.back_button).setOnClickListener {
             findNavController().popBackStack()
@@ -210,46 +188,63 @@ class UPIFragment : Fragment() {
             upiAppsRv.visibility = View.GONE
             payByAnyUPIButton.visibility = View.GONE
         }
-        //  if (!upiPaymentMode.contains("Collect", true))
-        //   upiIdEt.visibility = View.GONE
         if (!upiPaymentMode.contains("Intent", true) && isQRAllowed) {
             payByQRLayout.visibility = View.GONE
         }
 
         payByQRButton.setOnClickListener {
             isQRPayment = true
-            payAction(null, UPI_INTENT_QR)
+            payAction(UPI_INTENT_QR)
         }
     }
 
     private fun setUpPayByUPIApps() {
-        val installedUPIApps = getUpiAppsInstalledInDevice()
-        if (installedUPIApps.isNotEmpty()) {
+        allInstalledUpiApps = getUpiAppsInstalledInDevice()
+        isShowingAllUpiApps = false
+
+        if (allInstalledUpiApps.isNotEmpty()) {
             payByAnyUPIButton.visibility = View.VISIBLE
             upiAppsRv.visibility = View.VISIBLE
             upiAppsRv.layoutManager = GridLayoutManager(requireContext(), 2)
-            upiAppsRv.adapter = UpiAppsAdapter(installedUPIApps, getItemClickListenerForUPIApp())
-
+            renderUpiApps()
         } else {
             upiAppsRv.visibility = View.GONE
         }
     }
 
+    private fun renderUpiApps() {
+        val displayedApps = if (!isShowingAllUpiApps && allInstalledUpiApps.size > COLLAPSED_UPI_APPS_COUNT) {
+            allInstalledUpiApps.take(COLLAPSED_UPI_APPS_COUNT) + UpiAppsAdapter.MORE_APPS_ITEM
+        } else {
+            allInstalledUpiApps
+        }
+
+        upiAppsRv.adapter = UpiAppsAdapter(displayedApps, getItemClickListenerForUPIApp())
+    }
+
     private fun getItemClickListenerForUPIApp(): ItemClickListener<String> {
         return object : ItemClickListener<String> {
             override fun onItemClick(position: Int, item: String) {
+                if (item == UpiAppsAdapter.MORE_APPS_ITEM) {
+                    isShowingAllUpiApps = true
+                    renderUpiApps()
+                    return
+                }
                 selectUPIPackage = item
-                payAction(null, UPI_INTENT)
+                payAction(UPI_INTENT)
             }
         }
     }
 
     private fun getUpiAppsInstalledInDevice(): List<String> {
-        val listOfUPIPackage = getSupportedUpiPackages(ExpressSDKObject.getFetchData())
-        val listOfPaymentReadyApps = mutableListOf<String>()
-        listOfPaymentReadyApps.addAll(getListOfActiveUPIApps(listOfUPIPackage))
-        return listOfPaymentReadyApps
-        // return listOfUPIPackage // only for testing purposes
+        return try {
+            val listOfUPIPackage = getUpiAppsInstalledInDevice(ExpressSDKObject.getFetchData())
+            val listOfPaymentReadyApps = mutableListOf<String>()
+            listOfPaymentReadyApps.addAll(getListOfActiveUPIApps(listOfUPIPackage))
+            getUpiAppsInDisplayOrder(listOfPaymentReadyApps)
+        } catch (_: Exception) {
+            emptyList()
+        }
     }
 
     private fun isAppUpiReady(packageName: String): Boolean {
@@ -257,53 +252,23 @@ class UPIFragment : Fragment() {
         val upiIntent = Intent(Intent.ACTION_VIEW, Uri.parse(UPI_INTENT_PREFIX))
         val pm = requireActivity().packageManager
         val upiActivities: List<ResolveInfo> = pm.queryIntentActivities(upiIntent, 0)
-        for (a in upiActivities) {
-            if (a.activityInfo.packageName == packageName) appUpiReady = true
+        for (activity in upiActivities) {
+            if (activity.activityInfo.packageName.equals(packageName, ignoreCase = true)) {
+                appUpiReady = true
+                break
+            }
         }
         return appUpiReady
     }
 
     private fun getListOfActiveUPIApps(listOfUPIPackage: List<String>): List<String> {
-        try { //Keeping a try-catch block to avoid crashes if no UPI apps are installed
-            val finalUpiAppsList = mutableListOf<String>()
-            val packageNamesOfAllInstalledApps = mutableListOf<String>()
-
-            for (app in listOfUPIPackage) {
-                if (isAppUpiReady(app.lowercase())) {
-                    packageNamesOfAllInstalledApps.add(app.lowercase())
-                }
-                if (packageNamesOfAllInstalledApps.contains(app.lowercase())) {
-                    finalUpiAppsList.add(app)
-                }
-            }
-            return finalUpiAppsList
-        } catch (_: Exception) {
-            // If no UPI apps are installed, return an empty list
-            return emptyList()
-        }
-    }
-
-    private fun setupUPIIdValidation() {
-        upiIdEt.setOnFocusChangeListener { v, hasFocus ->
-            if (hasFocus) {
-                errorinfoTextView.visibility = View.GONE
+        val finalUpiAppsList = mutableListOf<String>()
+        for (app in listOfUPIPackage) {
+            if (isAppUpiReady(app.lowercase())) {
+                finalUpiAppsList.add(app)
             }
         }
-        upiIdEt.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-
-            override fun afterTextChanged(s: Editable?) {
-                val isValidUPI = UPI_REGEX.matches(s.toString())
-                Utils.handleCTAEnableDisable(requireContext(), isValidUPI, verifyContinueButton)
-                if (!isValidUPI) {
-                    errorinfoTextView.visibility = View.VISIBLE
-                } else {
-                    errorinfoTextView.visibility = View.GONE
-                }
-            }
-        })
+        return finalUpiAppsList
     }
 
     private fun showUpiTray(deepLink: String, upiAppPackageName: String?) {
@@ -325,10 +290,7 @@ class UPIFragment : Fragment() {
         }
     }
 
-    private fun payAction(
-        vpa: String? = null,
-        transactionMode: String?,
-    ) {
+    private fun payAction(transactionMode: String?) {
         if (flowMode.equals(BRAND_WALLET_ID, true)) {
             val addMoneyResponse = ExpressSDKObject.getWalletAddMoneyResponse()
             val inquiryOrderId = addMoneyResponse?.charge_order?.order_id
@@ -365,26 +327,26 @@ class UPIFragment : Fragment() {
         mTransactionMode = transactionMode
         val paymentMode = arrayListOf(UPI_ID)
         val extra = Extra(
-            paymentMode,
-            getAmount(),
-            getCurrency(),
-            null,
-            null,
-            null,
-            null,
-            null,
-
-            null,
-            null,
-            Utils.createSDKData(requireActivity())
+            payment_mode = paymentMode,
+            payment_amount = getAmount(),
+            payment_currency = getCurrency(),
+            card_last4 = null,
+            redeemable_amount = null,
+            registered_mobile_number = null,
+            txn_mode = null,
+            device_info = null,
+            risk_validation_details = null,
+            dcc_status = null,
+            sdk_data = Utils.createSDKData(requireActivity()),
+            is_final_part_payment = true,
+            location_info = WalletAddMoneyLocationInfo()
         )
         val transactionModeValue = when (transactionMode) {
-            UPI_COLLECT -> "Collect"
-            UPI_INTENT -> "Intent"
-            UPI_INTENT_QR -> "Intent"
-            else -> null
+            UPI_INTENT -> UPI_INTENT
+            UPI_INTENT_QR -> UPI_INTENT
+            else -> UPI_INTENT
         }
-        val upiData = UpiData(UPI_ID, vpa, transactionModeValue)
+        val upiData = UpiData(UPI_ID, null, transactionModeValue)
         val convenienceFeesData = viewModel.selectedConvenienceFee?.let {
             Utils.getConvenienceFeesRequest(
                 it
@@ -410,7 +372,7 @@ class UPIFragment : Fragment() {
             PaymentModes.UPI.paymentModeName.toString(),
             Utils.getCartValue(),
             "not known",
-            verifyContinueButton.text.toString()
+            payByAnyUPIButton.text.toString()
         )
     }
 
@@ -466,8 +428,10 @@ class UPIFragment : Fragment() {
                             } else if (mTransactionMode == UPI_INTENT_QR && isQRPayment) {
                                 viewModel.startPolling()
                             } else {
-                                showProcessPaymentVPADialog()
-                                viewModel.startPolling()
+                                showUpiTray(
+                                    it.data.deep_link ?: "",
+                                    upiAppPackageName = selectUPIPackage
+                                )
                             }
                             bottomSheetDialog?.dismiss()
                             ExpressSDKObject.setProcessPaymentResponse(it.data)
@@ -578,7 +542,6 @@ class UPIFragment : Fragment() {
         if (hasShownBrandWalletOtpSheet) return
         hasShownBrandWalletOtpSheet = true
         viewModel.stopPolling()
-        bottomVPASheetDialog?.dismiss()
         bottomTimerSheetDialog?.dismiss()
         qrBottomSheetDialog?.dismiss()
         showBrandWalletOtpBottomSheet()
@@ -728,11 +691,9 @@ class UPIFragment : Fragment() {
 
 
     private fun cancelTransactionProcess() {
-        viewModel.isShowingVPADialog = false
         viewModel.isShowingUPIDialog = false
         bottomSheetDialog?.dismiss()
         bottomTimerSheetDialog?.dismiss()
-        bottomVPASheetDialog?.dismiss()
         qrBottomSheetDialog?.dismiss()
         brandWalletOtpBottomSheetDialog?.dismiss()
         brandWalletOtpBottomSheetDialog = null
@@ -744,26 +705,6 @@ class UPIFragment : Fragment() {
         viewModel.stopPolling()
     }
 
-
-    private fun showProcessPaymentVPADialog() {
-        viewModel.isShowingVPADialog = true
-        bottomVPASheetDialog = BottomSheetDialog(requireContext())
-        val view =
-            LayoutInflater.from(requireActivity())
-                .inflate(R.layout.upi_vpa_process_payment_bottom_sheet, null)
-        val cancelPaymentTextView: TextView = view.findViewById(R.id.cancelPaymentTextView)
-        val vpaId: TextView = view.findViewById(R.id.vpaId)
-        vpaId.text = upiIdEt.text.toString()
-        cancelPaymentTextView.setOnClickListener {
-            viewModel.isShowingVPADialog = false
-            bottomVPASheetDialog?.dismiss()
-            cancelTransactionProcess()
-        }
-        bottomVPASheetDialog?.setCancelable(false)
-        bottomVPASheetDialog?.setCanceledOnTouchOutside(false)
-        bottomVPASheetDialog?.setContentView(view)
-        bottomVPASheetDialog?.show() // Show the dialog first
-    }
 
     private fun showProcessPaymentTimerDialog() {
         viewModel.isShowingUPIDialog = true
@@ -804,7 +745,6 @@ class UPIFragment : Fragment() {
 
     override fun onDestroyView() {
         bottomTimerSheetDialog?.dismiss()
-        bottomVPASheetDialog?.dismiss()
         qrBottomSheetDialog?.dismiss()
         brandWalletOtpBottomSheetDialog?.dismiss()
         brandWalletOtpBottomSheetDialog = null
