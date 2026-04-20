@@ -221,6 +221,7 @@ data class WalletAddMoneyRequest(
     val customer: CustomerInfo? = null,
     val txn_data: UpiTransactionData? = null,
     val extras: Extra? = null,
+    val payment_option: PaymentOptions? = null,
 )
 
 data class WalletAddMoneyResponse(
@@ -245,6 +246,30 @@ data class WalletAddMoneyResponse(
     val is_v2_emi_transaction: Boolean? = null,
     val response_code: Int? = null,
     val response_message: String? = null,
+)
+
+data class WalletValidateRequest(
+    val amount: OrderDetailsAmount? = null,
+    val customers: CustomerInfo? = null,
+)
+
+data class WalletValidateResponse(
+    val eligible_amount: OrderDetailsAmount? = null,
+    val status: String? = null,
+    val redemption_allowed: Boolean? = null,
+    val response_code: Int? = null,
+    val response_message: String? = null,
+    val total_balance_amount: OrderDetailsAmount? = null,
+    val payment_option_metadata: WalletValidatePaymentOptionMetadata? = null,
+)
+
+data class WalletValidatePaymentOptionMetadata(
+    val total_balance_amount: OrderDetailsAmount? = null,
+    val wallet_data: WalletValidateWalletData? = null,
+)
+
+data class WalletValidateWalletData(
+    val total_balance_amount: OrderDetailsAmount? = null,
 )
 
 data class WalletAddMoneyChargeOrder(
@@ -436,6 +461,7 @@ data class Extra(
     val is_final_part_payment: Boolean? = null,
     val location_info: WalletAddMoneyLocationInfo? = null,
     val order_currency: String? = null,
+    val customer: CustomerInfo? = null,
 ) : Parcelable
 
 data class PBPBank(
@@ -580,11 +606,18 @@ data class PaymentOptions(
     val card_data: CardData? = null,
     val upi_data: UpiData? = null,
     val wallet_details: WalletDetails? = null,
+    val gift_card_details: GiftCardDetails? = null,
 ) : Parcelable
 
 @Parcelize 
 data class WalletDetails(
     val customer_id: String? = null,
+) : Parcelable
+
+@Parcelize
+data class GiftCardDetails(
+    val gift_card_number: String? = null,
+    val pin: String? = null,
 ) : Parcelable
 
 @Parcelize

@@ -48,7 +48,7 @@ internal object ExpressSDKObject {
     private val sdkObjectRef = AtomicReference<SDKObject?>()
     private const val DEFAULT_CURRENCY_CODE = "INR"
     private const val DEFAULT_CURRENCY_SYMBOL = "\u20B9"
-    private const val DEFAULT_CURRENCY_RATIO = 1
+    private const val DEFAULT_CURRENCY_RATIO = 2
 
     fun initialize(
         context: Context,

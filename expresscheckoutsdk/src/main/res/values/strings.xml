@@ -231,6 +231,8 @@
     <string name="brand_wallet_redeem_gift_card_number_hint">Enter gift card number</string>
     <string name="brand_wallet_redeem_gift_card_pin">Gift Card PIN</string>
     <string name="brand_wallet_redeem_gift_card_pin_hint">Enter gift card PIN</string>
+    <string name="brand_wallet_redeem_success_title">Gift Card Applied</string>
+    <string name="brand_wallet_redeem_success_subtitle"><![CDATA[<b>Your gift card amount has been added.</b><br/>Refreshing wallet balance now.]]></string>
     <string name="brand_wallet_redeem_not_eligible_title">Gift card not eligible for redemption</string>
     <string name="brand_wallet_redeem_not_eligible_subtitle_prefix">Check  </string>
     <string name="brand_wallet_redeem_not_eligible_terms"><u> terms &amp; conditions</u></string>

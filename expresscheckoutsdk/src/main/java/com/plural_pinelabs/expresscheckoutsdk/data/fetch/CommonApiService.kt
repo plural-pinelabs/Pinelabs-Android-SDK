@@ -22,6 +22,8 @@ import com.plural_pinelabs.expresscheckoutsdk.data.model.CreateWalletRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CreateWalletResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.WalletAddMoneyRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.model.WalletAddMoneyResponse
+import com.plural_pinelabs.expresscheckoutsdk.data.model.WalletValidateRequest
+import com.plural_pinelabs.expresscheckoutsdk.data.model.WalletValidateResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.retrofit.ApiService
 import retrofit2.Response
 import retrofit2.http.Body
@@ -158,6 +160,12 @@ interface CommonApiService : ApiService {
         @Query("token", encoded = true) token: String?,
         @Body request: WalletAddMoneyRequest?
     ): Response<WalletAddMoneyResponse>
+
+    @POST("payment-option/wallet/validate")
+    suspend fun validateWalletBalance(
+        @Query("token", encoded = true) token: String?,
+        @Body request: WalletValidateRequest
+    ): Response<WalletValidateResponse>
 
 
 

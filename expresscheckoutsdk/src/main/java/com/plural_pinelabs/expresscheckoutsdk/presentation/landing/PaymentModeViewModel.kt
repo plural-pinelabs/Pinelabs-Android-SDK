@@ -11,6 +11,8 @@ import com.plural_pinelabs.expresscheckoutsdk.data.model.ProcessPaymentRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ProcessPaymentResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.WalletAddMoneyRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.model.WalletAddMoneyResponse
+import com.plural_pinelabs.expresscheckoutsdk.data.model.WalletValidateRequest
+import com.plural_pinelabs.expresscheckoutsdk.data.model.WalletValidateResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.repository.ExpressRepositoryImpl
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -34,6 +36,10 @@ class PaymentModeViewModel(private val expressRepositoryImpl: ExpressRepositoryI
     private val _submitOtpResult =
         MutableStateFlow<BaseResult<OTPResponse>>(BaseResult.Loading(false))
     val submitOtpResult: StateFlow<BaseResult<OTPResponse>> = _submitOtpResult
+
+    private val _walletValidateResult =
+        MutableStateFlow<BaseResult<WalletValidateResponse>>(BaseResult.Loading(false))
+    val walletValidateResult: StateFlow<BaseResult<WalletValidateResponse>> = _walletValidateResult
 
     fun createWallet(token: String?, request: CreateWalletRequest) =
         viewModelScope.launch(Dispatchers.IO) {
@@ -68,8 +74,19 @@ class PaymentModeViewModel(private val expressRepositoryImpl: ExpressRepositoryI
             }
         }
 
+    fun validateWalletBalance(token: String?, request: WalletValidateRequest) =
+        viewModelScope.launch(Dispatchers.IO) {
+            expressRepositoryImpl.validateWalletBalance(token, request).collect {
+                _walletValidateResult.value = it
+            }
+        }
+
     fun resetSubmitOtpState() {
         _submitOtpResult.value = BaseResult.Loading(false)
+    }
+
+    fun resetWalletValidateState() {
+        _walletValidateResult.value = BaseResult.Loading(false)
     }
 }
 

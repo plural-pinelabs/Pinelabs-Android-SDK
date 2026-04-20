@@ -71,4 +71,4 @@ private fun canonicalizeUpiPackage(packageName: String): String {
         MOBIKWIK_UPI, MOBIKWIK_LEGACY_UPI -> MOBIKWIK_UPI
         else -> packageName.lowercase()
     }
-}
+} 

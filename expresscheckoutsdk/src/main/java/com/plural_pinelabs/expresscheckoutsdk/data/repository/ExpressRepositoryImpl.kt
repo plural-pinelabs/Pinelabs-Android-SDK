@@ -30,6 +30,8 @@ import com.plural_pinelabs.expresscheckoutsdk.data.model.SavedCardResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.TransactionStatusResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.WalletAddMoneyRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.model.WalletAddMoneyResponse
+import com.plural_pinelabs.expresscheckoutsdk.data.model.WalletValidateRequest
+import com.plural_pinelabs.expresscheckoutsdk.data.model.WalletValidateResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.retrofit.ApiService
 import com.plural_pinelabs.expresscheckoutsdk.domain.repository.ExpressRepository
 import kotlinx.coroutines.flow.Flow
@@ -216,6 +218,15 @@ class ExpressRepositoryImpl(
     ): Flow<BaseResult<WalletAddMoneyResponse>> {
         return toResultFlow(networkHelper = networkHelper) {
             (apiService as CommonApiService).addMoneyToWallet(token, request)
+        }
+    }
+
+    override suspend fun validateWalletBalance(
+        token: String?,
+        request: WalletValidateRequest
+    ): Flow<BaseResult<WalletValidateResponse>> {
+        return toResultFlow(networkHelper = networkHelper) {
+            (apiService as CommonApiService).validateWalletBalance(token, request)
         }
     }
 }

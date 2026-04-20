@@ -80,9 +80,11 @@ import com.plural_pinelabs.expresscheckoutsdk.data.model.CustomerData
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CustomerInfo
 import com.plural_pinelabs.expresscheckoutsdk.data.model.EMIPaymentModeData
 import com.plural_pinelabs.expresscheckoutsdk.data.model.Extra
+import com.plural_pinelabs.expresscheckoutsdk.data.model.GiftCardDetails
 import com.plural_pinelabs.expresscheckoutsdk.data.model.OTPRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.model.OTPResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.OfferDetail
+import com.plural_pinelabs.expresscheckoutsdk.data.model.OrderDetailsAmount
 import com.plural_pinelabs.expresscheckoutsdk.data.model.PaymentMode
 import com.plural_pinelabs.expresscheckoutsdk.data.model.PaymentOptions
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ProcessPaymentRequest
@@ -93,6 +95,8 @@ import com.plural_pinelabs.expresscheckoutsdk.data.model.UpiTransactionData
 import com.plural_pinelabs.expresscheckoutsdk.data.model.WalletDetails
 import com.plural_pinelabs.expresscheckoutsdk.data.model.WalletAddMoneyRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.model.WalletAddMoneyResponse
+import com.plural_pinelabs.expresscheckoutsdk.data.model.WalletValidateRequest
+import com.plural_pinelabs.expresscheckoutsdk.data.model.WalletValidateResponse
 import com.plural_pinelabs.expresscheckoutsdk.presentation.LandingActivity
 import com.plural_pinelabs.expresscheckoutsdk.presentation.card.CardFragmentViewModel
 import com.plural_pinelabs.expresscheckoutsdk.presentation.offers.OfferSummaryDialog
@@ -108,6 +112,11 @@ class PaymentModeFragment : Fragment() {
     private enum class BrandWalletVerificationSheetState {
         EMAIL,
         OTP,
+    }
+
+    private enum class BrandWalletAddMoneySource {
+        TOP_UP,
+        REDEEM_GIFT_CARD,
     }
 
     private lateinit var savedCardRecyclerView: RecyclerView
@@ -175,7 +184,9 @@ class PaymentModeFragment : Fragment() {
     private var brandWalletReadyDismissJob: Job? = null
     private var brandWalletOtpCountdownJob: Job? = null
     private var brandWalletRedeemProgressJob: Job? = null
-    private var brandWalletRedeemMockResultJob: Job? = null
+    private var isBrandWalletRedeemFlowInFlight: Boolean = false
+    private var brandWalletAddMoneySource: BrandWalletAddMoneySource =
+        BrandWalletAddMoneySource.TOP_UP
     private var isBrandWalletActivatedCardToggled: Boolean = false
     private var isBrandWalletCardSelected: Boolean = false
     private var brandWalletVerificationEmail: String? = null
@@ -189,7 +200,6 @@ class PaymentModeFragment : Fragment() {
         const val BRAND_WALLET_PIN_LENGTH = 6
         const val BRAND_WALLET_PIN_RESEND_SECONDS = 120
         const val BRAND_WALLET_REDEEM_TIMEOUT_MS = 60_000L
-        const val BRAND_WALLET_REDEEM_MOCK_RESULT_DELAY_MS = 3_000L
         const val BRAND_WALLET_REDEEM_PROGRESS_INTERVAL_MS = 250L
         const val BRAND_WALLET_TERMS_SHEET_HEIGHT_RATIO = 0.82f
     }
@@ -217,6 +227,8 @@ class PaymentModeFragment : Fragment() {
         brandWalletReadyDismissJob = null
         brandWalletOtpCountdownJob?.cancel()
         brandWalletOtpCountdownJob = null
+        isBrandWalletRedeemFlowInFlight = false
+        brandWalletAddMoneySource = BrandWalletAddMoneySource.TOP_UP
         cancelBrandWalletRedeemJobs()
         brandWalletBottomSheetDialog?.dismiss()
         brandWalletBottomSheetDialog = null
@@ -582,14 +594,7 @@ class PaymentModeFragment : Fragment() {
         )
         val upiData = UpiData(UPI_ID, null, "INTENT")
         val mode = "CASH"
-        val customerInfo = ExpressSDKObject.getFetchData()?.customerInfo
-        val customer = CustomerInfo(
-            customer_id = customerInfo?.customerId ?: customerInfo?.customer_id ?: "",
-            country_code = customerInfo?.countryCode ?: customerInfo?.country_code ?: "91",
-            email_id = customerInfo?.emailId ?: customerInfo?.email_id ?: "",
-            mobile_number = customerInfo?.mobileNo ?: customerInfo?.mobile_number
-            ?: customerInfo?.mobileNumber ?: ""
-        )
+        val customer = buildBrandWalletCustomerPayload()
         val upiTxnData = UpiTransactionData(10)
         val addMoneyToWalletRequest =
             WalletAddMoneyRequest(
@@ -601,6 +606,65 @@ class PaymentModeFragment : Fragment() {
             )
 
         return addMoneyToWalletRequest
+    }
+
+    private fun redeemGiftCardToWallet(giftCardNumber: String, giftCardPin: String): WalletAddMoneyRequest {
+        val customer = buildBrandWalletCustomerPayload()
+
+        val extras = Extra(
+            payment_mode = null,
+            payment_amount = null,
+            payment_currency = null,
+            card_last4 = null,
+            redeemable_amount = null,
+            registered_mobile_number = null,
+            txn_mode = null,
+            device_info = null,
+            risk_validation_details = null,
+            customer = customer,
+        )
+
+        val paymentOption = PaymentOptions(
+            gift_card_details = GiftCardDetails(
+                gift_card_number = giftCardNumber.trim(),
+                pin = giftCardPin.trim(),
+            ),
+        )
+
+        return WalletAddMoneyRequest(
+            mode = "GIFT_CARD",
+            customer = null,
+            extras = extras,
+            payment_option = paymentOption,
+        )
+    }
+
+    private fun createBrandWalletValidateRequest(): WalletValidateRequest {
+        val customer = buildBrandWalletCustomerPayload()
+
+        return WalletValidateRequest(
+            amount = OrderDetailsAmount(
+                value = getBrandWalletOrderAmount(),
+                currency = getCurrency(),
+            ),
+            customers = customer,
+        )
+    }
+
+    private fun buildBrandWalletCustomerPayload(): CustomerInfo {
+        val customerInfo = ExpressSDKObject.getFetchData()?.customerInfo
+        val customerId = customerInfo?.customerId ?: customerInfo?.customer_id ?: ""
+        val countryCode = customerInfo?.countryCode ?: customerInfo?.country_code ?: "91"
+        val email = customerInfo?.emailId ?: customerInfo?.email_id ?: ""
+        val mobile = customerInfo?.mobileNo ?: customerInfo?.mobile_number
+        ?: customerInfo?.mobileNumber ?: ""
+
+        return CustomerInfo(
+            customer_id = customerId,
+            country_code = countryCode,
+            email_id = email,
+            mobile_number = mobile,
+        )
     }
 
 
@@ -1091,6 +1155,7 @@ class PaymentModeFragment : Fragment() {
             val isAmountValid = isBrandWalletAddMoneyAmountValid(enteredTopUpAmount, requiredTopUpAmount)
             if (!isAmountValid) return@setOnClickListener
 
+            brandWalletAddMoneySource = BrandWalletAddMoneySource.TOP_UP
             paymentModeViewModel.addMoneyToWallet(
                 ExpressSDKObject.getToken(),
                 addMoneyToWallet(enteredTopUpAmount)
@@ -1301,7 +1366,13 @@ class PaymentModeFragment : Fragment() {
             }
             formContainer.visibility = View.GONE
             loadingContainer.visibility = View.VISIBLE
-            startBrandWalletRedeemMockFlow(progressBar)
+            isBrandWalletRedeemFlowInFlight = true
+            brandWalletAddMoneySource = BrandWalletAddMoneySource.REDEEM_GIFT_CARD
+            startBrandWalletRedeemProgress(progressBar)
+            paymentModeViewModel.addMoneyToWallet(
+                token = ExpressSDKObject.getToken(),
+                request = redeemGiftCardToWallet(giftCardNumber, giftCardPin),
+            )
         }
 
         brandWalletBottomSheetDialog?.setContentView(view)
@@ -1321,6 +1392,7 @@ class PaymentModeFragment : Fragment() {
         brandWalletBottomSheetDialog?.setCancelable(true)
         brandWalletBottomSheetDialog?.setCanceledOnTouchOutside(true)
         brandWalletBottomSheetDialog?.setOnDismissListener {
+            isBrandWalletRedeemFlowInFlight = false
             cancelBrandWalletRedeemJobs()
             brandWalletBottomSheetDialog = null
         }
@@ -1328,14 +1400,14 @@ class PaymentModeFragment : Fragment() {
         brandWalletBottomSheetDialog?.show()
     }
 
-    private fun startBrandWalletRedeemMockFlow(progressBar: ProgressBar) {
+    private fun startBrandWalletRedeemProgress(progressBar: ProgressBar) {
         cancelBrandWalletRedeemJobs()
         progressBar.max = 100
         progressBar.progress = 0
 
         brandWalletRedeemProgressJob = viewLifecycleOwner.lifecycleScope.launch {
             var elapsedMs = 0L
-            while (elapsedMs < BRAND_WALLET_REDEEM_TIMEOUT_MS) {
+            while (isBrandWalletRedeemFlowInFlight && elapsedMs < BRAND_WALLET_REDEEM_TIMEOUT_MS) {
                 val progress =
                     ((elapsedMs.toFloat() / BRAND_WALLET_REDEEM_TIMEOUT_MS) * 100).toInt()
                         .coerceIn(0, 95)
@@ -1343,19 +1415,11 @@ class PaymentModeFragment : Fragment() {
                 delay(BRAND_WALLET_REDEEM_PROGRESS_INTERVAL_MS)
                 elapsedMs += BRAND_WALLET_REDEEM_PROGRESS_INTERVAL_MS
             }
-            progressBar.progress = 100
-            if (isAdded) {
-                brandWalletBottomSheetDialog?.dismiss()
-                showBrandWalletRedeemNotEligibleBottomSheet()
+            if (!isBrandWalletRedeemFlowInFlight) {
+                return@launch
             }
-        }
-
-        brandWalletRedeemMockResultJob = viewLifecycleOwner.lifecycleScope.launch {
-            delay(BRAND_WALLET_REDEEM_MOCK_RESULT_DELAY_MS)
-            brandWalletRedeemProgressJob?.cancel()
-            brandWalletRedeemProgressJob = null
             progressBar.progress = 100
-            delay(150)
+            isBrandWalletRedeemFlowInFlight = false
             if (isAdded) {
                 brandWalletBottomSheetDialog?.dismiss()
                 showBrandWalletRedeemNotEligibleBottomSheet()
@@ -1366,6 +1430,8 @@ class PaymentModeFragment : Fragment() {
     private fun showBrandWalletRedeemNotEligibleBottomSheet() {
         if (!isAdded) return
 
+        isBrandWalletRedeemFlowInFlight = false
+        brandWalletAddMoneySource = BrandWalletAddMoneySource.TOP_UP
         cancelBrandWalletRedeemJobs()
         brandWalletBottomSheetDialog?.dismiss()
         brandWalletBottomSheetDialog = BottomSheetDialog(requireContext())
@@ -1460,8 +1526,6 @@ class PaymentModeFragment : Fragment() {
     private fun cancelBrandWalletRedeemJobs() {
         brandWalletRedeemProgressJob?.cancel()
         brandWalletRedeemProgressJob = null
-        brandWalletRedeemMockResultJob?.cancel()
-        brandWalletRedeemMockResultJob = null
     }
 
     private fun isValidBrandWalletGiftCardNumber(value: String?): Boolean {
@@ -1501,7 +1565,10 @@ class PaymentModeFragment : Fragment() {
         return "${ExpressSDKObject.getCurrencySymbol()} ${formatter.format(amountInRupee)}"
     }
 
-    private fun showBrandWalletReadyBottomSheet() {
+    private fun showBrandWalletReadyBottomSheet(
+        titleText: String = getString(R.string.brand_wallet_ready_title),
+        subtitleText: String = getString(R.string.brand_wallet_ready_subtitle),
+    ) {
         if (!isAdded) return
 
         brandWalletReadyDismissJob?.cancel()
@@ -1512,9 +1579,11 @@ class PaymentModeFragment : Fragment() {
             .inflate(R.layout.brand_wallet_ready_bottom_sheet, null)
 
         val closeButton = view.findViewById<ImageView>(R.id.brand_wallet_ready_close)
+        val title = view.findViewById<TextView>(R.id.brand_wallet_ready_title)
         val subtitle = view.findViewById<TextView>(R.id.brand_wallet_ready_subtitle)
+        title.text = titleText
         subtitle.text = HtmlCompat.fromHtml(
-            getString(R.string.brand_wallet_ready_subtitle),
+            subtitleText,
             HtmlCompat.FROM_HTML_MODE_LEGACY
         )
 
@@ -1551,6 +1620,28 @@ class PaymentModeFragment : Fragment() {
             if (brandWalletBottomSheetDialog?.isShowing == true) {
                 brandWalletBottomSheetDialog?.dismiss()
             }
+        }
+    }
+
+    private fun applyValidatedBrandWalletBalance(response: WalletValidateResponse) {
+        val totalBalance = response.total_balance_amount
+            ?: response.payment_option_metadata?.wallet_data?.total_balance_amount
+            ?: response.payment_option_metadata?.total_balance_amount
+            ?: return
+        val balanceValue = totalBalance.value
+        if (balanceValue < 0) return
+
+        val fetchData = ExpressSDKObject.getFetchData() ?: return
+        val customerInfo = fetchData.customerInfo ?: CustomerInfo().also {
+            fetchData.customerInfo = it
+        }
+        customerInfo.brandWalletEnabled = true
+        customerInfo.brandWalletBalance = BrandWalletBalance(
+            value = balanceValue,
+            currency = totalBalance.currency,
+        )
+        if (view != null && isAdded) {
+            bindBrandWalletCard()
         }
     }
 
@@ -1889,25 +1980,55 @@ class PaymentModeFragment : Fragment() {
                 paymentModeViewModel.addMoneyToWalletResult.collect {
                     when (it) {
                         is BaseResult.Error -> {
+                            val isRedeemFlow =
+                                brandWalletAddMoneySource == BrandWalletAddMoneySource.REDEEM_GIFT_CARD
+                            isBrandWalletRedeemFlowInFlight = false
+                            brandWalletAddMoneySource = BrandWalletAddMoneySource.TOP_UP
+                            cancelBrandWalletRedeemJobs()
+                            brandWalletBottomSheetDialog?.dismiss()
+                            bottomSheetDialog?.dismiss()
+                            if (isRedeemFlow) {
+                                showBrandWalletRedeemNotEligibleBottomSheet()
+                                return@collect
+                            }
                             val bundle = Bundle()
                             bundle.putString(ERROR_KEY, it.errorCode)
                             bundle.putString(ERROR_MESSAGE_KEY, it.errorMessage)
-                            brandWalletBottomSheetDialog?.dismiss()
-                            bottomSheetDialog?.dismiss()
                             safeNavigate(R.id.action_paymentModeFragment_to_successFragment)
                         }
 
                         is BaseResult.Loading -> {
-                            if (it.isLoading)
+                            if (it.isLoading &&
+                                brandWalletAddMoneySource != BrandWalletAddMoneySource.REDEEM_GIFT_CARD
+                            )
                                 bottomSheetDialog = showProcessPaymentDialog(requireContext())
 
                         }
 
                         is BaseResult.Success<WalletAddMoneyResponse> -> {
+                            val isRedeemFlow =
+                                brandWalletAddMoneySource == BrandWalletAddMoneySource.REDEEM_GIFT_CARD
+                            isBrandWalletRedeemFlowInFlight = false
+                            brandWalletAddMoneySource = BrandWalletAddMoneySource.TOP_UP
+                            cancelBrandWalletRedeemJobs()
                             ExpressSDKObject.setWalletAddMoneyResponse(it.data)
                             ExpressSDKObject.setProcessPaymentResponse(
                                 mapWalletAddMoneyToProcessPaymentResponse(it.data)
                             )
+                            if (isRedeemFlow) {
+                                brandWalletBottomSheetDialog?.dismiss()
+                                bottomSheetDialog?.dismiss()
+                                showBrandWalletReadyBottomSheet(
+                                    titleText = getString(R.string.brand_wallet_redeem_success_title),
+                                    subtitleText = getString(R.string.brand_wallet_redeem_success_subtitle),
+                                )
+                                paymentModeViewModel.resetWalletValidateState()
+                                paymentModeViewModel.validateWalletBalance(
+                                    token = ExpressSDKObject.getToken(),
+                                    request = createBrandWalletValidateRequest(),
+                                )
+                                return@collect
+                            }
                             ExpressSDKObject.setSelectedMode(Constants.BRAND_WALLET_ID)
                             brandWalletBottomSheetDialog?.dismiss()
                             bottomSheetDialog?.dismiss()
@@ -1957,6 +2078,27 @@ class PaymentModeFragment : Fragment() {
                                 bundle.putString("MODE", Constants.BRAND_WALLET_ID)
                                 safeNavigate(R.id.action_paymentModeFragment_to_UPIFragment, bundle)
                             }
+                        }
+                    }
+                }
+            }
+        }
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                paymentModeViewModel.walletValidateResult.collect {
+                    when (it) {
+                        is BaseResult.Error -> {
+                            paymentModeViewModel.resetWalletValidateState()
+                        }
+
+                        is BaseResult.Loading -> Unit
+
+                        is BaseResult.Success<WalletValidateResponse> -> {
+                            paymentModeViewModel.resetWalletValidateState()
+                            applyValidatedBrandWalletBalance(it.data)
+                            brandWalletBottomSheetDialog?.dismiss()
+                            bottomSheetDialog?.dismiss()
                         }
                     }
                 }

@@ -25,6 +25,8 @@ import com.plural_pinelabs.expresscheckoutsdk.data.model.SavedCardResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.TransactionStatusResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.WalletAddMoneyRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.model.WalletAddMoneyResponse
+import com.plural_pinelabs.expresscheckoutsdk.data.model.WalletValidateRequest
+import com.plural_pinelabs.expresscheckoutsdk.data.model.WalletValidateResponse
 import kotlinx.coroutines.flow.Flow
 
 interface ExpressRepository {
@@ -117,6 +119,11 @@ interface ExpressRepository {
         token: String?,
         request: WalletAddMoneyRequest
     ): Flow<BaseResult<WalletAddMoneyResponse>>
+
+    suspend fun validateWalletBalance(
+        token: String?,
+        request: WalletValidateRequest
+    ): Flow<BaseResult<WalletValidateResponse>>
 
 
 }
