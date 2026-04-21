@@ -11,6 +11,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.plural_pinelabs.expresscheckoutsdk.R
 import com.plural_pinelabs.expresscheckoutsdk.common.ItemClickListener
+import com.plural_pinelabs.expresscheckoutsdk.common.PaymentModes
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils
 import com.plural_pinelabs.expresscheckoutsdk.data.model.PaymentMode
 
@@ -28,6 +29,7 @@ class PaymentModeRecyclerViewAdapter(
             val modeImage: ImageView = itemView.findViewById(R.id.payment_icon)
             val modeName: TextView = itemView.findViewById(R.id.payment_mode)
             val modeDescription: TextView = itemView.findViewById(R.id.payment_mode_description)
+            val modeSavingTag: TextView = itemView.findViewById(R.id.payment_mode_saving_tag)
             val parentLayout: ConstraintLayout = itemView.findViewById(R.id.payment_mode_parent)
             val recyclerViewPaymentOptionData = Utils.mapPaymentModes(item)
             if (recyclerViewPaymentOptionData.paymentOption == -1 || recyclerViewPaymentOptionData.paymentImage == -1 || recyclerViewPaymentOptionData.description == -1) {
@@ -36,6 +38,7 @@ class PaymentModeRecyclerViewAdapter(
             modeName.text = context.getString(recyclerViewPaymentOptionData.paymentOption)
             modeImage.setImageResource(recyclerViewPaymentOptionData.paymentImage)
             modeDescription.text = context.getString(recyclerViewPaymentOptionData.description)
+            bindSavingTag(item, modeSavingTag)
             parentLayout.backgroundTintList =
                 AppCompatResources.getColorStateList(context, R.color.colorPrimary)
             parentLayout.setOnClickListener {
@@ -58,5 +61,66 @@ class PaymentModeRecyclerViewAdapter(
 
     override fun onBindViewHolder(holder: PaymentModeViewHolder, position: Int) {
         holder.setItem(paymentModeDataList[position], position)
+    }
+
+    private fun bindSavingTag(item: PaymentMode, savingTag: TextView) {
+        if (!item.paymentModeId.equals(PaymentModes.UPI.paymentModeID, ignoreCase = true)) {
+            savingTag.visibility = View.GONE
+            return
+        }
+
+        val savingsAmount = extractSavingsAmount(item.paymentModeData)
+        savingTag.text = if (savingsAmount != null && savingsAmount > 0) {
+            context.getString(
+                R.string.save_rs_x,
+                Utils.convertToRupeesWithSymobl(context, savingsAmount)
+            )
+        } else {
+            context.getString(R.string.upi_default_save_chip)
+        }
+        savingTag.visibility = View.VISIBLE
+    }
+
+    private fun extractSavingsAmount(rawData: Any?): Int? {
+        return when (rawData) {
+            is Number -> rawData.toInt()
+            is String -> rawData.replace("[^0-9]".toRegex(), "").toIntOrNull()
+            is Map<*, *> -> {
+                val prioritized = rawData.entries.firstNotNullOfOrNull { entry ->
+                    val key = entry.key?.toString()?.lowercase() ?: return@firstNotNullOfOrNull null
+                    if (key in SAVINGS_KEYS) {
+                        extractSavingsAmount(entry.value)
+                    } else {
+                        null
+                    }
+                }
+                prioritized ?: rawData.values.firstNotNullOfOrNull { value ->
+                    extractSavingsAmount(value)
+                }
+            }
+
+            is List<*> -> rawData.firstNotNullOfOrNull { value ->
+                extractSavingsAmount(value)
+            }
+
+            else -> null
+        }
+    }
+
+    private companion object {
+        val SAVINGS_KEYS = setOf(
+            "maxsaving",
+            "max_saving",
+            "saving",
+            "savings",
+            "cashback",
+            "cashback_amount",
+            "instant_cashback",
+            "instantcashback",
+            "discount",
+            "discount_amount",
+            "eligible_amount",
+            "eligibleamount"
+        )
     }
 }

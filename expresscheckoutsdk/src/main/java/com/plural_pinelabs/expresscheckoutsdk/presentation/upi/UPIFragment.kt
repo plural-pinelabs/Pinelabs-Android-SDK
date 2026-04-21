@@ -77,6 +77,7 @@ import com.plural_pinelabs.expresscheckoutsdk.data.model.UpiTransactionData
 import com.plural_pinelabs.expresscheckoutsdk.data.model.WalletAddMoneyLocationInfo
 import com.plural_pinelabs.expresscheckoutsdk.data.model.WalletDetails
 import com.plural_pinelabs.expresscheckoutsdk.presentation.LandingActivity
+import com.plural_pinelabs.expresscheckoutsdk.presentation.offers.OfferSummaryDialog
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -86,6 +87,10 @@ class UPIFragment : Fragment() {
 
     private lateinit var payByAnyUPIButton: TextView
     private lateinit var upiAppsRv: RecyclerView
+    private lateinit var upiSavingsZoneContainer: ConstraintLayout
+    private lateinit var upiSavingsZoneCta: View
+    private lateinit var upiSavingsZoneAvailCta: View
+    private lateinit var upiSavingsZoneAppsMoreCount: TextView
     private lateinit var viewModel: UPIViewModel
     private var mTransactionMode: String? = null
     private var bottomSheetDialog: BottomSheetDialog? = null
@@ -170,9 +175,23 @@ class UPIFragment : Fragment() {
         upiAppsRv = view.findViewById(R.id.upi_app_rv)
         payByQRButton = view.findViewById(R.id.pay_by_qr_btn)
         payByQRLayout = view.findViewById(R.id.pay_by_qr)
+        upiSavingsZoneContainer = view.findViewById(R.id.upi_savings_zone_container)
+        upiSavingsZoneCta = view.findViewById(R.id.upi_savings_zone_cta)
+        upiSavingsZoneAvailCta = view.findViewById(R.id.upi_savings_zone_avail_cta)
+        upiSavingsZoneAppsMoreCount = view.findViewById(R.id.upi_savings_zone_apps_more_count)
 
         if (flowMode.equals(BRAND_WALLET_ID, true)) {
             payByAnyUPIButton.text = getString(R.string.pay_by_existing_upi_app)
+            upiSavingsZoneContainer.visibility = View.GONE
+        } else {
+            upiSavingsZoneContainer.visibility = View.VISIBLE
+            updateSavingsZoneAppsBadge()
+            val openOfferDialog = View.OnClickListener {
+                val offersDialog = OfferSummaryDialog()
+                offersDialog.show(parentFragmentManager, "UpiOfferSummaryDialog")
+            }
+            upiSavingsZoneCta.setOnClickListener(openOfferDialog)
+            upiSavingsZoneAvailCta.setOnClickListener(openOfferDialog)
         }
 
 
@@ -201,6 +220,7 @@ class UPIFragment : Fragment() {
     private fun setUpPayByUPIApps() {
         allInstalledUpiApps = getUpiAppsInstalledInDevice()
         isShowingAllUpiApps = false
+        updateSavingsZoneAppsBadge()
 
         if (allInstalledUpiApps.isNotEmpty()) {
             payByAnyUPIButton.visibility = View.VISIBLE
@@ -210,6 +230,19 @@ class UPIFragment : Fragment() {
         } else {
             upiAppsRv.visibility = View.GONE
         }
+    }
+
+    private fun updateSavingsZoneAppsBadge() {
+        if (!::upiSavingsZoneAppsMoreCount.isInitialized) return
+        if (allInstalledUpiApps.isEmpty()) {
+            upiSavingsZoneAppsMoreCount.text = getString(R.string.upi_savings_zone_apps_more_default)
+            return
+        }
+        val remainingAppsCount = (allInstalledUpiApps.size - 1).coerceAtLeast(1)
+        upiSavingsZoneAppsMoreCount.text = getString(
+            R.string.upi_savings_zone_apps_more_count,
+            remainingAppsCount
+        )
     }
 
     private fun renderUpiApps() {

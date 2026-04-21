@@ -46,5 +46,7 @@
     <color name="green_009E54">#009E54</color>
     <color name="green_66EC9D">#66EC9D</color>
     <color name="black_24342B">#8824342B</color>
+    <color name="savings_zone_title_teal">#005656</color>
+    <color name="savings_zone_auto_applied_text">#CE8809</color>
 
 </resources>
