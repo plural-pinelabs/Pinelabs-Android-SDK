@@ -13,7 +13,6 @@ import com.plural_pinelabs.expresscheckoutsdk.common.Constants.BASE_URL_QA
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.BASE_URL_UAT
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.HTTPS
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.TIMEOUT
-import com.plural_pinelabs.expresscheckoutsdk.common.PaymentModeDeserialiser
 import com.plural_pinelabs.expresscheckoutsdk.data.fetch.CommonApiService
 import com.plural_pinelabs.expresscheckoutsdk.data.fetch.ExpressApiService
 import com.plural_pinelabs.expresscheckoutsdk.data.fetch.FetchApiService
@@ -31,7 +30,6 @@ object RetrofitBuilder {
     private val clientBuilder: OkHttpClient.Builder = createBuilder()
 
     private val gson: Gson = GsonBuilder()
-        .registerTypeAdapter(Any::class.java, PaymentModeDeserialiser())
         .create()
 
     private fun getRetrofit(): Retrofit {
