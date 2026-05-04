@@ -1,0 +1,29 @@
+name: AI Code Review
+
+on:
+  pull_request:
+
+jobs:
+  architecture-and-governance-review:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate agentic baseline
+        run: |
+          test -f Architecture.md
+          test -f Governance.md
+          test -f .github/hooks/financial-integrity-check.md
+
+      - name: Enforce required instruction files
+        run: |
+          test -f .github/instructions/payment-lifecycle.md
+          test -f .github/instructions/idempotency-guidelines.md
+          test -f .github/instructions/connector-guidelines.md
+
+      - name: Emit review summary
+        run: |
+          echo "AI review baseline checks passed."
+          echo "Integrate repository-specific reviewer agent automation here."

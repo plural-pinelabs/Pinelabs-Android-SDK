@@ -333,7 +333,7 @@ class CardFragment : Fragment() {
 
                         is BaseResult.Success<ProcessPaymentResponse> -> {
                             ExpressSDKObject.setProcessPaymentResponse(it.data)
-                            if (isNativeOTP) {
+                            if (it.data.is_native_otp_eligible == true) {
                                 callNativeRequestOTP()
                             } else {
                                 redirectToACS()

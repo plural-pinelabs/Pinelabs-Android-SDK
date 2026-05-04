@@ -1,0 +1,21 @@
+name: AI Test Generation
+
+on:
+  pull_request:
+
+jobs:
+  suggest-test-cases:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Generate test checklist
+        run: |
+          echo "Suggested tests for payment changes:"
+          echo "- state transition success/failure cases"
+          echo "- idempotency replay/conflict/concurrency"
+          echo "- connector mapping and error normalization"
+          echo "- webhook signature and replay protection"
+          echo "Replace this step with your internal AI test generator tool."

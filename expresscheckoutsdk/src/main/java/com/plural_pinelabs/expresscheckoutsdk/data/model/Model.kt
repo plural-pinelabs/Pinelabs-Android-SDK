@@ -376,6 +376,7 @@ data class ProcessPaymentResponse(
     val payment_id: String?,
     val order_id: String?,
     val short_link: String?,
+    val is_native_otp_eligible: Boolean? = null,
 )
 
 @Parcelize
