@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bottomsheet_rounded_corners"
+    android:paddingStart="20dp"
+    android:paddingTop="14dp"
+    android:paddingEnd="20dp"
+    android:paddingBottom="12dp">
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/brand_wallet_sheet_scroll"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:clipToPadding="false"
+        android:fillViewport="true"
+        android:overScrollMode="never"
+        android:paddingBottom="8dp"
+        app:layout_constraintBottom_toTopOf="@id/brand_wallet_sheet_create_wallet"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/brand_wallet_sheet_close"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_gravity="end"
+                android:background="@drawable/circle_background"
+                android:backgroundTint="@color/black_text_8"
+                android:contentDescription="@string/close"
+                android:padding="10dp"
+                android:src="@drawable/ic_cancel_close"
+                app:tint="@color/black_text_60" />
+
+            <FrameLayout
+                android:id="@+id/brand_wallet_sheet_illustration"
+                android:layout_width="182dp"
+                android:layout_height="158dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="16dp">
+
+                <View
+                    android:layout_width="120dp"
+                    android:layout_height="120dp"
+                    android:layout_gravity="center"
+                    android:background="@drawable/brand_wallet_sheet_backdrop" />
+
+                <View
+                    android:layout_width="106dp"
+                    android:layout_height="22dp"
+                    android:layout_gravity="bottom|center_horizontal"
+                    android:layout_marginBottom="12dp"
+                    android:background="@drawable/brand_wallet_sheet_shadow" />
+
+                <View
+                    android:layout_width="48dp"
+                    android:layout_height="76dp"
+                    android:layout_gravity="top|center_horizontal"
+                    android:layout_marginTop="22dp"
+                    android:layout_marginEnd="32dp"
+                    android:alpha="0.96"
+                    android:background="@drawable/brand_wallet_sheet_note"
+                    android:rotation="-16" />
+
+                <View
+                    android:layout_width="48dp"
+                    android:layout_height="76dp"
+                    android:layout_gravity="top|center_horizontal"
+                    android:layout_marginStart="30dp"
+                    android:layout_marginTop="16dp"
+                    android:alpha="0.96"
+                    android:background="@drawable/brand_wallet_sheet_note"
+                    android:rotation="10" />
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/brand_wallet_sheet_wallet_icon"
+                    android:layout_width="144dp"
+                    android:layout_height="112dp"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="10dp"
+                    android:src="@drawable/brand_wallet_logo"
+                    tools:ignore="UseAppTint" />
+
+            </FrameLayout>
+
+            <TextView
+                android:id="@+id/brand_wallet_sheet_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="20dp"
+                android:fontFamily="sans-serif-medium"
+                android:text="@string/brand_wallet_bottom_sheet_title"
+                android:textColor="@color/black_text"
+                android:textFontWeight="700"
+                android:textSize="17sp" />
+
+            <TextView
+                android:id="@+id/brand_wallet_sheet_subtitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:gravity="center"
+                android:lineSpacingExtra="2dp"
+                android:paddingHorizontal="26dp"
+                android:text="@string/brand_wallet_bottom_sheet_subtitle"
+                android:textColor="@color/black_text_50"
+                android:textFontWeight="500"
+                android:textSize="13sp" />
+
+            <TextView
+                android:id="@+id/brand_wallet_sheet_why"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="30dp"
+                android:fontFamily="sans-serif-medium"
+                android:text="@string/brand_wallet_bottom_sheet_why"
+                android:textColor="@color/black_text"
+                android:textFontWeight="700"
+                android:textSize="16sp" />
+
+            <LinearLayout
+                android:id="@+id/brand_wallet_sheet_stepper_content"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:paddingEnd="6dp"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="top"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:layout_width="16dp"
+                        android:layout_height="12dp"
+                        android:layout_marginTop="3dp"
+                        android:importantForAccessibility="no"
+                        android:src="@drawable/brand_wallet_stepper" />
+
+                    <TextView
+                        android:id="@+id/brand_wallet_sheet_stepper_line_one"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="14dp"
+                        android:layout_weight="1"
+                        android:lineSpacingExtra="4dp"
+                        android:text="@string/brand_wallet_stepper_line_one"
+                        android:textColor="@color/black_text_50"
+                        android:textFontWeight="500"
+                        android:textSize="14sp" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:gravity="top"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:layout_width="16dp"
+                        android:layout_height="12dp"
+                        android:layout_marginTop="3dp"
+                        android:importantForAccessibility="no"
+                        android:src="@drawable/brand_wallet_stepper" />
+
+                    <TextView
+                        android:id="@+id/brand_wallet_sheet_stepper_line_two"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="14dp"
+                        android:layout_weight="1"
+                        android:lineSpacingExtra="4dp"
+                        android:text="@string/brand_wallet_stepper_line_two"
+                        android:textColor="@color/black_text_50"
+                        android:textFontWeight="500"
+                        android:textSize="14sp" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:gravity="top"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:layout_width="16dp"
+                        android:layout_height="12dp"
+                        android:layout_marginTop="3dp"
+                        android:importantForAccessibility="no"
+                        android:src="@drawable/brand_wallet_stepper" />
+
+                    <TextView
+                        android:id="@+id/brand_wallet_sheet_stepper_line_three"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="14dp"
+                        android:layout_weight="1"
+                        android:lineSpacingExtra="4dp"
+                        android:text="@string/brand_wallet_stepper_line_three"
+                        android:textColor="@color/black_text_50"
+                        android:textFontWeight="500"
+                        android:textSize="14sp" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/brand_wallet_sheet_terms"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="18dp"
+                android:lineSpacingExtra="1dp"
+                android:textColor="@color/black_text_50"
+                android:textSize="12sp"
+                tools:text="By proceeding, I agree to the Wallet Terms &amp; Conditions and understand that a wallet associated to Croma will be created" />
+
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/brand_wallet_sheet_create_wallet"
+        android:layout_width="0dp"
+        android:layout_height="52dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="2dp"
+        android:background="@drawable/primary_button_background"
+        android:fontFamily="sans-serif-medium"
+        android:minHeight="52dp"
+        android:text="@string/brand_wallet_create_wallet"
+        android:textAllCaps="false"
+        android:textColor="@color/white"
+        android:textFontWeight="600"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>

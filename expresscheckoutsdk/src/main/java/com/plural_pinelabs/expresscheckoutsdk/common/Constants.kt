@@ -19,6 +19,7 @@ internal object Constants {
 
     const val CREDIT_DEBIT_ID = "CREDIT_DEBIT"
     const val PAY_BY_POINTS_ID = "PAYBYPOINTS"
+    const val BRAND_WALLET_ID = "BRAND_WALLET"
     const val NET_BANKING_ID = "NET_BANKING"
     const val UPI_ID = "UPI"
     const val WALLET_ID = "WALLET"
@@ -52,6 +53,8 @@ internal object Constants {
     const val CRED_UPI = "com.dreamplug.androidapp"
     const val MOBIKWIK_UPI= "com.mobikwik_new"
     const val KIWI_UPI= "in.gokiwi.kiwitpap"
+    const val NAVI_UPI = "com.naviapp"
+    const val SUPERMONEY_UPI = "in.super.money"
     const val UPI_INTENT = "INTENT"
     const val UPI_INTENT_QR = "INTENT_QR"
     const val UPI_COLLECT = "COLELCT"

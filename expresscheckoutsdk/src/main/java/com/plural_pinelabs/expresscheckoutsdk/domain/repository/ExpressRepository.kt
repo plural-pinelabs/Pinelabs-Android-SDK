@@ -1,12 +1,13 @@
 package com.plural_pinelabs.expresscheckoutsdk.domain.repository
 
 import com.plural_pinelabs.expresscheckoutsdk.common.BaseResult
-import com.plural_pinelabs.expresscheckoutsdk.data.model.Address
 import com.plural_pinelabs.expresscheckoutsdk.data.model.AddressRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.model.AddressResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CancelTransactionResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CardBinMetaDataRequestList
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CardBinMetaDataResponse
+import com.plural_pinelabs.expresscheckoutsdk.data.model.CreateWalletRequest
+import com.plural_pinelabs.expresscheckoutsdk.data.model.CreateWalletResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CustomerInfo
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CustomerInfoResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ExpressAddress
@@ -14,7 +15,6 @@ import com.plural_pinelabs.expresscheckoutsdk.data.model.ExpressAddressResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.FetchResponseDTO
 import com.plural_pinelabs.expresscheckoutsdk.data.model.KFSResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.LogData
-import com.plural_pinelabs.expresscheckoutsdk.data.model.LogRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.model.LogResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.OTPRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.model.OTPResponse
@@ -23,6 +23,14 @@ import com.plural_pinelabs.expresscheckoutsdk.data.model.ProcessPaymentRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ProcessPaymentResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.SavedCardResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.TransactionStatusResponse
+import com.plural_pinelabs.expresscheckoutsdk.data.model.UpiFetchVpaRequest
+import com.plural_pinelabs.expresscheckoutsdk.data.model.UpiFetchVpaResponse
+import com.plural_pinelabs.expresscheckoutsdk.data.model.UpiOfferValidateRequest
+import com.plural_pinelabs.expresscheckoutsdk.data.model.WalletAddMoneyRequest
+import com.plural_pinelabs.expresscheckoutsdk.data.model.WalletAddMoneyResponse
+import com.plural_pinelabs.expresscheckoutsdk.data.model.WalletResetOtpResponse
+import com.plural_pinelabs.expresscheckoutsdk.data.model.WalletValidateRequest
+import com.plural_pinelabs.expresscheckoutsdk.data.model.WalletValidateResponse
 import kotlinx.coroutines.flow.Flow
 
 interface ExpressRepository {
@@ -57,7 +65,8 @@ interface ExpressRepository {
     ): Flow<BaseResult<SavedCardResponse>>
 
     suspend fun transactionStatus(
-        token: String?
+        token: String?,
+        orderId: String? = null,
     ): Flow<BaseResult<TransactionStatusResponse>>
 
     suspend fun graphQl(
@@ -65,14 +74,19 @@ interface ExpressRepository {
         request: ExpressAddress
     ): Flow<BaseResult<ExpressAddressResponse>>
 
-   suspend fun createInactiveUser(
-    token: String?,
-    request: CustomerInfo?
+    suspend fun createInactiveUser(
+        token: String?,
+        request: CustomerInfo?
     ): Flow<BaseResult<CustomerInfo>>
 
     suspend fun validateOffers(
         token: String?,
         paymentData: ProcessPaymentRequest?
+    ): Flow<BaseResult<OfferEligibilityResponse>>
+
+    suspend fun validateOffersV2(
+        token: String?,
+        request: UpiOfferValidateRequest?
     ): Flow<BaseResult<OfferEligibilityResponse>>
 
     suspend fun getKFS(
@@ -100,8 +114,35 @@ interface ExpressRepository {
         request: List<LogData>?,
     ): Flow<BaseResult<LogResponse>>
 
-    suspend fun  cancelPayment(
+    suspend fun createWallet(
         token: String?,
-        cancelPayment:Boolean
-    ):Flow<BaseResult<CancelTransactionResponse>>
+        request: CreateWalletRequest
+    ): Flow<BaseResult<CreateWalletResponse>>
+
+    suspend fun cancelPayment(
+        token: String?,
+        cancelPayment: Boolean
+    ): Flow<BaseResult<CancelTransactionResponse>>
+
+    suspend fun addMoneyWallet(
+        token: String?,
+        request: WalletAddMoneyRequest
+    ): Flow<BaseResult<WalletAddMoneyResponse>>
+
+    suspend fun validateWalletBalance(
+        token: String?,
+        request: WalletValidateRequest
+    ): Flow<BaseResult<WalletValidateResponse>>
+
+    suspend fun resetWalletOtp(
+        token: String?,
+        customerId: String,
+    ): Flow<BaseResult<WalletResetOtpResponse>>
+
+    suspend fun fetchUpiVpa(
+        token: String?,
+        request: UpiFetchVpaRequest,
+    ): Flow<BaseResult<UpiFetchVpaResponse>>
+
+
 }

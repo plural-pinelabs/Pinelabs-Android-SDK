@@ -197,6 +197,11 @@ class SplashFragment : Fragment() {
     }
 
     private fun handleNav() {
+        if (ExpressSDKObject.isMCCTransaction()) {
+            findNavController().navigate(R.id.action_splashFragment_to_cardFragment)
+            return
+        }
+
         // TODO Finalize the condition for the d2c flow
 //                                if (it.customerInfo?.customerId.isNullOrEmpty()) {
 //                                    // no customer id new user

@@ -33,6 +33,11 @@ android {
             "SHA256_PROD",
             "\"DxH4tt40L+eduF6szpY6TONlxhZhBd+pJ9wbHlQ2fuw=\""
         )
+        buildConfigField(
+            "boolean",
+            "ENABLE_UPI_ICB_SAVINGS_UI",
+            "false"
+        )
     }
 
     buildTypes {

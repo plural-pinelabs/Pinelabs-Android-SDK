@@ -15,6 +15,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.activity.OnBackPressedCallback
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -59,6 +60,7 @@ class CardFragment : Fragment() {
     private var isPBPEnabled = false // TODO to configure this from the server
     private var isDCCEnabled = false // TODO to configure this from the server
     private var isSavedCardEnabled = false // TODO to configure this from the server
+    private var isMCCTransaction = false
 
     private var binData: CardBinMetaDataResponse? = null
 
@@ -127,6 +129,16 @@ class CardFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         isPBPEnabled = checkIfPBPIsEnabled()
         setFlags(ExpressSDKObject.getFetchData())
+        if (isMCCTransaction) {
+            requireActivity().onBackPressedDispatcher.addCallback(
+                viewLifecycleOwner,
+                object : OnBackPressedCallback(true) {
+                    override fun handleOnBackPressed() {
+                        // Intentionally block back navigation for MCC card flow.
+                    }
+                }
+            )
+        }
         setupViews(view)
         setCardFocusListener()
         setUpCardNumberValidation()
@@ -150,6 +162,7 @@ class CardFragment : Fragment() {
     }
 
     private fun setFlags(fetchData: FetchResponseDTO?) {
+        isMCCTransaction = fetchData?.transactionInfo?.isMCCTransaction == true
         fetchData?.merchantInfo?.featureFlags?.let {
             isNativeOTP = it.isNativeOTPEnabled ?: false
             isDCCEnabled = it.isDCCEnabled ?: false
@@ -206,9 +219,13 @@ class CardFragment : Fragment() {
         pbpRedeemPointsParentLayout.visibility = View.GONE
         pbpRedeemPointsErrorParentLayout.visibility = View.GONE
 
-
-        backBtn.setOnClickListener {
-            findNavController().popBackStack()
+        if (isMCCTransaction) {
+            backBtn.visibility = View.GONE
+        } else {
+            backBtn.visibility = View.VISIBLE
+            backBtn.setOnClickListener {
+                findNavController().popBackStack()
+            }
         }
         setUpAmount()
     }
@@ -216,7 +233,7 @@ class CardFragment : Fragment() {
     private fun setUpAmount() {
         payBtn.text = getString(
             R.string.pay_amount_text,
-            getString(R.string.rupee_symbol),
+            ExpressSDKObject.getCurrencySymbol(),
             Utils.convertInRupees(ExpressSDKObject.getAmount())
         )
         payBtn.setOnClickListener {
@@ -306,6 +323,7 @@ class CardFragment : Fragment() {
                             bundle.putString(ERROR_KEY, it.errorCode)
                             bundle.putString(ERROR_MESSAGE_KEY, it.errorMessage)
                             bottomSheetDialog?.dismiss()
+                            viewModel.resetProcessPaymentState()
                             findNavController().navigate(R.id.action_cardFragment_to_successFragment)
                         }
 
@@ -316,7 +334,8 @@ class CardFragment : Fragment() {
 
                         is BaseResult.Success<ProcessPaymentResponse> -> {
                             ExpressSDKObject.setProcessPaymentResponse(it.data)
-                            if (isNativeOTP) {
+                            viewModel.resetProcessPaymentState()
+                            if (it.data.is_native_otp_eligible == true) {
                                 callNativeRequestOTP()
                             } else {
                                 redirectToACS()

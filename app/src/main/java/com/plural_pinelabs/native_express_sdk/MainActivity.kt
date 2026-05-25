@@ -82,7 +82,7 @@ class MainActivity : AppCompatActivity() {
                             "Cancelled: $responseCode, $responseMessage, $responseDescription"
                         )
                     }
-                }, true
+                }, false
             )
         }
     }

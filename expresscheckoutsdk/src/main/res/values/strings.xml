@@ -57,11 +57,31 @@
     <string name="or_complete_payment_on_your"><font color='background: #1C1C1C80;'> Or, complete payment on your </font><font color='#CC1C1C1C'><u>bank’s website</u></font></string>
     <string name="pay_using_upi">Pay using UPI</string>
     <string name="pay_by_any_upi_app">Pay by any UPI app</string>
+    <string name="pay_by_existing_upi_app">Pay by existing UPI app</string>
+    <string name="upi_no_apps_available">No UPI apps available</string>
+    <string name="upi_no_apps_found_to_continue">No UPI app found, please install one to continue</string>
+    <string name="upi_savings_zone_title">Savings Zone</string>
+    <string name="upi_savings_zone_subtitle">Instant Cashback up to ₹ 100</string>
+    <string name="upi_savings_zone_subtitle_dynamic">Instant Cashback up to %1$s</string>
+    <string name="upi_savings_zone_cta">View All</string>
+    <string name="upi_savings_zone_cta_underlined"><u>View All</u></string>
+    <string name="upi_savings_zone_apps_more_default">5+</string>
+    <string name="upi_savings_zone_apps_more_count">%1$d+</string>
+    <string name="upi_savings_zone_offer_hint">Best offer for you, Avail in 2 Steps</string>
+    <string name="upi_savings_zone_auto_applied_hint">Best offer auto-applied, Avail in 2 Steps</string>
+    <string name="upi_savings_zone_offer_applied_hint">Best offer applied</string>
+    <string name="upi_savings_zone_avail">Avail</string>
+    <string name="upi_savings_zone_applied">Applied</string>
+    <string name="savings_zone_chip_label">Savings Zone</string>
+    <string name="upi_default_save_chip">Save ₹ 100</string>
     <string name="upi_app_google_pay">Google Pay</string>
     <string name="upi_app_phonepe">PhonePe</string>
     <string name="upi_app_paytm">Paytm</string>
     <string name="upi_app_bhim_upi">BHIM </string>
     <string name="upi_app_cred">CRED</string>
+    <string name="upi_app_navi">Navi</string>
+    <string name="upi_app_supermoney">SuperMoney</string>
+    <string name="upi_more_apps">More Apps</string>
     <string name="or_get_payment_request_on_upi_id">Or get payment request on UPI ID</string>
     <string name="upi_open_with">Open with</string>
     <string name="full_name">Full name</string>
@@ -197,6 +217,15 @@
     <string name="convenience_fee_gst">GST on Convenience Fee </string>
     <string name="no_cost_discount">No Cost EMI Discount</string>
     <string name="cashback">Cashback</string>
+    <string name="offer_savings_tag_format">%1$s %2$s</string>
+    <string name="offer_filter_all_count">All (%1$d)</string>
+    <string name="offer_filter_credit_count">Credit Cards (%1$d)</string>
+    <string name="offer_filter_debit_count">Debit Cards (%1$d)</string>
+    <string name="offer_filter_upi_count">UPI (%1$d)</string>
+    <string name="avail_offer">Avail Offer</string>
+    <string name="upi_offer_title_flat_off">Flat %1$s Off</string>
+    <string name="upi_offer_title_flat_cashback">Flat %1$s Cashback</string>
+    <string name="upi_offer_only_applicable_upi_id">Only applicable to UPI ID</string>
     <string name="processing_fee_info">%s processing fee + GST will be charged by %s bank.</string>
     <string name="total_amount">Total Amount</string>
     <string name="emi_interest">EMI Interest</string>
@@ -204,6 +233,28 @@
     <string name="discount">Discount</string>
     <string name="coupons_offers">Coupons &amp;Offers</string>
     <string name="maximize_your_savings_with_exclusive_offers">Maximize your savings with exclusive offers!</string>
+    <string name="upi_icb_floating_title">🔒 Offer Locked In!</string>
+    <string name="upi_icb_floating_subtitle">Saving ₹100 on UPI payment</string>
+    <string name="upi_icb_floating_subtitle_amount">Saving %s on UPI payment</string>
+    <string name="upi_icb_floating_message">Continue with payment to enjoy savings on your order</string>
+    <string name="upi_icb_ok_got_it">Okay, Got it!</string>
+    <string name="upi_icb_status_pending_title">Pay Using UPI</string>
+    <string name="upi_icb_status_pending_subtitle">Sit back! We’re verifying your UPI details</string>
+    <string name="upi_icb_status_success_title">Pay Using UPI</string>
+    <string name="upi_icb_status_success_subtitle">Sit back! We’re verifying your UPI details</string>
+    <string name="upi_icb_status_pending_banner">Offer’s still waiting. Just try with another number</string>
+    <string name="upi_icb_status_success_banner">We have your offer locked in, Saving ₹ 100!</string>
+    <string name="upi_icb_status_continue_cta">Continue to Pay</string>
+    <string name="upi_icb_status_continue_with_tpap">Continue with %1$s</string>
+    <string name="upi_icb_status_continue_with_vpa">Continue with %1$s</string>
+    <string name="upi_icb_status_change_mobile_cta">Change mobile no.</string>
+    <string name="upi_icb_edit_mobile_title">Change Mobile No.</string>
+    <string name="upi_icb_status_fetching_vpa">Fetching UPI ID on %1$s</string>
+    <string name="upi_icb_status_found_vpa_prefix">UPI&#160;ID&#160;found : </string>
+    <string name="upi_icb_status_no_vpa_found">No UPI ID found</string>
+    <string name="upi_icb_status_unknown_mobile">your number</string>
+    <string name="upi_icb_status_unknown_vpa">Not available</string>
+    <string name="upi_icb_status_bhim_notice">Please pay via BHIM app to avail the offer</string>
     <string name="instant_discount_on_full_payment">Instant discount on full payment</string>
     <string name="applicable_on_emitenurelist_emi_tenures">Applicable on %s EMI tenures</string>
     <string name="x_proccessing_gst_will_be_applied">%s processing fee + GST will be charged by %s bank.</string>
@@ -217,6 +268,107 @@
     <string name="recommended_payment_option">Recommended Payment Option</string>
     <string name="incorrect_otp_please_try_again">Incorrect OTP. Please try again.</string>
     <string name="continue_to_pay">Continue to Pay</string>
+    <string name="brand_wallet_action_redeem_gift_card">Redeem Gift Card</string>
+    <string name="brand_wallet_action_add_money">+ Add Money</string>
+    <string name="brand_wallet_action_proceed_to_pay">Proceed to pay</string>
+    <string name="brand_wallet_refresh_balance">Refresh wallet balance</string>
+    <string name="brand_wallet_redeem_gift_card_title">Redeem gift card</string>
+    <string name="brand_wallet_redeem_loading_title">Applying Gift Card</string>
+    <string name="brand_wallet_redeem_gift_card_number">Gift Card Number</string>
+    <string name="brand_wallet_redeem_gift_card_number_hint">Enter gift card number</string>
+    <string name="brand_wallet_redeem_gift_card_pin">Gift Card PIN</string>
+    <string name="brand_wallet_redeem_gift_card_pin_hint">Enter gift card PIN</string>
+    <string name="brand_wallet_redeem_success_title">Gift Card Applied</string>
+    <string name="brand_wallet_redeem_success_subtitle"><![CDATA[<b>Your gift card amount has been added.</b><br/>Refreshing wallet balance now.]]></string>
+    <string name="brand_wallet_redeem_not_eligible_title">Gift card not eligible for redemption</string>
+    <string name="brand_wallet_redeem_not_eligible_subtitle_prefix">Check  </string>
+    <string name="brand_wallet_redeem_not_eligible_terms"><u> terms &amp; conditions</u></string>
+    <string name="brand_wallet_redeem_not_eligible_subtitle_suffix"> for eligibility.</string>
+    <string name="brand_wallet_redeem_not_eligible_cta">Try another gift card</string>
+    <string name="brand_wallet_terms_conditions_title">Terms &amp; Conditions</string>
+    <string name="brand_wallet_terms_conditions_cta">Got it</string>
+    <string name="brand_wallet_terms_conditions_body"><![CDATA[• This Gift Voucher is issued by Croma Retail Limited (Croma).
+
+• This Gift Voucher is valid only for a period of 12 months from the date of receipt.
+
+• Gift Voucher can be redeemed at JioMart online platform in India. This GV cannot be used on 3P products (Third-party products listed on JioMart Platform).
+
+• Gift Voucher cannot be exchanged for cash. This Gift Voucher can be redeemed only once.
+
+• This Gift Voucher is not valid on purchase of Gold/Silver Coins and fine jewellery.
+
+• This Gift Voucher cannot be redeemed in parts and needs to be redeemed for full value.
+
+• This Gift Voucher is redeemable for a single order only. Also, multiple Gift Vouchers cannot be redeemed in a single order.
+
+• No extension of the validity period nor refund of the value of the Gift Voucher in case of failure to use the Gift Voucher on or before the validity period.
+
+• Croma shall not be responsible for loss or misuse of Gift Voucher and no duplicate or compensation in lieu of the Gift Voucher shall be given by Croma.
+
+• Croma’s overall liability will not exceed the value of the Gift Voucher.
+
+• Bearer of the Gift Voucher shall be deemed to have read, understood, and accepted these terms and conditions.
+
+• Bearer of the code of the Gift Voucher is deemed to be the beneficiary of this Gift Voucher. Any redemption by the bearer of the Gift Voucher shall be considered as a valid discharge of liabilities by Croma.
+
+• Croma shall not be liable under any circumstances towards any loss or damage or expenses or cost or any third-party liability, whether directly or indirectly arising out of or in relation to use of Gift Voucher and redemption thereunder by the bearer.
+
+• Croma reserves its right to modify/amend the terms and conditions of the Gift Voucher at any time without prior notice and such modifications shall be binding on the user/bearer of the Gift Voucher.
+
+• Any dispute with regard to product liability, guarantee, warranty, and quality of the products to be purchased under redemption of the Gift Voucher shall be addressed to the respective manufacturer/brand owner and Croma shall not be held responsible/liabIe for the same. The guarantee and warranty of the products shall be transferred as received from the respective manufacturer/distributor.
+
+• In case of any issue faced by the Gift Voucher bearer, they can reach out to customer service at the stores or customer care at toll-free number 1800 891 0001 or email at customerservice@croma.com.
+
+• For any Croma Retail GV queries/issues related to receiving of the voucher, please reach out to customer care via cromasupport@pinelabs.com or toll-free number 080-64534440.
+
+• The Gift Voucher is binding for all applicable laws of India.
+
+• All disputes are subject to the jurisdiction of courts at Mumbai only.
+
+• E-Gift Cards are normally delivered instantly. But sometimes due to system issues, delivery can be delayed up to 24–48 hours.
+
+• No returns and no refunds on gift cards, e-gift cards, and gift vouchers shipped by Woohoo.in. Please check the refund policy at http://www.woohoo.in/faq for further details.]]></string>
+    <string name="brand_wallet_title">Croma Wallet</string>
+    <string name="brand_wallet_zero_balance">₹ 0</string>
+    <string name="brand_wallet_activate_description">Access balance, add funds, redeem gift card, and make your shopping more rewarding.</string>
+    <string name="brand_wallet_activate_now"><u>Activate Now</u></string>
+    <string name="brand_wallet_bottom_sheet_title">Pay using %1$s!</string>
+    <string name="brand_wallet_bottom_sheet_subtitle">Get Rewards and Exclusive Offers on the wallet</string>
+    <string name="brand_wallet_bottom_sheet_why">Why %1$s ?</string>
+    <string name="brand_wallet_create_wallet">Create Wallet</string>
+    <string name="brand_wallet_add_money_title">Add Money to Wallet</string>
+    <string name="brand_wallet_add_money_label">Enter the amount to add</string>
+    <string name="brand_wallet_add_money_amount_default">₹ 3,000</string>
+    <string name="brand_wallet_add_money_minimum_text">Minimum amount is <b>₹ 3,000</b> is required</string>
+    <string name="brand_wallet_add_money_required_text">Amount required to complete payment is <b>%1$s</b></string>
+    <string name="brand_wallet_quick_adds">Quick Adds</string>
+    <string name="brand_wallet_quick_add_3000">₹ 3,000</string>
+    <string name="brand_wallet_quick_add_5000">₹ 5,000</string>
+    <string name="brand_wallet_quick_add_8000">₹ 8,000</string>
+    <string name="brand_wallet_add_money_cta">Add Money</string>
+    <string name="brand_wallet_add_money_otp_title">Enter PIN to complete transaction</string>
+    <string name="brand_wallet_add_money_otp_subtitle">PIN sent to the mobile number/email linked to your wallet</string>
+    <string name="brand_wallet_add_money_otp_hint">Enter OTP</string>
+    <string name="brand_wallet_add_money_resend_pin_in">Resend PIN in %1$d sec</string>
+    <string name="brand_wallet_add_money_resend_pin">Resend PIN</string>
+    <string name="brand_wallet_otp_inline_error">Something went wrong</string>
+    <string name="brand_wallet_verify_and_add">Verify &amp; Add</string>
+    <string name="brand_wallet_verify_and_pay">Verify and pay</string>
+    <string name="brand_wallet_verify_email_title">Verify email to create wallet</string>
+    <string name="brand_wallet_email_label">Email ID</string>
+    <string name="brand_wallet_email_hint">Enter email ID</string>
+    <string name="brand_wallet_continue">Continue</string>
+    <string name="brand_wallet_otp_title">Enter OTP to complete verification</string>
+    <string name="brand_wallet_otp_subtitle">OTP sent to the email ID</string>
+    <string name="brand_wallet_otp_hint">Enter OTP</string>
+    <string name="brand_wallet_otp_resend">Resend OTP in 1:40 min</string>
+    <string name="brand_wallet_verify_and_create">Verify &amp; Create</string>
+    <string name="brand_wallet_stepper_line_one">One click Payment through %1$s Credit without PIN or card details</string>
+    <string name="brand_wallet_stepper_line_two">Personalised Offers on payment through %1$s Credit</string>
+    <string name="brand_wallet_stepper_line_three">Instant Refund in %1$s Credit without waiting for 5-7 days for bank transfer</string>
+    <string name="brand_wallet_terms_text">By proceeding, I agree to the Wallet <u><b>Terms &amp; Conditions</b></u> and understand that a wallet associated to %1$s will be created</string>
+    <string name="brand_wallet_ready_title">Great, Your wallet is ready!</string>
+    <string name="brand_wallet_ready_subtitle"><![CDATA[<b>Access balance, add funds, redeem gift card,</b><br/>and make your shopping more rewarding.]]></string>
     <string name="address_error_full_name_required">Full Name is required</string>
     <string name="address_error_full_name_error">Full Name should contain only alphabets and spaces.</string>
     <string name="address_error_pincode_required">Pincode is required</string>

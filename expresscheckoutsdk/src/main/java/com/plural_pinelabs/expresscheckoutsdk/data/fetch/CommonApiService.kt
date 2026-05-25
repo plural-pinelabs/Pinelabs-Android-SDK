@@ -18,10 +18,22 @@ import com.plural_pinelabs.expresscheckoutsdk.data.model.ProcessPaymentRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ProcessPaymentResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.SavedCardResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.TransactionStatusResponse
+import com.plural_pinelabs.expresscheckoutsdk.data.model.CreateWalletRequest
+import com.plural_pinelabs.expresscheckoutsdk.data.model.CreateWalletResponse
+import com.plural_pinelabs.expresscheckoutsdk.data.model.UpiFetchVpaRequest
+import com.plural_pinelabs.expresscheckoutsdk.data.model.UpiFetchVpaResponse
+import com.plural_pinelabs.expresscheckoutsdk.data.model.UpiOfferValidateRequest
+import com.plural_pinelabs.expresscheckoutsdk.data.model.WalletAddMoneyRequest
+import com.plural_pinelabs.expresscheckoutsdk.data.model.WalletAddMoneyResponse
+import com.plural_pinelabs.expresscheckoutsdk.data.model.WalletResetOtpRequest
+import com.plural_pinelabs.expresscheckoutsdk.data.model.WalletResetOtpResponse
+import com.plural_pinelabs.expresscheckoutsdk.data.model.WalletValidateRequest
+import com.plural_pinelabs.expresscheckoutsdk.data.model.WalletValidateResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.retrofit.ApiService
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.Path
 import retrofit2.http.POST
 import retrofit2.http.Query
 
@@ -104,13 +116,20 @@ interface CommonApiService : ApiService {
         @Query(
             "token",
             encoded = true
-        ) token: String?
+        ) token: String?,
+        @Query("order_id", encoded = true) orderId: String? = null,
     ): Response<TransactionStatusResponse>
 
     @POST("offer/validate")
     suspend fun validateOffer(
         @Query("token", encoded = true) token: String?,
         @Body request: ProcessPaymentRequest?
+    ): Response<OfferEligibilityResponse>
+
+    @POST("offer/v2/validate")
+    suspend fun validateOfferV2(
+        @Query("token", encoded = true) token: String?,
+        @Body request: UpiOfferValidateRequest?
     ): Response<OfferEligibilityResponse>
 
     @POST("offer/keyfactstatement")
@@ -133,6 +152,12 @@ interface CommonApiService : ApiService {
         @Body request: List<LogData>?
     ): Response<LogResponse>
 
+    @POST("wallet/create")
+    suspend fun createWallet(
+        @Query("token", encoded = true) token: String?,
+        @Body request: CreateWalletRequest
+    ): Response<CreateWalletResponse>
+
     @POST("cancel")
     suspend fun cancelTransaction(
         @Query(
@@ -142,5 +167,30 @@ interface CommonApiService : ApiService {
     ): Response<CancelTransactionResponse>
 
 
-}
+    @POST("api/pay/v1/add_money")
+    suspend fun addMoneyToWallet(
+        @Query("token", encoded = true) token: String?,
+        @Body request: WalletAddMoneyRequest?
+    ): Response<WalletAddMoneyResponse>
 
+    @POST("payment-option/wallet/validate")
+    suspend fun validateWalletBalance(
+        @Query("token", encoded = true) token: String?,
+        @Body request: WalletValidateRequest
+    ): Response<WalletValidateResponse>
+
+    @POST("wallet/customer/{customer_id}/reset")
+    suspend fun resetWalletOtp(
+        @Path("customer_id", encoded = true) customerId: String,
+        @Body request: WalletResetOtpRequest,
+    ): Response<WalletResetOtpResponse>
+
+    @POST("payment-option")
+    suspend fun fetchUpiVpa(
+        @Query("token", encoded = true) token: String?,
+        @Body request: UpiFetchVpaRequest,
+    ): Response<UpiFetchVpaResponse>
+
+
+
+}

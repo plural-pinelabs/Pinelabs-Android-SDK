@@ -340,9 +340,22 @@ internal object Utils {
     )
 
 
-    fun formatToIndianNumbering(value: Double): String {
-        val formatter = DecimalFormat("##,##,##0.00")
+    private fun formatAmountByCurrency(value: Double, currencyCode: String): String {
+        val formatter = if (currencyCode.equals("INR", ignoreCase = true)) {
+            DecimalFormat("##,##,##0.00")
+        } else {
+            DecimalFormat("#,##0.00")
+        }
         return formatter.format(value)
+    }
+
+    private fun convertMinorToMajorUnit(amountInMinor: Int, ratio: Int): Double {
+        val transformationRatio = if (ratio > 0) ratio else 2
+        return amountInMinor / 10.0.pow(transformationRatio.toDouble())
+    }
+
+    fun formatToIndianNumbering(value: Double): String {
+        return formatAmountByCurrency(value, "INR")
     }
 
 
@@ -350,16 +363,19 @@ internal object Utils {
         if (amountInPaisa == null) {
             return "Some error occurred"
         }
-        return context.getString(R.string.rupee_symbol) + " " + formatToIndianNumbering(
-            amountInPaisa.toDouble() / 100
-        )
+        val symbol = ExpressSDKObject.getCurrencySymbol()
+            .ifBlank { context.getString(R.string.rupee_symbol) }
+        return "$symbol ${convertInRupees(amountInPaisa)}"
     }
 
     fun convertInRupees(amountInPaisa: Int?): String {
         if (amountInPaisa == null) {
             return "Error"
         }
-        return formatToIndianNumbering(amountInPaisa.toDouble() / 100)
+        val currencyCode = ExpressSDKObject.getCurrency()
+        val ratio = ExpressSDKObject.getCurrencyTransformationRatio()
+        val majorAmount = convertMinorToMajorUnit(amountInPaisa, ratio)
+        return formatAmountByCurrency(majorAmount, currencyCode)
     }
 
 
