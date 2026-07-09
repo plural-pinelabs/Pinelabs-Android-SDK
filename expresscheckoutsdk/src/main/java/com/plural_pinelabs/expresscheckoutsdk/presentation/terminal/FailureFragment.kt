@@ -11,7 +11,6 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.plural_pinelabs.expresscheckoutsdk.ExpressSDKObject
 import com.plural_pinelabs.expresscheckoutsdk.R
-import com.plural_pinelabs.expresscheckoutsdk.common.CleverTapUtil
 import com.plural_pinelabs.expresscheckoutsdk.common.TimerManager
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils.MTAG
@@ -35,18 +34,6 @@ class FailureFragment : Fragment() {
         val isCancelled = arguments?.getBoolean("isCancelled") ?: false
 
         Log.i(MTAG, "inside failure fragment")
-
-        CleverTapUtil.sdkTransactionFailed(
-            CleverTapUtil.getInstance(requireContext()),
-            ExpressSDKObject.getFetchData(),
-            "",
-            Utils.getCartValue(),
-            "failure",
-            "1000",
-            "Step",
-            false,
-            Utils.createSDKData(requireContext()).toString(),
-        )
 
         view.findViewById<Button>(R.id.continue_btn).setOnClickListener {
             timer.stopTimer()

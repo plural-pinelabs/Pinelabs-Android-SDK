@@ -8,17 +8,6 @@
     <application
         android:allowBackup="false">
 
-<!--        <meta-data-->
-<!--            android:name="CLEVERTAP_IDENTIFIER"-->
-<!--            android:value="Identity,Phone" />-->
-
-        <meta-data
-            android:name="CLEVERTAP_ACCOUNT_ID"
-            android:value="844-WR5-847Z" />
-        <meta-data
-            android:name="CLEVERTAP_TOKEN"
-            android:value="520-44b" />
-
         <activity
             android:name=".presentation.LandingActivity"
             android:exported="false"

@@ -18,12 +18,10 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
-import com.clevertap.android.sdk.isNotNullAndBlank
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.plural_pinelabs.expresscheckoutsdk.ExpressSDKObject
 import com.plural_pinelabs.expresscheckoutsdk.R
 import com.plural_pinelabs.expresscheckoutsdk.common.BaseResult
-import com.plural_pinelabs.expresscheckoutsdk.common.CleverTapUtil
 import com.plural_pinelabs.expresscheckoutsdk.common.D2CViewModelFactory
 import com.plural_pinelabs.expresscheckoutsdk.common.NetworkHelper
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils
@@ -214,15 +212,6 @@ class PhoneNumberFragment : Fragment() {
                     viewGroup = phoneNumberParentLayout
                 )
                 Utils.handleCTAEnableDisable(requireContext(), isPhoneNumberValid, continueBtn)
-                if (!phoneNumberEt.text.isNullOrBlank()) {
-                    CleverTapUtil.sdkMobileEntered(
-                        CleverTapUtil.getInstance(requireContext()),
-                        ExpressSDKObject.getFetchData(),
-                        isPhoneNumberValid,
-                        false
-                    )
-                }
-
             }
         }
     }
@@ -258,12 +247,6 @@ class PhoneNumberFragment : Fragment() {
                     emailId = emailEt.text.toString() // Assuming +91 as default country code since we are not using a country picker here for now
                 )
                 viewModel.createInactiveUser(ExpressSDKObject.getToken(), customerInfo)
-                CleverTapUtil.sdkMobileChanged(
-                    CleverTapUtil.getInstance(requireContext()),
-                    ExpressSDKObject.getFetchData(),
-                    true,
-                    false
-                )
             }
         }
     }
@@ -280,11 +263,11 @@ class PhoneNumberFragment : Fragment() {
         emailInfoText = view.findViewById(R.id.email_info_icon)
         val existingPhoneNumber = ExpressSDKObject.getFetchData()?.customerInfo?.mobileNo
         val email = ExpressSDKObject.getFetchData()?.customerInfo?.emailId
-        if (existingPhoneNumber.isNotNullAndBlank()) {
+        if (!existingPhoneNumber.isNullOrBlank()) {
             phoneNumberEt.text = Editable.Factory.getInstance().newEditable(existingPhoneNumber)
             onNumberChange(phoneNumberEt.text)
         }
-        if (email.isNotNullAndBlank()) {
+        if (!email.isNullOrBlank()) {
             emailEt.text = Editable.Factory.getInstance().newEditable(email)
         }
 
@@ -302,8 +285,7 @@ class PhoneNumberFragment : Fragment() {
     }
 
     private fun onNumberChange(s: Editable?) {
-        isPhoneNumberValid = s.toString()
-            .isNotNullAndBlank() && s.toString().length == 10 && Utils.isValidPhoneNumber(s.toString())
+        isPhoneNumberValid = !s.isNullOrBlank() && s.toString().length == 10 && Utils.isValidPhoneNumber(s.toString())
         continueBtn.isEnabled = isPhoneNumberValid
         Utils.showRemoveErrorBackground(
             requireContext(),

@@ -21,12 +21,9 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.navigation.findNavController
-import com.clevertap.android.sdk.ActivityLifecycleCallback
-import com.clevertap.android.sdk.CleverTapAPI
 import com.plural_pinelabs.expresscheckoutsdk.ExpressSDKObject
 import com.plural_pinelabs.expresscheckoutsdk.R
 import com.plural_pinelabs.expresscheckoutsdk.common.BaseResult
-import com.plural_pinelabs.expresscheckoutsdk.common.CleverTapUtil
 import com.plural_pinelabs.expresscheckoutsdk.common.CustomExceptionHandler
 import com.plural_pinelabs.expresscheckoutsdk.common.ItemClickListener
 import com.plural_pinelabs.expresscheckoutsdk.common.NetworkHelper
@@ -101,8 +98,6 @@ class LandingActivity : AppCompatActivity() {
         setView()
         supportFragmentManager.registerFragmentLifecycleCallbacks(dynamicThemeLifecycleCallback, true)
         initExceptionHandler()
-        ActivityLifecycleCallback.register(this.application)
-        CleverTapAPI.getDefaultInstance(applicationContext)
     }
 
     override fun onDestroy() {
@@ -235,15 +230,6 @@ class LandingActivity : AppCompatActivity() {
                 "INFO",
                 "SDK"
             )
-            CleverTapUtil.sdkTransactionAbandoned(
-                CleverTapUtil.getInstance(applicationContext),
-                ExpressSDKObject.getFetchData(),
-                System.currentTimeMillis().toString(),
-                "",
-                "",
-                Utils.createSDKData(applicationContext).toString(),
-                ""
-            )
 
             try {
                 runBlocking {
@@ -296,7 +282,6 @@ class LandingActivity : AppCompatActivity() {
 
     fun updateValueForHeaderLayout(fetchResponse: FetchResponseDTO?) {
         fetchResponse?.let { fetchData ->
-            CleverTapUtil.updateCleverTapUserProfile(applicationContext, fetchData)
             showHideHeaderLayout(true)
             applyMerchantBrandTheme()
             fetchData.customerInfo?.let { customerInfo ->

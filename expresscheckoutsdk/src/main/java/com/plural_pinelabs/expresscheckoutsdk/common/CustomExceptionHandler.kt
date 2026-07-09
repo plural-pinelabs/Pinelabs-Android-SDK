@@ -25,16 +25,6 @@ class CustomExceptionHandler(
             source = "SDK"
         )
 
-        // Optionally prevent crash by not calling originalHandler
-        // But be cautious: suppressing all crashes can hide critical issues
-        CleverTapUtil.sdkCrashed(
-            CleverTapUtil.getInstance(applicationContext),
-            ExpressSDKObject.getFetchData(),
-            errorCode = "UNCAUGHT_EXCEPTION",
-            errorMessage = "${throwable.message}",
-            throwable.stackTraceToString()
-        )
-
         try {
             runBlocking {
                 withTimeout(3000) { // Optional: timeout to avoid hanging

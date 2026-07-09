@@ -7,7 +7,7 @@ plugins {
 
 android {
     namespace = "com.plural_pinelabs.expresscheckoutsdk"
-    compileSdk = 34
+    compileSdk = 36
 
     buildFeatures {
         buildConfig = true
@@ -114,7 +114,6 @@ dependencies {
     // -------------------------------------------------
     // Other
     // -------------------------------------------------
-    implementation(libs.clevertap)
     implementation(libs.play.services.auth.api.phone)
     implementation("com.journeyapps:zxing-android-embedded:4.3.0")
 

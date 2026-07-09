@@ -19,7 +19,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.plural_pinelabs.expresscheckoutsdk.ExpressSDKObject
 import com.plural_pinelabs.expresscheckoutsdk.R
 import com.plural_pinelabs.expresscheckoutsdk.common.BaseResult
-import com.plural_pinelabs.expresscheckoutsdk.common.CleverTapUtil
 import com.plural_pinelabs.expresscheckoutsdk.common.NetworkHelper
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils
 import com.plural_pinelabs.expresscheckoutsdk.data.repository.ExpressRepositoryImpl
@@ -186,15 +185,6 @@ class CancelReasonsFragment : Fragment() {
                 ExpressSDKObject.getFetchData()?.transactionInfo?.orderId ?: "",
                 "INFO",
                 "SDK"
-            )
-            CleverTapUtil.sdkTransactionAbandoned(
-                CleverTapUtil.getInstance(appContext),
-                ExpressSDKObject.getFetchData(),
-                System.currentTimeMillis().toString(),
-                "",
-                "",
-                Utils.createSDKData(appContext).toString(),
-                ""
             )
 
             try {
