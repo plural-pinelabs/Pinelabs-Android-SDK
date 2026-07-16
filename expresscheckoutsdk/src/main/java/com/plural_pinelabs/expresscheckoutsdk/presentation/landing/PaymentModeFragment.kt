@@ -1586,8 +1586,9 @@ class PaymentModeFragment : Fragment() {
             progressBar.progress = 100
             isBrandWalletRedeemFlowInFlight = false
             if (isAdded) {
-                brandWalletBottomSheetDialog?.dismiss()
-                showBrandWalletRedeemNotEligibleBottomSheet()
+                dismissCurrentBrandWalletSheet {
+                    showBrandWalletRedeemNotEligibleBottomSheet()
+                }
             }
         }
     }
@@ -1612,12 +1613,14 @@ class PaymentModeFragment : Fragment() {
             brandWalletBottomSheetDialog?.dismiss()
         }
         tryAnotherButton.setOnClickListener {
-            brandWalletBottomSheetDialog?.dismiss()
-            showBrandWalletRedeemGiftCardBottomSheet()
+            dismissCurrentBrandWalletSheet {
+                showBrandWalletRedeemGiftCardBottomSheet()
+            }
         }
         termsText.setOnClickListener {
-            brandWalletBottomSheetDialog?.dismiss()
-            showBrandWalletTermsConditionsBottomSheet()
+            dismissCurrentBrandWalletSheet {
+                showBrandWalletTermsConditionsBottomSheet()
+            }
         }
 
         brandWalletBottomSheetDialog?.setContentView(view)
@@ -1730,9 +1733,20 @@ class PaymentModeFragment : Fragment() {
         return "${ExpressSDKObject.getCurrencySymbol()} ${formatter.format(amountInRupee)}"
     }
 
+    private fun formatBrandWalletReadyAmountText(response: WalletAddMoneyResponse): String {
+        val amountInPaise = response.order_amount?.value ?: 0
+        return getString(
+            R.string.brand_wallet_redeem_success_subtitle,
+            formatBrandWalletBalanceWithoutPaise(amountInPaise)
+        )
+    }
+
     private fun showBrandWalletReadyBottomSheet(
         titleText: String = getString(R.string.brand_wallet_ready_title),
         subtitleText: String = getString(R.string.brand_wallet_ready_subtitle),
+        amountText: String? = null,
+        ctaText: String = getString(R.string.brand_wallet_ready_cta),
+        autoDismissAfterMs: Long? = 5000L,
     ) {
         if (!isAdded) return
 
@@ -1746,13 +1760,28 @@ class PaymentModeFragment : Fragment() {
         val closeButton = view.findViewById<ImageView>(R.id.brand_wallet_ready_close)
         val title = view.findViewById<TextView>(R.id.brand_wallet_ready_title)
         val subtitle = view.findViewById<TextView>(R.id.brand_wallet_ready_subtitle)
+        val amount = view.findViewById<TextView>(R.id.brand_wallet_ready_amount)
+        val ctaButton = view.findViewById<TextView>(R.id.brand_wallet_ready_cta)
         title.text = titleText
+        ctaButton.text = ctaText
         subtitle.text = HtmlCompat.fromHtml(
             subtitleText,
             HtmlCompat.FROM_HTML_MODE_LEGACY
         )
+        if (amountText.isNullOrBlank()) {
+            amount.visibility = View.GONE
+        } else {
+            amount.text = amountText
+            amount.visibility = View.VISIBLE
+        }
 
         closeButton.setOnClickListener {
+            brandWalletBottomSheetDialog?.dismiss()
+        }
+
+        ctaButton.setOnClickListener {
+            brandWalletReadyDismissJob?.cancel()
+            brandWalletReadyDismissJob = null
             brandWalletBottomSheetDialog?.dismiss()
         }
 
@@ -1780,12 +1809,32 @@ class PaymentModeFragment : Fragment() {
         brandWalletBottomSheetDialog?.setCanceledOnTouchOutside(true)
         brandWalletBottomSheetDialog?.window?.setBackgroundDrawable(Color.TRANSPARENT.toDrawable())
         brandWalletBottomSheetDialog?.show()
-        brandWalletReadyDismissJob = viewLifecycleOwner.lifecycleScope.launch {
-            delay(5000)
-            if (brandWalletBottomSheetDialog?.isShowing == true) {
-                brandWalletBottomSheetDialog?.dismiss()
+        autoDismissAfterMs?.let { dismissAfterMs ->
+            brandWalletReadyDismissJob = viewLifecycleOwner.lifecycleScope.launch {
+                delay(dismissAfterMs)
+                if (brandWalletBottomSheetDialog?.isShowing == true) {
+                    brandWalletBottomSheetDialog?.dismiss()
+                }
             }
         }
+    }
+
+    private fun dismissCurrentBrandWalletSheet(onDismissed: (() -> Unit)? = null) {
+        val currentDialog = brandWalletBottomSheetDialog
+        if (currentDialog == null) {
+            onDismissed?.invoke()
+            return
+        }
+
+        currentDialog.setOnDismissListener {
+            brandWalletReadyDismissJob?.cancel()
+            brandWalletReadyDismissJob = null
+            if (brandWalletBottomSheetDialog === currentDialog) {
+                brandWalletBottomSheetDialog = null
+            }
+            onDismissed?.invoke()
+        }
+        currentDialog.dismiss()
     }
 
     private fun applyValidatedBrandWalletBalance(response: WalletValidateResponse) {
@@ -2203,17 +2252,20 @@ class PaymentModeFragment : Fragment() {
                                 mapWalletAddMoneyToProcessPaymentResponse(it.data)
                             )
                             if (isRedeemFlow) {
-                                brandWalletBottomSheetDialog?.dismiss()
                                 bottomSheetDialog?.dismiss()
-                                showBrandWalletReadyBottomSheet(
-                                    titleText = getString(R.string.brand_wallet_redeem_success_title),
-                                    subtitleText = getString(R.string.brand_wallet_redeem_success_subtitle),
-                                )
-                                paymentModeViewModel.resetWalletValidateState()
-                                paymentModeViewModel.validateWalletBalance(
-                                    token = ExpressSDKObject.getToken(),
-                                    request = createBrandWalletValidateRequest(),
-                                )
+                                dismissCurrentBrandWalletSheet {
+                                    showBrandWalletReadyBottomSheet(
+                                        titleText = getString(R.string.brand_wallet_redeem_success_modal_title),
+                                        subtitleText = "",
+                                        amountText = formatBrandWalletReadyAmountText(it.data),
+                                        ctaText = getString(R.string.brand_wallet_redeem_success_cta),
+                                    )
+                                    paymentModeViewModel.resetWalletValidateState()
+                                    paymentModeViewModel.validateWalletBalance(
+                                        token = ExpressSDKObject.getToken(),
+                                        request = createBrandWalletValidateRequest(),
+                                    )
+                                }
                                 return@collect
                             }
                             brandWalletAddMoneyDraftInput = ""
@@ -2257,6 +2309,7 @@ class PaymentModeFragment : Fragment() {
                             brandWalletBottomSheetDialog?.dismiss()
                             bottomSheetDialog?.dismiss()
                             if (shouldNavigateToSuccess) {
+                                ExpressSDKObject.setSelectedMode(getBrandWalletTitle())
                                 safeNavigate(R.id.action_paymentModeFragment_to_successFragment)
                             } else {
                                 ExpressSDKObject.setSelectedMode(Constants.BRAND_WALLET_ID)
@@ -2320,7 +2373,6 @@ class PaymentModeFragment : Fragment() {
                         is BaseResult.Success<WalletValidateResponse> -> {
                             paymentModeViewModel.resetWalletValidateState()
                             applyValidatedBrandWalletBalance(it.data)
-                            brandWalletBottomSheetDialog?.dismiss()
                             bottomSheetDialog?.dismiss()
                         }
                     }

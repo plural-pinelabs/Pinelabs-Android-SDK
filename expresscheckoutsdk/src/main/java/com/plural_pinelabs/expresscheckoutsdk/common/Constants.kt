@@ -16,6 +16,7 @@ internal object Constants {
     const val BASE_CHECKOUT = "/api/v3/checkout/"
 
     const val TIMEOUT: Long = 60
+    const val NATIVE_OTP_POLLING_TIMEOUT_SECONDS: Long = 30
 
     const val CREDIT_DEBIT_ID = "CREDIT_DEBIT"
     const val PAY_BY_POINTS_ID = "PAYBYPOINTS"

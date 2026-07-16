@@ -279,7 +279,7 @@
     <string name="brand_wallet_redeem_gift_card_pin">Gift Card PIN</string>
     <string name="brand_wallet_redeem_gift_card_pin_hint">Enter gift card PIN</string>
     <string name="brand_wallet_redeem_success_title">Gift Card Applied</string>
-    <string name="brand_wallet_redeem_success_subtitle"><![CDATA[<b>Your gift card amount has been added.</b><br/>Refreshing wallet balance now.]]></string>
+    <string name="brand_wallet_redeem_success_subtitle">You have saved ₹1,000 with this gift card!</string>
     <string name="brand_wallet_redeem_not_eligible_title">Gift card not eligible for redemption</string>
     <string name="brand_wallet_redeem_not_eligible_subtitle_prefix">Check  </string>
     <string name="brand_wallet_redeem_not_eligible_terms"><u> terms &amp; conditions</u></string>
@@ -346,11 +346,11 @@
     <string name="brand_wallet_quick_add_5000">₹ 5,000</string>
     <string name="brand_wallet_quick_add_8000">₹ 8,000</string>
     <string name="brand_wallet_add_money_cta">Add Money</string>
-    <string name="brand_wallet_add_money_otp_title">Enter PIN to complete transaction</string>
-    <string name="brand_wallet_add_money_otp_subtitle">PIN sent to the mobile number/email linked to your wallet</string>
+    <string name="brand_wallet_add_money_otp_title">Enter OTP to complete transaction</string>
+    <string name="brand_wallet_add_money_otp_subtitle">OTP sent to the mobile number linked to your wallet</string>
     <string name="brand_wallet_add_money_otp_hint">Enter OTP</string>
-    <string name="brand_wallet_add_money_resend_pin_in">Resend PIN in %1$d sec</string>
-    <string name="brand_wallet_add_money_resend_pin">Resend PIN</string>
+    <string name="brand_wallet_add_money_resend_pin_in">Resend OTP in %1$d sec</string>
+    <string name="brand_wallet_add_money_resend_pin">Resend OTP</string>
     <string name="brand_wallet_otp_inline_error">Something went wrong</string>
     <string name="brand_wallet_verify_and_add">Verify &amp; Add</string>
     <string name="brand_wallet_verify_and_pay">Verify and pay</string>
@@ -369,6 +369,9 @@
     <string name="brand_wallet_terms_text">By proceeding, I agree to the Wallet <u><b>Terms &amp; Conditions</b></u> and understand that a wallet associated to %1$s will be created</string>
     <string name="brand_wallet_ready_title">Great, Your wallet is ready!</string>
     <string name="brand_wallet_ready_subtitle"><![CDATA[<b>Access balance, add funds, redeem gift card,</b><br/>and make your shopping more rewarding.]]></string>
+    <string name="brand_wallet_ready_cta">Done</string>
+    <string name="brand_wallet_redeem_success_modal_title">Gift card applied successfully!</string>
+    <string name="brand_wallet_redeem_success_cta">Got it, Thanks!</string>
     <string name="address_error_full_name_required">Full Name is required</string>
     <string name="address_error_full_name_error">Full Name should contain only alphabets and spaces.</string>
     <string name="address_error_pincode_required">Pincode is required</string>

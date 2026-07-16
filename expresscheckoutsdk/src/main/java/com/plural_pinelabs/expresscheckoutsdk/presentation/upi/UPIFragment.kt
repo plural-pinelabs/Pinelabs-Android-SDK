@@ -308,6 +308,16 @@ class UPIFragment : Fragment() {
         bottomSheetDialog = null
     }
 
+    private fun exitBrandWalletUpiFlow() {
+        if (!isAdded) return
+        dismissProcessingOverlay()
+        bottomTimerSheetDialog?.dismiss()
+        qrBottomSheetDialog?.dismiss()
+        upiIcbStatusBottomSheetDialog?.dismiss()
+        brandWalletOtpBottomSheetDialog?.dismiss()
+        findNavController().popBackStack()
+    }
+
     private fun setViews(view: View) {
         payByAnyUPIButton = view.findViewById(R.id.pay_by_any_upi)
         upiNoAppsAvailableText = view.findViewById(R.id.upi_no_apps_available_text)
@@ -1493,7 +1503,7 @@ class UPIFragment : Fragment() {
                 val didLaunchUpiApp =
                     showUpiTray(existingDeepLink, upiAppPackageName = selectUPIPackage)
                 if (!didLaunchUpiApp) {
-                    cancelTransactionProcess()
+                    exitBrandWalletUpiFlow()
                     return
                 }
                 if (bottomTimerSheetDialog?.isShowing != true) {
@@ -1634,7 +1644,11 @@ class UPIFragment : Fragment() {
                                 }
 
                             if (!didLaunchUpiApp) {
-                                cancelTransactionProcess()
+                                if (flowMode.equals(BRAND_WALLET_ID, true)) {
+                                    exitBrandWalletUpiFlow()
+                                } else {
+                                    cancelTransactionProcess()
+                                }
                                 viewModel.resetPaymentFlowResponse()
                                 return@collect
                             }

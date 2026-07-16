@@ -131,7 +131,7 @@ publishing {
         create<MavenPublication>("release") {
             groupId = "com.github.plural-pinelabs"
             artifactId = "express-checkout-sdk"
-            version = "1.0.8"   // ⬅️ MUST bump version
+            version = "1.2.0"
 
             afterEvaluate {
                 from(components["release"])
