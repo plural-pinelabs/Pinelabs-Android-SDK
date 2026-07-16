@@ -12,7 +12,6 @@ import coil.ImageLoader
 import coil.decode.SvgDecoder
 import coil.load
 import coil.request.CachePolicy
-import com.clevertap.android.sdk.isNotNullAndBlank
 import com.plural_pinelabs.expresscheckoutsdk.R
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CartItem
@@ -47,7 +46,7 @@ class ProductRVAdapter(
 
             productPriceText.text =
                 Utils.convertToRupeesWithSymobl(context, item.item_original_unit_price?.toInt())
-            if (item.item_image_url?.isNotNullAndBlank() == true) {
+            if (!item.item_image_url.isNullOrBlank()) {
                 productImage.load(item.item_image_url, imageLoader) {
                     placeholder(R.drawable.ic_generic)
                     error(R.drawable.ic_generic)

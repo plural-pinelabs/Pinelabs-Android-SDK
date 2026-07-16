@@ -28,6 +28,7 @@ import com.plural_pinelabs.expresscheckoutsdk.ExpressSDKObject
 import com.plural_pinelabs.expresscheckoutsdk.R
 import com.plural_pinelabs.expresscheckoutsdk.common.AppSignatureHelper
 import com.plural_pinelabs.expresscheckoutsdk.common.BaseResult
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PROCESSED_PENDING
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PROCESSED_STATUS
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.REQ_USER_CONSENT
 import com.plural_pinelabs.expresscheckoutsdk.common.NativeOTPFragmentViewModelFactory
@@ -140,8 +141,7 @@ class NativeOTPFragment : Fragment() {
                         }
 
                         is BaseResult.Success -> {
-                            bottomSheetDialog?.dismiss()
-                            viewModel.getTransactionStatus(ExpressSDKObject.getToken())
+                            viewModel.startPolling()
                         }
 
                         is BaseResult.Error -> {
@@ -162,10 +162,17 @@ class NativeOTPFragment : Fragment() {
 
                         is BaseResult.Success -> {
                             result.data.data.let { data ->
+                                if (data.status == PROCESSED_PENDING) {
+                                    return@let
+                                }
+
+                                viewModel.stopPolling()
                                 if (data.status == PROCESSED_STATUS) {
+                                    bottomSheetDialog?.dismiss()
                                     findNavController().navigate(R.id.action_nativeOTPFragment_to_successFragment)
                                 } else {
                                     if (data.is_retry_available) {
+                                        bottomSheetDialog?.dismiss()
                                         findNavController().navigate(R.id.action_nativeOTPFragment_to_retryFragment)
                                     } else {
                                         findNavController().navigate(R.id.action_nativeOTPFragment_to_failureFragment)
@@ -175,6 +182,7 @@ class NativeOTPFragment : Fragment() {
                         }
 
                         is BaseResult.Error -> {
+                            viewModel.stopPolling()
                             findNavController().navigate(R.id.action_nativeOTPFragment_to_ACSFragment)
                         }
                     }
@@ -294,6 +302,7 @@ class NativeOTPFragment : Fragment() {
 
     override fun onStop() {
         super.onStop()
+        viewModel.stopPolling()
         requireActivity().unregisterReceiver(smsBroadcastReceiver)
     }
 

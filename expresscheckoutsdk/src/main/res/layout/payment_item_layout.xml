@@ -52,10 +52,30 @@
         android:textColor="@color/black_text"
         android:textFontWeight="700"
         android:textSize="14sp"
-        app:layout_constraintEnd_toStartOf="@id/chevron_arrow"
+        app:layout_constraintEnd_toStartOf="@id/payment_mode_saving_tag"
         app:layout_constraintStart_toEndOf="@id/payment_icon"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="Item name" />
+
+    <TextView
+        android:id="@+id/payment_mode_saving_tag"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:background="@drawable/saving_green_bg"
+        android:fontFamily="sans-serif-medium"
+        android:gravity="center"
+        android:paddingHorizontal="10dp"
+        android:paddingVertical="4dp"
+        android:textColor="@color/green_00722F"
+        android:textFontWeight="700"
+        android:textSize="13sp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/payment_mode"
+        app:layout_constraintEnd_toStartOf="@id/chevron_arrow"
+        app:layout_constraintTop_toTopOf="@id/payment_mode"
+        tools:text="Savings"
+        tools:visibility="visible" />
 
     <TextView
         android:id="@+id/payment_mode_description"

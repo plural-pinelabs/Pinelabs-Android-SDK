@@ -3,18 +3,22 @@ package com.plural_pinelabs.expresscheckoutsdk.common
 import android.app.Activity
 import android.content.ContentValues
 import android.content.Context
+import android.content.res.ColorStateList
 import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.PixelFormat
+import android.graphics.drawable.Drawable
 import android.graphics.drawable.GradientDrawable
+import android.graphics.drawable.LayerDrawable
 import android.os.Build
 import android.provider.Settings
 import android.text.TextUtils
 import android.util.Base64
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
@@ -336,9 +340,22 @@ internal object Utils {
     )
 
 
-    fun formatToIndianNumbering(value: Double): String {
-        val formatter = DecimalFormat("##,##,##0.00")
+    private fun formatAmountByCurrency(value: Double, currencyCode: String): String {
+        val formatter = if (currencyCode.equals("INR", ignoreCase = true)) {
+            DecimalFormat("##,##,##0.00")
+        } else {
+            DecimalFormat("#,##0.00")
+        }
         return formatter.format(value)
+    }
+
+    private fun convertMinorToMajorUnit(amountInMinor: Int, ratio: Int): Double {
+        val transformationRatio = if (ratio > 0) ratio else 2
+        return amountInMinor / 10.0.pow(transformationRatio.toDouble())
+    }
+
+    fun formatToIndianNumbering(value: Double): String {
+        return formatAmountByCurrency(value, "INR")
     }
 
 
@@ -346,16 +363,19 @@ internal object Utils {
         if (amountInPaisa == null) {
             return "Some error occurred"
         }
-        return context.getString(R.string.rupee_symbol) + " " + formatToIndianNumbering(
-            amountInPaisa.toDouble() / 100
-        )
+        val symbol = ExpressSDKObject.getCurrencySymbol()
+            .ifBlank { context.getString(R.string.rupee_symbol) }
+        return "$symbol ${convertInRupees(amountInPaisa)}"
     }
 
     fun convertInRupees(amountInPaisa: Int?): String {
         if (amountInPaisa == null) {
             return "Error"
         }
-        return formatToIndianNumbering(amountInPaisa.toDouble() / 100)
+        val currencyCode = ExpressSDKObject.getCurrency()
+        val ratio = ExpressSDKObject.getCurrencyTransformationRatio()
+        val majorAmount = convertMinorToMajorUnit(amountInPaisa, ratio)
+        return formatAmountByCurrency(majorAmount, currencyCode)
     }
 
 
@@ -573,6 +593,7 @@ internal object Utils {
         val cancelYesButton: Button = view.findViewById(R.id.cancel_yes_btn)
         val cancelNoButton: Button = view.findViewById(R.id.cancel_no_btn)
         val cancelButton: ImageView = view.findViewById(R.id.cancel_btn)
+        applyPrimaryButtonBackground(cancelYesButton)
         cancelNoButton.setOnClickListener {
             bottomSheetDialog.dismiss()
         }
@@ -906,10 +927,79 @@ internal object Utils {
 
     }
 
+    fun resolveBrandPrimaryColor(context: Context): Int {
+        val defaultColor = ContextCompat.getColor(context, R.color.colorPrimary)
+        val rawColor = ExpressSDKObject.getFetchData()
+            ?.merchantBrandingData
+            ?.brandTheme
+            ?.color
+            ?.trim()
+            .orEmpty()
+
+        if (rawColor.isEmpty()) return defaultColor
+
+        val normalizedColor = if (rawColor.startsWith("#")) rawColor else "#$rawColor"
+        return runCatching { Color.parseColor(normalizedColor) }.getOrDefault(defaultColor)
+    }
+
+    fun getPrimaryButtonBackground(context: Context): Drawable? {
+        val drawable = AppCompatResources.getDrawable(context, R.drawable.primary_button_background)
+            ?.mutate() as? LayerDrawable ?: return null
+
+        val baseLayer = drawable.getDrawable(0)
+        val primaryColor = resolveBrandPrimaryColor(context)
+
+        when (baseLayer) {
+            is GradientDrawable -> baseLayer.setColor(primaryColor)
+            else -> baseLayer.setTint(primaryColor)
+        }
+
+        return drawable
+    }
+
+    fun applyPrimaryButtonBackground(view: View) {
+        view.background = getPrimaryButtonBackground(view.context)
+            ?: AppCompatResources.getDrawable(view.context, R.drawable.primary_button_background)
+    }
+
+    fun applyDynamicPrimaryButtonBackgrounds(root: View) {
+        val primaryButtonState = AppCompatResources.getDrawable(root.context, R.drawable.primary_button_background)
+            ?.constantState
+        if (primaryButtonState == null) return
+
+        fun applyIfNeeded(target: View) {
+            if (target.background?.constantState == primaryButtonState) {
+                applyPrimaryButtonBackground(target)
+            }
+            if (target is ViewGroup) {
+                for (index in 0 until target.childCount) {
+                    applyIfNeeded(target.getChildAt(index))
+                }
+            }
+        }
+
+        applyIfNeeded(root)
+    }
+
+    fun applyCardIconTint(root: View) {
+        val tintColor = ColorStateList.valueOf(resolveBrandPrimaryColor(root.context))
+        listOf(
+            R.id.card_icon_fragment,
+            R.id.upi_icon_fragment,
+            R.id.wallet_icon_fragment,
+            R.id.emi_icon_fragment,
+            R.id.netbanking_icon_fragment,
+            R.id.cancel_reason_icon_fragment
+        ).forEach { iconId ->
+            root.findViewById<ImageView>(iconId)?.imageTintList = tintColor
+        }
+    }
+
     fun handleCTAEnableDisable(context: Context, isEnabled: Boolean, button: Button) {
         button.isEnabled = isEnabled
         if (isEnabled) {
-            button.setBackgroundResource(R.drawable.primary_button_background)
+            button.background = getPrimaryButtonBackground(context)
+                ?: AppCompatResources.getDrawable(context, R.drawable.primary_button_background)
             button.setTextColor(
                 AppCompatResources.getColorStateList(
                     context,

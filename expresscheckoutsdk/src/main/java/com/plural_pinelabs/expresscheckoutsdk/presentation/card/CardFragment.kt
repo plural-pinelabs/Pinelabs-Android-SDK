@@ -15,7 +15,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
-import androidx.appcompat.content.res.AppCompatResources
+import androidx.activity.OnBackPressedCallback
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -29,7 +29,6 @@ import com.plural_pinelabs.expresscheckoutsdk.ExpressSDKObject
 import com.plural_pinelabs.expresscheckoutsdk.R
 import com.plural_pinelabs.expresscheckoutsdk.common.BaseResult
 import com.plural_pinelabs.expresscheckoutsdk.common.CardFragmentViewModelFactory
-import com.plural_pinelabs.expresscheckoutsdk.common.CleverTapUtil
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.BROWSER_ACCEPT_ALL
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.BROWSER_USER_AGENT_ANDROID
@@ -60,6 +59,7 @@ class CardFragment : Fragment() {
     private var isPBPEnabled = false // TODO to configure this from the server
     private var isDCCEnabled = false // TODO to configure this from the server
     private var isSavedCardEnabled = false // TODO to configure this from the server
+    private var isMCCTransaction = false
 
     private var binData: CardBinMetaDataResponse? = null
 
@@ -128,6 +128,16 @@ class CardFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         isPBPEnabled = checkIfPBPIsEnabled()
         setFlags(ExpressSDKObject.getFetchData())
+        if (isMCCTransaction) {
+            requireActivity().onBackPressedDispatcher.addCallback(
+                viewLifecycleOwner,
+                object : OnBackPressedCallback(true) {
+                    override fun handleOnBackPressed() {
+                        // Intentionally block back navigation for MCC card flow.
+                    }
+                }
+            )
+        }
         setupViews(view)
         setCardFocusListener()
         setUpCardNumberValidation()
@@ -151,6 +161,7 @@ class CardFragment : Fragment() {
     }
 
     private fun setFlags(fetchData: FetchResponseDTO?) {
+        isMCCTransaction = fetchData?.transactionInfo?.isMCCTransaction == true
         fetchData?.merchantInfo?.featureFlags?.let {
             isNativeOTP = it.isNativeOTPEnabled ?: false
             isDCCEnabled = it.isDCCEnabled ?: false
@@ -207,9 +218,13 @@ class CardFragment : Fragment() {
         pbpRedeemPointsParentLayout.visibility = View.GONE
         pbpRedeemPointsErrorParentLayout.visibility = View.GONE
 
-
-        backBtn.setOnClickListener {
-            findNavController().popBackStack()
+        if (isMCCTransaction) {
+            backBtn.visibility = View.GONE
+        } else {
+            backBtn.visibility = View.VISIBLE
+            backBtn.setOnClickListener {
+                findNavController().popBackStack()
+            }
         }
         setUpAmount()
     }
@@ -217,19 +232,11 @@ class CardFragment : Fragment() {
     private fun setUpAmount() {
         payBtn.text = getString(
             R.string.pay_amount_text,
-            getString(R.string.rupee_symbol),
+            ExpressSDKObject.getCurrencySymbol(),
             Utils.convertInRupees(ExpressSDKObject.getAmount())
         )
         payBtn.setOnClickListener {
             validateAllFields()
-            CleverTapUtil.sdkCheckoutContinueClicked(
-                CleverTapUtil.getInstance(requireContext()),
-                ExpressSDKObject.getFetchData(),
-                PaymentModes.CREDIT_DEBIT.paymentModeName.toString(),
-                Utils.getCartValue(),
-                "not known",
-                payBtn.text.toString()
-            )
         }
     }
 
@@ -307,6 +314,7 @@ class CardFragment : Fragment() {
                             bundle.putString(ERROR_KEY, it.errorCode)
                             bundle.putString(ERROR_MESSAGE_KEY, it.errorMessage)
                             bottomSheetDialog?.dismiss()
+                            viewModel.resetProcessPaymentState()
                             findNavController().navigate(R.id.action_cardFragment_to_successFragment)
                         }
 
@@ -317,7 +325,8 @@ class CardFragment : Fragment() {
 
                         is BaseResult.Success<ProcessPaymentResponse> -> {
                             ExpressSDKObject.setProcessPaymentResponse(it.data)
-                            if (isNativeOTP) {
+                            viewModel.resetProcessPaymentState()
+                            if (it.data.is_native_otp_eligible == true) {
                                 callNativeRequestOTP()
                             } else {
                                 redirectToACS()
@@ -349,15 +358,6 @@ class CardFragment : Fragment() {
                         hideCardDetailsError()
                         enableDisableContinueBtn(true)
                     }
-                }
-                if (cardNumber.isNotEmpty()) {
-                    CleverTapUtil.cardNumberEntered(
-                        CleverTapUtil.getInstance(requireContext()),
-                        ExpressSDKObject.getFetchData(),
-                        binData?.card_payment_details?.firstOrNull()?.card_type ?: "",
-                        binData?.card_payment_details?.firstOrNull()?.card_network ?: "",
-                        isCardValid
-                    )
                 }
             }
         }
@@ -573,14 +573,6 @@ class CardFragment : Fragment() {
                         false
                     )
 
-                    if (cvv.isNotEmpty()) {
-                        CleverTapUtil.cvvEntered(
-                            CleverTapUtil.getInstance(requireContext()),
-                            ExpressSDKObject.getFetchData(),
-                            binData?.card_payment_details?.firstOrNull()?.card_issuer ?: "",
-                            isCVVValid
-                        )
-                    }
                 }
             }
         }
@@ -814,6 +806,7 @@ class CardFragment : Fragment() {
         val view = LayoutInflater.from(context).inflate(R.layout.pbp_bottom_sheetl_layout, null)
         val phoneNumberEt = view.findViewById<EditText>(R.id.phone_number_et)
         val checkPointsBtn = view.findViewById<Button>(R.id.check_points_btn)
+        Utils.applyPrimaryButtonBackground(checkPointsBtn)
 
         phoneNumberEt.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
@@ -868,31 +861,8 @@ class CardFragment : Fragment() {
     }
 
     private fun enableDisableContinueBtn(isEnabled: Boolean) {
-        if (isEnabled && isCardValid && isExpiryValid && isCVVValid && isCardHolderNameValid) {
-            payBtn.background = AppCompatResources.getDrawable(
-                requireContext(),
-                R.drawable.primary_button_background
-            )
-            payBtn.setTextColor(
-                AppCompatResources.getColorStateList(
-                    requireContext(),
-                    R.color.white
-                )
-            )
-            payBtn.isEnabled = true
-        } else {
-            payBtn.background = AppCompatResources.getDrawable(
-                requireContext(),
-                R.drawable.primary_button_disabled_bg
-            )
-            payBtn.setTextColor(
-                AppCompatResources.getColorStateList(
-                    requireContext(),
-                    R.color.text_disabled_C0C9D2
-                )
-            )
-            payBtn.isEnabled = false
-        }
+        val shouldEnable = isEnabled && isCardValid && isExpiryValid && isCVVValid && isCardHolderNameValid
+        Utils.handleCTAEnableDisable(requireContext(), shouldEnable, payBtn)
     }
 
 

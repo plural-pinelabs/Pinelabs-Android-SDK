@@ -28,7 +28,6 @@ import com.plural_pinelabs.expresscheckoutsdk.ExpressSDKObject
 import com.plural_pinelabs.expresscheckoutsdk.R
 import com.plural_pinelabs.expresscheckoutsdk.common.BaseResult
 import com.plural_pinelabs.expresscheckoutsdk.common.CardFragmentViewModelFactory
-import com.plural_pinelabs.expresscheckoutsdk.common.CleverTapUtil
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.BASE_IMAGES
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.BROWSER_ACCEPT_ALL
@@ -230,14 +229,6 @@ class DCEMICardDetailsFragment : Fragment() {
             validateAllFields()
             val offerDetails = ExpressSDKObject.getSelectedOfferDetail()
             val offerTenure = offerDetails?.tenureOffers?.find { it.tenureId == tenureId }
-            CleverTapUtil.sdkCheckoutContinueClicked(
-                CleverTapUtil.getInstance(requireContext()),
-                ExpressSDKObject.getFetchData(),
-                "Credit Card EMI",
-                Utils.getCartValue(),
-                offerTenure?.offerLabel ?: "",
-                payBtn.text.toString()
-            )
         }
     }
 
@@ -356,7 +347,7 @@ class DCEMICardDetailsFragment : Fragment() {
     private fun redirectToACS(
     ) {
         bottomSheetDialog?.dismiss()
-        findNavController().navigate(R.id.action_EMICardDetailsFragment_to_ACSFragment)
+        findNavController().navigate(R.id.action_DCEMICardDetailsFragment_to_ACSFragment)
 
     }
 
@@ -522,7 +513,7 @@ class DCEMICardDetailsFragment : Fragment() {
         val paymentData = ExpressSDKObject.getFetchData()?.paymentData
         if (paymentData == null) {
             //TODO notify of payment failure
-            findNavController().navigate(R.id.action_EMICardDetailsFragment_to_failureFragment)
+            findNavController().navigate(R.id.action_DCEMICardDetailsFragment_to_failureFragment)
         }
         val amount = issuer?.tenures?.find { it.tenure_id == tenureId }?.loan_amount?.value
             ?: 0

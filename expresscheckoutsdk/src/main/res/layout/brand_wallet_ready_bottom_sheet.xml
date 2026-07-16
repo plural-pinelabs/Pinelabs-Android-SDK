@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bottomsheet_rounded_corners"
+    android:paddingStart="20dp"
+    android:paddingTop="16dp"
+    android:paddingEnd="20dp"
+    android:paddingBottom="20dp">
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/brand_wallet_ready_confetti"
+        android:layout_width="144dp"
+        android:layout_height="139dp"
+        android:alpha="1"
+        android:importantForAccessibility="no"
+        android:scaleType="fitCenter"
+        android:src="@drawable/brand_wallet_ready_icon"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/brand_wallet_ready_close"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:background="@drawable/circle_background"
+        android:backgroundTint="@color/black_text_8"
+        android:contentDescription="@string/close"
+        android:padding="8dp"
+        android:src="@drawable/ic_cancel_close"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="@color/black_text_60" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/brand_wallet_ready_icon"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:importantForAccessibility="no"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/brand_wallet_ready_title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:fontFamily="sans-serif-medium"
+        android:gravity="center"
+        android:text="@string/brand_wallet_ready_title"
+        android:textColor="@color/black_text"
+        android:textFontWeight="700"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/brand_wallet_ready_confetti" />
+
+    <TextView
+        android:id="@+id/brand_wallet_ready_subtitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:gravity="center"
+        android:lineSpacingExtra="0dp"
+        android:paddingHorizontal="6dp"
+        android:textColor="@color/black_text_60"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/brand_wallet_ready_title"
+        tools:text="Access balance, add funds, redeem gift card, and make your shopping more rewarding." />
+
+    <TextView
+        android:id="@+id/brand_wallet_ready_amount"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:fontFamily="sans-serif-medium"
+        android:gravity="center"
+        android:textColor="@color/colorPrimary"
+        android:textFontWeight="700"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:visibility="gone"
+        android:layout_marginBottom="20dp"
+        app:layout_constraintBottom_toTopOf="@id/brand_wallet_ready_cta"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/brand_wallet_ready_title"
+        tools:text="You have saved ₹1,000 with this gift card!"
+        tools:visibility="visible" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/brand_wallet_ready_cta"
+        android:layout_width="0dp"
+        android:layout_height="52dp"
+        android:layout_marginTop="24dp"
+        android:insetTop="0dp"
+        android:insetBottom="0dp"
+        android:text="@string/brand_wallet_ready_cta"
+        android:textAllCaps="false"
+        android:textColor="@android:color/white"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:backgroundTint="@color/colorPrimary"
+        app:cornerRadius="112dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

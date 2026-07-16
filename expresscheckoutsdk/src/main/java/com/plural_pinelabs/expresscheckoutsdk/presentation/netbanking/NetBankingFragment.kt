@@ -33,7 +33,6 @@ import com.journeyapps.barcodescanner.BarcodeEncoder
 import com.plural_pinelabs.expresscheckoutsdk.ExpressSDKObject
 import com.plural_pinelabs.expresscheckoutsdk.R
 import com.plural_pinelabs.expresscheckoutsdk.common.BaseResult
-import com.plural_pinelabs.expresscheckoutsdk.common.CleverTapUtil
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.BASE_IMAGES
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.DEFAULT_BANK_CODE
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.ERROR_KEY
@@ -51,6 +50,7 @@ import com.plural_pinelabs.expresscheckoutsdk.common.PaymentModes
 import com.plural_pinelabs.expresscheckoutsdk.common.TimerManager
 import com.plural_pinelabs.expresscheckoutsdk.common.TransactionMode
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils
+import com.plural_pinelabs.expresscheckoutsdk.common.safeNavigate
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils.getBankLogoHashMap
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils.showProcessPaymentBottomSheetDialog
 import com.plural_pinelabs.expresscheckoutsdk.data.model.AcquirerWisePaymentData
@@ -129,7 +129,7 @@ class NetBankingFragment : Fragment() {
                             bundle.putString(ERROR_KEY, it.errorCode)
                             bundle.putString(ERROR_MESSAGE_KEY, it.errorMessage)
                             bottomSheetDialog?.dismiss()
-                            findNavController().navigate(
+                            safeNavigate(
                                 R.id.action_netBankingFragment_to_successFragment,
                             )
                         }
@@ -168,7 +168,7 @@ class NetBankingFragment : Fragment() {
                             //Throw error and exit SDK
                             //TODO Pass error message and description
                             bottomSheetDialog?.dismiss()
-                            findNavController().navigate(R.id.action_netBankingFragment_to_successFragment)
+                            safeNavigate(R.id.action_netBankingFragment_to_successFragment)
                         }
 
                         is BaseResult.Loading -> {
@@ -200,17 +200,17 @@ class NetBankingFragment : Fragment() {
 
                                 PROCESSED_STATUS -> {
                                     cancelTransactionProcess()
-                                    findNavController().navigate(R.id.action_netBankingFragment_to_successFragment)
+                                    safeNavigate(R.id.action_netBankingFragment_to_successFragment)
                                 }
 
                                 PROCESSED_ATTEMPTED -> {
                                     cancelTransactionProcess()
-                                    findNavController().navigate(R.id.action_netBankingFragment_to_successFragment)
+                                    safeNavigate(R.id.action_netBankingFragment_to_successFragment)
                                 }
 
                                 PROCESSED_FAILED -> {
                                     cancelTransactionProcess()
-                                    findNavController().navigate(R.id.action_netBankingFragment_to_successFragment)
+                                    safeNavigate(R.id.action_netBankingFragment_to_successFragment)
                                 }
                             }
                             viewModel.resetTransactionResponse()
@@ -229,7 +229,7 @@ class NetBankingFragment : Fragment() {
     private fun redirectToACS(
     ) {
         bottomSheetDialog?.dismiss()
-        findNavController().navigate(R.id.action_netBankingFragment_to_ACSFragment)
+        safeNavigate(R.id.action_netBankingFragment_to_ACSFragment)
 
     }
 
@@ -455,15 +455,6 @@ class NetBankingFragment : Fragment() {
                 )
                 viewModel.processPayment(ExpressSDKObject.getToken(), processPaymentRequest)
 
-                CleverTapUtil.sdkCheckoutContinueClicked(
-                    CleverTapUtil.getInstance(requireContext()),
-                    ExpressSDKObject.getFetchData(),
-                    PaymentModes.NET_BANKING.paymentModeName.toString(),
-                    Utils.getCartValue(),
-                    "not known",
-                    "${item.bankName} ${item.bankCode}"
-                )
-
             }
         }
     }
@@ -603,7 +594,7 @@ class NetBankingFragment : Fragment() {
                 )
 
             } else {
-                findNavController().navigate(R.id.action_netBankingFragment_to_successFragment)
+                safeNavigate(R.id.action_netBankingFragment_to_successFragment)
             }
         }
     }

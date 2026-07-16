@@ -75,6 +75,10 @@ class CardFragmentViewModel(private val expressRepositoryImpl: ExpressRepository
             }
         }
 
+    fun resetProcessPaymentState() {
+        _processPaymentResult.value = BaseResult.Loading(false)
+    }
+
     fun validateOffer(token: String?, paymentData: ProcessPaymentRequest?) =
         viewModelScope.launch(Dispatchers.IO) {
             expressRepositoryImpl.validateOffers(token, paymentData).collect {

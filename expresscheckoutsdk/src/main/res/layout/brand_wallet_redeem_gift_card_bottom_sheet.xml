@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bottomsheet_rounded_corners">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/brand_wallet_redeem_form_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="16dp"
+        android:paddingTop="16dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="32dp">
+
+        <TextView
+            android:id="@+id/brand_wallet_redeem_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:fontFamily="sans-serif-medium"
+            android:text="@string/brand_wallet_redeem_gift_card_title"
+            android:textColor="@color/black_text"
+            android:textFontWeight="700"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toStartOf="@id/brand_wallet_redeem_close"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/brand_wallet_redeem_close"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:background="@drawable/circle_background"
+            android:backgroundTint="@color/black_text_8"
+            android:contentDescription="@string/close"
+            android:padding="8dp"
+            android:src="@drawable/ic_cancel_close"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="@color/black_text_60" />
+
+        <View
+            android:id="@+id/brand_wallet_redeem_divider"
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_marginTop="16dp"
+            android:background="@color/black_text_12"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/brand_wallet_redeem_title" />
+
+        <TextView
+            android:id="@+id/brand_wallet_redeem_card_number_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="@string/brand_wallet_redeem_gift_card_number"
+            android:textColor="@color/black_text_80"
+            android:textFontWeight="500"
+            android:textSize="14sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/brand_wallet_redeem_divider" />
+
+        <androidx.appcompat.widget.AppCompatEditText
+            android:id="@+id/brand_wallet_redeem_card_number_input"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/brand_wallet_verification_field_background"
+            android:fontFamily="sans-serif-medium"
+            android:gravity="center_vertical"
+            android:hint="@string/brand_wallet_redeem_gift_card_number_hint"
+            android:imeOptions="actionNext"
+            android:inputType="textVisiblePassword|textNoSuggestions"
+            android:maxLines="1"
+            android:paddingHorizontal="16dp"
+            android:singleLine="true"
+            android:textColor="@color/black_text"
+            android:textColorHint="@color/black_text_30"
+            android:textFontWeight="700"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/brand_wallet_redeem_card_number_label"
+            tools:text="QC-9032-1190-4421" />
+
+        <TextView
+            android:id="@+id/brand_wallet_redeem_card_pin_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="22dp"
+            android:text="@string/brand_wallet_redeem_gift_card_pin"
+            android:textColor="@color/black_text_80"
+            android:textFontWeight="500"
+            android:textSize="14sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/brand_wallet_redeem_card_number_input" />
+
+        <androidx.appcompat.widget.AppCompatEditText
+            android:id="@+id/brand_wallet_redeem_card_pin_input"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/brand_wallet_verification_field_background"
+            android:digits="0123456789"
+            android:fontFamily="sans-serif-medium"
+            android:gravity="center_vertical"
+            android:hint="@string/brand_wallet_redeem_gift_card_pin_hint"
+            android:imeOptions="actionDone"
+            android:inputType="number"
+            android:maxLength="6"
+            android:maxLines="1"
+            android:paddingHorizontal="16dp"
+            android:singleLine="true"
+            android:textColor="@color/black_text"
+            android:textColorHint="@color/black_text_30"
+            android:textFontWeight="700"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/brand_wallet_redeem_card_pin_label"
+            tools:text="677384" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/brand_wallet_redeem_cta"
+            android:layout_width="0dp"
+            android:layout_height="52dp"
+            android:layout_marginTop="24dp"
+            android:background="@drawable/primary_button_disabled_bg"
+            android:fontFamily="sans-serif-medium"
+            android:text="@string/brand_wallet_redeem_gift_card_title"
+            android:textAllCaps="false"
+            android:textColor="@color/text_disabled_C0C9D2"
+            android:textFontWeight="700"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/brand_wallet_redeem_card_pin_input" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/brand_wallet_redeem_loading_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="16dp"
+        android:paddingTop="16dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="20dp"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/brand_wallet_redeem_loading_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:fontFamily="sans-serif-medium"
+            android:text="@string/brand_wallet_redeem_loading_title"
+            android:textColor="@color/black_text"
+            android:textFontWeight="700"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toStartOf="@id/brand_wallet_redeem_loading_close"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/brand_wallet_redeem_loading_close"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:background="@drawable/circle_background"
+            android:backgroundTint="@color/black_text_8"
+            android:contentDescription="@string/close"
+            android:padding="8dp"
+            android:src="@drawable/ic_cancel_close"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="@color/black_text_60" />
+
+        <View
+            android:id="@+id/brand_wallet_redeem_loading_divider"
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_marginTop="16dp"
+            android:background="@color/black_text_12"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/brand_wallet_redeem_loading_title" />
+
+        <ProgressBar
+            android:id="@+id/brand_wallet_redeem_loading_progress"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="0dp"
+            android:layout_height="9dp"
+            android:layout_marginTop="41dp"
+            android:max="100"
+            android:progress="40"
+            android:progressDrawable="@drawable/brand_wallet_redeem_progress"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/brand_wallet_redeem_loading_divider"
+            tools:progress="40" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</FrameLayout>

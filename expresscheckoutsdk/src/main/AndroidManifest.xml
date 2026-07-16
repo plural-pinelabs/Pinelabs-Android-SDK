@@ -8,17 +8,6 @@
     <application
         android:allowBackup="false">
 
-<!--        <meta-data-->
-<!--            android:name="CLEVERTAP_IDENTIFIER"-->
-<!--            android:value="Identity,Phone" />-->
-
-        <meta-data
-            android:name="CLEVERTAP_ACCOUNT_ID"
-            android:value="844-WR5-847Z" />
-        <meta-data
-            android:name="CLEVERTAP_TOKEN"
-            android:value="520-44b" />
-
         <activity
             android:name=".presentation.LandingActivity"
             android:exported="false"
@@ -29,10 +18,18 @@
     </application>
 
     <queries>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="upi" />
+        </intent>
         <package android:name="com.google.android.apps.nbu.paisa.user" />
         <package android:name="net.one97.paytm" />
         <package android:name="com.phonepe.app" />
+        <package android:name="com.mobikwik_new" />
         <package android:name="com.mobiKwik" />
+        <package android:name="in.gokiwi.kiwitpap" />
+        <package android:name="com.naviapp" />
+        <package android:name="in.super.money" />
         <package android:name="com.freecharge.android" />
         <package android:name="in.org.npci.upiapp" />
         <package android:name="com.dreamplug.androidapp" />

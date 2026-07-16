@@ -11,6 +11,8 @@ import com.plural_pinelabs.expresscheckoutsdk.data.model.AddressResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CancelTransactionResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CardBinMetaDataRequestList
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CardBinMetaDataResponse
+import com.plural_pinelabs.expresscheckoutsdk.data.model.CreateWalletRequest
+import com.plural_pinelabs.expresscheckoutsdk.data.model.CreateWalletResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CustomerInfo
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CustomerInfoResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ExpressAddress
@@ -18,7 +20,6 @@ import com.plural_pinelabs.expresscheckoutsdk.data.model.ExpressAddressResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.FetchResponseDTO
 import com.plural_pinelabs.expresscheckoutsdk.data.model.KFSResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.LogData
-import com.plural_pinelabs.expresscheckoutsdk.data.model.LogRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.model.LogResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.OTPRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.model.OTPResponse
@@ -27,6 +28,15 @@ import com.plural_pinelabs.expresscheckoutsdk.data.model.ProcessPaymentRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ProcessPaymentResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.SavedCardResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.TransactionStatusResponse
+import com.plural_pinelabs.expresscheckoutsdk.data.model.UpiFetchVpaRequest
+import com.plural_pinelabs.expresscheckoutsdk.data.model.UpiFetchVpaResponse
+import com.plural_pinelabs.expresscheckoutsdk.data.model.UpiOfferValidateRequest
+import com.plural_pinelabs.expresscheckoutsdk.data.model.WalletAddMoneyRequest
+import com.plural_pinelabs.expresscheckoutsdk.data.model.WalletAddMoneyResponse
+import com.plural_pinelabs.expresscheckoutsdk.data.model.WalletResetOtpRequest
+import com.plural_pinelabs.expresscheckoutsdk.data.model.WalletResetOtpResponse
+import com.plural_pinelabs.expresscheckoutsdk.data.model.WalletValidateRequest
+import com.plural_pinelabs.expresscheckoutsdk.data.model.WalletValidateResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.retrofit.ApiService
 import com.plural_pinelabs.expresscheckoutsdk.domain.repository.ExpressRepository
 import kotlinx.coroutines.flow.Flow
@@ -106,10 +116,11 @@ class ExpressRepositoryImpl(
     }
 
     override suspend fun transactionStatus(
-        token: String?
+        token: String?,
+        orderId: String?,
     ): Flow<BaseResult<TransactionStatusResponse>> {
         return toResultFlow(networkHelper = networkHelper) {
-            (apiService as CommonApiService).statusOfTransaction(token)
+            (apiService as CommonApiService).statusOfTransaction(token, orderId)
         }
     }
 
@@ -152,6 +163,15 @@ class ExpressRepositoryImpl(
         }
     }
 
+    override suspend fun validateOffersV2(
+        token: String?,
+        request: UpiOfferValidateRequest?
+    ): Flow<BaseResult<OfferEligibilityResponse>> {
+        return toResultFlow(networkHelper = networkHelper) {
+            (apiService as CommonApiService).validateOfferV2(token, request)
+        }
+    }
+
     override suspend fun getKFS(
         token: String?,
         paymentData: ProcessPaymentRequest?
@@ -188,12 +208,60 @@ class ExpressRepositoryImpl(
         }
     }
 
+    override suspend fun createWallet(
+        token: String?,
+        request: CreateWalletRequest
+    ): Flow<BaseResult<CreateWalletResponse>> {
+        return toResultFlow(networkHelper = networkHelper) {
+            (apiService as CommonApiService).createWallet(token, request)
+        }
+    }
+
     override suspend fun cancelPayment(
         token: String?,
         cancelPayment: Boolean
     ): Flow<BaseResult<CancelTransactionResponse>> {
         return toResultFlow(networkHelper = networkHelper) {
             (apiService as CommonApiService).cancelTransaction(token, cancelPayment)
+        }
+    }
+
+    override suspend fun addMoneyWallet(
+        token: String?,
+        request: WalletAddMoneyRequest
+    ): Flow<BaseResult<WalletAddMoneyResponse>> {
+        return toResultFlow(networkHelper = networkHelper) {
+            (apiService as CommonApiService).addMoneyToWallet(token, request)
+        }
+    }
+
+    override suspend fun validateWalletBalance(
+        token: String?,
+        request: WalletValidateRequest
+    ): Flow<BaseResult<WalletValidateResponse>> {
+        return toResultFlow(networkHelper = networkHelper) {
+            (apiService as CommonApiService).validateWalletBalance(token, request)
+        }
+    }
+
+    override suspend fun resetWalletOtp(
+        token: String?,
+        customerId: String,
+    ): Flow<BaseResult<WalletResetOtpResponse>> {
+        return toResultFlow(networkHelper = networkHelper) {
+            (apiService as CommonApiService).resetWalletOtp(
+                customerId = customerId,
+                request = WalletResetOtpRequest(token = token),
+            )
+        }
+    }
+
+    override suspend fun fetchUpiVpa(
+        token: String?,
+        request: UpiFetchVpaRequest,
+    ): Flow<BaseResult<UpiFetchVpaResponse>> {
+        return toResultFlow(networkHelper = networkHelper) {
+            (apiService as CommonApiService).fetchUpiVpa(token, request)
         }
     }
 }

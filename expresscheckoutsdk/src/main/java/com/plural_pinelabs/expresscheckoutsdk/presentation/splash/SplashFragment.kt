@@ -13,11 +13,9 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.airbnb.lottie.LottieAnimationView
-import com.clevertap.android.sdk.isNotNullAndBlank
 import com.plural_pinelabs.expresscheckoutsdk.ExpressSDKObject
 import com.plural_pinelabs.expresscheckoutsdk.R
 import com.plural_pinelabs.expresscheckoutsdk.common.BaseResult
-import com.plural_pinelabs.expresscheckoutsdk.common.CleverTapUtil
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PROCESSED_ATTEMPTED
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PROCESSED_FAILED
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PROCESSED_PENDING
@@ -59,7 +57,6 @@ class SplashFragment : Fragment() {
         observeViewModel()
 
         viewModel.fetchData(ExpressSDKObject.getToken() ?: "")
-        CleverTapUtil.sdkInitialized(CleverTapUtil.getInstance(requireContext()), requireContext())
 
     }
 
@@ -130,10 +127,6 @@ class SplashFragment : Fragment() {
                                 // Process the data
                                 ExpressSDKObject.setFetchData(it)
                                 (activity as? LandingActivity)?.updateValueForHeaderLayout(it)
-                                CleverTapUtil.sdkCheckoutRendered(
-                                    CleverTapUtil.getInstance(requireContext()),
-                                    it
-                                )
                                 if (it?.transactionInfo?.orderStatus?.equals(
                                         PROCESSED_STATUS,
                                         true
@@ -197,6 +190,11 @@ class SplashFragment : Fragment() {
     }
 
     private fun handleNav() {
+        if (ExpressSDKObject.isMCCTransaction()) {
+            findNavController().navigate(R.id.action_splashFragment_to_cardFragment)
+            return
+        }
+
         // TODO Finalize the condition for the d2c flow
 //                                if (it.customerInfo?.customerId.isNullOrEmpty()) {
 //                                    // no customer id new user
@@ -221,7 +219,7 @@ class SplashFragment : Fragment() {
                 "checkoutCollectMobile"
             )
 
-        if (address?.address1 != null && mobileNo.isNotNullAndBlank()) {
+        if (address?.address1 != null && !mobileNo.isNullOrBlank()) {
             ExpressSDKObject.setSelectedAddress(ExpressSDKObject.getFetchData()?.shippingAddress)
             findNavController().navigate(R.id.action_splashFragment_to_paymentModeFragment)
         } else if (address?.id == null && addressCollectionFlag == true) {

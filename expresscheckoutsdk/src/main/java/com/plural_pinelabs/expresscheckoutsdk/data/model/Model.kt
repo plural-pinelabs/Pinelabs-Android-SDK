@@ -3,6 +3,7 @@ package com.plural_pinelabs.expresscheckoutsdk.data.model
 import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
 import kotlinx.parcelize.Parcelize
+import kotlinx.parcelize.RawValue
 
 
 data class FetchResponseDTO(
@@ -18,6 +19,7 @@ data class FetchResponseDTO(
     val cartDetails: CartDetails? = null,
     val convenienceFeesInfo: List<ConvenienceFeesInfo>? = null,
     val merchantMetadata: MerchantMetadata? = null,
+    val vpaMapper: Map<String, List<String>>? = null,
 )
 
 @Parcelize
@@ -86,7 +88,8 @@ data class FetchFailure(
 
 data class TransactionInfo(
     val orderId: String,
-    val orderStatus: String?
+    val orderStatus: String?,
+    val isMCCTransaction: Boolean? = false
 )
 
 data class MerchantInfo(
@@ -99,12 +102,16 @@ data class MerchantInfo(
 data class FeatureFlag(
     var isSavedCardEnabled: Boolean?,
     var isNativeOTPEnabled: Boolean?,
-    var isDCCEnabled: Boolean?
+    var isDCCEnabled: Boolean?,
+    val isTpapConfigurable: Boolean?
 )
 
 data class OrignalTransactionAmount(var amount: Int?, val currency: String)
 
-data class PaymentData(var originalTxnAmount: OrignalTransactionAmount?)
+data class PaymentData(
+    var originalTxnAmount: OrignalTransactionAmount?,
+    var paymentAmount: OrignalTransactionAmount? = null
+)
 
 data class PaymentMode(
     val paymentModeId: String,
@@ -112,10 +119,70 @@ data class PaymentMode(
 )
 
 data class PaymentModeData(
-    val upi_flows: List<String>?,
-    val IssersUIDataList: List<issuerDataList>?,
-    val acquirerWisePaymentData: List<AcquirerWisePaymentData>?,
-    val isMobileQRCode:Boolean ?,
+    val upi_flows: List<String>? = null,
+    val IssersUIDataList: List<issuerDataList>? = null,
+    val acquirerWisePaymentData: List<AcquirerWisePaymentData>? = null,
+    val isMobileQRCode: Boolean? = null,
+    @SerializedName("SelectedUpiThirdPartyUpiApp")
+    val selectedUpiThirdPartyUpiApp: Int? = null,
+    @SerializedName("UPIPaymentOptions")
+    val upiPaymentOptions: List<UpiPaymentOption>? = null,
+    @SerializedName("offerData")
+    val offerData: UpiOfferData? = null,
+)
+
+data class UpiPaymentOption(
+    @SerializedName("UPIThirdPartyAppId")
+    val upiThirdPartyAppId: Int? = null,
+    @SerializedName("AppName")
+    val appName: String? = null,
+    @SerializedName("UPIOptionUIVal")
+    val upiOptionUiVal: Int? = null,
+    @SerializedName("UPIOptionUIId")
+    val upiOptionUiId: String? = null,
+)
+
+data class UpiOfferData(
+    val entities: List<UpiOfferEntity>? = null,
+    val offerDetails: List<OfferDetail>? = null,
+)
+
+data class UpiOfferEntity(
+    val entity_id: String? = null,
+    val entity_name: String? = null,
+    val entity_display_name: String? = null,
+    val entity_type: String? = null,
+    val entity_priority: Int? = null,
+    val tenures: List<UpiOfferTenure>? = null,
+)
+
+data class UpiOfferTenure(
+    val tenure_id: String? = null,
+    val name: String? = null,
+    val tenure_type: String? = null,
+    val tenure_value: Int? = null,
+    val offers: List<UpiOfferRankedOffer>? = null,
+)
+
+data class UpiOfferRankedOffer(
+    val offer_ranking: Int? = null,
+    val discount: UpiOfferDiscount? = null,
+    val total_discount_amount: UpiOfferAmount? = null,
+    val emi_type: String? = null,
+    val is_mobile_number_required_for_eligibility: Boolean? = null,
+    val is_offer_auto_applied: Boolean? = null,
+)
+
+data class UpiOfferDiscount(
+    val discount_type: String? = null,
+    val percentage: Double? = null,
+    val amount: UpiOfferAmount? = null,
+    val max_amount: UpiOfferAmount? = null,
+)
+
+data class UpiOfferAmount(
+    val currency: String? = null,
+    val value: Int? = null,
 )
 
 data class AcquirerWisePaymentData(
@@ -149,10 +216,17 @@ data class RecyclerViewPaymentOptionData(
 )
 
 @Parcelize
+data class BrandWalletBalance(
+    val value: Int? = null,
+    val currency: String? = null,
+) : Parcelable
+
+@Parcelize
 // New data class to hold customer information
 data class CustomerInfo(
     val lastUsedPaymode: LastUsedPaymode? = null,
-    val shipping_address: Address? = null,
+    var shipping_address: Address? = null,
+    var billing_address: Address? = null,
     val customerId: String? = null,
     var customer_id: String? = null,
     val firstName: String? = null,
@@ -176,7 +250,10 @@ data class CustomerInfo(
     val status: String? = null,
     val created_at: String? = null,
     val updated_at: String? = null,
-    var customerToken: String? = null
+    var customerToken: String? = null,
+    var brandWalletEnabled: Boolean? = null,
+    @SerializedName("brandWalletBalance")
+    var brandWalletBalance: BrandWalletBalance? = null,
 ) : Parcelable
 
 data class CustomerInfoResponse(
@@ -184,6 +261,209 @@ data class CustomerInfoResponse(
     val customerInfo: CustomerInfo?,
     val customerToken: String? = null,
 )
+
+data class CreateWalletRequest(
+    val currency_code: String? = null,
+    val customers: List<CreateWalletCustomer> = emptyList(),
+)
+
+data class CreateWalletCustomer(
+    val first_name: String? = null,
+    val last_name: String? = null,
+    val country_code: String? = null,
+    val mobile_number: String? = null,
+    val email_id: String? = null,
+    val customer_id: String? = null,
+    val billing_address: CreateWalletAddress? = null,
+    val shipping_address: CreateWalletAddress? = null,
+)
+
+data class CreateWalletAddress(
+    val address1: String? = null,
+    val pincode: String? = null,
+    val city: String? = null,
+    val state: String? = null,
+    val country: String? = null,
+)
+
+data class CreateWalletResponse(
+    val success: Boolean? = null,
+    val message: String? = null,
+    val data: CreateWalletData? = null,
+)
+
+data class CreateWalletData(
+    val currency_code: String? = null,
+    val customers: List<CustomerInfo> = emptyList(),
+)
+
+data class WalletAddMoneyRequest(
+    val upi_data: UpiData? = null,
+    val mode: String? = null,
+    val customer: CustomerInfo? = null,
+    val txn_data: UpiTransactionData? = null,
+    val extras: Extra? = null,
+    val payment_option: PaymentOptions? = null,
+)
+
+data class WalletAddMoneyResponse(
+    val order_id: String? = null,
+    val merchant_order_reference: String? = null,
+    val type: String? = null,
+    val status: String? = null,
+    val merchant_id: String? = null,
+    val order_amount: OrderDetailsAmount? = null,
+    val notes: String? = null,
+    val pre_auth: Boolean? = null,
+    val part_payment: Boolean? = null,
+    val allowed_payment_methods: List<String>? = null,
+    val purchase_details: WalletAddMoneyPurchaseDetails? = null,
+    val charge_order: WalletAddMoneyChargeOrder? = null,
+    val created_at: String? = null,
+    val updated_at: String? = null,
+    val integration_mode: String? = null,
+    val payment_retries_remaining: Int? = null,
+    val is_mcc_transaction: Boolean? = null,
+    val is_domestic_txn_for_risk_enabled: Boolean? = null,
+    val is_v2_emi_transaction: Boolean? = null,
+    val response_code: Int? = null,
+    val response_message: String? = null,
+)
+
+data class WalletValidateRequest(
+    val amount: OrderDetailsAmount? = null,
+    val customers: CustomerInfo? = null,
+)
+
+data class WalletValidateResponse(
+    val eligible_amount: OrderDetailsAmount? = null,
+    val status: String? = null,
+    val redemption_allowed: Boolean? = null,
+    val response_code: Int? = null,
+    val response_message: String? = null,
+    val total_balance_amount: OrderDetailsAmount? = null,
+    val payment_option_metadata: WalletValidatePaymentOptionMetadata? = null,
+)
+
+data class WalletResetOtpRequest(
+    val token: String? = null,
+)
+
+data class WalletResetOtpResponse(
+    val success: Boolean? = null,
+    val message: String? = null,
+    val data: WalletResetOtpData? = null,
+)
+
+data class WalletResetOtpData(
+    val pin: String? = null,
+    val pin_attempts_remaining: Int? = null,
+)
+
+data class WalletValidatePaymentOptionMetadata(
+    val total_balance_amount: OrderDetailsAmount? = null,
+    val wallet_data: WalletValidateWalletData? = null,
+)
+
+data class WalletValidateWalletData(
+    val total_balance_amount: OrderDetailsAmount? = null,
+)
+
+data class UpiFetchVpaRequest(
+    val payment_method: String,
+    val payment_option: UpiFetchVpaRequestPaymentOption,
+)
+
+data class UpiFetchVpaRequestPaymentOption(
+    val upi_details: UpiFetchVpaRequestUpiDetails,
+)
+
+data class UpiFetchVpaRequestUpiDetails(
+    val txn_mode: String,
+    val payer: UpiFetchVpaRequestPayer,
+)
+
+data class UpiFetchVpaRequestPayer(
+    val phone_number: String,
+    val fetch_vpa: Boolean,
+)
+
+data class UpiFetchVpaResponse(
+    val status: UpiFetchVpaStatus? = null,
+    val data: UpiFetchVpaResponseData? = null,
+)
+
+data class UpiFetchVpaStatus(
+    val code: String? = null,
+    val message: String? = null,
+)
+
+data class UpiFetchVpaResponseData(
+    val payment_method: String? = null,
+    val is_eligible: Boolean? = null,
+    val payment_option_metadata: UpiFetchVpaPaymentOptionMetadata? = null,
+)
+
+data class UpiFetchVpaPaymentOptionMetadata(
+    val upi_payment_option_data: UpiFetchVpaPaymentOptionData? = null,
+    val upi_data: UpiFetchVpaPaymentOptionData? = null,
+)
+
+data class UpiFetchVpaPaymentOptionData(
+    val fetched_vpa: String? = null,
+    val vpa: String? = null,
+)
+
+data class WalletAddMoneyChargeOrder(
+    val order_id: String? = null,
+    val parent_order_id: String? = null,
+    val merchant_order_reference: String? = null,
+    val type: String? = null,
+    val status: String? = null,
+    val challenge_url: String? = null,
+    val merchant_id: String? = null,
+    val order_amount: OrderDetailsAmount? = null,
+    val notes: String? = null,
+    val pre_auth: Boolean? = null,
+    val part_payment: Boolean? = null,
+    val allowed_payment_methods: List<String>? = null,
+    val purchase_details: WalletAddMoneyPurchaseDetails? = null,
+    val payments: List<WalletAddMoneyPayment>? = null,
+    val created_at: String? = null,
+    val updated_at: String? = null,
+    val integration_mode: String? = null,
+    val payment_retries_remaining: Int? = null,
+    val is_mcc_transaction: Boolean? = null,
+    val is_domestic_txn_for_risk_enabled: Boolean? = null,
+    val is_v2_emi_transaction: Boolean? = null,
+)
+
+data class WalletAddMoneyPurchaseDetails(
+    val customer: CustomerInfo? = null,
+)
+
+data class WalletAddMoneyPayment(
+    val id: String? = null,
+    val merchant_payment_reference: String? = null,
+    val status: String? = null,
+    val payment_amount: OrderDetailsAmount? = null,
+    val challenge_url: String? = null,
+    val payment_method: String? = null,
+    val payment_option: PaymentOptions? = null,
+    val acquirer_data: AcquirerData? = null,
+    val created_at: String? = null,
+    val updated_at: String? = null,
+)
+
+
+@Parcelize
+data class WalletAddMoneyLocationInfo(
+    val latitude: Double? = null,
+    val longitude: Double? = null,
+    val city: String? = null,
+    val state: String? = null,
+    val country: String? = null,
+) : Parcelable
 
 @Parcelize
 data class ProcessPaymentRequest(
@@ -198,6 +478,7 @@ data class ProcessPaymentRequest(
     val convenience_fee_data: ConvenienceFeesData? = null,
     val emi_data: EmiData? = null,
     val card_meta_data: CardMetaData? = null,
+    val payment_option: PaymentOptions? = null,
 ) : Parcelable
 
 @Parcelize
@@ -237,6 +518,7 @@ data class ProcessPaymentResponse(
     val payment_id: String?,
     val order_id: String?,
     val short_link: String?,
+    val is_native_otp_eligible: Boolean? = null,
 )
 
 @Parcelize
@@ -318,7 +600,12 @@ data class Extra(
     var dcc_status: String? = null,
     val sdk_data: SDKData? = null,
     val order_amount: Int? = null,
-    val language: String? = null
+    val language: String? = null,
+    val is_final_part_payment: Boolean? = null,
+    val location_info: WalletAddMoneyLocationInfo? = null,
+    val order_currency: String? = null,
+    val customer: CustomerInfo? = null,
+    val order_id: String? = null,
 ) : Parcelable
 
 data class PBPBank(
@@ -330,8 +617,23 @@ data class PBPBank(
 data class UpiData(
     val upi_option: String,
     val vpa: String?,
-    val txn_mode: String?
+    val txn_mode: String?,
+    val registered_mobile_number: String? = null,
+    val offer_data: @RawValue Any? = null,
 ) : Parcelable
+
+data class UpiOfferValidateRequest(
+    val upi_data: UpiOfferValidateData? = null,
+    val extras: Extra? = null,
+)
+
+data class UpiOfferValidateData(
+    val upi_option: String,
+    val txn_mode: String? = null,
+    val vpa: String? = null,
+    val registered_mobile_number: String? = null,
+    val offer_data: Any? = null,
+)
 
 @Parcelize
 data class UpiTransactionData(
@@ -461,6 +763,20 @@ data class AcquirerData(
 @Parcelize
 data class PaymentOptions(
     val card_data: CardData? = null,
+    val upi_data: UpiData? = null,
+    val wallet_details: WalletDetails? = null,
+    val gift_card_details: GiftCardDetails? = null,
+) : Parcelable
+
+@Parcelize 
+data class WalletDetails(
+    val customer_id: String? = null,
+) : Parcelable
+
+@Parcelize
+data class GiftCardDetails(
+    val gift_card_number: String? = null,
+    val pin: String? = null,
 ) : Parcelable
 
 @Parcelize
@@ -952,13 +1268,13 @@ data class SDKErrorDetails(
     val transactionId: String?,
     val sdkData: SDKData?,
     val message: String?,
-    )
+)
 
 data class LogRequest(
     val logs: List<LogData>
 )
 
-data class  LogResponse(
+data class LogResponse(
     val status: String,
     val message: String
 )

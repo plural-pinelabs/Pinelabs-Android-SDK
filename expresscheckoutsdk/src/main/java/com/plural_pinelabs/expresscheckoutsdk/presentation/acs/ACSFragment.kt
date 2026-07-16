@@ -81,7 +81,9 @@ internal class ACSFragment : Fragment() {
             }
         )
         (activity as LandingActivity).showHideHeaderLayout(false)
-        initializeValueFromProcessPaymentResponse()
+        if (!initializeValueFromProcessPaymentResponse()) {
+            return
+        }
         setUpViews(view)
         observeViewModel()
         setUpWebView()
@@ -157,15 +159,29 @@ internal class ACSFragment : Fragment() {
     }
 
 
-    private fun initializeValueFromProcessPaymentResponse() {
+    private fun initializeValueFromProcessPaymentResponse(): Boolean {
         val processPaymentResponse = ExpressSDKObject.getProcessPaymentResponse()
         processPaymentResponse?.let {
             orderId = it.order_id
             paymentId = it.payment_id
             token = ExpressSDKObject.getToken()
             redirectUrl = it.redirect_url ?: ""
+            if (redirectUrl.isBlank()) {
+                SdkLogger.log(
+                    requireContext(),
+                    "ACS_REDIRECT_URL_MISSING",
+                    "Redirect URL is missing for ACS flow",
+                    orderId,
+                    "HIGH",
+                    "SDK"
+                )
+                findNavController().navigate(R.id.action_ACSFragment_to_failureFragment)
+                return false
+            }
+            return true
         } ?: run {
             findNavController().navigate(R.id.action_ACSFragment_to_failureFragment)
+            return false
         }
     }
 

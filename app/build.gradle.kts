@@ -8,12 +8,12 @@ plugins {
 
 android {
     namespace = "com.plural_pinelabs.native_express_sdk"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.plural_pinelabs.native_express_sdk"
         minSdk = 26
-        targetSdk = 35
+        targetSdk = 36
         versionCode = 20
         versionName = "1.0.0"
 

@@ -24,6 +24,7 @@
             app:tint="@color/black_text_80" />
 
         <ImageView
+            android:id="@+id/card_icon_fragment"
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:layout_marginStart="4dp"

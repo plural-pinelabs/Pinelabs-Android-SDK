@@ -7,7 +7,7 @@ plugins {
 
 android {
     namespace = "com.plural_pinelabs.expresscheckoutsdk"
-    compileSdk = 34
+    compileSdk = 36
 
     buildFeatures {
         buildConfig = true
@@ -31,7 +31,12 @@ android {
         buildConfigField(
             "String",
             "SHA256_PROD",
-            "\"D3pseS7ojH9IDxqT4rUEuAt5/IykaPmeaiNHhJabd3c=\""
+            "\"DxH4tt40L+eduF6szpY6TONlxhZhBd+pJ9wbHlQ2fuw=\""
+        )
+        buildConfigField(
+            "boolean",
+            "ENABLE_UPI_ICB_SAVINGS_UI",
+            "false"
         )
     }
 
@@ -109,7 +114,6 @@ dependencies {
     // -------------------------------------------------
     // Other
     // -------------------------------------------------
-    implementation(libs.clevertap)
     implementation(libs.play.services.auth.api.phone)
     implementation("com.journeyapps:zxing-android-embedded:4.3.0")
 
@@ -127,7 +131,7 @@ publishing {
         create<MavenPublication>("release") {
             groupId = "com.github.plural-pinelabs"
             artifactId = "express-checkout-sdk"
-            version = "1.0.8"   // ⬅️ MUST bump version
+            version = "1.2.0"
 
             afterEvaluate {
                 from(components["release"])

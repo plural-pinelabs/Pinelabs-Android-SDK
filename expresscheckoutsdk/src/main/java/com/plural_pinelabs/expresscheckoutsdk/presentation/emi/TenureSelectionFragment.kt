@@ -35,7 +35,6 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.plural_pinelabs.expresscheckoutsdk.ExpressSDKObject
 import com.plural_pinelabs.expresscheckoutsdk.R
 import com.plural_pinelabs.expresscheckoutsdk.common.BaseResult
-import com.plural_pinelabs.expresscheckoutsdk.common.CleverTapUtil
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.BASE_IMAGES
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.BROWSER_ACCEPT_ALL
@@ -282,16 +281,6 @@ class TenureSelectionFragment : Fragment() {
                 bundle
             )
         }
-
-        CleverTapUtil.emiOptionSelected(
-            CleverTapUtil.getInstance(requireContext()),
-            ExpressSDKObject.getFetchData(),
-            selectedTenure?.tenure_value.toString(),
-            selectedTenure?.interest_rate_percentage.toString(),
-            selectedTenure?.subvention?.subvention_type ?: "",
-            selectedTenure?.monthly_emi_amount?.amount.toString(),
-            false
-        )
     }
 
     private fun mapBanKLogo() {
@@ -333,7 +322,7 @@ class TenureSelectionFragment : Fragment() {
 
         val paymentData = ExpressSDKObject.getFetchData()?.paymentData
         if (paymentData == null) {
-            findNavController().navigate(R.id.action_EMICardDetailsFragment_to_failureFragment)
+            findNavController().navigate(R.id.action_tenureSelectionFragment_to_failureFragment)
         }
         val amount = issuer?.tenures?.find { it.tenure_id == tenureId }?.loan_amount?.value
             ?: 0

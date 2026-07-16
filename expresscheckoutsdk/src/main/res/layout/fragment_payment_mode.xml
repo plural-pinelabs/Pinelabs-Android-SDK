@@ -353,6 +353,220 @@
             android:textSize="12sp" />
 
         <androidx.cardview.widget.CardView
+            android:id="@+id/brand_wallet_card_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="2dp"
+            android:layout_marginBottom="16dp"
+            android:visibility="gone"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="4dp"
+            app:cardUseCompatPadding="false">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/brand_wallet_card_background"
+                android:clipToPadding="false"
+                android:paddingStart="11dp"
+                android:paddingTop="15dp"
+                android:paddingEnd="11dp"
+                android:paddingBottom="14dp">
+
+                <View
+                    android:id="@+id/brand_wallet_corner_accent"
+                    android:layout_width="165dp"
+                    android:layout_height="77dp"
+                    android:background="@drawable/brand_wallet_corner_accent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <LinearLayout
+                    android:id="@+id/brand_wallet_header"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    app:layout_constraintEnd_toStartOf="@id/brand_wallet_selected_icon"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <ImageView
+                        android:id="@+id/brand_wallet_icon"
+                        android:layout_width="35dp"
+                        android:layout_height="34dp"
+                        android:background="@drawable/brand_wallet_logo_background"
+                        android:importantForAccessibility="no"
+                        android:padding="5dp"
+                        android:src="@drawable/brand_wallet_logo"
+                        tools:ignore="UseAppTint" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="12dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/brand_wallet_title"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:ellipsize="end"
+                            android:fontFamily="sans-serif-medium"
+                            android:maxLines="2"
+                            android:textColor="@color/black_text_80"
+                            android:textFontWeight="700"
+                            android:textSize="16sp"
+                            tools:text="Croma Wallet" />
+
+                        <LinearLayout
+                            android:id="@+id/brand_wallet_balance_row"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:id="@+id/brand_wallet_balance"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="sans-serif-medium"
+                                android:textColor="@color/green_00722F"
+                                android:textFontWeight="700"
+                                android:textSize="18sp"
+                                tools:text="₹ 2,000" />
+
+                            <ImageView
+                                android:id="@+id/brand_wallet_balance_refresh"
+                                android:layout_width="16dp"
+                                android:layout_height="16dp"
+                                android:layout_marginStart="8dp"
+                                android:contentDescription="@string/brand_wallet_refresh_balance"
+                                android:src="@drawable/ic_brand_wallet_refresh"
+                                android:visibility="gone"
+                                app:tint="@color/black_text_50" />
+
+                        </LinearLayout>
+
+                        <TextView
+                            android:id="@+id/brand_wallet_description"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:fontFamily="sans-serif"
+                            android:textColor="@color/black_text_80"
+                            android:textFontWeight="600"
+                            android:textSize="14sp"
+                            android:visibility="gone"
+                            tools:text="Access balance, add funds, redeem gift card, and make your shopping more rewarding." />
+
+                        <LinearLayout
+                            android:id="@+id/brand_wallet_activate_cta_row"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:visibility="gone">
+
+                            <TextView
+                                android:id="@+id/brand_wallet_activate_text"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="sans-serif-medium"
+                                android:text="@string/brand_wallet_activate_now"
+                                android:textColor="@color/black_text"
+                                android:textFontWeight="700"
+                                android:textSize="18sp" />
+
+                            <ImageView
+                                android:id="@+id/brand_wallet_activate_arrow"
+                                android:layout_width="9dp"
+                                android:layout_height="14dp"
+                                android:layout_marginStart="6dp"
+                                android:importantForAccessibility="no"
+                                android:rotation="180"
+                                android:src="@drawable/ic_chevron_left" />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <ImageView
+                    android:id="@+id/brand_wallet_selected_icon"
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/ic_check_circle_unselected"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <LinearLayout
+                    android:id="@+id/brand_wallet_actions_row"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:orientation="horizontal"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/brand_wallet_header">
+
+                    <TextView
+                        android:id="@+id/brand_wallet_primary_action"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/brand_wallet_chip_background"
+                        android:fontFamily="sans-serif-medium"
+                        android:paddingHorizontal="12dp"
+                        android:paddingVertical="6dp"
+                        android:textColor="@color/black_text_80"
+                        android:textFontWeight="600"
+                        android:textSize="16sp"
+                        tools:text="Redeem Gift Card" />
+
+                    <TextView
+                        android:id="@+id/brand_wallet_secondary_action"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:background="@drawable/brand_wallet_chip_background"
+                        android:fontFamily="sans-serif-medium"
+                        android:paddingHorizontal="12dp"
+                        android:paddingVertical="6dp"
+                        android:textColor="@color/black_text_80"
+                        android:textFontWeight="600"
+                        android:textSize="16sp"
+                        tools:text="+ Add Money" />
+
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/brand_wallet_proceed_action"
+                    android:layout_width="0dp"
+                    android:layout_height="52dp"
+                    android:layout_marginTop="16dp"
+                    android:background="@drawable/brand_wallet_proceed_button_background"
+                    android:fontFamily="sans-serif-medium"
+                    android:gravity="center"
+                    android:paddingHorizontal="16dp"
+                    android:text="@string/brand_wallet_action_proceed_to_pay"
+                    android:textColor="@color/white"
+                    android:textFontWeight="600"
+                    android:textSize="16sp"
+                    android:visibility="gone"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/brand_wallet_actions_row" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
             android:id="@+id/payment_option_card"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

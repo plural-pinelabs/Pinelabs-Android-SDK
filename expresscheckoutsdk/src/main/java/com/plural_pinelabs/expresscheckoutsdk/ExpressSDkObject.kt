@@ -7,6 +7,8 @@ import com.plural_pinelabs.expresscheckoutsdk.data.model.FetchResponseDTO
 import com.plural_pinelabs.expresscheckoutsdk.data.model.OfferDetail
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ProcessPaymentResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.Tenure
+import com.plural_pinelabs.expresscheckoutsdk.data.model.WalletAddMoneyResponse
+import java.util.Locale
 import java.util.concurrent.atomic.AtomicReference
 
 internal data class SDKObject(
@@ -16,6 +18,8 @@ internal data class SDKObject(
     val sandBoxMode: Boolean = false,
     var fetchResponseDTO: FetchResponseDTO? = null,
     var processPaymentResponse: ProcessPaymentResponse? = null,
+    var walletAddMoneyResponse: WalletAddMoneyResponse? = null,
+    var selectedMode: String? = null,
     var phoneNumber: String? = null,
     var emiPaymentModeData: EMIPaymentModeData? = null,
     var payableAmount: Int? = null,
@@ -28,11 +32,23 @@ internal data class SDKObject(
     var customerId: String? = null,
     var customerToken: String? = null,
     var createdAt: String? = null,
-    var logCount: Int = -1
+    var logCount: Int = -1,
+    var resolvedCurrencyCode: String = "INR",
+    var resolvedCurrencySymbol: String = "\u20B9",
+    var resolvedCurrencyRatio: Int = 2
+)
+
+internal data class CurrencyMapping(
+    val code: String,
+    val symbol: String,
+    val transformationRatio: Int
 )
 
 internal object ExpressSDKObject {
     private val sdkObjectRef = AtomicReference<SDKObject?>()
+    private const val DEFAULT_CURRENCY_CODE = "INR"
+    private const val DEFAULT_CURRENCY_SYMBOL = "\u20B9"
+    private const val DEFAULT_CURRENCY_RATIO = 2
 
     fun initialize(
         context: Context,
@@ -56,7 +72,16 @@ internal object ExpressSDKObject {
     }
 
     fun setFetchData(it: FetchResponseDTO) {
-        getSDKObject()?.fetchResponseDTO = it
+        val sdkObject = getSDKObject() ?: return
+        sdkObject.fetchResponseDTO = it
+
+        val transactionCurrencyCode =
+            it.paymentData?.paymentAmount?.currency ?: it.paymentData?.originalTxnAmount?.currency
+        val mappedCurrency = mapCurrency(transactionCurrencyCode, it)
+
+        sdkObject.resolvedCurrencyCode = mappedCurrency.code
+        sdkObject.resolvedCurrencySymbol = mappedCurrency.symbol
+        sdkObject.resolvedCurrencyRatio = mappedCurrency.transformationRatio
     }
 
     fun getFetchData(): FetchResponseDTO? {
@@ -82,10 +107,49 @@ internal object ExpressSDKObject {
     }
 
     fun getCurrency(): String {
-        val fetchResponse = getFetchData()
-        return (fetchResponse?.paymentData?.originalTxnAmount?.currency ?: run {
-            ""
-        })
+        return getSDKObject()?.resolvedCurrencyCode ?: DEFAULT_CURRENCY_CODE
+    }
+
+    fun getCurrencySymbol(): String {
+        return getSDKObject()?.resolvedCurrencySymbol ?: DEFAULT_CURRENCY_SYMBOL
+    }
+
+    fun getCurrencyTransformationRatio(): Int {
+        return getSDKObject()?.resolvedCurrencyRatio ?: DEFAULT_CURRENCY_RATIO
+    }
+
+    fun mapCurrency(
+        currencyCode: String?,
+        fetchResponse: FetchResponseDTO? = getFetchData()
+    ): CurrencyMapping {
+        val normalizedCode = currencyCode
+            ?.trim()
+            ?.takeIf { it.isNotEmpty() }
+            ?.uppercase(Locale.ROOT)
+            ?: DEFAULT_CURRENCY_CODE
+
+        val currencyData = fetchResponse?.dccData?.currencyMapper
+            ?.entries
+            ?.firstOrNull { it.key.equals(normalizedCode, ignoreCase = true) }
+            ?.value
+
+        val mappedSymbol = currencyData?.symbol
+            ?.takeIf { it.isNotBlank() }
+            ?: if (normalizedCode == DEFAULT_CURRENCY_CODE) DEFAULT_CURRENCY_SYMBOL else normalizedCode
+
+        val mappedRatio = currencyData?.transformation_ratio
+            ?.takeIf { it > 0 }
+            ?: DEFAULT_CURRENCY_RATIO
+
+        return CurrencyMapping(
+            code = normalizedCode,
+            symbol = mappedSymbol,
+            transformationRatio = mappedRatio
+        )
+    }
+
+    fun isMCCTransaction(): Boolean {
+        return getFetchData()?.transactionInfo?.isMCCTransaction == true
     }
 
     fun setProcessPaymentResponse(it: ProcessPaymentResponse) {
@@ -94,6 +158,22 @@ internal object ExpressSDKObject {
 
     fun getProcessPaymentResponse(): ProcessPaymentResponse? {
         return getSDKObject()?.processPaymentResponse
+    }
+
+    fun setWalletAddMoneyResponse(response: WalletAddMoneyResponse?) {
+        getSDKObject()?.walletAddMoneyResponse = response
+    }
+
+    fun getWalletAddMoneyResponse(): WalletAddMoneyResponse? {
+        return getSDKObject()?.walletAddMoneyResponse
+    }
+
+    fun setSelectedMode(mode: String?) {
+        getSDKObject()?.selectedMode = mode
+    }
+
+    fun getSelectedMode(): String? {
+        return getSDKObject()?.selectedMode
     }
 
     fun setPhoneNumber(phoneNumber: String) {
