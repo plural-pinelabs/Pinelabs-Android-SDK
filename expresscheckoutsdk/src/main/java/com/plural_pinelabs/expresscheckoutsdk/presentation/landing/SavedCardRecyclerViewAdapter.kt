@@ -56,6 +56,7 @@ class SavedCardRecyclerViewAdapter(
             cardName.text = item.cardData.issuerName ?: ""
             last4Digits.text = item.cardData.last4Digit
             loadBankLogo(item.cardData.issuerName, cardLogo)
+            val requiresCvv = item.cardData.cvvRequired || item.cardData.international
             payButton.text = context.getString(
                 R.string.pay_amount_text,
                 ExpressSDKObject.getCurrencySymbol(),
@@ -78,7 +79,7 @@ class SavedCardRecyclerViewAdapter(
             cvvLessSelect.setOnCheckedChangeListener(null)
             cvvLessSelect.isChecked = isSelected && selectedType == 1
 
-            if (!item.cardData.cvvRequired) {
+            if (!requiresCvv) {
                 // if (position % 2 == 0) {
                 cvvEditText.visibility = View.GONE
                 cvvLessSelect.visibility = View.VISIBLE
@@ -129,10 +130,10 @@ class SavedCardRecyclerViewAdapter(
             }
 
             payButton.setOnClickListener {
-                if (item.cardData.cvvRequired && (cvvEditText.text.isNullOrEmpty() || cvvEditText.text.toString().length < 3)) {
+                if (requiresCvv && (cvvEditText.text.isNullOrEmpty() || cvvEditText.text.toString().length < 3)) {
                     errorText.visibility = View.VISIBLE
                     return@setOnClickListener
-                } else if (item.cardData.cvvRequired && cvvEditText.text.isNotEmpty() && cvvEditText.text.toString().length >= 3) {
+                } else if (requiresCvv && cvvEditText.text.isNotEmpty() && cvvEditText.text.toString().length >= 3) {
                     errorText.visibility = View.GONE
                     item.cvvInput = cvvEditText.text.toString()
                     savedCardSelectionCallback?.onItemClick(position, item)

@@ -2474,9 +2474,28 @@ class PaymentModeFragment : Fragment() {
 
     }
 
+    private fun getHighestSavingOffer(offerDetails: List<OfferDetail>?): OfferDetail? {
+        return offerDetails
+            ?.maxByOrNull { offerDetail ->
+                val savings = offerDetail.tenureOffers
+                    ?.maxOfOrNull { tenureOffer ->
+                        tenureOffer.discountAmount + tenureOffer.cashbackAmount
+                    }
+                    ?: 0
+                if (savings > 0) savings else offerDetail.maxSaving
+            }
+            ?: ExpressSDKObject.getEMIPaymentModeData()?.offerDetails?.maxByOrNull { offerDetail ->
+                val savings = offerDetail.tenureOffers
+                    ?.maxOfOrNull { tenureOffer ->
+                        tenureOffer.discountAmount + tenureOffer.cashbackAmount
+                    }
+                    ?: 0
+                if (savings > 0) savings else offerDetail.maxSaving
+            }
+    }
+
     private fun getBestOfferRecommended(offerDetails: List<OfferDetail>?) {
-        val item = offerDetails?.firstOrNull()
-            ?: ExpressSDKObject.getEMIPaymentModeData()?.offerDetails?.firstOrNull()
+        val item = getHighestSavingOffer(offerDetails)
         if (item != null) {
             val spec = BankColors.getGradientColors(item.issuer?.display_name)
 
@@ -2515,7 +2534,7 @@ class PaymentModeFragment : Fragment() {
                 requireContext(),
                 fullTenure?.loan_amount?.value ?: 0
             ) + "/month"
-            handleRecommendedOptionClick()
+            handleRecommendedOptionClick(item)
         } else
             recommendedParentLayout.visibility = View.GONE
     }
@@ -2528,9 +2547,8 @@ class PaymentModeFragment : Fragment() {
         }
     }
 
-    private fun handleRecommendedOptionClick() {
+    private fun handleRecommendedOptionClick(offerDetails: OfferDetail) {
         actionBtn.setOnClickListener {
-            val offerDetails = ExpressSDKObject.getEMIPaymentModeData()?.offerDetails?.firstOrNull()
             ExpressSDKObject.setSelectedOfferDetail(offerDetails)
             val issuer =
                 ExpressSDKObject.getEMIPaymentModeData()?.issuers?.find { it.id == offerDetails?.issuerId }
@@ -2558,11 +2576,23 @@ class PaymentModeFragment : Fragment() {
         recommendedParentLayout.visibility = View.GONE
         recommendedSavedCardParentLayout.visibility = View.GONE
 
+        val showRecommendations =
+            ExpressSDKObject.getFetchData()?.merchantBrandingData?.expressCheckoutSettings?.showRecommendations == true ||
+                ExpressSDKObject.getFetchData()?.merchantMetadata?.express_checkout_allowed_action?.contains(
+                    "showRecommendations"
+                ) == true
+        val bestOffer = getHighestSavingOffer(null)
+
+        if (showRecommendations && bestOffer != null) {
+            recommendedOptionLabel.visibility = View.VISIBLE
+            recommendedParentLayout.visibility = View.VISIBLE
+            getBestOfferRecommended(listOf(bestOffer))
+            return
+        }
+
         val lastPaymentMode = ExpressSDKObject.getFetchData()?.customerInfo?.lastUsedPaymode
         val lastPayModeUsed = lastPaymentMode?.lastTransactionPaymentMode
         if (lastPaymentMode == null) {
-            // do not show any paymodes
-            // do nothing
             return
         } else if (lastPayModeUsed.isNullOrEmpty()) {
             // show last used method
@@ -2616,7 +2646,6 @@ class PaymentModeFragment : Fragment() {
                 val offerDetails =
                     ExpressSDKObject.getFetchData()?.customerInfo?.lastUsedPaymode?.card?.lastUsedCard?.firstOrNull()?.emiData?.offerDetails
                 recommendedParentLayout.visibility = View.VISIBLE
-                handleRecommendedOptionClick()
                 getBestOfferRecommended(offerDetails)
 
             }

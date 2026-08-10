@@ -863,7 +863,8 @@ data class SavedCardDataObject(
     val last4Digit: String,
     val networkName: String,
     val issuerName: String,
-    val cvvRequired: Boolean
+    val cvvRequired: Boolean,
+    val international: Boolean = false,
 ) : Parcelable
 
 @Parcelize
@@ -886,7 +887,8 @@ data class SDKData(
     /*val browser_name: String?,
     val browser_version: String?,*/
     val timestamp: String?,
-    val version: String
+    val version: String,
+    val upi_name : String?,
 ) : Parcelable
 
 

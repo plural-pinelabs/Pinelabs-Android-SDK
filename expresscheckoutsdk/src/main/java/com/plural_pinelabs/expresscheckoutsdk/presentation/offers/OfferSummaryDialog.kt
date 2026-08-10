@@ -250,16 +250,16 @@ class OfferSummaryDialog : DialogFragment() {
         ExpressSDKObject.setSelectedOfferDetail(item)
         dismiss()
         if (item.isInstantSaving) {
-            findNavController().navigate(R.id.action_offerSummaryDialog_to_EMICardDetailsFragment)
+            findNavController().navigate(R.id.action_paymentModeFragment_to_EMICardDetailsFragment)
         } else {
-            findNavController().navigate(R.id.action_offerSummaryDialog_to_tenureSelectionFragment)
+            findNavController().navigate(R.id.action_paymentModeFragment_to_tenureSelectionFragment)
         }
     }
 
     private fun proceedWithSelectedUpiOffer(item: OfferDetail) {
         ExpressSDKObject.setSelectedOfferDetail(item)
         dismiss()
-        findNavController().navigate(R.id.action_offerSummaryDialog_to_UPIFragment)
+        findNavController().navigate(R.id.action_paymentModeFragment_to_UPIFragment)
     }
 
     override fun onDestroyView() {
