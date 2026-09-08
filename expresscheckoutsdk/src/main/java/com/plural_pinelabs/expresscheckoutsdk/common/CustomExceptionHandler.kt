@@ -29,7 +29,7 @@ class CustomExceptionHandler(
             runBlocking {
                 withTimeout(3000) { // Optional: timeout to avoid hanging
                     val repo = ExpressRepositoryImpl(
-                        RetrofitBuilder.fetchApiService,
+                        RetrofitBuilder.commonApiService,
                         NetworkHelper(applicationContext)
                     )
                     val logs = Utils.getUnSyncedErrors(applicationContext)

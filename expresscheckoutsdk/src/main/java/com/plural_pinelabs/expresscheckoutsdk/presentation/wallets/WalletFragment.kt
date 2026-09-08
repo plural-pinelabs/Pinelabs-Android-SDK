@@ -243,17 +243,17 @@ class WalletFragment : Fragment() {
             null
         )
         val extras = Extra(
-            paymentMode,
-            amount,
-            currency,
-            null,
-            null,
-            null,
-            TransactionMode.REDIRECT.name,
-            deviceInfo,
-            null,
-            null,
-            Utils.createSDKData(requireActivity())
+            payment_mode = paymentMode,
+            payment_amount = amount,
+            payment_currency = currency,
+            card_last4 = null,
+            redeemable_amount = null,
+            registered_mobile_number = null,
+            txn_mode = TransactionMode.REDIRECT.name,
+            device_info = deviceInfo,
+            risk_validation_details = null,
+            dcc_status = null,
+            sdk_data = Utils.createSDKData(requireActivity())
         )
         val processPaymentRequest = ProcessPaymentRequest(
             null, null, null, null, walletData, null, extras, null, null

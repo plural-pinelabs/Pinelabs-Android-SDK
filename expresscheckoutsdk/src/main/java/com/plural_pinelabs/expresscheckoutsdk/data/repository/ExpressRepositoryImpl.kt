@@ -45,10 +45,32 @@ class ExpressRepositoryImpl(
     private val apiService: ApiService,
     private val networkHelper: NetworkHelper
 ) : ExpressRepository {
+    private val fetchApiService = apiService as? FetchApiService
+    private val commonApiService = apiService as? CommonApiService
+    private val expressApiService = apiService as? ExpressApiService
+
+    private fun requireFetchApiService(): FetchApiService {
+        return requireNotNull(fetchApiService) {
+            "ExpressRepositoryImpl requires FetchApiService for this operation"
+        }
+    }
+
+    private fun requireCommonApiService(): CommonApiService {
+        return requireNotNull(commonApiService) {
+            "ExpressRepositoryImpl requires CommonApiService for this operation"
+        }
+    }
+
+    private fun requireExpressApiService(): ExpressApiService {
+        return requireNotNull(expressApiService) {
+            "ExpressRepositoryImpl requires ExpressApiService for this operation"
+        }
+    }
+
     override suspend fun fetchData(token: String?): Flow<BaseResult<FetchResponseDTO>> {
         // call the API to fetch data
         return toResultFlow(networkHelper = networkHelper) {
-            (apiService as FetchApiService).fetchData(token)
+            requireFetchApiService().fetchData(token)
         }
     }
 
@@ -57,7 +79,7 @@ class ExpressRepositoryImpl(
         request: CardBinMetaDataRequestList
     ): Flow<BaseResult<CardBinMetaDataResponse>> {
         return toResultFlow(networkHelper = networkHelper) {
-            (apiService as CommonApiService).getMetaData(token, request)
+            requireCommonApiService().getMetaData(token, request)
         }
     }
 
@@ -66,7 +88,7 @@ class ExpressRepositoryImpl(
         paymentData: ProcessPaymentRequest?
     ): Flow<BaseResult<ProcessPaymentResponse>> {
         return toResultFlow(networkHelper = networkHelper) {
-            (apiService as CommonApiService).processPayment(token, paymentData)
+            requireCommonApiService().processPayment(token, paymentData)
         }
     }
 
@@ -75,7 +97,7 @@ class ExpressRepositoryImpl(
         otpRequest: OTPRequest
     ): Flow<BaseResult<OTPResponse>> {
         return toResultFlow(networkHelper = networkHelper) {
-            (apiService as CommonApiService).submitOTP(token, otpRequest)
+            requireCommonApiService().submitOTP(token, otpRequest)
         }
     }
 
@@ -84,7 +106,7 @@ class ExpressRepositoryImpl(
         otpRequest: OTPRequest
     ): Flow<BaseResult<OTPResponse>> {
         return toResultFlow(networkHelper = networkHelper) {
-            (apiService as CommonApiService).initiateOTP(token, otpRequest)
+            requireCommonApiService().initiateOTP(token, otpRequest)
         }
     }
 
@@ -93,7 +115,7 @@ class ExpressRepositoryImpl(
         otpRequest: OTPRequest
     ): Flow<BaseResult<OTPResponse>> {
         return toResultFlow(networkHelper = networkHelper) {
-            (apiService as CommonApiService).initiateOTP(token, otpRequest)
+            requireCommonApiService().initiateOTP(token, otpRequest)
         }
     }
 
@@ -102,7 +124,7 @@ class ExpressRepositoryImpl(
         otpRequest: OTPRequest?
     ): Flow<BaseResult<SavedCardResponse>> {
         return toResultFlow(networkHelper = networkHelper) {
-            (apiService as CommonApiService).sendOTPCustomer(token, otpRequest)
+            requireCommonApiService().sendOTPCustomer(token, otpRequest)
         }
     }
 
@@ -111,7 +133,7 @@ class ExpressRepositoryImpl(
         otpRequest: OTPRequest?
     ): Flow<BaseResult<SavedCardResponse>> {
         return toResultFlow(networkHelper = networkHelper) {
-            (apiService as CommonApiService).validateOTPCustomer(token, otpRequest)
+            requireCommonApiService().validateOTPCustomer(token, otpRequest)
         }
     }
 
@@ -120,7 +142,7 @@ class ExpressRepositoryImpl(
         orderId: String?,
     ): Flow<BaseResult<TransactionStatusResponse>> {
         return toResultFlow(networkHelper = networkHelper) {
-            (apiService as CommonApiService).statusOfTransaction(token, orderId)
+            requireCommonApiService().statusOfTransaction(token, orderId)
         }
     }
 
@@ -129,7 +151,7 @@ class ExpressRepositoryImpl(
         request: ExpressAddress
     ): Flow<BaseResult<ExpressAddressResponse>> {
         return toResultFlow(networkHelper = networkHelper) {
-            (apiService as ExpressApiService).graphQl("Bearer ${token?.trim()}", request)
+            requireExpressApiService().graphQl("Bearer ${token?.trim()}", request)
         }
     }
 
@@ -138,7 +160,7 @@ class ExpressRepositoryImpl(
         request: ExpressAddress
     ): Flow<BaseResult<ExpressAddressResponse>> {
         return toResultFlow(networkHelper = networkHelper) {
-            (apiService as ExpressApiService).addCustomerAddresses(
+            requireExpressApiService().addCustomerAddresses(
                 "Bearer ${token?.trim()}",
                 request
             )
@@ -150,7 +172,7 @@ class ExpressRepositoryImpl(
         request: CustomerInfo?
     ): Flow<BaseResult<CustomerInfo>> {
         return toResultFlow(networkHelper = networkHelper) {
-            (apiService as CommonApiService).createInactive(token, request)
+            requireCommonApiService().createInactive(token, request)
         }
     }
 
@@ -159,7 +181,7 @@ class ExpressRepositoryImpl(
         paymentData: ProcessPaymentRequest?
     ): Flow<BaseResult<OfferEligibilityResponse>> {
         return toResultFlow(networkHelper = networkHelper) {
-            (apiService as CommonApiService).validateOffer(token, paymentData)
+            requireCommonApiService().validateOffer(token, paymentData)
         }
     }
 
@@ -168,7 +190,7 @@ class ExpressRepositoryImpl(
         request: UpiOfferValidateRequest?
     ): Flow<BaseResult<OfferEligibilityResponse>> {
         return toResultFlow(networkHelper = networkHelper) {
-            (apiService as CommonApiService).validateOfferV2(token, request)
+            requireCommonApiService().validateOfferV2(token, request)
         }
     }
 
@@ -177,7 +199,7 @@ class ExpressRepositoryImpl(
         paymentData: ProcessPaymentRequest?
     ): Flow<BaseResult<KFSResponse>> {
         return toResultFlow(networkHelper = networkHelper) {
-            (apiService as CommonApiService).getKFS(token, paymentData)
+            requireCommonApiService().getKFS(token, paymentData)
         }
     }
 
@@ -186,7 +208,7 @@ class ExpressRepositoryImpl(
         request: OTPRequest?
     ): Flow<BaseResult<CustomerInfoResponse>> {
         return toResultFlow(networkHelper = networkHelper) {
-            (apiService as CommonApiService).validateUpdateOrder(token, request)
+            requireCommonApiService().validateUpdateOrder(token, request)
         }
     }
 
@@ -195,7 +217,7 @@ class ExpressRepositoryImpl(
         request: AddressRequest?
     ): Flow<BaseResult<AddressResponse>> {
         return toResultFlow(networkHelper = networkHelper) {
-            (apiService as CommonApiService).updateAddress(token, request)
+            requireCommonApiService().updateAddress(token, request)
         }
     }
 
@@ -204,7 +226,7 @@ class ExpressRepositoryImpl(
         request: List<LogData>?
     ): Flow<BaseResult<LogResponse>> {
         return toResultFlow(networkHelper = networkHelper) {
-            (apiService as CommonApiService).log(token, request)
+            requireCommonApiService().log(token, request)
         }
     }
 
@@ -213,7 +235,7 @@ class ExpressRepositoryImpl(
         request: CreateWalletRequest
     ): Flow<BaseResult<CreateWalletResponse>> {
         return toResultFlow(networkHelper = networkHelper) {
-            (apiService as CommonApiService).createWallet(token, request)
+            requireCommonApiService().createWallet(token, request)
         }
     }
 
@@ -222,7 +244,7 @@ class ExpressRepositoryImpl(
         cancelPayment: Boolean
     ): Flow<BaseResult<CancelTransactionResponse>> {
         return toResultFlow(networkHelper = networkHelper) {
-            (apiService as CommonApiService).cancelTransaction(token, cancelPayment)
+            requireCommonApiService().cancelTransaction(token, cancelPayment)
         }
     }
 
@@ -231,7 +253,7 @@ class ExpressRepositoryImpl(
         request: WalletAddMoneyRequest
     ): Flow<BaseResult<WalletAddMoneyResponse>> {
         return toResultFlow(networkHelper = networkHelper) {
-            (apiService as CommonApiService).addMoneyToWallet(token, request)
+            requireCommonApiService().addMoneyToWallet(token, request)
         }
     }
 
@@ -240,7 +262,7 @@ class ExpressRepositoryImpl(
         request: WalletValidateRequest
     ): Flow<BaseResult<WalletValidateResponse>> {
         return toResultFlow(networkHelper = networkHelper) {
-            (apiService as CommonApiService).validateWalletBalance(token, request)
+            requireCommonApiService().validateWalletBalance(token, request)
         }
     }
 
@@ -249,7 +271,7 @@ class ExpressRepositoryImpl(
         customerId: String,
     ): Flow<BaseResult<WalletResetOtpResponse>> {
         return toResultFlow(networkHelper = networkHelper) {
-            (apiService as CommonApiService).resetWalletOtp(
+            requireCommonApiService().resetWalletOtp(
                 customerId = customerId,
                 request = WalletResetOtpRequest(token = token),
             )
@@ -261,7 +283,7 @@ class ExpressRepositoryImpl(
         request: UpiFetchVpaRequest,
     ): Flow<BaseResult<UpiFetchVpaResponse>> {
         return toResultFlow(networkHelper = networkHelper) {
-            (apiService as CommonApiService).fetchUpiVpa(token, request)
+            requireCommonApiService().fetchUpiVpa(token, request)
         }
     }
 }

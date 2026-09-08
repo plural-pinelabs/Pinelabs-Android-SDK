@@ -20,6 +20,7 @@ import com.plural_pinelabs.expresscheckoutsdk.ExpressSDKObject
 import com.plural_pinelabs.expresscheckoutsdk.R
 import com.plural_pinelabs.expresscheckoutsdk.common.ItemClickListener
 import com.plural_pinelabs.expresscheckoutsdk.common.PaymentModes
+import com.plural_pinelabs.expresscheckoutsdk.common.safeNavigate
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils
 import com.plural_pinelabs.expresscheckoutsdk.data.model.OfferDetail
 import com.plural_pinelabs.expresscheckoutsdk.presentation.upi.resolveUpiOfferDetails
@@ -249,17 +250,19 @@ class OfferSummaryDialog : DialogFragment() {
     private fun proceedWithSelectedOffer(item: OfferDetail) {
         ExpressSDKObject.setSelectedOfferDetail(item)
         dismiss()
+        val navController = parentFragment?.findNavController() ?: findNavController()
         if (item.isInstantSaving) {
-            findNavController().navigate(R.id.action_paymentModeFragment_to_EMICardDetailsFragment)
+            navController.safeNavigate(R.id.action_paymentModeFragment_to_EMICardDetailsFragment)
         } else {
-            findNavController().navigate(R.id.action_paymentModeFragment_to_tenureSelectionFragment)
+            navController.safeNavigate(R.id.action_paymentModeFragment_to_tenureSelectionFragment)
         }
     }
 
     private fun proceedWithSelectedUpiOffer(item: OfferDetail) {
         ExpressSDKObject.setSelectedOfferDetail(item)
         dismiss()
-        findNavController().navigate(R.id.action_paymentModeFragment_to_UPIFragment)
+        val navController = parentFragment?.findNavController() ?: findNavController()
+        navController.safeNavigate(R.id.action_paymentModeFragment_to_UPIFragment)
     }
 
     override fun onDestroyView() {
@@ -284,9 +287,14 @@ class OfferSummaryDialog : DialogFragment() {
         val offersList: ArrayList<OfferDetail> = arrayListOf()
         val offerDetails = emiPaymentModeData?.offerDetails
         offerDetails?.forEach { offerDetail ->
-            offerDetail.offerTitle =
-                Utils.getTitleForEMI(requireContext(), offerDetail.issuer) + " EMI"
-            offersList.add(offerDetail)
+            val regularTenures = offerDetail.tenureOffers
+                ?.filterNot { it.tenureId == "7" }
+                .orEmpty()
+            if (regularTenures.isNotEmpty()) {
+                offerDetail.offerTitle =
+                    Utils.getTitleForEMI(requireContext(), offerDetail.issuer) + " EMI"
+                offersList.add(offerDetail)
+            }
             val cashbackTenure = offerDetail.tenureOffers?.find { it.tenureId == "7" }
             if (cashbackTenure != null) {
                 val cashBackOfferDetail = offerDetail.copy()

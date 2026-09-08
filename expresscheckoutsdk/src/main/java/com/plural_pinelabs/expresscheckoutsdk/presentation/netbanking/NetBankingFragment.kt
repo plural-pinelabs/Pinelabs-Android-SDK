@@ -532,17 +532,17 @@ class NetBankingFragment : Fragment() {
             null, null, null, null, null
         )
         val extras = Extra(
-            paymentMode,
-            amount/*655925*/,
-            currency,
-            null,
-            null,
-            mobileNumber,
-            txnMode,
-            deviceInfo,
-            null,
-            null,
-            Utils.createSDKData(requireActivity())
+            payment_mode = paymentMode,
+            payment_amount = amount,
+            payment_currency = currency,
+            card_last4 = null,
+            redeemable_amount = null,
+            registered_mobile_number = mobileNumber,
+            txn_mode = txnMode,
+            device_info = deviceInfo,
+            risk_validation_details = null,
+            dcc_status = null,
+            sdk_data = Utils.createSDKData(requireActivity())
         )
         val processPaymentRequest =
             ProcessPaymentRequest(

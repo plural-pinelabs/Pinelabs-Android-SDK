@@ -49,6 +49,7 @@ import com.plural_pinelabs.expresscheckoutsdk.data.model.FetchResponseDTO
 import com.plural_pinelabs.expresscheckoutsdk.data.model.OTPRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ProcessPaymentRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ProcessPaymentResponse
+import com.plural_pinelabs.expresscheckoutsdk.data.model.WalletAddMoneyLocationInfo
 import com.plural_pinelabs.expresscheckoutsdk.presentation.LandingActivity
 import kotlinx.coroutines.launch
 import java.util.Calendar
@@ -723,6 +724,7 @@ class CardFragment : Fragment() {
         }
         var amount = ExpressSDKObject.getAmount()
         val currency = paymentData?.originalTxnAmount?.currency
+        val resolvedOrderId = ExpressSDKObject.getFetchData()?.transactionInfo?.orderId
 
 
         val paymentMode = arrayListOf<String>()
@@ -766,6 +768,8 @@ class CardFragment : Fragment() {
                 paymentMode,
                 amount,
                 currency,
+                null,
+                null,
                 last4,
                 null, //TODO redeemableAmount pass this from reward points api
                 null,
@@ -773,7 +777,14 @@ class CardFragment : Fragment() {
                 deviceInfo,
                 null,
                 null,// dccstatus pass this from dcc api call
-                Utils.createSDKData(requireActivity())
+                Utils.createSDKData(requireActivity()),
+                order_amount = null,
+                language = null,
+                is_final_part_payment = true,
+                location_info = WalletAddMoneyLocationInfo(),
+                order_currency = null,
+                customer = null,
+                order_id = resolvedOrderId,
             )
         val cardData =
             CardData(

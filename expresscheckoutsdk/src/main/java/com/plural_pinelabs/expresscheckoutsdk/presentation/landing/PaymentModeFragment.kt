@@ -100,6 +100,7 @@ import com.plural_pinelabs.expresscheckoutsdk.data.model.WalletAddMoneyResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.WalletResetOtpResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.WalletValidateRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.model.WalletValidateResponse
+import com.plural_pinelabs.expresscheckoutsdk.logger.Last9RumManager
 import com.plural_pinelabs.expresscheckoutsdk.presentation.LandingActivity
 import com.plural_pinelabs.expresscheckoutsdk.presentation.card.CardFragmentViewModel
 import com.plural_pinelabs.expresscheckoutsdk.presentation.offers.OfferSummaryDialog
@@ -161,12 +162,16 @@ class PaymentModeFragment : Fragment() {
     private lateinit var recommendedUPIVPAParentLayout: LinearLayout
     private lateinit var recommendedUPIVPATextview: TextView
     private lateinit var bankLogoName: ImageView
+    private lateinit var bankNameText: TextView
     private lateinit var offerType: TextView
     private lateinit var emiDiscount: TextView
     private lateinit var bankOffer: TextView
     private lateinit var perMonthEmi: TextView
     private lateinit var emiDuration: TextView
     private lateinit var totalPayable: TextView
+    private lateinit var emiDiscountGroup: LinearLayout
+    private lateinit var bankOfferGroup: LinearLayout
+    private lateinit var totalPayableGroup: LinearLayout
     private lateinit var actionBtn: TextView
     private lateinit var upiVPACheck: CheckBox
     private lateinit var payByUPIVPABtn: TextView
@@ -215,6 +220,7 @@ class PaymentModeFragment : Fragment() {
     private var hasObservedPaymentResult = false
 
     private companion object {
+        const val LAST9_SCREEN = "payment_mode_fragment"
         const val BRAND_WALLET_PIN_LENGTH = 6
         const val BRAND_WALLET_PIN_RESEND_SECONDS = 120
         const val BRAND_WALLET_REDEEM_TIMEOUT_MS = 60_000L
@@ -266,6 +272,7 @@ class PaymentModeFragment : Fragment() {
     }
 
     override fun onDestroyView() {
+        Last9RumManager.trace(screen = LAST9_SCREEN, event = "fragment_view_destroyed")
         hasObservedPaymentResult = false
         brandWalletReadyDismissJob?.cancel()
         brandWalletReadyDismissJob = null
@@ -290,6 +297,17 @@ class PaymentModeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        val fetchData = ExpressSDKObject.getFetchData()
+        Last9RumManager.trace(
+            screen = LAST9_SCREEN,
+            event = "fragment_view_created",
+            attributes = mapOf(
+                "express.order_id" to (fetchData?.transactionInfo?.orderId ?: ""),
+                "express.available_modes" to getPaymentModeArray(),
+                "express.has_saved_cards" to (!fetchData?.customerInfo?.tokens.isNullOrEmpty()).toString(),
+                "express.customer_mobile_present" to (!fetchData?.customerInfo?.mobileNo.isNullOrBlank()).toString()
+            )
+        )
         restoreBrandWalletSavedState(savedInstanceState)
         requireActivity().onBackPressedDispatcher.addCallback(
             viewLifecycleOwner,
@@ -485,10 +503,14 @@ class PaymentModeFragment : Fragment() {
         recommendedUPIVPAParentLayout = view.findViewById(R.id.upi_vpa_parent_layout)
         recommendedParentLayout = view.findViewById(R.id.parent_recommended_card_item_cl)
         bankLogoName = view.findViewById(R.id.bank_logo)
+        bankNameText = view.findViewById(R.id.bank_name)
         offerType = view.findViewById(R.id.offer_type)
         emiDiscount = view.findViewById(R.id.emi_discount_value)
         bankOffer = view.findViewById(R.id.bank_offer_value)
         totalPayable = view.findViewById(R.id.total_payable_value)
+        emiDiscountGroup = view.findViewById(R.id.emi_discount_group)
+        bankOfferGroup = view.findViewById(R.id.bank_offer_group)
+        totalPayableGroup = view.findViewById(R.id.total_payable_group)
         perMonthEmi = view.findViewById(R.id.emi_per_month_value)
         emiDuration = view.findViewById(R.id.emi_per_x_month)
         actionBtn = view.findViewById(R.id.action_btn)
@@ -780,10 +802,19 @@ class PaymentModeFragment : Fragment() {
         bindBrandWalletCard()
         val paymentModes = getPaymentModes().orEmpty()
         if (paymentModes.isEmpty()) {
+            Last9RumManager.trace(screen = LAST9_SCREEN, event = "payment_modes_empty")
             paymentOptionCard.visibility = View.GONE
             paymentModeRecyclerView.visibility = View.GONE
             return
         }
+        Last9RumManager.trace(
+            screen = LAST9_SCREEN,
+            event = "payment_modes_bound",
+            attributes = mapOf(
+                "express.mode_count" to paymentModes.size.toString(),
+                "express.available_modes" to paymentModes.joinToString(",") { it.paymentModeId }
+            )
+        )
         paymentOptionCard.visibility = View.VISIBLE
         paymentModeRecyclerView.visibility = View.VISIBLE
         val adapter =
@@ -2063,6 +2094,15 @@ class PaymentModeFragment : Fragment() {
     private fun getPaymentModeSelectionCallback(context: Context): ItemClickListener<PaymentMode>? {
         return object : ItemClickListener<PaymentMode> {
             override fun onItemClick(position: Int, item: PaymentMode) {
+                Last9RumManager.trace(
+                    screen = LAST9_SCREEN,
+                    event = "payment_mode_selected",
+                    attributes = mapOf(
+                        "express.position" to position.toString(),
+                        "express.payment_mode_id" to item.paymentModeId,
+                        "express.payment_mode_label" to item.paymentModeId
+                    )
+                )
                 when (item.paymentModeId) {
                     PaymentModes.CREDIT_DEBIT.paymentModeID -> {
                         safeNavigate(R.id.action_paymentModeFragment_to_cardFragment)
@@ -2469,6 +2509,13 @@ class PaymentModeFragment : Fragment() {
     }
 
     private fun showOffers() {
+        Last9RumManager.trace(
+            screen = LAST9_SCREEN,
+            event = "offers_opened",
+            attributes = mapOf(
+                "express.offer_count" to (ExpressSDKObject.getEMIPaymentModeData()?.offerDetails?.size?.toString() ?: "0")
+            )
+        )
         val topFragment = OfferSummaryDialog.newInstance()
         topFragment.show(requireActivity().supportFragmentManager, "TopSheetDialogFragment")
 
@@ -2507,14 +2554,19 @@ class PaymentModeFragment : Fragment() {
 
             //TODO this could be null handle that case
             getBankLogo(item.name)?.let { bankLogoName.setImageResource(it) }
+            bankNameText.text = item.issuer?.display_name ?: item.name
             offerType.text = getEMITypeLabel(item.tenureOffers?.firstOrNull()?.emiType)
+            val discountAmount = item.tenureOffers?.firstOrNull()?.discountAmount ?: 0
+            val cashbackAmount = item.tenureOffers?.firstOrNull()?.cashbackAmount ?: 0
+            emiDiscountGroup.visibility = if (discountAmount > 0) View.VISIBLE else View.GONE
+            bankOfferGroup.visibility = if (cashbackAmount > 0) View.VISIBLE else View.GONE
             emiDiscount.text = Utils.convertToRupeesWithSymobl(
                 requireContext(),
-                item.tenureOffers?.firstOrNull()?.discountAmount ?: 0
+                discountAmount
             )
             bankOffer.text = Utils.convertToRupeesWithSymobl(
                 requireContext(),
-                item.tenureOffers?.firstOrNull()?.cashbackAmount ?: 0
+                cashbackAmount
             )
             val fullTenure = item.tenureOffers?.firstOrNull()?.fullTenure
                 ?: ExpressSDKObject.getEMIPaymentModeData()?.issuers?.find { it.id == item.issuerId }?.tenures?.find { it.tenure_id == item.tenureOffers?.firstOrNull()?.tenureId }
@@ -2524,16 +2576,23 @@ class PaymentModeFragment : Fragment() {
             )
             if (item.tenureOffers?.firstOrNull()?.tenureId == "7") {
                 emiDuration.visibility = View.GONE
-                totalPayable.visibility = View.GONE
+            } else {
+                emiDuration.visibility = View.VISIBLE
             }
             emiDuration.text = String.format(
                 requireContext().getString(R.string.for_x_months),
                 fullTenure?.tenure_value.toString()
             )
+            val totalPayableAmount = if (item.tenureOffers?.firstOrNull()?.tenureId == "7") {
+                fullTenure?.net_payment_amount?.value ?: fullTenure?.loan_amount?.value ?: 0
+            } else {
+                fullTenure?.loan_amount?.value ?: 0
+            }
+            totalPayableGroup.visibility = if (totalPayableAmount > 0) View.VISIBLE else View.GONE
             totalPayable.text = Utils.convertToRupeesWithSymobl(
                 requireContext(),
-                fullTenure?.loan_amount?.value ?: 0
-            ) + "/month"
+                totalPayableAmount
+            ) + if (item.tenureOffers?.firstOrNull()?.tenureId == "7") "" else "/month"
             handleRecommendedOptionClick(item)
         } else
             recommendedParentLayout.visibility = View.GONE
