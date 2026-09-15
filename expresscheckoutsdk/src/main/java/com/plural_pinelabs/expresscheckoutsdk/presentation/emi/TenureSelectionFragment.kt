@@ -65,7 +65,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import okhttp3.internal.closeQuietly
 import java.io.BufferedInputStream
 import java.io.File
 import java.io.FileOutputStream
@@ -95,9 +94,9 @@ class TenureSelectionFragment : Fragment() {
     private var bottomSheetDialog: BottomSheetDialog? = null
 
     private var pageIndex = 0
-    private lateinit var pdfRenderer: PdfRenderer
-    private lateinit var currentPage: PdfRenderer.Page
-    private lateinit var parcelFileDescriptor: ParcelFileDescriptor
+    private var pdfRenderer: PdfRenderer? = null
+    private var currentPage: PdfRenderer.Page? = null
+    private var parcelFileDescriptor: ParcelFileDescriptor? = null
 
     private lateinit var viewModel: TenureSelectionViewModel
     private var isFromOfferDetails: Boolean = false
@@ -355,17 +354,17 @@ class TenureSelectionFragment : Fragment() {
         )
 
         val cardDataExtra = Extra(
-            paymentMode,
-            amount,
-            currency,
-            null,
-            null, //TODO redeemableAmount pass this from reward points api
-            null,
-            null,
-            deviceInfo,
-            null,
-            null,// dccstatus pass this from dcc api call
-            Utils.createSDKData(requireActivity()),
+            payment_mode = paymentMode,
+            payment_amount = amount,
+            payment_currency = currency,
+            card_last4 = null,
+            redeemable_amount = null,
+            registered_mobile_number = null,
+            txn_mode = null,
+            device_info = deviceInfo,
+            risk_validation_details = null,
+            dcc_status = null,
+            sdk_data = Utils.createSDKData(requireActivity()),
             order_amount = ExpressSDKObject.getAmount(),
             language = "ENGLISH"
         )
@@ -458,9 +457,11 @@ class TenureSelectionFragment : Fragment() {
 
     private fun openPdfRenderer(file: File) {
         try {
+            closePdfRenderer()
             parcelFileDescriptor =
                 ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY)
-            pdfRenderer = PdfRenderer(parcelFileDescriptor)
+            pdfRenderer = PdfRenderer(parcelFileDescriptor!!)
+            pageIndex = 0
         } catch (e: Exception) {
             e.printStackTrace()
             //TODO error loading pdf
@@ -469,22 +470,33 @@ class TenureSelectionFragment : Fragment() {
 
     @SuppressLint("UseKtx")
     private fun showPage(index: Int, imageView: ImageView) {
-        // Close previous page if initialized
-        if (::currentPage.isInitialized) {
-            currentPage.close()
-        }
+        val renderer = pdfRenderer ?: return
+
+        currentPage?.runCatching { close() }
+        currentPage = null
 
         // Open and render new page
-        currentPage = pdfRenderer.openPage(index)
+        currentPage = renderer.openPage(index)
+
+        val page = currentPage ?: return
 
         val bitmap = Bitmap.createBitmap(
-            currentPage.width,
-            currentPage.height,
+            page.width,
+            page.height,
             Bitmap.Config.ARGB_8888
         )
-        currentPage.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
+        page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
 
         imageView.setImageBitmap(bitmap)
+    }
+
+    private fun closePdfRenderer() {
+        currentPage?.runCatching { close() }
+        currentPage = null
+        pdfRenderer?.runCatching { close() }
+        pdfRenderer = null
+        parcelFileDescriptor?.runCatching { close() }
+        parcelFileDescriptor = null
     }
 
     @SuppressLint("InflateParams")
@@ -575,10 +587,11 @@ class TenureSelectionFragment : Fragment() {
         }
 
         nextPage.setOnClickListener {
-            if (pageIndex < pdfRenderer.pageCount - 1) {
+            val pageCount = pdfRenderer?.pageCount ?: 0
+            if (pageIndex < pageCount - 1) {
                 showPage(++pageIndex, kfsImageView)
             }
-            if (pageIndex == pdfRenderer.pageCount - 1) {
+            if (pageCount > 0 && pageIndex == pageCount - 1) {
                 consentCheckBox.isEnabled = true
             }
         }
@@ -615,20 +628,10 @@ class TenureSelectionFragment : Fragment() {
             errorLayout.visibility = View.GONE
         }
 
-        bottomSheetDialog?.show() // Show the dialog first
         bottomSheetDialog?.setOnDismissListener {
-
-            try {
-                if (::pdfRenderer.isInitialized) {
-                    currentPage.close()
-                    pdfRenderer.close()
-                    parcelFileDescriptor
-                    parcelFileDescriptor.closeQuietly()
-                }
-            } catch (_: Exception) {
-                // TODO do nothing
-            }
+            closePdfRenderer()
         }
+        bottomSheetDialog?.show()
     }
 
 

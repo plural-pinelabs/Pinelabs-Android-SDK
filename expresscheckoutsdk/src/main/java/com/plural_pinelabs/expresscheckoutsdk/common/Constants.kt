@@ -38,7 +38,7 @@ internal object Constants {
     const val SDK_TYPE = "ANDROID"
     const val PLATFORM_TYPE = "NATIVE_MOBILE"
     const val OS = "Android"
-    const val PLATFORM_VERSION = "v3"
+    const val PLATFORM_VERSION = "v31"
     const val APP_VERSION = "1.0"
 
     const val IMAGE_LOGO = BASE_ANIMATION + "logo_shimmer.json"

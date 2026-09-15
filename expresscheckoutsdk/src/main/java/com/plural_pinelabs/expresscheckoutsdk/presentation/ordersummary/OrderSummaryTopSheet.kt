@@ -59,6 +59,7 @@ class TopSheetDialogFragment : DialogFragment() {
         closeButton.setOnClickListener {
             dismiss()
         }
+
         val data = ExpressSDKObject.getFetchData()
         val cartItems = data?.cartDetails?.cart_items
         if (cartItems.isNullOrEmpty()) {
