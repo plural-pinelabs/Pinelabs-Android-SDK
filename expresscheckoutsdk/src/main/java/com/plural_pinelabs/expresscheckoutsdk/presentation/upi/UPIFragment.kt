@@ -122,6 +122,7 @@ class UPIFragment : Fragment() {
     private var upiIcbStatusBottomSheetDialog: BottomSheetDialog? = null
     private var upiIcbStatusFetchJob: Job? = null
     private var selectUPIPackage: String? = null
+    private var usertappedapp: String? = null
     private var upiIcbStatusMobileOverride: String? = null
     private var flowMode: String? = null
     private var allInstalledUpiApps: List<String> = emptyList()
@@ -366,6 +367,7 @@ class UPIFragment : Fragment() {
 
             if (shouldIgnoreRapidUpiCtaClick()) return@setOnClickListener
             isQRPayment = false
+            usertappedapp = "upi intent"
             payAction(UPI_INTENT)
         }
         view.findViewById<ImageView>(R.id.back_button).setOnClickListener {
@@ -388,6 +390,7 @@ class UPIFragment : Fragment() {
         payByQRButton.setOnClickListener {
             if (shouldIgnoreRapidUpiCtaClick()) return@setOnClickListener
             isQRPayment = true
+            usertappedapp = "upi qr"
             payAction(UPI_INTENT_QR)
         }
     }
@@ -879,6 +882,7 @@ class UPIFragment : Fragment() {
         resolvedMobile: String?,
     ) {
         selectUPIPackage = targetPackage?.takeIf { isAppUpiReady(it) }
+        usertappedapp = "vpa"
 
         viewLifecycleOwner.lifecycleScope.launch {
             if (!isAdded) return@launch
@@ -1388,8 +1392,22 @@ class UPIFragment : Fragment() {
                     return
                 }
                 selectUPIPackage = item
+                usertappedapp = resolveTappedUpiAppName(item)
                 payAction(UPI_INTENT)
             }
+        }
+    }
+
+    private fun resolveTappedUpiAppName(packageName: String): String {
+        return when (packageName.trim().lowercase()) {
+            GPAY -> "google pay"
+            PHONEPE -> "phone pe"
+            PAYTM -> "paytm"
+            BHIM_UPI -> "bhim upi"
+            CRED_UPI -> "cred"
+            NAVI_UPI -> "navi"
+            SUPERMONEY_UPI -> "supermoney"
+            else -> packageName.substringAfterLast('.')
         }
     }
 
@@ -1551,7 +1569,7 @@ class UPIFragment : Fragment() {
             device_info = null,
             risk_validation_details = null,
             dcc_status = null,
-            sdk_data = Utils.createSDKData(requireActivity()),
+                sdk_data = Utils.createSDKData(requireActivity(), usertappedapp),
             order_amount = orderAmount,
             is_final_part_payment = true,
             location_info = WalletAddMoneyLocationInfo(),

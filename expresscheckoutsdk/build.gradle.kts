@@ -17,6 +17,26 @@ android {
         minSdk = 26
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
+        buildConfigField(
+            "String",
+            "LAST9_BASE_URL",
+            "\"https://otlp.last9.io\""
+        )
+        buildConfigField(
+            "String",
+            "LAST9_ORIGIN",
+            "\"android_sdk\""
+        )
+        buildConfigField(
+            "String",
+            "LAST9_FLOW_NAME",
+            "\"express-checkout\""
+        )
+        buildConfigField(
+            "String",
+            "LAST9_CLIENT_TOKEN",
+            "\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJsYXN0OS5pbyIsImF1ZCI6WyJhcHAubGFzdDkuaW8iXSwiZXhwIjoyMTAxODgwMDQzLCJuYmYiOjE3ODY1MjAwNDMsImlhdCI6MTc4NjUyMDA0MywianRpIjoiOTI5ZmI1MzUtMmRkYS00YWVjLTgxNzQtMWE2YzMyNTBiMTE0Iiwic2NvcGVzIjpbIndyaXRlIl0sImtpbmQiOiJjbGllbnRfdG9rZW4iLCJlbWFpbCI6InJhaHVsLm1lZW5hQHBpbmVsYWJzLmNvbSIsIm9yZ2FuaXphdGlvbl9zbHVnIjoicGluZWxhYnMiLCJ0b2tlbl9pZCI6Ijg4YzlkYjAwLTMyMzQtNDcwYi05OTUwLWU5Mzc0ZDI2YjVjMyIsInByb3BlcnRpZXMiOnsib3JpZ2lucyI6WyJhbmRyb2lkOi8vY29tLnBsdXJhbF9waW5lbGFicy5uYXRpdmVfZXhwcmVzc19zZGsiXSwib3RscF91c2VybmFtZSI6InBpbmVsYWJzIiwicmVnaW9uIjoiYXAtc291dGgtMSIsInJlc291cmNlX3R5cGUiOiJjbGllbnRfbW9uaXRvcmluZyJ9fQ.wAlLO3I6ljNDndi9x2ajJBEHhqk9LOwrUGGnqZqaXog\""
+        )
 
         buildConfigField(
             "String",

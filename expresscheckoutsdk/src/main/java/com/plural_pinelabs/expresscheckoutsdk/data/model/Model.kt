@@ -591,6 +591,8 @@ data class Extra(
     val payment_mode: List<String>?,
     var payment_amount: Int?,
     var payment_currency: String?,
+    val base_amount: Int? = null,
+    val base_currency: String? = null,
     val card_last4: String?,
     val redeemable_amount: Int?,
     val registered_mobile_number: String?,
@@ -601,7 +603,7 @@ data class Extra(
     val sdk_data: SDKData? = null,
     val order_amount: Int? = null,
     val language: String? = null,
-    val is_final_part_payment: Boolean? = null,
+    val is_final_part_payment: Boolean? = true,
     val location_info: WalletAddMoneyLocationInfo? = null,
     val order_currency: String? = null,
     val customer: CustomerInfo? = null,
@@ -863,7 +865,8 @@ data class SavedCardDataObject(
     val last4Digit: String,
     val networkName: String,
     val issuerName: String,
-    val cvvRequired: Boolean
+    val cvvRequired: Boolean,
+    val international: Boolean = false,
 ) : Parcelable
 
 @Parcelize
@@ -886,7 +889,8 @@ data class SDKData(
     /*val browser_name: String?,
     val browser_version: String?,*/
     val timestamp: String?,
-    val version: String
+    val version: String,
+    val upi_name : String?,
 ) : Parcelable
 
 

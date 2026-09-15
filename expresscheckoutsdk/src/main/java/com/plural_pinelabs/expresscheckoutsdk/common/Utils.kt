@@ -415,7 +415,7 @@ internal object Utils {
     }
 
 
-    fun createSDKData(context: Context): SDKData {
+    fun createSDKData(context: Context, upiName: String? =null): SDKData {
         return SDKData(
             TRANSACTION_TYPE_SDK,
             SDK_TYPE,
@@ -428,7 +428,8 @@ internal object Utils {
             OS,
             Build.VERSION.SDK,
             System.currentTimeMillis().toString(),
-            PLATFORM_VERSION
+            PLATFORM_VERSION,
+            upiName
         )
     }
 
@@ -963,8 +964,9 @@ internal object Utils {
     }
 
     fun applyDynamicPrimaryButtonBackgrounds(root: View) {
-        val primaryButtonState = AppCompatResources.getDrawable(root.context, R.drawable.primary_button_background)
-            ?.constantState
+        val primaryButtonState =
+            AppCompatResources.getDrawable(root.context, R.drawable.primary_button_background)
+                ?.constantState
         if (primaryButtonState == null) return
 
         fun applyIfNeeded(target: View) {

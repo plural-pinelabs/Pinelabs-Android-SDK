@@ -24,6 +24,21 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
+            android:id="@+id/bank_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:ellipsize="end"
+            android:fontFamily="sans-serif-medium"
+            android:maxLines="1"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/bank_logo"
+            tools:text="MASTERCARD" />
+
+        <TextView
             android:id="@+id/offer_type"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -39,16 +54,17 @@
             android:id="@+id/values_ll"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="40dp"
+            android:layout_marginTop="16dp"
             android:orientation="horizontal"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/bank_logo">
+            app:layout_constraintTop_toBottomOf="@id/bank_name">
 
             <LinearLayout
+                android:id="@+id/emi_discount_group"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:gravity="center"
+                android:gravity="start"
                 android:orientation="vertical">
 
                 <TextView
@@ -70,10 +86,11 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/bank_offer_group"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:gravity="center"
+                android:gravity="start"
                 android:orientation="vertical">
 
                 <TextView
@@ -95,11 +112,12 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/total_payable_group"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_weight="1"
-                android:gravity="center"
+                android:gravity="start"
                 android:orientation="vertical">
 
                 <TextView
@@ -155,20 +173,19 @@
             android:id="@+id/action_btn"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="18dp"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="16dp"
             android:background="@drawable/input_field_border"
             android:drawableEnd="@drawable/ic_chevron_white"
             android:drawablePadding="8dp"
             android:drawableTint="@color/black_text_80"
+            android:gravity="center_vertical"
             android:paddingVertical="12dp"
             android:paddingStart="24dp"
             android:paddingEnd="16dp"
             android:text="Continue to pay"
-            app:flow_horizontalAlign="end"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/emi_per_x_month"
-            app:layout_constraintTop_toBottomOf="@id/values_ll" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/emi_per_x_month" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>

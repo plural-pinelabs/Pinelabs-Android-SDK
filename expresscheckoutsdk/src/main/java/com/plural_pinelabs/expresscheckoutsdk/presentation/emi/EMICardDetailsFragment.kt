@@ -687,17 +687,17 @@ class EMICardDetailsFragment : Fragment() {
         )
 
         val cardDataExtra = Extra(
-            paymentMode,
-            amount,
-            currency,
-            last4,
-            null, //TODO redeemableAmount pass this from reward points api
-            null,
-            null,
-            deviceInfo,
-            null,
-            null,// dccstatus pass this from dcc api call
-            Utils.createSDKData(requireActivity()),
+            payment_mode = paymentMode,
+            payment_amount = amount,
+            payment_currency = currency,
+            card_last4 = last4,
+            redeemable_amount = null,
+            registered_mobile_number = null,
+            txn_mode = null,
+            device_info = deviceInfo,
+            risk_validation_details = null,
+            dcc_status = null,
+            sdk_data = Utils.createSDKData(requireActivity()),
             order_amount = ExpressSDKObject.getAmount()
         )
         val cardData = CardData(

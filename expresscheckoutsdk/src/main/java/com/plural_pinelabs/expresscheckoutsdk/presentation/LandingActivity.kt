@@ -34,12 +34,18 @@ import com.plural_pinelabs.expresscheckoutsdk.data.model.CustomerInfo
 import com.plural_pinelabs.expresscheckoutsdk.data.model.FetchResponseDTO
 import com.plural_pinelabs.expresscheckoutsdk.data.repository.ExpressRepositoryImpl
 import com.plural_pinelabs.expresscheckoutsdk.data.retrofit.RetrofitBuilder
+import com.plural_pinelabs.expresscheckoutsdk.logger.Last9RumManager
 import com.plural_pinelabs.expresscheckoutsdk.logger.SdkLogger
 import com.plural_pinelabs.expresscheckoutsdk.presentation.ordersummary.TopSheetDialogFragment
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeout
 
 class LandingActivity : AppCompatActivity() {
+    private companion object {
+        const val LAST9_SCREEN = "landing_activity"
+        const val TAG = "LandingActivity"
+    }
+
     private val dynamicThemeLifecycleCallback = object : FragmentManager.FragmentLifecycleCallbacks() {
         override fun onFragmentViewCreated(
             fm: FragmentManager,
@@ -79,6 +85,18 @@ class LandingActivity : AppCompatActivity() {
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        val fetchData = ExpressSDKObject.getFetchData()
+        Last9RumManager.trace(
+            screen = LAST9_SCREEN,
+            event = "activity_created",
+            attributes = mapOf(
+                "express.order_id" to (fetchData?.transactionInfo?.orderId ?: ""),
+                "express.amount" to ExpressSDKObject.getAmount().toString(),
+                "express.currency" to ExpressSDKObject.getCurrency(),
+                "express.customer_id_present" to (!fetchData?.customerInfo?.customerId.isNullOrBlank()).toString()
+            )
+        )
+        Log.i(TAG, "LandingActivity created for order=${fetchData?.transactionInfo?.orderId.orEmpty()}")
           SdkLogger.log(
             this,
             "SDK_LAUNCH",
@@ -102,6 +120,7 @@ class LandingActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         supportFragmentManager.unregisterFragmentLifecycleCallbacks(dynamicThemeLifecycleCallback)
+        Last9RumManager.trace(screen = LAST9_SCREEN, event = "activity_destroyed")
         super.onDestroy()
     }
 
@@ -117,6 +136,11 @@ class LandingActivity : AppCompatActivity() {
 
     fun showHideHeaderLayout(isShow: Boolean) {
         val headerLayout = findViewById<View>(R.id.header_layout)
+        Last9RumManager.trace(
+            screen = LAST9_SCREEN,
+            event = "header_visibility_changed",
+            attributes = mapOf("express.header_visible" to isShow.toString())
+        )
         SdkLogger.log(
             this,
             "HEADER_VISIBILITY",
@@ -148,6 +172,13 @@ class LandingActivity : AppCompatActivity() {
         showHideHeaderLayout(false)
         mainContentLayout = findViewById(R.id.main)
         cancelBtn.setOnClickListener {
+            Last9RumManager.trace(
+                screen = LAST9_SCREEN,
+                event = "cancel_clicked",
+                attributes = mapOf(
+                    "express.order_id" to (ExpressSDKObject.getFetchData()?.transactionInfo?.orderId ?: "")
+                )
+            )
             SdkLogger.log(
                 this,
                 "PAYMENT_CANCEL_INITIATED",
@@ -169,6 +200,13 @@ class LandingActivity : AppCompatActivity() {
         }
 
         orderSummary.setOnClickListener {
+            Last9RumManager.trace(
+                screen = LAST9_SCREEN,
+                event = "order_summary_clicked",
+                attributes = mapOf(
+                    "express.order_id" to (ExpressSDKObject.getFetchData()?.transactionInfo?.orderId ?: "")
+                )
+            )
             SdkLogger.log(
                 this,
                 "ORDER_SUMMARY_CLICKED",
@@ -235,7 +273,7 @@ class LandingActivity : AppCompatActivity() {
                 runBlocking {
                     withTimeout(3000) {
                         val repo = ExpressRepositoryImpl(
-                            RetrofitBuilder.fetchApiService,
+                            RetrofitBuilder.commonApiService,
                             NetworkHelper(applicationContext)
                         )
                         val logs = Utils.getUnSyncedErrors(applicationContext)
