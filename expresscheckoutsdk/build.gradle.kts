@@ -124,7 +124,6 @@ dependencies {
     implementation("com.facebook.shimmer:shimmer:0.5.0")
     implementation("io.coil-kt:coil:2.4.0")
     implementation("io.coil-kt:coil-svg:2.4.0")
-    implementation("io.last9:rum-android:1.1.7")
 
     // -------------------------------------------------
     // Coroutines
