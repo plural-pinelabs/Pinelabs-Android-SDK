@@ -65,6 +65,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import okhttp3.internal.closeQuietly
 import java.io.BufferedInputStream
 import java.io.File
 import java.io.FileOutputStream
@@ -493,8 +494,10 @@ class TenureSelectionFragment : Fragment() {
     private fun closePdfRenderer() {
         currentPage?.runCatching { close() }
         currentPage = null
+
         pdfRenderer?.runCatching { close() }
         pdfRenderer = null
+
         parcelFileDescriptor?.runCatching { close() }
         parcelFileDescriptor = null
     }
@@ -628,10 +631,10 @@ class TenureSelectionFragment : Fragment() {
             errorLayout.visibility = View.GONE
         }
 
+        bottomSheetDialog?.show() // Show the dialog first
         bottomSheetDialog?.setOnDismissListener {
             closePdfRenderer()
         }
-        bottomSheetDialog?.show()
     }
 
 

@@ -88,6 +88,7 @@ object RetrofitBuilder {
 
         val certificatePinner_PROD = CertificatePinner.Builder()
             .add(BASE_URL_PROD, sha256PROD)
+            .add(BASE_URL_PROD, "sha256/" + BuildConfig.SHA256_PROD_BACKUP)
             .build()
 
         val clientBuilder = OkHttpClient.Builder()
