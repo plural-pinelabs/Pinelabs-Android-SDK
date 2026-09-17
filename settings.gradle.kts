@@ -16,6 +16,7 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        maven("https://cdn.last9.io/rum-sdk/android/maven/")
     }
 }
 
