@@ -95,6 +95,7 @@ import com.plural_pinelabs.expresscheckoutsdk.data.model.UpiTransactionData
 import com.plural_pinelabs.expresscheckoutsdk.data.model.WalletAddMoneyLocationInfo
 import com.plural_pinelabs.expresscheckoutsdk.data.model.WalletDetails
 import com.plural_pinelabs.expresscheckoutsdk.data.model.WalletResetOtpResponse
+import com.plural_pinelabs.expresscheckoutsdk.logger.SdkLogger
 import com.plural_pinelabs.expresscheckoutsdk.presentation.LandingActivity
 import com.plural_pinelabs.expresscheckoutsdk.presentation.offers.OfferSummaryDialog
 import kotlinx.coroutines.Job
@@ -192,21 +193,20 @@ class UPIFragment : Fragment() {
         transactionLauncher = registerForActivityResult(
             ActivityResultContracts.StartActivityForResult()
         ) { result ->
-            if (result.resultCode == 0) {
-                // If the result is not OK, cancel the transaction process
-                cancelTransactionProcess()
+            // UPI apps do not consistently call setResult(). A completed payment can therefore
+            // return RESULT_CANCELED. Never derive payment state from this result code; inquiry is
+            // the source of truth.
+            logUpiFlowEvent(
+                event = "UPI_APP_RETURNED",
+                message = "UPI app returned with activity result code=${result.resultCode}"
+            )
+            if (!viewModel.isUpiPaymentInProgress) {
                 return@registerForActivityResult
             }
-            if (flowMode.equals(BRAND_WALLET_ID, true)) {
-                if (bottomTimerSheetDialog?.isShowing != true) {
-                    showProcessPaymentTimerDialog()
-                    viewModel.startCountDownTimer()
-                }
-                return@registerForActivityResult
+            if (bottomTimerSheetDialog?.isShowing != true) {
+                showProcessPaymentTimerDialog()
             }
-            showProcessPaymentTimerDialog()
-            viewModel.startCountDownTimer()
-            viewModel.startPolling()
+            viewModel.ensurePaymentMonitoring()
         }
         flowMode = arguments?.getString("MODE", null) ?: ExpressSDKObject.getSelectedMode()
         if (!flowMode.isNullOrBlank()) {
@@ -264,6 +264,17 @@ class UPIFragment : Fragment() {
     override fun onStop() {
         dismissProcessingOverlay()
         super.onStop()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (::viewModel.isInitialized && viewModel.isUpiPaymentInProgress) {
+            // Also covers activity/fragment recreation while the external UPI app was open.
+            viewModel.ensurePaymentMonitoring()
+            if (viewModel.shouldShowPaymentTimer && bottomTimerSheetDialog?.isShowing != true) {
+                showProcessPaymentTimerDialog()
+            }
+        }
     }
 
     private fun restoreBrandWalletOtpSavedState(savedInstanceState: Bundle?) {
@@ -1526,9 +1537,12 @@ class UPIFragment : Fragment() {
                 }
                 if (bottomTimerSheetDialog?.isShowing != true) {
                     showProcessPaymentTimerDialog()
-                    viewModel.startCountDownTimer()
                 }
-                viewModel.startPolling(inquiryOrderId)
+                viewModel.beginPaymentMonitoring(inquiryOrderId)
+                logUpiFlowEvent(
+                    event = "UPI_APP_LAUNCHED",
+                    message = "UPI app launched; backend inquiry started"
+                )
             } else {
                 Toast.makeText(
                     requireActivity(),
@@ -1645,6 +1659,7 @@ class UPIFragment : Fragment() {
                                 return@collect
                             }
                             bottomSheetDialog?.dismiss()
+                            ExpressSDKObject.setProcessPaymentResponse(it.data)
                             val didLaunchUpiApp =
                                 if (mTransactionMode == UPI_INTENT) {
                                     showUpiTray(
@@ -1652,7 +1667,7 @@ class UPIFragment : Fragment() {
                                         upiAppPackageName = selectUPIPackage
                                     )
                                 } else if (mTransactionMode == UPI_INTENT_QR && isQRPayment) {
-                                    viewModel.startPolling()
+                                    viewModel.beginPaymentMonitoring(startTimer = false)
                                     true
                                 } else {
                                     showUpiTray(
@@ -1671,7 +1686,13 @@ class UPIFragment : Fragment() {
                                 return@collect
                             }
                             bottomSheetDialog?.dismiss()
-                            ExpressSDKObject.setProcessPaymentResponse(it.data)
+                            if (!isQRPayment) {
+                                viewModel.beginPaymentMonitoring()
+                                logUpiFlowEvent(
+                                    event = "UPI_APP_LAUNCHED",
+                                    message = "UPI app launched; backend inquiry started"
+                                )
+                            }
                             viewModel.resetPaymentFlowResponse()
                         }
                     }
@@ -1687,8 +1708,13 @@ class UPIFragment : Fragment() {
                         is BaseResult.Error -> {
                             //Throw error and exit SDK
                             //TODO Pass error message and description
-                            bottomSheetDialog?.dismiss()
-                            qrBottomSheetDialog?.dismiss()
+                            if (!viewModel.tryHandleTerminalResult()) return@collect
+                            logUpiFlowEvent(
+                                event = "UPI_INQUIRY_ERROR",
+                                message = it.errorMessage ?: "UPI inquiry failed",
+                                severity = "HIGH"
+                            )
+                            cancelTransactionProcess()
                             safeNavigate(R.id.action_UPIFragment_to_failureFragment)
                         }
 
@@ -1712,6 +1738,8 @@ class UPIFragment : Fragment() {
 
 
                                 PROCESSED_STATUS -> {
+                                    if (!viewModel.tryHandleTerminalResult()) return@collect
+                                    logUpiTerminalStatus(status)
                                     if (flowMode.equals(BRAND_WALLET_ID, true)) {
                                         startBrandWalletOtpFlowAfterUpi()
                                         viewModel.resetTransactionResponse()
@@ -1722,6 +1750,8 @@ class UPIFragment : Fragment() {
                                 }
 
                                 PROCESSED_ATTEMPTED -> {
+                                    if (!viewModel.tryHandleTerminalResult()) return@collect
+                                    logUpiTerminalStatus(status)
                                     if (flowMode.equals(BRAND_WALLET_ID, true)) {
                                         startBrandWalletOtpFlowAfterUpi()
                                         viewModel.resetTransactionResponse()
@@ -1733,6 +1763,8 @@ class UPIFragment : Fragment() {
                                 }
 
                                 PROCESSED_FAILED -> {
+                                    if (!viewModel.tryHandleTerminalResult()) return@collect
+                                    logUpiTerminalStatus(status)
                                     cancelTransactionProcess()
                                     safeNavigate(R.id.action_UPIFragment_to_successFragment)
                                 }
@@ -1813,7 +1845,7 @@ class UPIFragment : Fragment() {
     private fun startBrandWalletOtpFlowAfterUpi() {
         if (hasShownBrandWalletOtpSheet) return
         hasShownBrandWalletOtpSheet = true
-        viewModel.stopPolling()
+        viewModel.finishPaymentMonitoring()
         bottomTimerSheetDialog?.dismiss()
         qrBottomSheetDialog?.dismiss()
         showBrandWalletOtpBottomSheet()
@@ -2031,7 +2063,7 @@ class UPIFragment : Fragment() {
 
     private fun cancelTransactionProcess() {
         viewModel.isShowingUPIDialog = false
-        viewModel.stopCountDownTimer()
+        viewModel.finishPaymentMonitoring()
         paymentTimerCollectJob?.cancel()
         paymentTimerCollectJob = null
         dismissProcessingOverlay()
@@ -2056,7 +2088,31 @@ class UPIFragment : Fragment() {
         isBrandWalletOtpTriggerProcessPayment = false
         hasShownBrandWalletOtpSheet = false
         upiIcbStatusMobileOverride = null
-        viewModel.stopPolling()
+    }
+
+    private fun logUpiTerminalStatus(status: String) {
+        logUpiFlowEvent(
+            event = "UPI_INQUIRY_TERMINAL",
+            message = "UPI inquiry reached terminal status=$status"
+        )
+    }
+
+    private fun logUpiFlowEvent(
+        event: String,
+        message: String,
+        severity: String = "INFO"
+    ) {
+        Log.i(MTAG, "$event: $message")
+        context?.let { currentContext ->
+            SdkLogger.log(
+                context = currentContext,
+                errorCode = event,
+                errorMessage = message,
+                transactionId = ExpressSDKObject.getFetchData()?.transactionInfo?.orderId,
+                severity = severity,
+                source = "SDK"
+            )
+        }
     }
 
 
@@ -2255,4 +2311,3 @@ class UPIFragment : Fragment() {
 
 
 }
-

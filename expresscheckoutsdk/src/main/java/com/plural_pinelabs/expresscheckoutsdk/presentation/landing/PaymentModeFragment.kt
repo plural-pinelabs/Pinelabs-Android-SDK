@@ -100,7 +100,6 @@ import com.plural_pinelabs.expresscheckoutsdk.data.model.WalletAddMoneyResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.WalletResetOtpResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.WalletValidateRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.model.WalletValidateResponse
-import com.plural_pinelabs.expresscheckoutsdk.logger.Last9RumManager
 import com.plural_pinelabs.expresscheckoutsdk.presentation.LandingActivity
 import com.plural_pinelabs.expresscheckoutsdk.presentation.card.CardFragmentViewModel
 import com.plural_pinelabs.expresscheckoutsdk.presentation.offers.OfferSummaryDialog
@@ -220,7 +219,6 @@ class PaymentModeFragment : Fragment() {
     private var hasObservedPaymentResult = false
 
     private companion object {
-        const val LAST9_SCREEN = "payment_mode_fragment"
         const val BRAND_WALLET_PIN_LENGTH = 6
         const val BRAND_WALLET_PIN_RESEND_SECONDS = 120
         const val BRAND_WALLET_REDEEM_TIMEOUT_MS = 60_000L
@@ -272,7 +270,6 @@ class PaymentModeFragment : Fragment() {
     }
 
     override fun onDestroyView() {
-        Last9RumManager.trace(screen = LAST9_SCREEN, event = "fragment_view_destroyed")
         hasObservedPaymentResult = false
         brandWalletReadyDismissJob?.cancel()
         brandWalletReadyDismissJob = null
@@ -298,16 +295,6 @@ class PaymentModeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val fetchData = ExpressSDKObject.getFetchData()
-        Last9RumManager.trace(
-            screen = LAST9_SCREEN,
-            event = "fragment_view_created",
-            attributes = mapOf(
-                "express.order_id" to (fetchData?.transactionInfo?.orderId ?: ""),
-                "express.available_modes" to getPaymentModeArray(),
-                "express.has_saved_cards" to (!fetchData?.customerInfo?.tokens.isNullOrEmpty()).toString(),
-                "express.customer_mobile_present" to (!fetchData?.customerInfo?.mobileNo.isNullOrBlank()).toString()
-            )
-        )
         restoreBrandWalletSavedState(savedInstanceState)
         requireActivity().onBackPressedDispatcher.addCallback(
             viewLifecycleOwner,
@@ -802,19 +789,10 @@ class PaymentModeFragment : Fragment() {
         bindBrandWalletCard()
         val paymentModes = getPaymentModes().orEmpty()
         if (paymentModes.isEmpty()) {
-            Last9RumManager.trace(screen = LAST9_SCREEN, event = "payment_modes_empty")
             paymentOptionCard.visibility = View.GONE
             paymentModeRecyclerView.visibility = View.GONE
             return
         }
-        Last9RumManager.trace(
-            screen = LAST9_SCREEN,
-            event = "payment_modes_bound",
-            attributes = mapOf(
-                "express.mode_count" to paymentModes.size.toString(),
-                "express.available_modes" to paymentModes.joinToString(",") { it.paymentModeId }
-            )
-        )
         paymentOptionCard.visibility = View.VISIBLE
         paymentModeRecyclerView.visibility = View.VISIBLE
         val adapter =
@@ -2094,15 +2072,6 @@ class PaymentModeFragment : Fragment() {
     private fun getPaymentModeSelectionCallback(context: Context): ItemClickListener<PaymentMode>? {
         return object : ItemClickListener<PaymentMode> {
             override fun onItemClick(position: Int, item: PaymentMode) {
-                Last9RumManager.trace(
-                    screen = LAST9_SCREEN,
-                    event = "payment_mode_selected",
-                    attributes = mapOf(
-                        "express.position" to position.toString(),
-                        "express.payment_mode_id" to item.paymentModeId,
-                        "express.payment_mode_label" to item.paymentModeId
-                    )
-                )
                 when (item.paymentModeId) {
                     PaymentModes.CREDIT_DEBIT.paymentModeID -> {
                         safeNavigate(R.id.action_paymentModeFragment_to_cardFragment)
@@ -2509,13 +2478,6 @@ class PaymentModeFragment : Fragment() {
     }
 
     private fun showOffers() {
-        Last9RumManager.trace(
-            screen = LAST9_SCREEN,
-            event = "offers_opened",
-            attributes = mapOf(
-                "express.offer_count" to (ExpressSDKObject.getEMIPaymentModeData()?.offerDetails?.size?.toString() ?: "0")
-            )
-        )
         val topFragment = OfferSummaryDialog.newInstance()
         topFragment.show(requireActivity().supportFragmentManager, "TopSheetDialogFragment")
 
