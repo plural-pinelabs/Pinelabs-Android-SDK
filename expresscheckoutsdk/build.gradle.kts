@@ -17,31 +17,28 @@ android {
         minSdk = 26
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
+        buildConfigField("String", "SDK_VERSION", "\"1.5.3\"")
         buildConfigField(
             "String",
-            "LAST9_BASE_URL",
-            "\"https://otlp.last9.io\""
+            "SHA256_UAT_AMAZON_ROOT_CA_1",
+            // Current pluraluat.v2.pinepg.in trust root. Pin the root SPKI so
+            // ACM leaf/intermediate rotations do not break released clients.
+            "\"++MBgDH5WGvL9Bcn5Be30cRcL0f5O+NyoXuWtQdX1aI=\""
         )
         buildConfigField(
             "String",
-            "LAST9_ORIGIN",
-            "\"android_sdk\""
+            "SHA256_UAT_DIGICERT_GLOBAL_ROOT_G2",
+            // Rotation pin supplied by the cloud team. This is the SPKI of
+            // DigiCert Global Root G2 (the key is identical in its self-signed
+            // and cross-signed certificate forms).
+            "\"i7WTqTvh0OioIruIfFR4kMPnBqrS2rdiVPl/s2uC/CY=\""
         )
         buildConfigField(
             "String",
-            "LAST9_FLOW_NAME",
-            "\"express-checkout\""
-        )
-        buildConfigField(
-            "String",
-            "LAST9_CLIENT_TOKEN",
-            "\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJsYXN0OS5pbyIsImF1ZCI6WyJhcHAubGFzdDkuaW8iXSwiZXhwIjoyMTAxODgwMDQzLCJuYmYiOjE3ODY1MjAwNDMsImlhdCI6MTc4NjUyMDA0MywianRpIjoiOTI5ZmI1MzUtMmRkYS00YWVjLTgxNzQtMWE2YzMyNTBiMTE0Iiwic2NvcGVzIjpbIndyaXRlIl0sImtpbmQiOiJjbGllbnRfdG9rZW4iLCJlbWFpbCI6InJhaHVsLm1lZW5hQHBpbmVsYWJzLmNvbSIsIm9yZ2FuaXphdGlvbl9zbHVnIjoicGluZWxhYnMiLCJ0b2tlbl9pZCI6Ijg4YzlkYjAwLTMyMzQtNDcwYi05OTUwLWU5Mzc0ZDI2YjVjMyIsInByb3BlcnRpZXMiOnsib3JpZ2lucyI6WyJhbmRyb2lkOi8vY29tLnBsdXJhbF9waW5lbGFicy5uYXRpdmVfZXhwcmVzc19zZGsiXSwib3RscF91c2VybmFtZSI6InBpbmVsYWJzIiwicmVnaW9uIjoiYXAtc291dGgtMSIsInJlc291cmNlX3R5cGUiOiJjbGllbnRfbW9uaXRvcmluZyJ9fQ.wAlLO3I6ljNDndi9x2ajJBEHhqk9LOwrUGGnqZqaXog\""
-        )
-
-        buildConfigField(
-            "String",
-            "SHA256_UAT",
-            "\"c2hhMjU2LzRnZU5TQkpuem9BYVc2K3puR2x3YmhYZWdSS1Q0c0s2bEdUZ0w2YmVZQmM9\""
+            "SHA256_UAT_DIGICERT_HIGH_ASSURANCE_ROOT",
+            // Compatibility trust anchor for the supplied cross-signed
+            // DigiCert Global Root G2 chain.
+            "\"WoiWRyIOVNa9ihaBciRSC7XHjliYS9VwUGOIud4PB18=\""
         )
         buildConfigField(
             "String",
@@ -50,15 +47,17 @@ android {
         )
         buildConfigField(
             "String",
-            "SHA256_PROD",
-            // Current intermediate SPKI pin: Amazon RSA 2048 M04.
-            "\"G9LNNAql897egYsabashkzUCTEJkWBzgoEtk8X/678c=\""
+            "SHA256_PROD_AMAZON_ROOT_CA_1",
+            // Long-lived production trust root. This survives leaf renewals
+            // and switches between Amazon RSA intermediates such as M01/M04.
+            "\"++MBgDH5WGvL9Bcn5Be30cRcL0f5O+NyoXuWtQdX1aI=\""
         )
         buildConfigField(
             "String",
-            "SHA256_PROD_BACKUP",
-            // Previous intermediate SPKI pin: Amazon RSA 2048 M01.
-            "\"DxH4tt40L+eduF6szpY6TONlxhZhBd+pJ9wbHlQ2fuw=\""
+            "SHA256_PROD_STARFIELD_ROOT_CA_G2",
+            // Compatibility root for Amazon Root CA 1's supplied cross-signed
+            // trust path. This is a root SPKI, not an end-entity certificate.
+            "\"KwccWaCgrnaw6tsrrSO61FgLacNgG2MMLq8GE6+oP5I=\""
         )
         buildConfigField(
             "boolean",
@@ -106,8 +105,8 @@ dependencies {
     implementation("com.google.android.material:material:1.11.0")
 
 
-    // Fragment (BASE runtime — CRITICAL)
-    implementation("androidx.fragment:fragment:1.3.6")
+    // Keep Fragment and Navigation on mutually compatible AndroidX versions.
+    implementation(libs.fragment.ktx)
 
     // -------------------------------------------------
     // Lifecycle (KTX REQUIRED for your code)
@@ -116,10 +115,10 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2")
 
     // -------------------------------------------------
-    // Navigation (SAFE versions)
+    // Navigation
     // -------------------------------------------------
-    implementation("androidx.navigation:navigation-fragment-ktx:2.3.5")
-    implementation("androidx.navigation:navigation-ui-ktx:2.3.5")
+    implementation(libs.androidx.navigation.fragment.ktx)
+    implementation(libs.androidx.navigation.ui.ktx)
 
     // -------------------------------------------------
     // Networking / UI
@@ -131,7 +130,6 @@ dependencies {
     implementation("com.facebook.shimmer:shimmer:0.5.0")
     implementation("io.coil-kt:coil:2.4.0")
     implementation("io.coil-kt:coil-svg:2.4.0")
-    implementation("io.last9:rum-android:1.1.7")
 
     // -------------------------------------------------
     // Coroutines
@@ -158,8 +156,8 @@ publishing {
     publications {
         create<MavenPublication>("release") {
             groupId = "com.github.plural-pinelabs"
-            artifactId = "express-checkout-sdk"
-            version = "1.2.0"
+            artifactId = "Pinelabs-Android-SDK"
+            version = "1.5.3"
 
             afterEvaluate {
                 from(components["release"])

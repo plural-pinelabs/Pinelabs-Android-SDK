@@ -17,7 +17,6 @@ kotlinxCoroutinesCore = "1.7.3"
 coil = "2.7.0"
 lottie = "6.0.0"
 shimmer = "0.5.0"
-clevertap = "7.0.3"
 playServicesAuthApiPhone = "18.1.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
@@ -52,7 +51,6 @@ coil-svg = { group = "io.coil-kt", name = "coil-svg", version.ref = "coil" }
 lottie = { group = "com.airbnb.android", name = "lottie", version.ref = "lottie" }
 shimmer = { group = "com.facebook.shimmer", name = "shimmer", version.ref = "shimmer" }
 
-clevertap = { group = "com.clevertap.android", name = "clevertap-android-sdk", version.ref = "clevertap" }
 play-services-auth-api-phone = { group = "com.google.android.gms", name = "play-services-auth-api-phone", version.ref = "playServicesAuthApiPhone" }
 
 junit = { group = "junit", name = "junit", version.ref = "junit" }

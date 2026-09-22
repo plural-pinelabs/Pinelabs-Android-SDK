@@ -1,16 +1,16 @@
-# Express Checkout SDK
+# Pine Labs Express Checkout Android SDK
 
-JitPack publishes this repository from the `ExpressCheckoutSdk` Android library module.
+Android SDK for integrating Pine Labs Express Checkout.
 
-## Release Coordinates
+## Release coordinates
 
+- Repository: JitPack
 - Group: `com.github.plural-pinelabs`
-- Artifact: `express-checkout-sdk`
-- Version: `v1.2.0`
+- Artifact: `Pinelabs-Android-SDK`
+- Version: `1.5.3`
+- Minimum Android SDK: 26
 
-## Gradle
-
-Add JitPack to your repositories:
+Add JitPack to the merchant application's repositories:
 
 ```kotlin
 dependencyResolutionManagement {
@@ -23,16 +23,18 @@ dependencyResolutionManagement {
 }
 ```
 
-Add the dependency:
+Add the SDK dependency:
 
 ```kotlin
 dependencies {
-    implementation("com.github.plural-pinelabs:express-checkout-sdk:v1.2.0")
+    implementation("com.github.plural-pinelabs:Pinelabs-Android-SDK:1.5.3")
 }
 ```
 
-## Changelog Version -1.2.0
-- Added Brand Wallet as payment mode
-- Updated Compile SDK and Target SDK to API 36.
-- Added Android 16 KB page size compatibility.
-- Improved SDK stability and performance.
+## Version 1.5.3
+
+- Uses long-lived root SPKI pins for the UAT and production endpoints.
+- Removes the Last9/OpenTelemetry dependency.
+- Includes release/R8 consumer rules for Retrofit, Gson, and Kotlin coroutines.
+- Improves UPI return handling through inquiry-driven terminal-state resolution.
+- Returns categorized initialization errors for TLS, connectivity, timeout, and HTTP failures.

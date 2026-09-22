@@ -19,3 +19,6 @@ local.properties
 /gradle-assemble.log
 /gradle-verify.log
 /.idea/inspectionProfiles/Project_Default.xml
+**/google-services.json
+hs_err_pid*.log
+replay_pid*.log

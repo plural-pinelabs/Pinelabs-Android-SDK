@@ -191,7 +191,7 @@ class CancelReasonsFragment : Fragment() {
                 runBlocking {
                     withTimeout(3000) {
                         val repo = ExpressRepositoryImpl(
-                            RetrofitBuilder.fetchApiService,
+                            RetrofitBuilder.commonApiService,
                             NetworkHelper(appContext)
                         )
                         val logs = Utils.getUnSyncedErrors(appContext)
