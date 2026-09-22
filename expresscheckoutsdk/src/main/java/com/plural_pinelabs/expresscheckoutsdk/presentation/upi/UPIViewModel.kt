@@ -63,6 +63,13 @@ class UPIViewModel(private val expressRepositoryImpl: ExpressRepositoryImpl) : V
 
     private var pollingJob: Job? = null
     private var paymentCountDownTimer: CountDownTimer? = null
+    private val paymentSession = UpiPaymentSession()
+
+    val isUpiPaymentInProgress: Boolean
+        get() = paymentSession.isActive
+
+    val shouldShowPaymentTimer: Boolean
+        get() = paymentSession.shouldShowPaymentTimer
 
     var isShowingVPADialog = false
     var isShowingUPIDialog = false
@@ -139,15 +146,45 @@ class UPIViewModel(private val expressRepositoryImpl: ExpressRepositoryImpl) : V
         pollingJob?.cancel()
         pollingJob = viewModelScope.launch(Dispatchers.IO) {
             while (isActive) {
-                getTransactionStatus(ExpressSDKObject.getToken(), orderId)
+                expressRepositoryImpl.transactionStatus(
+                    ExpressSDKObject.getToken(),
+                    orderId
+                ).collect {
+                    _transactionStatusResult.value = it
+                }
                 delay(UPI_TRANSACTION_STATUS_INTERVAL)
             }
         }
     }
 
+    fun beginPaymentMonitoring(orderId: String? = null, startTimer: Boolean = true) {
+        paymentSession.begin(orderId, showPaymentTimer = startTimer)
+        if (startTimer) startCountDownTimer()
+        startPolling(orderId)
+    }
+
+    fun ensurePaymentMonitoring() {
+        if (!paymentSession.isActive) return
+        if (paymentSession.shouldShowPaymentTimer && _countDownTimer.value == -1L) {
+            startCountDownTimer()
+        }
+        if (pollingJob?.isActive != true) {
+            startPolling(paymentSession.inquiryOrderId)
+        }
+    }
+
+    fun tryHandleTerminalResult(): Boolean = paymentSession.tryHandleTerminalResult()
+
+    fun finishPaymentMonitoring() {
+        paymentSession.finish()
+        stopCountDownTimer()
+        stopPolling()
+    }
+
 
     fun stopPolling() {
         pollingJob?.cancel()
+        pollingJob = null
     }
 
     fun cancelPayment(){

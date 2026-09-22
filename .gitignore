@@ -18,4 +18,6 @@ local.properties
 /.idea/deploymentTargetSelector.xml
 /gradle-assemble.log
 /gradle-verify.log
+hs_err_pid*.log
+replay_pid*.log
 /.idea/inspectionProfiles/Project_Default.xml

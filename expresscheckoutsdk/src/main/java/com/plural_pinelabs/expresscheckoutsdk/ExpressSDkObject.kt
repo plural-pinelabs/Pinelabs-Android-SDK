@@ -9,6 +9,7 @@ import com.plural_pinelabs.expresscheckoutsdk.data.model.ProcessPaymentResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.Tenure
 import com.plural_pinelabs.expresscheckoutsdk.data.model.WalletAddMoneyResponse
 import java.util.Locale
+import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicReference
 
 internal data class SDKObject(
@@ -46,6 +47,7 @@ internal data class CurrencyMapping(
 
 internal object ExpressSDKObject {
     private val sdkObjectRef = AtomicReference<SDKObject?>()
+    private val terminalCallbackDelivered = AtomicBoolean(false)
     private const val DEFAULT_CURRENCY_CODE = "INR"
     private const val DEFAULT_CURRENCY_SYMBOL = "\u20B9"
     private const val DEFAULT_CURRENCY_RATIO = 2
@@ -56,8 +58,12 @@ internal object ExpressSDKObject {
         token: String,
         runInSandboxedSdk: Boolean = false
     ) {
+        terminalCallbackDelivered.set(false)
         sdkObjectRef.set(SDKObject(context, callback, token, runInSandboxedSdk))
     }
+
+    /** Returns true only for the first terminal callback in an SDK session. */
+    fun tryClaimTerminalCallback(): Boolean = terminalCallbackDelivered.compareAndSet(false, true)
 
     fun getToken(): String? {
         return sdkObjectRef.get()?.token
@@ -283,5 +289,4 @@ internal object ExpressSDKObject {
 
 
 }
-
 

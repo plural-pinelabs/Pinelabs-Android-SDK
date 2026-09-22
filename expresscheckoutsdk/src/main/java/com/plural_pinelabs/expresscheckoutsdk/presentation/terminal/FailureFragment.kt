@@ -11,15 +11,15 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.plural_pinelabs.expresscheckoutsdk.ExpressSDKObject
 import com.plural_pinelabs.expresscheckoutsdk.R
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.ERROR_DESCRIPTION_KEY
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.ERROR_KEY
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.ERROR_MESSAGE_KEY
 import com.plural_pinelabs.expresscheckoutsdk.common.TimerManager
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils.MTAG
 
 
 class FailureFragment : Fragment() {
-
-
-    private var cancelCallbackCalled: Boolean = false
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -55,8 +55,10 @@ class FailureFragment : Fragment() {
     }
 
     private fun handleClosingSDK(isCancelled: Boolean) {
-        if (cancelCallbackCalled) return
-        cancelCallbackCalled = true
+        if (!ExpressSDKObject.tryClaimTerminalCallback()) {
+            requireActivity().finish()
+            return
+        }
         val message =
             if (isCancelled) "Transaction Cancelled by User" else "Transaction Failed"
         if (isCancelled) {
@@ -68,9 +70,9 @@ class FailureFragment : Fragment() {
             )
         } else {
             ExpressSDKObject.getCallback()?.onError(
-                "1000",
-                "Failure",
-                message,
+                arguments?.getString(ERROR_KEY) ?: "1000",
+                arguments?.getString(ERROR_MESSAGE_KEY) ?: "Failure",
+                arguments?.getString(ERROR_DESCRIPTION_KEY) ?: message,
                 ExpressSDKObject.getFetchData()?.transactionInfo?.orderId
             )
         }// Replace with actual success data if needed

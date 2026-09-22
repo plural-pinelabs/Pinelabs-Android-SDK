@@ -17,27 +17,7 @@ android {
         minSdk = 26
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
-        buildConfigField(
-            "String",
-            "LAST9_BASE_URL",
-            "\"https://otlp.last9.io\""
-        )
-        buildConfigField(
-            "String",
-            "LAST9_ORIGIN",
-            "\"android_sdk\""
-        )
-        buildConfigField(
-            "String",
-            "LAST9_FLOW_NAME",
-            "\"express-checkout\""
-        )
-        buildConfigField(
-            "String",
-            "LAST9_CLIENT_TOKEN",
-            "\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJsYXN0OS5pbyIsImF1ZCI6WyJhcHAubGFzdDkuaW8iXSwiZXhwIjoyMTAxODgwMDQzLCJuYmYiOjE3ODY1MjAwNDMsImlhdCI6MTc4NjUyMDA0MywianRpIjoiOTI5ZmI1MzUtMmRkYS00YWVjLTgxNzQtMWE2YzMyNTBiMTE0Iiwic2NvcGVzIjpbIndyaXRlIl0sImtpbmQiOiJjbGllbnRfdG9rZW4iLCJlbWFpbCI6InJhaHVsLm1lZW5hQHBpbmVsYWJzLmNvbSIsIm9yZ2FuaXphdGlvbl9zbHVnIjoicGluZWxhYnMiLCJ0b2tlbl9pZCI6Ijg4YzlkYjAwLTMyMzQtNDcwYi05OTUwLWU5Mzc0ZDI2YjVjMyIsInByb3BlcnRpZXMiOnsib3JpZ2lucyI6WyJhbmRyb2lkOi8vY29tLnBsdXJhbF9waW5lbGFicy5uYXRpdmVfZXhwcmVzc19zZGsiXSwib3RscF91c2VybmFtZSI6InBpbmVsYWJzIiwicmVnaW9uIjoiYXAtc291dGgtMSIsInJlc291cmNlX3R5cGUiOiJjbGllbnRfbW9uaXRvcmluZyJ9fQ.wAlLO3I6ljNDndi9x2ajJBEHhqk9LOwrUGGnqZqaXog\""
-        )
-
+        buildConfigField("String", "SDK_VERSION", "\"1.5.2\"")
         buildConfigField(
             "String",
             "SHA256_UAT",
@@ -51,7 +31,20 @@ android {
         buildConfigField(
             "String",
             "SHA256_PROD",
+            // Current intermediate SPKI pin: Amazon RSA 2048 M04.
+            "\"G9LNNAql897egYsabashkzUCTEJkWBzgoEtk8X/678c=\""
+        )
+        buildConfigField(
+            "String",
+            "SHA256_PROD_BACKUP",
+            // Previous intermediate SPKI pin: Amazon RSA 2048 M01.
             "\"DxH4tt40L+eduF6szpY6TONlxhZhBd+pJ9wbHlQ2fuw=\""
+        )
+        buildConfigField(
+            "String",
+            "SHA256_PROD_CERT_BACKUP",
+            // Leaf SPKI pin supplied for the next api.pluralpay.in certificate.
+            "\"nziIXeybUaaAh3+DVEraUVCgTNb94okPwUDBtSxBEFA=\""
         )
         buildConfigField(
             "boolean",
@@ -99,8 +92,8 @@ dependencies {
     implementation("com.google.android.material:material:1.11.0")
 
 
-    // Fragment (BASE runtime — CRITICAL)
-    implementation("androidx.fragment:fragment:1.3.6")
+    // Keep Fragment and Navigation on mutually compatible AndroidX versions.
+    implementation(libs.fragment.ktx)
 
     // -------------------------------------------------
     // Lifecycle (KTX REQUIRED for your code)
@@ -109,10 +102,10 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2")
 
     // -------------------------------------------------
-    // Navigation (SAFE versions)
+    // Navigation
     // -------------------------------------------------
-    implementation("androidx.navigation:navigation-fragment-ktx:2.3.5")
-    implementation("androidx.navigation:navigation-ui-ktx:2.3.5")
+    implementation(libs.androidx.navigation.fragment.ktx)
+    implementation(libs.androidx.navigation.ui.ktx)
 
     // -------------------------------------------------
     // Networking / UI
@@ -150,8 +143,8 @@ publishing {
     publications {
         create<MavenPublication>("release") {
             groupId = "com.github.plural-pinelabs"
-            artifactId = "express-checkout-sdk"
-            version = "1.2.0"
+            artifactId = "Pinelabs-Android-SDK"
+            version = "1.5.2"
 
             afterEvaluate {
                 from(components["release"])

@@ -41,7 +41,8 @@
 -keep class * implements com.google.gson.JsonDeserializer
 
 -keep,allowobfuscation,allowshrinking class com.google.gson.reflect.TypeToken
--keep,allowobfuscation,allowshrinking class * extends com.google.gson.reflect.TypeToken
+-if class * extends com.google.gson.reflect.TypeToken
+-keep,allowobfuscation,allowoptimization class <1>
 
 # --- SDK public entry points ---
 -keep class com.plural_pinelabs.expresscheckoutsdk.ExpressSDKCallback {*;}

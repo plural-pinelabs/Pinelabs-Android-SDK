@@ -73,6 +73,7 @@ internal object Constants {
 
     const val ERROR_KEY = "Error"
     const val ERROR_MESSAGE_KEY = "ErrorMessage"
+    const val ERROR_DESCRIPTION_KEY = "ErrorDescription"
 
     //bank code
     const val AXIS_BANK_CODE = "NB1004"
