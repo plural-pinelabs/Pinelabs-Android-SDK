@@ -1,9 +1,6 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
-    id("com.google.gms.google-services")
-    id("com.google.firebase.crashlytics")
-
 }
 
 android {
@@ -22,7 +19,13 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            // Exercise the same R8/resource shrinking path used by merchant
+            // release builds. This sample is the release-consumer smoke test.
+            // Debug signing is used only so this local release smoke test can
+            // be installed directly on a connected device.
+            signingConfig = signingConfigs.getByName("debug")
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"

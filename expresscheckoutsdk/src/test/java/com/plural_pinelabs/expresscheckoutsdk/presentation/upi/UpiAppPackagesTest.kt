@@ -33,28 +33,28 @@ class UpiAppPackagesTest {
                 KIWI_UPI,
                 MOBIKWIK_UPI
             ),
-            getSupportedUpiPackages(fetchData(isTpapConfigurable = true))
+            getUpiAppsInstalledInDevice(fetchData(isTpapConfigurable = true))
         )
     }
     @Test
     fun `excludes Mobikwik and Kiwi and keeps base order when TPAP is not configurable`() {
         assertEquals(
             listOf(PHONEPE, GPAY, PAYTM, CRED_UPI, BHIM_UPI, NAVI_UPI, SUPERMONEY_UPI),
-            getSupportedUpiPackages(fetchData(isTpapConfigurable = false))
+            getUpiAppsInstalledInDevice(fetchData(isTpapConfigurable = false))
         )
     }
     @Test
     fun `excludes Mobikwik and Kiwi and keeps base order when fetch data is missing`() {
         assertEquals(
             listOf(PHONEPE, GPAY, PAYTM, CRED_UPI, BHIM_UPI, NAVI_UPI, SUPERMONEY_UPI),
-            getSupportedUpiPackages(null)
+            getUpiAppsInstalledInDevice(null)
         )
     }
     @Test
     fun `excludes Mobikwik and Kiwi and keeps base order when TPAP flag is null`() {
         assertEquals(
             listOf(PHONEPE, GPAY, PAYTM, CRED_UPI, BHIM_UPI, NAVI_UPI, SUPERMONEY_UPI),
-            getSupportedUpiPackages(fetchData(isTpapConfigurable = null))
+            getUpiAppsInstalledInDevice(fetchData(isTpapConfigurable = null))
         )
     }
 

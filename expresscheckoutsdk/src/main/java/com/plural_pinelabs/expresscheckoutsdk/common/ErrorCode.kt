@@ -5,6 +5,10 @@ enum class ErrorCode(val code: String) {
     INVALID_REQUEST("1002"),
     INTERNAL_SERVER_ERROR("1003"),
     INTERNET_NOT_AVAILABLE("1004"),
+    NETWORK_TIMEOUT("1005"),
+    DNS_FAILURE("1006"),
+    TLS_FAILURE("1007"),
+    NETWORK_FAILURE("1008"),
     // Payment Gateway SDK related errors
     ORDER_PROCESSED("2001"), //  success code for order processing
     PAYMENT_FAILED("2002"), //  failure code for payment failure

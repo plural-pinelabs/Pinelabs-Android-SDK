@@ -1,9 +1,8 @@
 package com.plural_pinelabs.expresscheckoutsdk.common
 
-import android.util.Log
 import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 import com.plural_pinelabs.expresscheckoutsdk.data.model.FetchError
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -20,64 +19,51 @@ inline fun <reified T> toResultFlow(
             emit(BaseResult.Loading(true))
             try {
                 val c = call()
-                c?.let { response ->
-                    Log.d("Toresultflow", "Response: ${response.raw().body}")
-                    Log.d("Toresultflow", "Response: ${response.raw().isSuccessful}")
-                    Log.d("Toresultflow", "Response: ${response.raw().toString()}")
+                if (c == null) {
+                    emit(
+                        BaseResult.Error(
+                            ErrorCode.EXCEPTION_THROWN.code,
+                            "EMPTY_RESPONSE",
+                            "The payment service returned no response."
+                        )
+                    )
+                } else {
+                    val response = c
                     if (c.isSuccessful && c.body() != null) {
                         c.body()?.let {
                             emit(BaseResult.Success(it))
                         }
                     } else {
-                        Log.d("Toresultflow", "Response: emit error  ${response.raw().body}")
-                        val type = object : TypeToken<FetchError>() {}.type
-                        val errorResponse: FetchError? =
-                            Gson().fromJson(response.errorBody()?.charStream(), type)
+                        val errorResponse = parseFetchError(response.errorBody()?.charStream())
                         emit(
                             BaseResult.Error(
                                 errorResponse?.error_code ?: ErrorCode.INTERNAL_SERVER_ERROR.code,
-                                errorResponse?.error_message
+                                errorResponse?.error_message ?: "HTTP_ERROR",
+                                "Payment service returned HTTP ${response.code()}."
                             )
                         )
                     }
                 }
             } catch (e: Exception) {
-                Log.d("Toresultflow", "exception error: ${e.message}")
-
-                emit(
-                    BaseResult.Error(
-                        ErrorCode.EXCEPTION_THROWN.code,
-                        e.message,
-                        e.stackTrace.toString()
-                    )
-                )
+                if (e is CancellationException) throw e
+                emit(mapNetworkFailure(e))
             }
         } else {
-            emit(BaseResult.Error(ErrorCode.INTERNET_NOT_AVAILABLE.code))
+            emit(
+                BaseResult.Error(
+                    ErrorCode.INTERNET_NOT_AVAILABLE.code,
+                    "INTERNET_NOT_AVAILABLE",
+                    "No internet connection is available."
+                )
+            )
         }
     }.catch { e ->
-        Log.e("Toresultflow", "Caught exception: ${e.message}")
-        when (e) {
-            is java.net.SocketTimeoutException -> {
-                emit(
-                    BaseResult.Error(
-                        ErrorCode.UNKNOWN_PAYMENT_ERROR.code,
-                        "Request timed out. Please try again.",
-                        e.stackTraceToString()
-                    )
-                )
-            }
-
-            else -> {
-                emit(
-                    BaseResult.Error(
-                        ErrorCode.EXCEPTION_THROWN.code,
-                        e.message,
-                        e.stackTraceToString()
-                    )
-                )
-            }
-        }
+        if (e is CancellationException) throw e
+        emit(mapNetworkFailure(e))
     }.flowOn(Dispatchers.IO)
 }
 
+@PublishedApi
+internal fun parseFetchError(reader: java.io.Reader?): FetchError? = runCatching {
+    reader?.use { Gson().fromJson(it, FetchError::class.java) }
+}.getOrNull()

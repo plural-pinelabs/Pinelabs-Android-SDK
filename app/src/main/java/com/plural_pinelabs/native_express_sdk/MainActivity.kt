@@ -11,6 +11,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.plural_pinelabs.expresscheckoutsdk.ExpressSDKCallback
 import com.plural_pinelabs.expresscheckoutsdk.ExpressSDKInitializer
+import com.google.android.material.materialswitch.MaterialSwitch
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -29,6 +30,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun setViews() {
         val tokenEt = findViewById<EditText>(R.id.edt_redirect_url)
+        val useUatSwitch = findViewById<MaterialSwitch>(R.id.switch_use_uat)
         val startSDKBtn = findViewById<Button>(R.id.btn_start_sdk)
         startSDKBtn.setOnClickListener {
             ExpressSDKInitializer().initializeSDK(
@@ -82,7 +84,7 @@ class MainActivity : AppCompatActivity() {
                             "Cancelled: $responseCode, $responseMessage, $responseDescription"
                         )
                     }
-                }, true
+                }, useUatSwitch.isChecked
             )
         }
     }

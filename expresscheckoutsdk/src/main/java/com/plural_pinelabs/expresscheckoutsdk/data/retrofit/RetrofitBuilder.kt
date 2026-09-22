@@ -9,7 +9,6 @@ import com.plural_pinelabs.expresscheckoutsdk.common.Constants.BASE_CHECKOUTBFF
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.BASE_URL_EXPRESS_PROD
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.BASE_URL_EXPRESS_UAT
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.BASE_URL_PROD
-import com.plural_pinelabs.expresscheckoutsdk.common.Constants.BASE_URL_QA
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.BASE_URL_UAT
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.HTTPS
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.TIMEOUT
@@ -27,7 +26,7 @@ import java.util.concurrent.TimeUnit
 object RetrofitBuilder {
 
     private val interceptor = HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY)
-    private val clientBuilder: OkHttpClient.Builder = createBuilder()
+    private val client: OkHttpClient by lazy { createClient() }
 
     private val gson: Gson = GsonBuilder()
         .create()
@@ -38,7 +37,7 @@ object RetrofitBuilder {
             .baseUrl(HTTPS + baseUrl + BASE_CHECKOUTBFF)
             .addConverterFactory(GsonConverterFactory.create())
             .addConverterFactory(GsonConverterFactory.create(gson))
-            .client(clientBuilder.build())
+            .client(client)
             .build()
     }
 
@@ -48,7 +47,7 @@ object RetrofitBuilder {
             .baseUrl(HTTPS + baseUrl + BASE_CHECKOUT)
             .addConverterFactory(GsonConverterFactory.create())
             .addConverterFactory(GsonConverterFactory.create(gson))
-            .client(clientBuilder.build())
+            .client(client)
             .build()
     }
 
@@ -61,49 +60,46 @@ object RetrofitBuilder {
             .baseUrl(HTTPS + baseUrl)
             .addConverterFactory(GsonConverterFactory.create())
             .addConverterFactory(GsonConverterFactory.create(gson))
-            .client(clientBuilder.build())
+            .client(client)
             .build()
     }
 
-    val fetchApiService: FetchApiService = getRetrofit().create(FetchApiService::class.java)
-    val commonApiService: CommonApiService = getRetrofit().create(CommonApiService::class.java)
-    val expressApiService: ExpressApiService =
-        getRetrofitForExpressCheckout().create(ExpressApiService::class.java)
-    val checkoutApiService: CommonApiService =
-        getRetrofitForCheckout().create(CommonApiService::class.java)
+    // Resolve the environment when a checkout starts instead of freezing the
+    // first environment used by this process for all later SDK sessions.
+    val fetchApiService: FetchApiService
+        get() = getRetrofit().create(FetchApiService::class.java)
+    val commonApiService: CommonApiService
+        get() = getRetrofit().create(CommonApiService::class.java)
+    val expressApiService: ExpressApiService
+        get() = getRetrofitForExpressCheckout().create(ExpressApiService::class.java)
+    val checkoutApiService: CommonApiService
+        get() = getRetrofitForCheckout().create(CommonApiService::class.java)
 
-    private fun createBuilder(): OkHttpClient.Builder {
+    private fun createClient(): OkHttpClient {
 
-        val sha256QA = String(Base64.getDecoder().decode(BuildConfig.SHA256_QA))
         val sha256UAT = String(Base64.getDecoder().decode(BuildConfig.SHA256_UAT))
         // val sha256PROD = String(Base64.getDecoder().decode(BuildConfig.SHA256_PROD))
         val sha256PROD = "sha256/" + BuildConfig.SHA256_PROD
-        val certificatePinner_QA = CertificatePinner.Builder()
-            .add(BASE_URL_QA, sha256QA)
-            .build()
-
-        val certificatePinner_UAT = CertificatePinner.Builder()
+        val certificatePinner = CertificatePinner.Builder()
             .add(BASE_URL_UAT, sha256UAT)
-            .build()
-
-        val certificatePinner_PROD = CertificatePinner.Builder()
             .add(BASE_URL_PROD, sha256PROD)
             .add(BASE_URL_PROD, "sha256/" + BuildConfig.SHA256_PROD_BACKUP)
+            .add(BASE_URL_PROD, "sha256/" + BuildConfig.SHA256_PROD_CERT_BACKUP)
             .build()
 
         val clientBuilder = OkHttpClient.Builder()
 
         if (BuildConfig.DEBUG) clientBuilder.addInterceptor(interceptor)
 
-        clientBuilder.certificatePinner(certificatePinner_QA)
-        clientBuilder.certificatePinner(certificatePinner_UAT)
-        clientBuilder.certificatePinner(certificatePinner_PROD)
+        // certificatePinner(...) replaces the previous value, so all host/pin
+        // pairs must be installed in one CertificatePinner instance.
+        clientBuilder.certificatePinner(certificatePinner)
         clientBuilder.connectTimeout(TIMEOUT, TimeUnit.SECONDS)
 
         clientBuilder.readTimeout(TIMEOUT, TimeUnit.SECONDS)
 
         clientBuilder.writeTimeout(TIMEOUT, TimeUnit.SECONDS)
 
-        return clientBuilder
+        return clientBuilder.build()
     }
 }

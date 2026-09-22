@@ -76,6 +76,10 @@ class PendingFragment : Fragment() {
 
 
     private fun handleClosingSDK(isCancelled: Boolean) {
+        if (!ExpressSDKObject.tryClaimTerminalCallback()) {
+            requireActivity().finish()
+            return
+        }
         val message =
             if (isCancelled) "Transaction Cancelled by User" else "Transaction Failed"
         if (isCancelled) {

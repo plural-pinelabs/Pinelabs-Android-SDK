@@ -111,12 +111,7 @@ class SuccessFragment : Fragment() {
         subtotalRecylerView = view.findViewById(R.id.subtotal_recycler_view)
         continueToMerchantButton.visibility = View.GONE
         continueToMerchantButton.setOnClickListener {
-            ExpressSDKObject.getCallback()?.onSuccess(
-                "200",
-                "success",
-                "Transaction Successful",
-                ExpressSDKObject.getFetchData()?.transactionInfo?.orderId
-            ) // Replace with actual success data if needed
+            deliverSuccessCallback()
             requireActivity().finish()
         }
 
@@ -347,15 +342,19 @@ class SuccessFragment : Fragment() {
                 timeLeft -= 1_000
             }
 
-            ExpressSDKObject.getCallback()
-                ?.onSuccess(
-                    "200",
-                    "success",
-                    "Transaction Successful",
-                    ExpressSDKObject.getFetchData()?.transactionInfo?.orderId
-                )
+            deliverSuccessCallback()
             requireActivity().finish()
         }
+    }
+
+    private fun deliverSuccessCallback() {
+        if (!ExpressSDKObject.tryClaimTerminalCallback()) return
+        ExpressSDKObject.getCallback()?.onSuccess(
+            "200",
+            "success",
+            "Transaction Successful",
+            ExpressSDKObject.getFetchData()?.transactionInfo?.orderId
+        )
     }
 
     override fun onDestroyView() {

@@ -13,9 +13,13 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.airbnb.lottie.LottieAnimationView
+import com.plural_pinelabs.expresscheckoutsdk.BuildConfig
 import com.plural_pinelabs.expresscheckoutsdk.ExpressSDKObject
 import com.plural_pinelabs.expresscheckoutsdk.R
 import com.plural_pinelabs.expresscheckoutsdk.common.BaseResult
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.ERROR_DESCRIPTION_KEY
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.ERROR_KEY
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.ERROR_MESSAGE_KEY
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PROCESSED_ATTEMPTED
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PROCESSED_FAILED
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PROCESSED_PENDING
@@ -24,6 +28,7 @@ import com.plural_pinelabs.expresscheckoutsdk.common.NetworkHelper
 import com.plural_pinelabs.expresscheckoutsdk.common.SplashViewModelFactory
 import com.plural_pinelabs.expresscheckoutsdk.data.model.FetchResponseDTO
 import com.plural_pinelabs.expresscheckoutsdk.data.model.TransactionStatusResponse
+import com.plural_pinelabs.expresscheckoutsdk.logger.SdkLogger
 import com.plural_pinelabs.expresscheckoutsdk.presentation.LandingActivity
 import kotlinx.coroutines.launch
 
@@ -108,15 +113,30 @@ class SplashFragment : Fragment() {
                     when (result) {
                         is BaseResult.Error -> {
                             isDataFetched = true
-                            // Han
-                            // dle error
-                            result.errorCode.let { exception ->
-                                Log.d("Error", "Error fetching data: $exception")
-                                findNavController().navigate(R.id.action_splashFragment_to_failureFragment)
-                                // Log the error or show a message to the user
-                                Log.e("Error", exception)
-                                // For example, navigate to an error screen or show a dialog
+                            val environment =
+                                if (ExpressSDKObject.isSandBoxMode()) "UAT" else "PRODUCTION"
+                            val category = result.errorMessage ?: "UNKNOWN"
+                            SdkLogger.log(
+                                requireContext(),
+                                result.errorCode,
+                                "Initialization failed; sdk=${BuildConfig.SDK_VERSION}; " +
+                                    "environment=$environment; category=$category",
+                                "",
+                                "HIGH",
+                                "SDK"
+                            )
+                            val errorArguments = Bundle().apply {
+                                putString(ERROR_KEY, result.errorCode)
+                                putString(ERROR_MESSAGE_KEY, category)
+                                putString(
+                                    ERROR_DESCRIPTION_KEY,
+                                    result.errorDescription ?: "Unable to initialize checkout."
+                                )
                             }
+                            findNavController().navigate(
+                                R.id.action_splashFragment_to_failureFragment,
+                                errorArguments
+                            )
 
                         }
 
