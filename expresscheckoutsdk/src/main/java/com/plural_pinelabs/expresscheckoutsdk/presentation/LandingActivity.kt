@@ -96,7 +96,16 @@ class LandingActivity : AppCompatActivity() {
         setContentView(R.layout.activity_landing)
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            val ime = insets.getInsets(WindowInsetsCompat.Type.ime())
+            // Edge-to-edge layouts are not resized automatically for the IME. Keep the
+            // navigation host above whichever bottom inset is larger so form scroll views
+            // can bring their focused fields (including EMI card-holder name) into view.
+            v.setPadding(
+                systemBars.left,
+                systemBars.top,
+                systemBars.right,
+                maxOf(systemBars.bottom, ime.bottom)
+            )
             insets
         }
         //Required to change the background color of the screen

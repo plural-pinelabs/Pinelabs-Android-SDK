@@ -53,6 +53,9 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     implementation(project(":expresscheckoutsdk"))
+    //implementation(platform("com.google.firebase:firebase-bom:33.15.0"))
+   // implementation("com.google.firebase:firebase-analytics")
+   // implementation("com.google.firebase:firebase-crashlytics")
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
 
 

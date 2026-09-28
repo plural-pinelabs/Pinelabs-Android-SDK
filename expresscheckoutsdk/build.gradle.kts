@@ -17,7 +17,7 @@ android {
         minSdk = 26
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
-        buildConfigField("String", "SDK_VERSION", "\"1.5.3\"")
+        buildConfigField("String", "SDK_VERSION", "\"1.5.2\"")
         buildConfigField(
             "String",
             "SHA256_UAT_AMAZON_ROOT_CA_1",
@@ -157,7 +157,7 @@ publishing {
         create<MavenPublication>("release") {
             groupId = "com.github.plural-pinelabs"
             artifactId = "Pinelabs-Android-SDK"
-            version = "1.5.3"
+            version = "1.5.2"
 
             afterEvaluate {
                 from(components["release"])
