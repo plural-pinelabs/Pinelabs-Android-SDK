@@ -98,7 +98,7 @@
     <string name="enter_pin_code_to_view_available_delivery_methods">Enter PIN code to view available delivery methods</string>
     <string name="processing_payment_description">We’ll confirm everything in just a few seconds.</string>
     <string name="email">Email</string>
-    <string name="timer_format">%02d:%02d</string>
+    <string name="timer_format">%1$02d:%2$02d</string>
     <string name="resend_otp">Resend OTP</string>
     <string name="saved_card_otp_information">Verifying your mobile number is a one-time activity</string>
     <string name="mm_yy">MM / YY</string>
@@ -175,7 +175,7 @@
     <string name="total_payable">Total payable</string>
     <string name="paying_in_emi_of_x_months">Paying in EMI of %s months</string>
     <string name="save_rs_x">Save %s</string>
-    <string name="issuer_title_with_emi_card">%s %s</string>
+    <string name="issuer_title_with_emi_card">%1$s %2$s</string>
     <string name="recommended">Recommended</string>
     <string name="best_value">Best Value</string>
     <string name="no_cost">No Cost</string>
@@ -211,7 +211,7 @@
     <string name="convenience_fees_x_added_upi">A convenience fee of %s has been added for UPI payments</string>
     <string name="convenience_fees_x_added_nb">A convenience fee of %s has been added for NetBanking payments</string>
     <string name="convenience_fees_x_added_general">A convenience fee of %s has been added for your payments</string>
-    <string name="convenience_fees_x_added_for_x_card_payments">A convenience fee of %s has been added for %s card payments</string>
+    <string name="convenience_fees_x_added_for_x_card_payments">A convenience fee of %1$s has been added for %2$s card payments</string>
     <string name="subtotal">Subtotal</string>
     <string name="convenience_fee">Convenience Fee</string>
     <string name="convenience_fee_gst">GST on Convenience Fee </string>
@@ -226,7 +226,7 @@
     <string name="upi_offer_title_flat_off">Flat %1$s Off</string>
     <string name="upi_offer_title_flat_cashback">Flat %1$s Cashback</string>
     <string name="upi_offer_only_applicable_upi_id">Only applicable to UPI ID</string>
-    <string name="processing_fee_info">%s processing fee + GST will be charged by %s bank.</string>
+    <string name="processing_fee_info">%1$s processing fee + GST will be charged by %2$s bank.</string>
     <string name="total_amount">Total Amount</string>
     <string name="emi_interest">EMI Interest</string>
     <string name="total_emi_cost">Total EMI Cost</string>
@@ -257,7 +257,7 @@
     <string name="upi_icb_status_bhim_notice">Please pay via BHIM app to avail the offer</string>
     <string name="instant_discount_on_full_payment">Instant discount on full payment</string>
     <string name="applicable_on_emitenurelist_emi_tenures">Applicable on %s EMI tenures</string>
-    <string name="x_proccessing_gst_will_be_applied">%s processing fee + GST will be charged by %s bank.</string>
+    <string name="x_proccessing_gst_will_be_applied">%1$s processing fee + GST will be charged by %2$s bank.</string>
     <string name="contact_details">Contact details</string>
     <string name="verified_user">Verified User</string>
     <string name="delivery_address">delivery address</string>
@@ -279,7 +279,7 @@
     <string name="brand_wallet_redeem_gift_card_pin">Gift Card PIN</string>
     <string name="brand_wallet_redeem_gift_card_pin_hint">Enter gift card PIN</string>
     <string name="brand_wallet_redeem_success_title">Gift Card Applied</string>
-    <string name="brand_wallet_redeem_success_subtitle">You have saved ₹1,000 with this gift card!</string>
+    <string name="brand_wallet_redeem_success_subtitle">You have saved %1$s with this gift card!</string>
     <string name="brand_wallet_redeem_not_eligible_title">Gift card not eligible for redemption</string>
     <string name="brand_wallet_redeem_not_eligible_subtitle_prefix">Check  </string>
     <string name="brand_wallet_redeem_not_eligible_terms"><u> terms &amp; conditions</u></string>

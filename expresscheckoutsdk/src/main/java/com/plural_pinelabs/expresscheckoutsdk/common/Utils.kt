@@ -1069,7 +1069,7 @@ internal object Utils {
             final_amt_in_paise = selectedFees.paymentAmount?.amount ?: 0,
             transaction_amount = selectedFees.originalTxnAmount?.amount ?: 0,
             convenience_fees_maximum_fee_amount = selectedFees.convenienceFeesMaximumFeeAmount?.amount
-                ?: 0,
+                ?: 0L,
             convenience_fees_applicable_fee_amount = selectedFees.convenienceFeesApplicableFeeAmount?.amount
                 ?: 0,
             currency = selectedFees.paymentAmount?.currency ?: "INR"

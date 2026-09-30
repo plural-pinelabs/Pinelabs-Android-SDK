@@ -32,7 +32,7 @@
                 android:background="@drawable/upi_icb_close_bg"
                 android:padding="7dp"
                 android:src="@drawable/ic_cancel_close"
-                android:tint="@color/black_text_80"
+                app:tint="@color/black_text_80"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -106,7 +106,7 @@
                             android:layout_gravity="center"
                             android:importantForAccessibility="no"
                             android:src="@drawable/ic_saving_offer_tag"
-                            android:tint="@color/white" />
+                            app:tint="@color/white" />
 
                     </FrameLayout>
 

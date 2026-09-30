@@ -48,7 +48,7 @@
                     android:background="@drawable/upi_icb_close_bg"
                     android:padding="7dp"
                     android:src="@drawable/ic_cancel_close"
-                    android:tint="@color/black_text_80" />
+                    app:tint="@color/black_text_80" />
 
             </LinearLayout>
 

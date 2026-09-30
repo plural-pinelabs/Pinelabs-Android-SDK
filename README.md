@@ -7,7 +7,7 @@ Android SDK for integrating Pine Labs Express Checkout.
 - Repository: JitPack
 - Group: `com.github.plural-pinelabs`
 - Artifact: `Pinelabs-Android-SDK`
-- Version: `1.5.3`
+- Version: `1.5.5`
 - Minimum Android SDK: 26
 
 Add JitPack to the merchant application's repositories:
@@ -27,14 +27,11 @@ Add the SDK dependency:
 
 ```kotlin
 dependencies {
-    implementation("com.github.plural-pinelabs:Pinelabs-Android-SDK:1.5.3")
+    implementation("com.github.plural-pinelabs:Pinelabs-Android-SDK:1.5.5")
 }
 ```
 
-## Version 1.5.3
+## Version 1.5.5
 
-- Uses long-lived root SPKI pins for the UAT and production endpoints.
-- Removes the Last9/OpenTelemetry dependency.
-- Includes release/R8 consumer rules for Retrofit, Gson, and Kotlin coroutines.
-- Improves UPI return handling through inquiry-driven terminal-state resolution.
-- Returns categorized initialization errors for TLS, connectivity, timeout, and HTTP failures.
+- Fixed production checkout initialization when the API returns a convenience-fee maximum amount larger than the 32-bit integer range.
+- Preserved the full maximum-fee value when sending the process-payment request.

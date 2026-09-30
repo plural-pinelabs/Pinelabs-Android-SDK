@@ -56,6 +56,7 @@ import com.plural_pinelabs.expresscheckoutsdk.data.model.EMIPaymentModeData
 import com.plural_pinelabs.expresscheckoutsdk.data.model.EmiData
 import com.plural_pinelabs.expresscheckoutsdk.data.model.Extra
 import com.plural_pinelabs.expresscheckoutsdk.data.model.Issuer
+import com.plural_pinelabs.expresscheckoutsdk.data.model.MaximumFeeAmount
 import com.plural_pinelabs.expresscheckoutsdk.data.model.OfferDetails
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ProcessPaymentRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.model.Tenure
@@ -666,10 +667,10 @@ class TenureSelectionFragment : Fragment() {
                 amount = convenienceFeeBreakdown.applicable_fee_amount?.value ?: 0,
                 value = 0
             ),
-            convenienceFeesMaximumFeeAmount = Amount(
+            convenienceFeesMaximumFeeAmount = MaximumFeeAmount(
                 currency = convenienceFeeBreakdown.maximum_fee_amount?.currency ?: "INR",
-                amount = convenienceFeeBreakdown.maximum_fee_amount?.value ?: 0,
-                value = 0
+                amount = convenienceFeeBreakdown.maximum_fee_amount?.value ?: 0L,
+                value = 0L
             ),
             originalTxnAmount = Amount(
                 currency = convenienceFeeBreakdown.fee_calculated_on_amount?.currency ?: "INR",

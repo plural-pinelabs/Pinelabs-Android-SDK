@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@color/white"
@@ -17,7 +18,7 @@
         android:background="@drawable/upi_icb_close_bg"
         android:padding="7dp"
         android:src="@drawable/ic_cancel_close"
-        android:tint="@color/black_text_80" />
+        app:tint="@color/black_text_80" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -205,7 +206,7 @@
             android:layout_height="20dp"
             android:importantForAccessibility="no"
             android:src="@drawable/ic_info_icon"
-            android:tint="@color/black_text_70" />
+            app:tint="@color/black_text_70" />
 
         <TextView
             android:layout_width="0dp"

@@ -494,7 +494,7 @@ data class ConvenienceFeesData(
     val convenience_fees_fees_addition_amt_in_paise: Int,
     val final_amt_in_paise: Int,
     val transaction_amount: Int,
-    val convenience_fees_maximum_fee_amount: Int,
+    val convenience_fees_maximum_fee_amount: Long,
     val convenience_fees_applicable_fee_amount: Int,
     val currency: String
 ) : Parcelable
@@ -1057,6 +1057,19 @@ data class Amount(
     val amount: Int,
 ) : Parcelable
 
+/**
+ * The checkout API can use a value larger than [Int.MAX_VALUE] for an effectively
+ * unbounded convenience-fee limit. Keep this separate from regular transaction
+ * amounts so that the sentinel value is preserved when it is sent back in the
+ * process-payment request.
+ */
+@Parcelize
+data class MaximumFeeAmount(
+    val currency: String,
+    val value: Long,
+    val amount: Long,
+) : Parcelable
+
 @Parcelize
 data class ProcessingFeeDetails(
     val percentage: Double? = null,
@@ -1155,7 +1168,7 @@ data class ConvenienceFeeBreakdown(
     val fee_calculated_on_amount: Amount? = null,
     val fee_amount: Amount? = null,
     val tax_amount: Amount? = null,
-    val maximum_fee_amount: Amount? = null,
+    val maximum_fee_amount: MaximumFeeAmount? = null,
     val applicable_fee_amount: Amount? = null,
     val additional_fee_amount: Amount? = null,
 ) : Parcelable
@@ -1172,7 +1185,7 @@ data class ConvenienceFeesInfo(
     val convenienceFeesAmount: Amount? = null,
     val convenienceFeesGSTAmount: Amount? = null,
     val convenienceFeesAdditionalAmount: Amount? = null,
-    val convenienceFeesMaximumFeeAmount: Amount? = null,
+    val convenienceFeesMaximumFeeAmount: MaximumFeeAmount? = null,
     val convenienceFeesApplicableFeeAmount: Amount? = null,
     val originalTxnAmount: Amount? = null,
     val paymentModeType: String? = null,
@@ -1282,6 +1295,5 @@ data class LogResponse(
     val status: String,
     val message: String
 )
-
 
 
