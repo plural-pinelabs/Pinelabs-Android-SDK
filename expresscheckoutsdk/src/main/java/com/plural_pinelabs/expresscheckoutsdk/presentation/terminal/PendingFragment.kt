@@ -90,10 +90,15 @@ class PendingFragment : Fragment() {
                 ExpressSDKObject.getFetchData()?.transactionInfo?.orderId
             )
         } else {
+            val isUpiPending = ExpressSDKObject.isUpiPendingOutcome()
             ExpressSDKObject.getCallback()?.onError(
                 "1003",
-                "Failure for Pending Transaction",
-                message,
+                if (isUpiPending) "Transaction Pending" else "Failure for Pending Transaction",
+                if (isUpiPending) {
+                    "Payment confirmation is still pending. Verify the order status before retrying."
+                } else {
+                    message
+                },
                 ExpressSDKObject.getFetchData()?.transactionInfo?.orderId
             )
         }// Replace with actual success data if needed

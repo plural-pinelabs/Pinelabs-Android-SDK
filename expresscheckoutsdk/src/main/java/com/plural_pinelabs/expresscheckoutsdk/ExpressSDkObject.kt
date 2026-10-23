@@ -7,6 +7,7 @@ import com.plural_pinelabs.expresscheckoutsdk.data.model.FetchResponseDTO
 import com.plural_pinelabs.expresscheckoutsdk.data.model.OfferDetail
 import com.plural_pinelabs.expresscheckoutsdk.data.model.ProcessPaymentResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.Tenure
+import com.plural_pinelabs.expresscheckoutsdk.data.model.TransactionStatusResponse
 import com.plural_pinelabs.expresscheckoutsdk.data.model.WalletAddMoneyResponse
 import java.util.Locale
 import java.util.concurrent.atomic.AtomicBoolean
@@ -19,6 +20,8 @@ internal data class SDKObject(
     val sandBoxMode: Boolean = false,
     var fetchResponseDTO: FetchResponseDTO? = null,
     var processPaymentResponse: ProcessPaymentResponse? = null,
+    var confirmedTransactionStatusResponse: TransactionStatusResponse? = null,
+    var isUpiPendingOutcome: Boolean = false,
     var walletAddMoneyResponse: WalletAddMoneyResponse? = null,
     var selectedMode: String? = null,
     var phoneNumber: String? = null,
@@ -165,6 +168,24 @@ internal object ExpressSDKObject {
     fun getProcessPaymentResponse(): ProcessPaymentResponse? {
         return getSDKObject()?.processPaymentResponse
     }
+
+    fun setConfirmedTransactionStatus(response: TransactionStatusResponse) {
+        getSDKObject()?.confirmedTransactionStatusResponse = response
+    }
+
+    fun getConfirmedTransactionStatus(): TransactionStatusResponse? {
+        return getSDKObject()?.confirmedTransactionStatusResponse
+    }
+
+    fun clearConfirmedTransactionStatus() {
+        getSDKObject()?.confirmedTransactionStatusResponse = null
+    }
+
+    fun setUpiPendingOutcome(isPending: Boolean) {
+        getSDKObject()?.isUpiPendingOutcome = isPending
+    }
+
+    fun isUpiPendingOutcome(): Boolean = getSDKObject()?.isUpiPendingOutcome == true
 
     fun setWalletAddMoneyResponse(response: WalletAddMoneyResponse?) {
         getSDKObject()?.walletAddMoneyResponse = response

@@ -67,6 +67,7 @@ interface ExpressRepository {
     suspend fun transactionStatus(
         token: String?,
         orderId: String? = null,
+        paymentId: String? = null,
     ): Flow<BaseResult<TransactionStatusResponse>>
 
     suspend fun graphQl(

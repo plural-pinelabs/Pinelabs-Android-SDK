@@ -23,6 +23,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.plural_pinelabs.expresscheckoutsdk.ExpressSDKObject
 import com.plural_pinelabs.expresscheckoutsdk.R
 import com.plural_pinelabs.expresscheckoutsdk.common.BaseResult
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.AUTHORIZED_STATUS
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.BRAND_WALLET_ID
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.NET_BANKING
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PAYMENT_REFERENCE_TYPE_CARD
@@ -88,7 +89,19 @@ class SuccessFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setUpViews(view)
         observeViewModel()
-        viewModel.getTransactionStatus(ExpressSDKObject.getToken())
+        val confirmedStatus = ExpressSDKObject.getConfirmedTransactionStatus()
+        if (confirmedStatus != null) {
+            // UPI has already reached an authoritative terminal success. Reuse that exact
+            // payment-scoped response instead of issuing a second unscoped inquiry.
+            updateViews(
+                response = confirmedStatus,
+                preferredPaymentId = ExpressSDKObject.getProcessPaymentResponse()?.payment_id,
+                includeAuthorized = true,
+            )
+            handleTimer()
+        } else {
+            viewModel.getTransactionStatus(ExpressSDKObject.getToken())
+        }
     }
 
     private fun setUpViews(view: View) {
@@ -146,53 +159,7 @@ class SuccessFragment : Fragment() {
 
                         is BaseResult.Success<TransactionStatusResponse> -> {
                             bottomSheetDialog?.dismiss()
-                            val status = it.data.data.status
-                            when (status) {
-                                PROCESSED_PENDING -> {
-                                    ExpressSDKObject.setCreatedAt(it.data.data.order_summary?.created_at)
-                                    findNavController().navigate(R.id.action_successFragment_to_pendingFragment)
-                                }
-
-                                PROCESSED_CREATED -> {
-                                    findNavController().navigate(R.id.action_successFragment_to_retryFragment)
-                                }
-
-                                PROCESSED_STATUS -> {
-                                    updateViews(it.data)
-                                    handleTimer()
-                                }
-
-                                PROCESSED_ATTEMPTED -> {
-                                    if (it.data.data.is_retry_available)
-                                        findNavController().navigate(R.id.action_successFragment_to_retryFragment)
-                                    else
-                                        findNavController().navigate(R.id.action_successFragment_to_failureFragment)
-                                    SdkLogger.log(
-                                        requireContext(),
-                                        "SUCCESS_TRANSACTION_ATTEMPTED",
-                                        "Transaction status is $status and retry is ${it.data.data.is_retry_available}",
-                                        it.data.data.order_id,
-                                        "HIGH",
-                                        "SDK"
-                                    )
-                                }
-
-                                PROCESSED_FAILED, PROCESSED_CANCELLED -> {
-                                    findNavController().navigate(R.id.action_successFragment_to_failureFragment)
-                                    SdkLogger.log(
-                                        requireContext(),
-                                        "SUCCESS_TRANSACTION_FAILED",
-                                        "Transaction status is $status",
-                                        it.data.data.order_id,
-                                        "HIGH",
-                                        "SDK"
-                                    )
-                                    viewModel.logData(
-                                        ExpressSDKObject.getToken(),
-                                        Utils.getUnSyncedErrors(requireContext())
-                                    )
-                                }
-                            }
+                            handleTransactionStatus(it.data)
                         }
                     }
                 }
@@ -233,14 +200,71 @@ class SuccessFragment : Fragment() {
 
     }
 
-    private fun updateViews(response: TransactionStatusResponse) {
+    private fun handleTransactionStatus(response: TransactionStatusResponse) {
+        val status = response.data.status
+        when (status) {
+            PROCESSED_PENDING -> {
+                ExpressSDKObject.setCreatedAt(response.data.order_summary?.created_at)
+                findNavController().navigate(R.id.action_successFragment_to_pendingFragment)
+            }
+
+            PROCESSED_CREATED -> {
+                findNavController().navigate(R.id.action_successFragment_to_retryFragment)
+            }
+
+            PROCESSED_STATUS -> {
+                updateViews(response)
+                handleTimer()
+            }
+
+            PROCESSED_ATTEMPTED -> {
+                if (response.data.is_retry_available) {
+                    findNavController().navigate(R.id.action_successFragment_to_retryFragment)
+                } else {
+                    findNavController().navigate(R.id.action_successFragment_to_failureFragment)
+                }
+                SdkLogger.log(
+                    requireContext(),
+                    "SUCCESS_TRANSACTION_ATTEMPTED",
+                    "Transaction status is $status and retry is ${response.data.is_retry_available}",
+                    response.data.order_id,
+                    "HIGH",
+                    "SDK"
+                )
+            }
+
+            PROCESSED_FAILED, PROCESSED_CANCELLED -> {
+                findNavController().navigate(R.id.action_successFragment_to_failureFragment)
+                SdkLogger.log(
+                    requireContext(),
+                    "SUCCESS_TRANSACTION_FAILED",
+                    "Transaction status is $status",
+                    response.data.order_id,
+                    "HIGH",
+                    "SDK"
+                )
+                viewModel.logData(
+                    ExpressSDKObject.getToken(),
+                    Utils.getUnSyncedErrors(requireContext())
+                )
+            }
+        }
+    }
+
+    private fun updateViews(
+        response: TransactionStatusResponse,
+        preferredPaymentId: String? = null,
+        includeAuthorized: Boolean = false,
+    ) {
         val orderSummary = response.data.order_summary
-        val paymentsData = orderSummary?.payments?.filter { it.status == PROCESSED_STATUS }
-        val paymentData = paymentsData?.get(0)
+        val paymentsData = orderSummary?.payments?.filter {
+            it.status == PROCESSED_STATUS || (includeAuthorized && it.status == AUTHORIZED_STATUS)
+        }
+        val paymentData = paymentsData?.firstOrNull { it.id == preferredPaymentId }
+            ?: paymentsData?.firstOrNull()
         dateTimeValueText.text = formatToReadableDate(orderSummary?.updated_at ?: "")
         orderNumberValueText.text = response.data.order_id
-        transactionIdValueText.text =
-            orderSummary?.payments?.find { it.status == PROCESSED_STATUS }?.id ?: ""
+        transactionIdValueText.text = paymentData?.id ?: ""
         if (paymentData != null) {
             cardDotsView.visibility = View.GONE
             cardsDivider.visibility = View.GONE

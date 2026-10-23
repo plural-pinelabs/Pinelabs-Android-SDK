@@ -118,6 +118,7 @@ interface CommonApiService : ApiService {
             encoded = true
         ) token: String?,
         @Query("order_id", encoded = true) orderId: String? = null,
+        @Query("payment_id", encoded = true) paymentId: String? = null,
     ): Response<TransactionStatusResponse>
 
     @POST("offer/validate")

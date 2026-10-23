@@ -173,6 +173,9 @@
         <action
             android:id="@+id/action_UPIFragment_to_retryFragment"
             app:destination="@id/retryFragment" />
+        <action
+            android:id="@+id/action_UPIFragment_to_pendingFragment"
+            app:destination="@id/pendingFragment" />
     </fragment>
     <fragment
         android:id="@+id/failureFragment"

@@ -56,14 +56,14 @@ import com.plural_pinelabs.expresscheckoutsdk.common.BaseResult
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.BHIM_UPI
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.CRED_UPI
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.GPAY
-import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PROCESSED_ATTEMPTED
-import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PROCESSED_FAILED
-import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PROCESSED_PENDING
-import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PROCESSED_STATUS
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.BRAND_WALLET_ID
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.NAVI_UPI
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PAYTM
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PHONEPE
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PROCESSED_ATTEMPTED
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PROCESSED_FAILED
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PROCESSED_PENDING
+import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PROCESSED_STATUS
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.SUPERMONEY_UPI
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.UPI_ID
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.UPI_INTENT
@@ -1538,6 +1538,8 @@ class UPIFragment : Fragment() {
                 if (bottomTimerSheetDialog?.isShowing != true) {
                     showProcessPaymentTimerDialog()
                 }
+                // The brand-wallet charge-order contract is queried by order id. Keep this
+                // separate from regular UPI, which must always be scoped by payment id.
                 viewModel.beginPaymentMonitoring(inquiryOrderId)
                 logUpiFlowEvent(
                     event = "UPI_APP_LAUNCHED",
@@ -1619,6 +1621,8 @@ class UPIFragment : Fragment() {
     }
 
     private fun initProcessPayment(processPaymentRequest: ProcessPaymentRequest) {
+        ExpressSDKObject.clearConfirmedTransactionStatus()
+        ExpressSDKObject.setUpiPendingOutcome(false)
         viewModel.processPayment(
             token = ExpressSDKObject.getToken(),
             paymentData = processPaymentRequest
@@ -1640,7 +1644,7 @@ class UPIFragment : Fragment() {
                                 return@collect
                             }
                             cancelTransactionProcess()
-                            safeNavigate(R.id.action_UPIFragment_to_successFragment)
+                            safeNavigate(R.id.action_UPIFragment_to_failureFragment)
                         }
 
                         is BaseResult.Loading -> {
@@ -1660,6 +1664,23 @@ class UPIFragment : Fragment() {
                             }
                             bottomSheetDialog?.dismiss()
                             ExpressSDKObject.setProcessPaymentResponse(it.data)
+                            if (!flowMode.equals(BRAND_WALLET_ID, true) &&
+                                it.data.payment_id.isNullOrBlank()
+                            ) {
+                                logUpiFlowEvent(
+                                    event = "UPI_PAYMENT_ID_MISSING",
+                                    message = "Process-payment succeeded without a payment id",
+                                    severity = "HIGH",
+                                )
+                                Toast.makeText(
+                                    requireContext(),
+                                    "Unable to verify this UPI payment. Please try again.",
+                                    Toast.LENGTH_SHORT,
+                                ).show()
+                                cancelTransactionProcess()
+                                viewModel.resetPaymentFlowResponse()
+                                return@collect
+                            }
                             val didLaunchUpiApp =
                                 if (mTransactionMode == UPI_INTENT) {
                                     showUpiTray(
@@ -1667,7 +1688,11 @@ class UPIFragment : Fragment() {
                                         upiAppPackageName = selectUPIPackage
                                     )
                                 } else if (mTransactionMode == UPI_INTENT_QR && isQRPayment) {
-                                    viewModel.beginPaymentMonitoring(startTimer = false)
+                                    viewModel.beginPaymentMonitoring(
+                                        orderId = it.data.order_id,
+                                        paymentId = it.data.payment_id,
+                                        startTimer = false,
+                                    )
                                     true
                                 } else {
                                     showUpiTray(
@@ -1687,7 +1712,11 @@ class UPIFragment : Fragment() {
                             }
                             bottomSheetDialog?.dismiss()
                             if (!isQRPayment) {
-                                viewModel.beginPaymentMonitoring()
+                                viewModel.beginPaymentMonitoring(
+                                    orderId = it.data.order_id
+                                        ?: ExpressSDKObject.getFetchData()?.transactionInfo?.orderId,
+                                    paymentId = it.data.payment_id,
+                                )
                                 logUpiFlowEvent(
                                     event = "UPI_APP_LAUNCHED",
                                     message = "UPI app launched; backend inquiry started"
@@ -1706,16 +1735,13 @@ class UPIFragment : Fragment() {
                 viewModel.transactionStatusResult.collect {
                     when (it) {
                         is BaseResult.Error -> {
-                            //Throw error and exit SDK
-                            //TODO Pass error message and description
-                            if (!viewModel.tryHandleTerminalResult()) return@collect
+                            // The polling loop will retry. A transient inquiry failure is not a
+                            // terminal payment result and must not override a payment still in flight.
                             logUpiFlowEvent(
                                 event = "UPI_INQUIRY_ERROR",
-                                message = it.errorMessage ?: "UPI inquiry failed",
-                                severity = "HIGH"
+                                message = "${it.errorCode}: ${it.errorMessage ?: "UPI inquiry failed; retrying"}",
+                                severity = "MEDIUM"
                             )
-                            cancelTransactionProcess()
-                            safeNavigate(R.id.action_UPIFragment_to_failureFragment)
                         }
 
                         is BaseResult.Loading -> {
@@ -1723,52 +1749,7 @@ class UPIFragment : Fragment() {
                         }
 
                         is BaseResult.Success<TransactionStatusResponse> -> {
-                            val status = it.data.data.status
-                            when (status) {
-
-                                PROCESSED_PENDING -> {
-                                    // Do nothing, we will keep polling for the transaction status
-                                    val deepLink = it.data.data.deep_link
-                                    if (!deepLink.isNullOrEmpty() && !consumedDeepLink && isQRPayment) {
-                                        consumedDeepLink = true
-                                        //show QR
-                                        showQRBottomSheet(deepLink)
-                                    }
-                                }
-
-
-                                PROCESSED_STATUS -> {
-                                    if (!viewModel.tryHandleTerminalResult()) return@collect
-                                    logUpiTerminalStatus(status)
-                                    if (flowMode.equals(BRAND_WALLET_ID, true)) {
-                                        startBrandWalletOtpFlowAfterUpi()
-                                        viewModel.resetTransactionResponse()
-                                        return@collect
-                                    }
-                                    cancelTransactionProcess()
-                                    safeNavigate(R.id.action_UPIFragment_to_successFragment)
-                                }
-
-                                PROCESSED_ATTEMPTED -> {
-                                    if (!viewModel.tryHandleTerminalResult()) return@collect
-                                    logUpiTerminalStatus(status)
-                                    if (flowMode.equals(BRAND_WALLET_ID, true)) {
-                                        startBrandWalletOtpFlowAfterUpi()
-                                        viewModel.resetTransactionResponse()
-                                        return@collect
-                                    }
-                                    cancelTransactionProcess()
-                                    safeNavigate(R.id.action_UPIFragment_to_successFragment)
-
-                                }
-
-                                PROCESSED_FAILED -> {
-                                    if (!viewModel.tryHandleTerminalResult()) return@collect
-                                    logUpiTerminalStatus(status)
-                                    cancelTransactionProcess()
-                                    safeNavigate(R.id.action_UPIFragment_to_successFragment)
-                                }
-                            }
+                            handleUpiInquiryResponse(it.data)
                             viewModel.resetTransactionResponse()
                         }
                     }
@@ -2060,6 +2041,107 @@ class UPIFragment : Fragment() {
         return customerInfo?.customer_id ?: customerInfo?.customerId
     }
 
+    private fun handleUpiInquiryResponse(
+        response: TransactionStatusResponse,
+        deadlineReached: Boolean = false,
+    ) {
+        if (flowMode.equals(BRAND_WALLET_ID, true)) {
+            handleBrandWalletInquiryResponse(response, deadlineReached)
+            return
+        }
+
+        val resolution = viewModel.resolveInquiryStatus(response)
+        when (resolution.outcome) {
+            UpiInquiryOutcome.KEEP_POLLING -> {
+                if (deadlineReached) {
+                    navigateToPending(response)
+                    return
+                }
+                val deepLink = response.data.deep_link
+                if (!deepLink.isNullOrEmpty() && !consumedDeepLink && isQRPayment) {
+                    consumedDeepLink = true
+                    showQRBottomSheet(deepLink)
+                }
+            }
+
+            UpiInquiryOutcome.SUCCESS -> {
+                if (!viewModel.tryHandleTerminalResult()) return
+                logUpiTerminalStatus(resolution.status ?: "UNKNOWN")
+                ExpressSDKObject.setConfirmedTransactionStatus(response)
+                cancelTransactionProcess()
+                safeNavigate(R.id.action_UPIFragment_to_successFragment)
+            }
+
+            UpiInquiryOutcome.ATTEMPT_FAILED -> {
+                if (response.data.is_retry_available) {
+                    if (!viewModel.tryHandleTerminalResult()) return
+                    logUpiTerminalStatus(resolution.status ?: "UNKNOWN")
+                    cancelTransactionProcess()
+                    safeNavigate(R.id.action_UPIFragment_to_retryFragment)
+                } else if (deadlineReached) {
+                    // The payment attempt ended, but the order has not reached an authoritative
+                    // FAILED/CANCELLED state. Do not manufacture a final failure from that race.
+                    navigateToPending(response)
+                }
+            }
+
+            UpiInquiryOutcome.FAILURE -> {
+                if (!viewModel.tryHandleTerminalResult()) return
+                logUpiTerminalStatus(resolution.status ?: "UNKNOWN")
+                cancelTransactionProcess()
+                safeNavigate(R.id.action_UPIFragment_to_failureFragment)
+            }
+        }
+    }
+
+    /** Preserve the existing brand-wallet charge-order behavior. */
+    private fun handleBrandWalletInquiryResponse(
+        response: TransactionStatusResponse,
+        deadlineReached: Boolean,
+    ) {
+        when (response.data.status) {
+            PROCESSED_PENDING -> {
+                if (deadlineReached) navigateToPending(response)
+            }
+
+            PROCESSED_STATUS, PROCESSED_ATTEMPTED -> {
+                if (!viewModel.tryHandleTerminalResult()) return
+                logUpiTerminalStatus(response.data.status)
+                startBrandWalletOtpFlowAfterUpi()
+                viewModel.resetTransactionResponse()
+            }
+
+            PROCESSED_FAILED -> {
+                if (!viewModel.tryHandleTerminalResult()) return
+                logUpiTerminalStatus(response.data.status)
+                cancelTransactionProcess()
+                safeNavigate(R.id.action_UPIFragment_to_successFragment)
+            }
+
+            else -> if (deadlineReached) navigateToPending(response)
+        }
+    }
+
+    private suspend fun reconcileAtDeadline() {
+        when (val result = viewModel.performFinalInquiry()) {
+            is BaseResult.Success -> handleUpiInquiryResponse(result.data, deadlineReached = true)
+            is BaseResult.Error, is BaseResult.Loading, null -> navigateToPending()
+        }
+    }
+
+    private fun navigateToPending(response: TransactionStatusResponse? = null) {
+        if (!viewModel.tryHandleTerminalResult()) return
+        ExpressSDKObject.setCreatedAt(response?.data?.order_summary?.created_at)
+        ExpressSDKObject.setUpiPendingOutcome(true)
+        logUpiFlowEvent(
+            event = "UPI_INQUIRY_UNRESOLVED",
+            message = "UPI inquiry remained unresolved at the verification deadline",
+            severity = "MEDIUM",
+        )
+        cancelTransactionProcess()
+        safeNavigate(R.id.action_UPIFragment_to_pendingFragment)
+    }
+
 
     private fun cancelTransactionProcess() {
         viewModel.isShowingUPIDialog = false
@@ -2143,8 +2225,7 @@ class UPIFragment : Fragment() {
                     secondsRemaining % 60
                 )
                 if (millisUntilFinished == 0L) {
-                    //throw error timer ended
-                    cancelTransactionProcess()
+                    reconcileAtDeadline()
                 }
             }
         }
@@ -2251,9 +2332,6 @@ class UPIFragment : Fragment() {
         }
         startQRTimer(timerText)
         qrBottomSheetDialog?.show()
-        qrBottomSheetDialog?.setOnDismissListener {
-            cancelTransactionProcess()
-        }
     }
 
     private var qrCountDownTimer: CountDownTimer? = null
@@ -2261,7 +2339,13 @@ class UPIFragment : Fragment() {
     private fun startQRTimer(timerText: TextView) {
 
         qrCountDownTimer?.cancel() // cancel if already running
-        val millis: Long = if (ExpressSDKObject.isSandBoxMode()) 120_000 else 600_000
+        val millis = viewModel.remainingPaymentTimeMillis()
+        if (millis <= 0L) {
+            viewLifecycleOwner.lifecycleScope.launch {
+                reconcileAtDeadline()
+            }
+            return
+        }
         qrCountDownTimer = object : CountDownTimer(millis, 1_000) { // 60 sec, tick every 1 sec
 
             override fun onTick(millisUntilFinished: Long) {
@@ -2295,9 +2379,9 @@ class UPIFragment : Fragment() {
             }
 
             override fun onFinish() {
-                qrBottomSheetDialog?.dismiss()
-                cancelTransactionProcess()
-                safeNavigate(R.id.action_UPIFragment_to_successFragment)
+                viewLifecycleOwner.lifecycleScope.launch {
+                    reconcileAtDeadline()
+                }
             }
 
         }.start()
