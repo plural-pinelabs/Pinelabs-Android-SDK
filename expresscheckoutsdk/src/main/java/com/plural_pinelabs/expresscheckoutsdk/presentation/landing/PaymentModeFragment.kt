@@ -74,6 +74,7 @@ import com.plural_pinelabs.expresscheckoutsdk.common.safeNavigate
 import com.plural_pinelabs.expresscheckoutsdk.data.model.Address
 import com.plural_pinelabs.expresscheckoutsdk.data.model.BrandWalletBalance
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CardTokenData
+import com.plural_pinelabs.expresscheckoutsdk.data.model.CardMetaData
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CreateWalletAddress
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CreateWalletCustomer
 import com.plural_pinelabs.expresscheckoutsdk.data.model.CreateWalletRequest
@@ -102,6 +103,8 @@ import com.plural_pinelabs.expresscheckoutsdk.data.model.WalletValidateRequest
 import com.plural_pinelabs.expresscheckoutsdk.data.model.WalletValidateResponse
 import com.plural_pinelabs.expresscheckoutsdk.presentation.LandingActivity
 import com.plural_pinelabs.expresscheckoutsdk.presentation.card.CardFragmentViewModel
+import com.plural_pinelabs.expresscheckoutsdk.presentation.card.resolveCardPaymentAmount
+import com.plural_pinelabs.expresscheckoutsdk.presentation.card.resolveSavedCardConvenienceFee
 import com.plural_pinelabs.expresscheckoutsdk.presentation.offers.OfferSummaryDialog
 import com.plural_pinelabs.expresscheckoutsdk.presentation.utils.DividerItemDecoration
 import kotlinx.coroutines.Job
@@ -578,9 +581,23 @@ class PaymentModeFragment : Fragment() {
             safeNavigate(R.id.action_paymentModeFragment_to_successFragment)
         }
         val customerInfo = ExpressSDKObject.getFetchData()?.customerInfo
-        val amount = paymentData?.originalTxnAmount?.amount
-        val currency = paymentData?.originalTxnAmount?.currency
-        val cardTokenData = CardTokenData(savedCardTokens.tokenId, savedCardTokens.cvvInput)
+        val baseAmount = paymentData?.originalTxnAmount?.amount ?: ExpressSDKObject.getAmount()
+        val currency = paymentData?.originalTxnAmount?.currency ?: ExpressSDKObject.getCurrency()
+        val selectedFee = resolveSavedCardConvenienceFee(
+            convenienceFees = ExpressSDKObject.getFetchData()?.convenienceFeesInfo,
+            cardNetwork = savedCardTokens.cardData.networkName,
+        )
+        val amount = resolveCardPaymentAmount(
+            baseAmount = baseAmount,
+            selectedConvenienceFee = selectedFee,
+            isPayByPoints = false,
+            redeemableAmount = 0,
+        )
+        val cardTokenData = CardTokenData(
+            token_id = savedCardTokens.tokenId,
+            cvv = savedCardTokens.cvvInput,
+            card_last_4_digits = savedCardTokens.cardData.last4Digit,
+        )
         val customerInfoData = CustomerData(
             emailId = customerInfo?.emailId ?: "",
             mobileNo = customerInfo?.mobileNumber ?: customerInfo?.mobileNo ?: ""
@@ -588,33 +605,32 @@ class PaymentModeFragment : Fragment() {
         val paymentMode = arrayListOf<String>()
         paymentMode.add(Constants.CREDIT_DEBIT_ID)
 
-        val cardDataExtra =
-            Extra(
-                paymentMode,
-                amount,
-                currency,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,// dccstatus pass this from dcc api call
-                null
-            )
+        val cardDataExtra = Extra(
+            payment_mode = paymentMode,
+            payment_amount = amount,
+            payment_currency = currency,
+            card_last4 = savedCardTokens.cardData.last4Digit,
+            redeemable_amount = null,
+            registered_mobile_number = null,
+            txn_mode = null,
+            device_info = null,
+            risk_validation_details = null,
+            dcc_status = null,
+            sdk_data = Utils.createSDKData(requireActivity()),
+        )
 
-        val processPaymentRequest =
-            ProcessPaymentRequest(
-                cardTokenData,
-                customerInfoData,
-                null,
-                upi_data = null,
-                null,
-                null,
-                cardDataExtra,
-                null,
-                null
-            )
+        val processPaymentRequest = ProcessPaymentRequest(
+            card_token_data = cardTokenData,
+            customer_data = customerInfoData,
+            extras = cardDataExtra,
+            convenience_fee_data = selectedFee?.let(Utils::getConvenienceFeesRequest),
+            card_meta_data = selectedFee?.let { fee ->
+                CardMetaData(
+                    scheme_name = fee.networkType ?: savedCardTokens.cardData.networkName,
+                    card_type = fee.cardType ?: "CREDIT",
+                )
+            },
+        )
         return processPaymentRequest
     }
 

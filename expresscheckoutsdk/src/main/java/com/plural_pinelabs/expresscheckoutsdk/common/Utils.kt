@@ -1072,7 +1072,9 @@ internal object Utils {
                 ?: 0L,
             convenience_fees_applicable_fee_amount = selectedFees.convenienceFeesApplicableFeeAmount?.amount
                 ?: 0,
-            currency = selectedFees.paymentAmount?.currency ?: "INR"
+            currency = selectedFees.originalTxnAmount?.currency
+                ?: selectedFees.paymentAmount?.currency
+                ?: "INR"
         )
         return convenienceFeesData
     }

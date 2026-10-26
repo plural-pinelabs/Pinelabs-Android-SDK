@@ -28,11 +28,6 @@ import com.plural_pinelabs.expresscheckoutsdk.common.BaseResult
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.BFF_RESPONSE_HANDLER_ENDPOINT
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.IMAGE_LOGO
-import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PROCESSED_ATTEMPTED
-import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PROCESSED_CREATED
-import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PROCESSED_FAILED
-import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PROCESSED_PENDING
-import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PROCESSED_STATUS
 import com.plural_pinelabs.expresscheckoutsdk.common.NetworkHelper
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils.MTAG
 import com.plural_pinelabs.expresscheckoutsdk.data.model.SDKData
@@ -121,7 +116,8 @@ internal class ACSFragment : Fragment() {
                         }
 
                         is BaseResult.Success<TransactionStatusResponse> -> {
-                            val status = it.data.data.status
+                            val transaction = it.data.data
+                            val status = transaction.order_summary?.status ?: transaction.status
                             SdkLogger.log(
                                 requireContext(),
                                 "ACS_TRANSACTION_STATUS_SUCCESS",
@@ -130,22 +126,22 @@ internal class ACSFragment : Fragment() {
                                 "INFO",
                                 "SDK"
                             )
-                            when (status) {
-                                PROCESSED_PENDING, PROCESSED_CREATED -> {
+                            when (
+                                resolveAcsInquiryStatus(
+                                    orderStatus = transaction.order_summary?.status,
+                                    paymentStatus = transaction.status,
+                                )
+                            ) {
+                                AcsInquiryOutcome.KEEP_POLLING -> {
                                     // Do nothing, we will keep polling for the transaction status
                                 }
 
-                                PROCESSED_STATUS -> {
+                                AcsInquiryOutcome.SUCCESS -> {
                                     viewModel.stopPolling()
                                     findNavController().navigate(R.id.action_ACSFragment_to_successFragment)
                                 }
 
-                                PROCESSED_ATTEMPTED -> {
-                                    viewModel.stopPolling()
-                                    findNavController().navigate(R.id.action_ACSFragment_to_successFragment)
-                                }
-
-                                PROCESSED_FAILED -> {
+                                AcsInquiryOutcome.FAILURE -> {
                                     viewModel.stopPolling()
                                     findNavController().navigate(R.id.action_ACSFragment_to_failureFragment)
                                 }
@@ -214,7 +210,7 @@ internal class ACSFragment : Fragment() {
                     webAcs.visibility = View.GONE
                     constrainSuccess.visibility = View.VISIBLE
                     // viewModel.getTransactionStatus(ExpressSDKObject.getToken())
-                    viewModel.startPolling()
+                    viewModel.startPolling(token, orderId, paymentId)
 
                 }
             }
@@ -232,7 +228,7 @@ internal class ACSFragment : Fragment() {
             Log.d(MTAG, "ACS Interface response $response")
             webAcs.visibility = View.GONE
             constrainSuccess.visibility = View.VISIBLE
-            viewModel.getTransactionStatus(ExpressSDKObject.getToken())
+            viewModel.startPolling(token, orderId, paymentId)
         }
     }
 

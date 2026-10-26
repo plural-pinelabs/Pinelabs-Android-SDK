@@ -524,7 +524,8 @@ data class ProcessPaymentResponse(
 @Parcelize
 data class CardTokenData(
     val token_id: String?,
-    val cvv: String?
+    val cvv: String?,
+    val card_last_4_digits: String? = null,
 ) : Parcelable
 
 @Parcelize

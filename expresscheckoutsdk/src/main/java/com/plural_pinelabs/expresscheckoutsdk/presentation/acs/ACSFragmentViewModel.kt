@@ -2,7 +2,6 @@ package com.plural_pinelabs.expresscheckoutsdk.presentation.acs
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.plural_pinelabs.expresscheckoutsdk.ExpressSDKObject
 import com.plural_pinelabs.expresscheckoutsdk.common.BaseResult
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.UPI_TRANSACTION_STATUS_INTERVAL
 import com.plural_pinelabs.expresscheckoutsdk.data.model.TransactionStatusResponse
@@ -26,18 +25,18 @@ class ACSFragmentViewModel(private val expressRepositoryImpl: ExpressRepositoryI
     private var pollingJob: Job? = null
 
 
-    fun getTransactionStatus(token: String?) =
+    fun getTransactionStatus(token: String?, orderId: String?, paymentId: String?) =
         viewModelScope.launch(Dispatchers.IO) {
-            expressRepositoryImpl.transactionStatus(token).collect {
+            expressRepositoryImpl.transactionStatus(token, orderId, paymentId).collect {
                 _transactionStatusResult.value = it
             }
         }
 
-    fun startPolling() {
+    fun startPolling(token: String?, orderId: String?, paymentId: String?) {
         pollingJob?.cancel()
         pollingJob = viewModelScope.launch(Dispatchers.IO) {
             while (isActive) {
-                getTransactionStatus(ExpressSDKObject.getToken())
+                getTransactionStatus(token, orderId, paymentId)
                 delay(UPI_TRANSACTION_STATUS_INTERVAL)
             }
         }

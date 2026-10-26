@@ -35,7 +35,6 @@ import com.plural_pinelabs.expresscheckoutsdk.common.Constants.BROWSER_USER_AGEN
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.ERROR_KEY
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.ERROR_MESSAGE_KEY
 import com.plural_pinelabs.expresscheckoutsdk.common.NetworkHelper
-import com.plural_pinelabs.expresscheckoutsdk.common.PaymentModes
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils.cardIcons
 import com.plural_pinelabs.expresscheckoutsdk.common.Utils.cardTypes
@@ -722,7 +721,7 @@ class CardFragment : Fragment() {
             //TODO notify of payment failure
             findNavController().navigate(R.id.action_cardFragment_to_failureFragment)
         }
-        var amount = ExpressSDKObject.getAmount()
+        val baseAmount = ExpressSDKObject.getAmount()
         val currency = paymentData?.originalTxnAmount?.currency
         val resolvedOrderId = ExpressSDKObject.getFetchData()?.transactionInfo?.orderId
 
@@ -731,7 +730,6 @@ class CardFragment : Fragment() {
         paymentMode.add(Constants.CREDIT_DEBIT_ID)
         if (isPBPChecked) {
             paymentMode.add(Constants.PAY_BY_POINTS_ID)
-            amount = amount.minus(redeemableAmount)
         }
         val last4 = cardNumber.substring(cardNumber.length - 4, cardNumber.length)
 
@@ -756,10 +754,18 @@ class CardFragment : Fragment() {
             Utils.getLocalIpAddress().toString()
         )
         val selectedFees = viewModel.selectedConvenienceFee
+        val amount = resolveCardPaymentAmount(
+            baseAmount = baseAmount,
+            selectedConvenienceFee = selectedFees,
+            isPayByPoints = isPBPChecked,
+            redeemableAmount = redeemableAmount,
+        )
         val convenienceFeesData = selectedFees?.let { Utils.getConvenienceFeesRequest(it) }
         val cardMetaData: CardMetaData = CardMetaData(
-            binData?.card_payment_details?.get(0)?.card_network,
-            binData?.card_payment_details?.get(0)?.card_type
+            selectedFees?.networkType
+                ?: binData?.card_payment_details?.get(0)?.card_network,
+            selectedFees?.cardType
+                ?: binData?.card_payment_details?.get(0)?.card_type
         )
 
 
@@ -884,8 +890,7 @@ class CardFragment : Fragment() {
             setUpAmount()
             return
         }
-        viewModel.convenienceFeesInfo =
-            fetchData?.convenienceFeesInfo?.filter { it.paymentModeType == PaymentModes.CREDIT_DEBIT.paymentModeID }
+        viewModel.convenienceFeesInfo = fetchData?.convenienceFeesInfo
         (requireActivity() as LandingActivity).showHideConvenienceFessMessage(
             true,
             showDefaultCardMessage = true
@@ -897,36 +902,11 @@ class CardFragment : Fragment() {
     private fun processConvenienceFees(it: CardBinMetaDataResponse) {
         val cardNetwork = it.card_payment_details[0].card_network
         val cardType = it.card_payment_details[0].card_type
-        viewModel.selectedConvenienceFee =
-            viewModel.convenienceFeesInfo?.filter { fees ->
-                fees.networkType.equals(
-                    cardNetwork,
-                    true
-                )
-            }?.getOrNull(0)
-
-        viewModel.selectedConvenienceFee = viewModel.convenienceFeesInfo
-            ?.filter { fees ->
-                fees.networkType.equals(
-                    cardNetwork,
-                    ignoreCase = true
-                ) ||
-                        fees.networkType.equals(
-                            "DEFAULT",
-                            ignoreCase = true
-                        )
-            }
-            ?.let { filteredFees ->
-                // Try to find exact cardType match
-                filteredFees.find { fee ->
-                    fee.cardType.equals(
-                        cardType,
-                        ignoreCase = true
-                    )
-                } ?: filteredFees.find { fee ->
-                    fee.cardType.equals("DEFAULT", ignoreCase = true)
-                }
-            }
+        viewModel.selectedConvenienceFee = resolveCardConvenienceFee(
+            convenienceFees = viewModel.convenienceFeesInfo,
+            cardNetwork = cardNetwork,
+            cardType = cardType,
+        )
 
 
 
