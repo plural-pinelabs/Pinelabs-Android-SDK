@@ -24,6 +24,7 @@ import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PROCESSED_ATTEMPT
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PROCESSED_FAILED
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PROCESSED_PENDING
 import com.plural_pinelabs.expresscheckoutsdk.common.Constants.PROCESSED_STATUS
+import com.plural_pinelabs.expresscheckoutsdk.common.Utils
 import com.plural_pinelabs.expresscheckoutsdk.common.NetworkHelper
 import com.plural_pinelabs.expresscheckoutsdk.common.SplashViewModelFactory
 import com.plural_pinelabs.expresscheckoutsdk.data.model.FetchResponseDTO
@@ -230,6 +231,14 @@ class SplashFragment : Fragment() {
     private fun navD2C() {
         val mobileNo = ExpressSDKObject.getFetchData()?.customerInfo?.mobileNo
         val address = ExpressSDKObject.getFetchData()?.shippingAddress
+        val goToPaymentLanding = {
+            if (Utils.isOnlyUpiAvailable()) {
+                ExpressSDKObject.setSelectedMode(null)
+                findNavController().navigate(R.id.action_splashFragment_to_UPIFragment)
+            } else {
+                findNavController().navigate(R.id.action_splashFragment_to_paymentModeFragment)
+            }
+        }
         val addressCollectionFlag =
             ExpressSDKObject.getFetchData()?.merchantMetadata?.express_checkout_allowed_action?.contains(
                 "checkoutCollectAddress"
@@ -241,7 +250,7 @@ class SplashFragment : Fragment() {
 
         if (address?.address1 != null && !mobileNo.isNullOrBlank()) {
             ExpressSDKObject.setSelectedAddress(ExpressSDKObject.getFetchData()?.shippingAddress)
-            findNavController().navigate(R.id.action_splashFragment_to_paymentModeFragment)
+            goToPaymentLanding()
         } else if (address?.id == null && addressCollectionFlag == true) {
             findNavController().navigate(R.id.action_splashFragment_to_phoneNumberFragment)
             // navigate to phone
@@ -249,8 +258,7 @@ class SplashFragment : Fragment() {
             // navigate to phone
             findNavController().navigate(R.id.action_splashFragment_to_phoneNumberFragment)
         } else {
-            findNavController().navigate(R.id.action_splashFragment_to_paymentModeFragment)
-            // navigate to payment
+            goToPaymentLanding()
         }
     }
 

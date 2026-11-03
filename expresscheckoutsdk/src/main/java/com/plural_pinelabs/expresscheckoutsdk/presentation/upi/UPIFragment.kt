@@ -381,8 +381,10 @@ class UPIFragment : Fragment() {
             usertappedapp = "upi intent"
             payAction(UPI_INTENT)
         }
-        view.findViewById<ImageView>(R.id.back_button).setOnClickListener {
-            findNavController().popBackStack()
+        view.findViewById<ImageView>(R.id.back_button).apply {
+            // Direct UPI entry from splash has no screen to go back to.
+            if (findNavController().previousBackStackEntry == null) visibility = View.GONE
+            setOnClickListener { findNavController().popBackStack() }
         }
 
         val upiFlows = getUPiFLowsList()

@@ -7,7 +7,7 @@ Android SDK for integrating Pine Labs Express Checkout.
 - Repository: JitPack
 - Group: `com.github.plural-pinelabs`
 - Artifact: `Pinelabs-Android-SDK`
-- Version: `1.5.5`
+- Version: `1.5.8`
 - Minimum Android SDK: 26
 
 Add JitPack to the merchant application's repositories:
@@ -31,7 +31,7 @@ dependencies {
 }
 ```
 
-## Version 1.5.5
+## Version 1.5.8
 
 - Fixed production checkout initialization when the API returns a convenience-fee maximum amount larger than the 32-bit integer range.
 - Preserved the full maximum-fee value when sending the process-payment request.

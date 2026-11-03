@@ -18,6 +18,11 @@
             android:id="@+id/action_splashFragment_to_paymentModeFragment"
             app:destination="@id/paymentModeFragment" />
         <action
+            android:id="@+id/action_splashFragment_to_UPIFragment"
+            app:destination="@id/UPIFragment"
+            app:popUpTo="@id/splashFragment"
+            app:popUpToInclusive="true" />
+        <action
             android:id="@+id/action_splashFragment_to_cardFragment"
             app:destination="@id/cardFragment" />
         <action

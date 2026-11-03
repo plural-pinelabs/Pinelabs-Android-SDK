@@ -270,6 +270,26 @@ internal object Utils {
     }
 
 
+    fun getVisiblePaymentModes(): List<PaymentMode>? {
+        val knownModeIds = PaymentModes.entries.map { it.paymentModeID.lowercase() }
+        val fetchData = ExpressSDKObject.getFetchData()
+        val hasToken = !fetchData?.customerInfo?.tokens.isNullOrEmpty()
+        return fetchData?.paymentModes?.filter {
+            val isCard = it.paymentModeId == PaymentModes.CREDIT_DEBIT.paymentModeID
+            it.paymentModeData != null && knownModeIds.contains(it.paymentModeId.lowercase()) &&
+                    !(isCard && hasToken)
+        }
+    }
+
+    fun isOnlyUpiAvailable(): Boolean {
+        val hasBrandWallet = ExpressSDKObject.getFetchData()?.paymentModes?.any {
+            it.paymentModeId.equals(Constants.BRAND_WALLET_ID, true)
+        } == true
+        if (hasBrandWallet) return false
+        val modes = getVisiblePaymentModes().orEmpty()
+        return modes.size == 1 && modes[0].paymentModeId == PaymentModes.UPI.paymentModeID
+    }
+
     fun mapPaymentModes(paymentMode: PaymentMode): RecyclerViewPaymentOptionData {
 
         var paymentModeData = RecyclerViewPaymentOptionData()

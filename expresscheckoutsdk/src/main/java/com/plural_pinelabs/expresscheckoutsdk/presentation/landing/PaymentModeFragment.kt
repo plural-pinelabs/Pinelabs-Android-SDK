@@ -2010,18 +2010,7 @@ class PaymentModeFragment : Fragment() {
     }
 
     private fun getPaymentModes(): List<PaymentMode>? {
-        val availablePaymentModes: ArrayList<String> = arrayListOf()
-        PaymentModes.entries.forEach {
-            availablePaymentModes.add(it.paymentModeID.lowercase())
-        }
-        val filteredPaymentModes = ExpressSDKObject.getFetchData()?.paymentModes?.filter {
-
-            val isCard = it.paymentModeId == PaymentModes.CREDIT_DEBIT.paymentModeID
-            val hasToken = !ExpressSDKObject.getFetchData()?.customerInfo?.tokens.isNullOrEmpty()
-            it.paymentModeData != null && availablePaymentModes.contains(it.paymentModeId.lowercase()) &&
-                    !(isCard && hasToken)
-        }
-        return filteredPaymentModes
+        return Utils.getVisiblePaymentModes()
     }
 
     private fun getBrandWalletPaymentMode(): PaymentMode? {
